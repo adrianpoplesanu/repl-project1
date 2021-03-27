@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'check2'
+    'check2',
+    'adrianus'
 ]
 
 MIDDLEWARE = [

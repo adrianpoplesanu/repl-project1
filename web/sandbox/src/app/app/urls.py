@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from check2.views import check2
+from adrianus.views import home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('check2.txt', check2),
+    path('', home)
 ]
