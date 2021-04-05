@@ -1,4 +1,6 @@
 #include <iostream>
+#include "token.h"
+#include "token.cpp"
 using namespace std;
 
 int main(int argc, char *argv[]) {
