@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title>Adrianus interpreter JS version tester</title>
+	<script type="text/javascript" src="src/token.js"></script>
+	<script type="text/javascript" src="src/lexer.js"></script>
+	<script type="text/javascript" src="src/repl.js"></script>
+	<script>
+		function run() {
+			console.log("running....");
+			var lexer = new Lexer();
+			var repl = new Repl(lexer);
+			repl.load("aaa");
+			repl.run();
+		}
+	</script>
+</head>
+<body>
+	<textarea>
+	</textarea>
+	<div>
+		<button onClick="run();">Run</button>
+	</div>
+</body>
+</html>
