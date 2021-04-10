@@ -1,10 +1,21 @@
 <html>
 <head>
-	<title>Adrianus Language</title>
+	<title>Adrianus(working title) Language</title>
 	<script src="static/home.js">
+	</script>
+	<script>
+
 	</script>
 </head>
 <body>
 	<h1>Welcome to Adrianus Language</h1>
+	
+	<form action="simple-login" method="POST">
+		{% csrf_token %}
+		<input type="text" name="username" />
+		<input type="password" name="password" />
+		<input type="submit" />
+	</form>
+	<a href="/guest-login">log in as Guest</a>
 </body>
 </html>
