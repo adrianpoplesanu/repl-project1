@@ -1,9 +1,14 @@
 #include <iostream>
-#include "token.h"
-#include "token.cpp"
-using namespace std;
+#include "tests.cpp"
+#include "repl.cpp"
+
+#define RUN_TESTS 1 // 0 - no test is being run ar startinme, 1 - all tests are run at startime
+
 
 int main(int argc, char *argv[]) {
-	cout << "Adrianus programming language...\n";
+	std::cout << "Adrianus programming language interpreter written in C++... v1.0\n";
+	if (RUN_TESTS) {
+		run_all_tests();
+	}
 	return 0;
 }
