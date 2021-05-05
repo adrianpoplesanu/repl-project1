@@ -32,12 +32,16 @@ enum TokenType {
 };
 
 std::map<TokenType, std::string> token_type_map = {
-	{ASSIGN, "ASSIGN"}
+	{ASSIGN, "ASSIGN"},
+	{ILLEGAL, "ILLEGAL"}
 };
 
 std::map<std::string, TokenType> keywords = {
 	{"if", IF},
-	{"else", ELSE}
+	{"else", ELSE},
+	{"return", RETURN},
+	{"true", TRUE_VALUE},
+	{"false", FALSE_VALUE}
 };
 
 class Token {

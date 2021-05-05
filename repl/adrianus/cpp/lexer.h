@@ -9,7 +9,7 @@ private:
 public:
 	Lexer();
 	~Lexer();
-	void Load(std::string s);
+	void Load(std::string);
 };
 
 #endif
