@@ -1,0 +1,24 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: auto;
+  width:100%;
+  height: 100%;
+  padding: 3%;
+  overflow: hidden;
+  background: #222;
+  //display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+
+  // start make text unselectable
+  // https://stackoverflow.com/questions/43393046/disable-text-selection-on-nested-span-react-electron
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+
+  /* No support for these yet, use at own risk */
+  -o-user-select: none;
+  user-select: none;
+  // end make text unselectable
+}

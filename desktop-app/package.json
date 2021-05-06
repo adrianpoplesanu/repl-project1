@@ -1,0 +1,17 @@
+{
+  "name": "desktop-app",
+  "version": "1.0.0",
+  "description": "Desktop App written with Electron",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^12.0.6"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
