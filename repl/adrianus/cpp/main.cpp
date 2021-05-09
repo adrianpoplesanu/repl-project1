@@ -7,7 +7,7 @@
 
 
 int main(int argc, char *argv[]) {
-	std::cout << "Adrianus programming language interpreter written in C++... v1.0\n";
+	std::cout << "Ad programming language interpreter written in C++... v1.0\n";
 	if (RUN_TESTS) {
 		run_all_tests();
 		test_simple_generic_object();
