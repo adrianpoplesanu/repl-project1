@@ -30,7 +30,8 @@ enum TokenType {
     TT_TRUE,
     TT_FALSE,
     TT_FUNCTION,
-    TT_LET
+    TT_LET,
+    TT_INT
 };
 
 std::map<TokenType, std::string> token_type_map = {
@@ -59,7 +60,8 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_MINUS, "MINUS"},
     {TT_SLASH, "SLASH"},
     {TT_ASTERISK, "ASTERISK"},
-    {TT_BANG, "BANG"}
+    {TT_BANG, "BANG"},
+    {TT_INT, "INTEGER"}
 };
 
 std::map<std::string, TokenType> keywords = {

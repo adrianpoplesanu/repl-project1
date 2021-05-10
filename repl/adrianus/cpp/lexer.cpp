@@ -37,23 +37,30 @@ bool Lexer::IsDigit() {
 }
 
 std::string Lexer::ReadIdentifier() {
-    // TODO
-    return "";
+    int start = position;
+    while(IsLetter()) {
+        ReadChar();
+    }
+    return source.substr(start, position - start);
 }
 
 std::string Lexer::ReadNumber() {
-    // TODO
-    return "";
+    int start = position;
+    while(IsDigit()) {
+        ReadChar();
+    }
+    return source.substr(start, position - start);
 }
 
 TokenType Lexer::LookupIdent(std::string ident) {
-    // TODO
-    return TT_ILLEGAL;
+    if (keywords.find(ident) != keywords.end()) {
+        return keywords.at(ident);
+    }
+    return TT_IDENT;
 }
 
 char Lexer::PeekChar() {
-    // TODO
-    return 0;
+    return source[readPosition];
 }
 
 Token Lexer::NextToken() {
@@ -113,18 +120,40 @@ Token Lexer::NextToken() {
             token.literal = current_char;
         break;
         case '=':
+            if (PeekChar() == '=') {
+                ReadChar();
+                token.type = TT_EQ;
+                token.literal = "==";
+            } else {
+                token.type = TT_ASSIGN;
+                token.literal = current_char;
+            }
         break;
         case '!':
+            if (PeekChar() == '=') {
+                ReadChar();
+                token.type = TT_NOT_EQ;
+                token.literal = "!=";
+            } else {
+                token.type = TT_BANG;
+                token.literal = current_char;
+            }
         break;
         default:
             if (IsLetter()) {
-
-            }
-            if (IsDigit()) {
-
+                std::string ident = ReadIdentifier();
+                token.type = LookupIdent(ident);
+                token.literal = ident;
+            } else if (IsDigit()) {
+                std::string num = ReadNumber();
+                token.type = TT_INT;
+                token.literal = num;
+            } else {
+                token.type = TT_ILLEGAL;
+                token.literal = "";
             }
         break;
     }
-    ReadChar();
+    if (token.type != TT_IDENT && token.type != TT_INT) ReadChar();
     return token;
 }
