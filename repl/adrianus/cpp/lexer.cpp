@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include "token.cpp"
 
 Lexer::Lexer() {
 
@@ -10,6 +11,8 @@ Lexer::~Lexer() {
 
 void Lexer::Load(std::string s) {
     source = s;
+    position = 0;
+    readPosition = 0;
 }
 
 void Lexer::ReadChar() {
@@ -61,6 +64,10 @@ TokenType Lexer::LookupIdent(std::string ident) {
 
 char Lexer::PeekChar() {
     return source[readPosition];
+}
+
+bool Lexer::IsEOF() {
+    return current_char == 0;
 }
 
 Token Lexer::NextToken() {

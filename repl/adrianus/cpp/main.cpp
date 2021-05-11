@@ -1,6 +1,7 @@
 #include <iostream>
 #include "tests.cpp"
 #include "test_objects.cpp"
+#include "repl.h"
 #include "repl.cpp"
 
 #define RUN_TESTS 1 // 0 - no test is being run ar startinme, 1 - all tests are run at startime
@@ -13,5 +14,7 @@ int main(int argc, char *argv[]) {
 		test_simple_generic_object();
 		test_simple_generic_object();
 	}
+	Repl repl;
+	repl.Loop();
 	return 0;
 }

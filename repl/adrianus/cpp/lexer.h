@@ -23,6 +23,7 @@ public:
 	TokenType LookupIdent(std::string); // (std::string ident)
 	char PeekChar();
 	Token NextToken();
+	bool IsEOF();
 };
 
 #endif
