@@ -10,7 +10,6 @@ all:
 	g++ -std=c++11 main.o -o main
 
 clean:
-	#rm main main.o token.o
 	find . -type f ! -name "*.h" ! -name "*.cpp" ! -name "README.md" ! -name "Makefile" ! -name "*.*" -delete
 	find . -name "*.o" -delete
 

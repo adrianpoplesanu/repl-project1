@@ -21,5 +21,7 @@ void Repl::Loop() {
 
 void Repl::ParseLine(std::string line) {
     parser.Load(line);
-    parser.ParseProgram();
+    Ad_AST_Program program;
+    parser.ParseProgram(program);
+    program.ToString();
 }

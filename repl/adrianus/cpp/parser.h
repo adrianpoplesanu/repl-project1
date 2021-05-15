@@ -39,10 +39,12 @@ public:
     Parser();
     ~Parser();
     void Load(std::string);
-    void ParseProgram();
+    void ParseProgram(Ad_AST_Program &);
     void NextToken();
     bool CurrentTokenIs(TokenType);
     bool PeekTokenIs(TokenType);
+    bool ExpectPeek(TokenType);
+    void PeekError(std::string);
     Ad_AST_Statement* ParseStatement();
     Ad_AST_Statement* ParseLetStatement();
     Ad_AST_Statement* ParseReturnStatement();
