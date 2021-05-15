@@ -2,6 +2,7 @@
 #define __PARSER_H
 
 #include "lexer.h"
+#include "ast.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -40,6 +41,13 @@ public:
     void Load(std::string);
     void ParseProgram();
     void NextToken();
+    bool CurrentTokenIs(TokenType);
+    bool PeekTokenIs(TokenType);
+    Ad_AST_Statement* ParseStatement();
+    Ad_AST_Statement* ParseLetStatement();
+    Ad_AST_Statement* ParseReturnStatement();
+    Ad_AST_Statement* ParseExpressionStatement();
+    void PrintStatement(Ad_AST_Statement*);
 };
 
 #endif
