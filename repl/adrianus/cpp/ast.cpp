@@ -19,16 +19,16 @@ Ad_AST_Program::~Ad_AST_Program() {
          Ad_AST_Node *generic = *it;
          switch(generic->type) {
              case ST_LET_STATEMENT:
-                delete generic; // mi se pare ca merge mai bine asa
-                //delete (Ad_AST_LetStatement*)generic;
+                //delete generic;
+                delete (Ad_AST_LetStatement*)generic; // mi se pare ca merge mai bine asa
              break;
              case ST_RETURN_STATEMENT:
-                delete generic; // mi se pare ca merge mai bine asa
-                //delete (Ad_AST_ReturnStatement*)generic;
+                //delete generic;
+                delete (Ad_AST_ReturnStatement*)generic; // mi se pare ca merge mai bine asa
              break;
              case ST_EXPRESSION_STATEMENT:
-                delete generic; // mi se pare ca merge mai bine asa
-                //delete (Ad_AST_ExpressionStatement*)generic;
+                //delete generic;
+                delete (Ad_AST_ExpressionStatement*)generic; // mi se pare ca merge mai bine asa
              break;
              default:
              break;
