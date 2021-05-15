@@ -21,5 +21,5 @@ void Repl::Loop() {
 
 void Repl::ParseLine(std::string line) {
     parser.Load(line);
-    parser.BuildStatements();
+    parser.ParseProgram();
 }

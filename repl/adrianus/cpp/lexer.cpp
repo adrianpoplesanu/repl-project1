@@ -13,6 +13,7 @@ void Lexer::Load(std::string s) {
     source = s;
     position = 0;
     readPosition = 0;
+    ReadChar();
 }
 
 void Lexer::ReadChar() {

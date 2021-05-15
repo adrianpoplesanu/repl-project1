@@ -28,3 +28,7 @@ TokenType Token::GetType() {
 void Token::SetType(TokenType tt) {
     type = tt;
 }
+
+std::string Token::ToString() {
+    return "Token[type: " + token_type_map[type] + ", literal: " + literal + "]";
+}

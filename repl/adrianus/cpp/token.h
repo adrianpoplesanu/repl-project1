@@ -86,6 +86,7 @@ public:
     void SetLiteral(std::string);
     TokenType GetType();
     void SetType(TokenType);
+    std::string ToString();
 };
 
 #endif
