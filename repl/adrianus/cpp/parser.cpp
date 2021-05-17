@@ -36,6 +36,7 @@ void Parser::AddPrefixInfixFunctions() {
 void Parser::TestInfixFunction(TokenType tt) {
     InfixCallback fp = infixParseFns[tt]; // fp - function pointer
     Ad_AST_Node* res = (this->*fp)(NULL);
+    delete res;
 }
 
 void Parser::Load(std::string s) {
@@ -50,12 +51,6 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
     while (current_token.type != TT_EOF) {
         std::cout << current_token.ToString() << "\n";
         Ad_AST_Statement *stmt = ParseStatement();
-        if (stmt) {
-            //std::cout << "created statement: ";
-            //PrintStatement(stmt);
-        } else {
-            //std::cout << "unable to create statement\n";
-        }
         if (stmt) program.statements.push_back(stmt);
         NextToken();
         ++limit;
@@ -177,15 +172,6 @@ Ad_AST_Node* Parser::ParseIdentifier() {
 }
 
 Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* left) {
-    // TODO
-    //std::cout << "am intrat prin function pointer pe aici\n";
-    /*
-    expression = InfixExpression(token=self.curToken, operator=self.curToken.literal, left=left)
-    preced = self.curPrecedence()
-    self.nextToken()
-    expression.right = self.parseExpression(preced)
-    return expression
-    */
     Ad_AST_InfixExpression* expr = new Ad_AST_InfixExpression();
     expr->token = current_token;
     expr->_operator = current_token.literal;
@@ -253,8 +239,5 @@ Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
         NextToken();
         leftExp = (Ad_AST_Expression*)(this->*infix)(leftExp);
     }
-    //std::cout << leftExp->type << "\n";
-    //std::cout << "aici3\n";
-    //std::cout << leftExp << " " << leftExp << "\n";
     return leftExp;
 }

@@ -40,6 +40,7 @@ public:
 
     Ad_AST_Integer();
     Ad_AST_Integer(Token, int);
+    ~Ad_AST_Integer();
     virtual std::string ToString();
 };
 
@@ -69,6 +70,7 @@ public:
     Ad_AST_Node *right;
 
     Ad_AST_InfixExpression();
+    ~Ad_AST_InfixExpression();
     virtual std::string ToString();
 };
 
@@ -118,5 +120,7 @@ public:
 bool StatementIs(Ad_AST_Statement *stmt, StatementType st) {
     return stmt->type == st;
 }
+
+void free_Ad_AST_Node_memory(Ad_AST_Node*);
 
 #endif
