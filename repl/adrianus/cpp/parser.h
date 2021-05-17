@@ -6,12 +6,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <functional>
-
-//#typedef std::function<Ad_AST_Node*(Ad_AST_Node*) caca
-
-//std::map<TokenType, std::function<void()>> prefixParseFns;
-//std::map<TokenType, std::function<Ad_AST_Node*(Ad_AST_Node*)>> infixParseFns;
 
 enum ParseType {
     PT_LOWEST,

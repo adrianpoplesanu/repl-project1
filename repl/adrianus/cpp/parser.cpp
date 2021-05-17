@@ -30,8 +30,7 @@ Parser::~Parser() {
 }
 
 void Parser::AddPrefixInfixFunctions() {
-    //infixParseFns[TT_PLUS] = std::bind(&Parser::ParseInfixExpression, this);
-    //infixParseFns.insert(std::pair<TokenType, std::function<Ad_AST_Node*(Ad_AST_Node*)>>(TT_PLUS, std::bind(&Parser::ParseInfixExpression, this)));
+
 }
 
 void Parser::TestInfixFunction(TokenType tt) {
@@ -190,8 +189,11 @@ Ad_AST_Node* Parser::ParseCallExpression(Ad_AST_Node* node) {
 }
 
 Ad_AST_Node* Parser::ParseIntegerLiteral() {
-    // TODO
-    return NULL;
+    Ad_AST_Integer* integer_node = new Ad_AST_Integer();
+    int val = stoi(current_token.literal);
+    integer_node->token = current_token;
+    integer_node->value = val;
+    return integer_node;
 }
 
 Ad_AST_Node* Parser::ParsePrefixExpression() {
@@ -239,6 +241,6 @@ Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
         leftExp = (Ad_AST_Expression*)(this->*infix)(leftExp);
     }
     std::cout << "aici3\n";
-    std::cout << leftExp << "\n";
+    std::cout << leftExp << " " << leftExp << "\n";
     return leftExp;
 }

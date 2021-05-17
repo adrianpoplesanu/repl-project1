@@ -15,7 +15,7 @@ class Ad_AST_Node {
 public:
     StatementType type;
     std::string TokenLiteral();
-    std::string ToString();
+    virtual std::string ToString();
 };
 
 class Ad_AST_Identifier : public Ad_AST_Node {
@@ -27,11 +27,21 @@ public:
     Ad_AST_Identifier(Token, std::string);
 };
 
+class Ad_AST_Integer : public Ad_AST_Node {
+public:
+    Token token;
+    int value;
+
+    Ad_AST_Integer();
+    Ad_AST_Integer(Token, int);
+    virtual std::string ToString();
+};
+
 class Ad_AST_Statement : public Ad_AST_Node {
 
 };
 
-class Ad_AST_Expression : public Ad_AST_Statement {
+class Ad_AST_Expression : public Ad_AST_Node {
 
 };
 
@@ -42,7 +52,7 @@ public:
     Ad_AST_Program();
     ~Ad_AST_Program();
     std::string TokenLiteral();
-    std::string ToString();
+    virtual std::string ToString();
 };
 
 class Ad_AST_LetStatement : public Ad_AST_Statement {
