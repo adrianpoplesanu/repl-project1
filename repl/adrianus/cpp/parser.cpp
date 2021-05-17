@@ -5,11 +5,38 @@
 #include "ast.cpp"
 
 Parser::Parser() {
-
+    prefixParseFns.insert(std::make_pair(TT_IDENT, &Parser::ParseIdentifier));
+    prefixParseFns.insert(std::make_pair(TT_INT, &Parser::ParseIntegerLiteral));
+    prefixParseFns.insert(std::make_pair(TT_BANG, &Parser::ParsePrefixExpression));
+    prefixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParsePrefixExpression));
+    prefixParseFns.insert(std::make_pair(TT_TRUE, &Parser::ParseBoolean));
+    prefixParseFns.insert(std::make_pair(TT_FALSE, &Parser::ParseBoolean));
+    prefixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseGroupedExpression));
+    prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
+    prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionLiteral));
+    infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_ASTERISK, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_EQ, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_NOT_EQ, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_LT, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_GT, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseCallExpression));
 }
 
 Parser::~Parser() {
 
+}
+
+void Parser::AddPrefixInfixFunctions() {
+    //infixParseFns[TT_PLUS] = std::bind(&Parser::ParseInfixExpression, this);
+    //infixParseFns.insert(std::pair<TokenType, std::function<Ad_AST_Node*(Ad_AST_Node*)>>(TT_PLUS, std::bind(&Parser::ParseInfixExpression, this)));
+}
+
+void Parser::TestInfixFunction(TokenType tt) {
+    InfixCallback fp = infixParseFns[tt]; // fp - function pointer
+    Ad_AST_Node* res = (this->*fp)(NULL);
 }
 
 void Parser::Load(std::string s) {
@@ -82,6 +109,19 @@ bool Parser::ExpectPeek(TokenType tt) {
     }
 }
 
+ParseType Parser::PeekPrecedence() {
+    /*
+        preced = self.precedences.get(self.peekToken.token_type)
+    if preced:
+        return preced
+    return ParseType.LOWEST
+    */
+    if (precedences.find(peek_token.type) != precedences.end()) {
+        return PT_LOWEST;
+    }
+    return precedences[peek_token.type];
+}
+
 void Parser::PeekError(std::string msg) {
     errors.push_back(msg);
 }
@@ -102,7 +142,7 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
         return NULL;
     }
 
-    stmt->name = Identifier(current_token, current_token.literal);
+    stmt->name = Ad_AST_Identifier(current_token, current_token.literal);
 
     if (!ExpectPeek(TT_ASSIGN)) {
         delete stmt;
@@ -110,19 +150,95 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
     }
 
     NextToken();
-    stmt->value = "expression not parsed yet";
+    // statement.value = self.parseExpression(ParseType.LOWEST) // original python code
+    //stmt->value = "expression not parsed yet";
+    stmt->value = ParseExpression(PT_LOWEST);
     if (CurrentTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
+    std::cout << "aici2\n";
     return stmt;
 }
 
 Ad_AST_Statement* Parser::ParseReturnStatement() {
     // TODO
-    return NULL;
+    Ad_AST_ReturnStatement* stmt = new Ad_AST_ReturnStatement();
+    return stmt;
 }
 
 Ad_AST_Statement* Parser::ParseExpressionStatement() {
     // TODO
+    Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
     return NULL;
+}
+
+Ad_AST_Node* Parser::ParseIdentifier() {
+    std::cout << "parse identifier\n";
+    Ad_AST_Identifier *identifier = new Ad_AST_Identifier(current_token, current_token.literal);
+    return identifier;
+}
+
+Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* node) {
+    // TODO
+    std::cout << "am intrat prin function pointer pe aici\n";
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseCallExpression(Ad_AST_Node* node) {
+    // TODO
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseIntegerLiteral() {
+    // TODO
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParsePrefixExpression() {
+    // TODO
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseBoolean() {
+    // TODO
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseGroupedExpression() {
+    // TODO
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseIfExpression() {
+    // TODO
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseFunctionLiteral() {
+    // TODO
+    return NULL;
+}
+
+// nu stiu daca aici trebuie sa returnez un pointer sau un obiect, trebuie verificat
+Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
+    if (prefixParseFns.find(current_token.type) == prefixParseFns.end()) {
+        std::cout << "oops! 1\n";
+        return NULL;
+    }
+    PrefixCallback prefix = prefixParseFns[current_token.type];
+
+    Ad_AST_Expression* leftExp = (Ad_AST_Expression*)(this->*prefix)();
+
+    while(!PeekTokenIs(TT_SEMICOLON) && (precedence < PeekPrecedence())) {
+        if (infixParseFns.find(peek_token.type) == infixParseFns.end()) {
+            std::cout << "oops! 2\n";
+            return leftExp;
+        }
+        InfixCallback infix = infixParseFns[peek_token.type];
+        NextToken();
+        leftExp = (Ad_AST_Expression*)(this->*infix)(leftExp);
+    }
+    std::cout << "aici3\n";
+    std::cout << leftExp << "\n";
+    return leftExp;
 }

@@ -11,20 +11,20 @@ enum StatementType {
     ST_EXPRESSION_STATEMENT
 };
 
-class Identifier {
-public:
-    Token token;
-    std::string value;
-
-    Identifier();
-    Identifier(Token, std::string);
-};
-
 class Ad_AST_Node {
 public:
     StatementType type;
     std::string TokenLiteral();
     std::string ToString();
+};
+
+class Ad_AST_Identifier : public Ad_AST_Node {
+public:
+    Token token;
+    std::string value;
+
+    Ad_AST_Identifier();
+    Ad_AST_Identifier(Token, std::string);
 };
 
 class Ad_AST_Statement : public Ad_AST_Node {
@@ -48,8 +48,9 @@ public:
 class Ad_AST_LetStatement : public Ad_AST_Statement {
 public:
     Token token;
-    Identifier name;
-    std::string value;
+    Ad_AST_Identifier name;
+    //std::string value;
+    Ad_AST_Expression* value;
 
     Ad_AST_LetStatement();
     Ad_AST_LetStatement(Token);

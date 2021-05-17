@@ -15,25 +15,25 @@ Ad_AST_Program::Ad_AST_Program() {
 
 Ad_AST_Program::~Ad_AST_Program() {
     std::cout << "cleaning up\n";
-     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-         Ad_AST_Node *generic = *it;
-         switch(generic->type) {
-             case ST_LET_STATEMENT:
+    for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
+        Ad_AST_Node *generic = *it;
+        switch(generic->type) {
+            case ST_LET_STATEMENT:
                 //delete generic;
                 delete (Ad_AST_LetStatement*)generic; // mi se pare ca merge mai bine asa
-             break;
-             case ST_RETURN_STATEMENT:
+            break;
+            case ST_RETURN_STATEMENT:
                 //delete generic;
                 delete (Ad_AST_ReturnStatement*)generic; // mi se pare ca merge mai bine asa
-             break;
-             case ST_EXPRESSION_STATEMENT:
+            break;
+            case ST_EXPRESSION_STATEMENT:
                 //delete generic;
                 delete (Ad_AST_ExpressionStatement*)generic; // mi se pare ca merge mai bine asa
-             break;
-             default:
-             break;
-         }
-     }
+            break;
+            default:
+            break;
+        }
+    }
 }
 
 std::string Ad_AST_Program::TokenLiteral() {
@@ -46,13 +46,13 @@ std::string Ad_AST_Program::ToString() {
         Ad_AST_Node *generic = *it;
         switch(generic->type) {
             case ST_LET_STATEMENT:
-               std::cout << ((Ad_AST_LetStatement*)generic)->ToString();
+                std::cout << ((Ad_AST_LetStatement*)generic)->ToString();
             break;
             case ST_RETURN_STATEMENT:
-               std::cout << ((Ad_AST_ReturnStatement*)generic)->ToString();
+                std::cout << ((Ad_AST_ReturnStatement*)generic)->ToString();
             break;
             case ST_EXPRESSION_STATEMENT:
-               std::cout << ((Ad_AST_ExpressionStatement*)generic)->ToString();
+                std::cout << ((Ad_AST_ExpressionStatement*)generic)->ToString();
             break;
             default:
             break;
@@ -67,8 +67,9 @@ Ad_AST_LetStatement::Ad_AST_LetStatement() {
 
 Ad_AST_LetStatement::Ad_AST_LetStatement(Token t) {
     token = t;
-    name = Identifier();
-    value = "";
+    name = Ad_AST_Identifier();
+    //value = "";
+    value = new Ad_AST_Expression();
     type = ST_LET_STATEMENT;
 }
 
@@ -110,11 +111,11 @@ std::string Ad_AST_ExpressionStatement::ToString() {
     return out;
 }
 
-Identifier::Identifier() {
+Ad_AST_Identifier::Ad_AST_Identifier() {
 
 }
 
-Identifier::Identifier(Token t, std::string val) {
+Ad_AST_Identifier::Ad_AST_Identifier(Token t, std::string val) {
     token = t;
     value = val;
 }
