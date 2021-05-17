@@ -52,6 +52,7 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
         std::cout << current_token.ToString() << "\n";
         Ad_AST_Statement *stmt = ParseStatement();
         if (stmt) program.statements.push_back(stmt);
+        //if (stmt) PrintNode(stmt);
         NextToken();
         ++limit;
         if (limit > 99) {
@@ -61,23 +62,8 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
     }
 }
 
-void Parser::PrintStatement(Ad_AST_Statement* stmt) {
-    Ad_AST_LetStatement* current;
-    switch(stmt->type) { // nu cred ca mai am nevoie de switch pentru ca ToString() e acum virtuala
-        case ST_LET_STATEMENT:
-            current = (Ad_AST_LetStatement*)stmt;
-            std::cout << stmt << " " << &(current->name) << " " << &(current->value) << " " << current->ToString() << "\n";
-        break;
-        case ST_RETURN_STATEMENT:
-            std::cout << stmt << " " << ((Ad_AST_ReturnStatement*)stmt)->ToString() << "\n";
-        break;
-        case ST_EXPRESSION_STATEMENT:
-            std::cout << stmt << " " << ((Ad_AST_ExpressionStatement*)stmt)->ToString() << "\n";
-        break;
-        default:
-            std::cout << "Unknown Statement\n";
-        break;
-    }
+void Parser::PrintNode(Ad_AST_Node* node) {
+    std::cout << node->ToString() << "\n";
 }
 
 void Parser::NextToken() {
@@ -149,7 +135,6 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
     if (CurrentTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
-    //std::cout << "aici2\n";
     return stmt;
 }
 
@@ -166,7 +151,6 @@ Ad_AST_Statement* Parser::ParseExpressionStatement() {
 }
 
 Ad_AST_Node* Parser::ParseIdentifier() {
-    std::cout << "parse identifier\n";
     Ad_AST_Identifier *identifier = new Ad_AST_Identifier(current_token, current_token.literal);
     return identifier;
 }
@@ -196,18 +180,24 @@ Ad_AST_Node* Parser::ParseIntegerLiteral() {
 }
 
 Ad_AST_Node* Parser::ParsePrefixExpression() {
-    // TODO
-    return NULL;
+    Ad_AST_PefixExpression* expr = new Ad_AST_PefixExpression(current_token, current_token.literal);
+    NextToken();
+    expr->right = ParseExpression(PT_PREFIX);
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseBoolean() {
-    // TODO
-    return NULL;
+    Ad_AST_Boolean* boolean_object = new Ad_AST_Boolean(current_token, CurrentTokenIs(TT_TRUE));
+    return boolean_object;
 }
 
 Ad_AST_Node* Parser::ParseGroupedExpression() {
-    // TODO
-    return NULL;
+    NextToken();
+    Ad_AST_Expression* expr = ParseExpression(PT_LOWEST);
+    if (!ExpectPeek(TT_RPAREN)) {
+        return NULL;
+    }
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseIfExpression() {
@@ -222,8 +212,6 @@ Ad_AST_Node* Parser::ParseFunctionLiteral() {
 
 Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
     if (prefixParseFns.find(current_token.type) == prefixParseFns.end()) {
-        std::cout << token_type_map[current_token.type] << " ";
-        std::cout << "oops! 1\n";
         return NULL;
     }
     PrefixCallback prefix = prefixParseFns[current_token.type];
@@ -232,7 +220,6 @@ Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
 
     while(!PeekTokenIs(TT_SEMICOLON) && (precedence < PeekPrecedence())) {
         if (infixParseFns.find(peek_token.type) == infixParseFns.end()) {
-            std::cout << "oops! 2\n";
             return leftExp;
         }
         InfixCallback infix = infixParseFns[peek_token.type];

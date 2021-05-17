@@ -11,9 +11,11 @@ enum StatementType {
     ST_EXPRESSION_STATEMENT,
     ST_IDENTIFIER,
     ST_INTEGER,
+    ST_BOOLEAN,
     ST_STATEMENT,
     ST_EXPRESSION,
-    ST_INFIX_EXPRESSION
+    ST_INFIX_EXPRESSION,
+    ST_PREFIX_EXPRESSION
 };
 
 class Ad_AST_Node {
@@ -51,6 +53,7 @@ public:
 
     Ad_AST_Boolean();
     Ad_AST_Boolean(Token, bool);
+    ~Ad_AST_Boolean();
     virtual std::string ToString();
 };
 
@@ -71,6 +74,18 @@ public:
 
     Ad_AST_InfixExpression();
     ~Ad_AST_InfixExpression();
+    virtual std::string ToString();
+};
+
+class Ad_AST_PefixExpression : public Ad_AST_Node {
+public:
+    Token token;
+    std::string _operator;
+    Ad_AST_Node *right;
+
+    Ad_AST_PefixExpression();
+    Ad_AST_PefixExpression(Token, std::string);
+    ~Ad_AST_PefixExpression();
     virtual std::string ToString();
 };
 

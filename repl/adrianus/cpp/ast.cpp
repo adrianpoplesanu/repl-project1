@@ -28,23 +28,7 @@ std::string Ad_AST_Program::ToString() {
     std::string out = "";
     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
         Ad_AST_Node *generic = *it;
-        switch(generic->type) { // pentru ca ToString e virtual, nici nu mai am in teorie nevoie de switchul asta
-            case ST_LET_STATEMENT:
-                std::cout << generic->ToString(); // pentru ca le-am facut virtuale
-                std::cout << "\n";
-            break;
-            case ST_RETURN_STATEMENT:
-                std::cout << generic->ToString();
-                std::cout << "\n";
-            break;
-            case ST_EXPRESSION_STATEMENT:
-                std::cout << generic->ToString();
-                std::cout << "\n";
-            break;
-            default:
-                std::cout << "ceva!!!: " << generic->type << "\n";
-            break;
-        }
+        std::cout << generic->ToString() << "\n";
     }
     return out;
 }
@@ -61,17 +45,14 @@ Ad_AST_LetStatement::Ad_AST_LetStatement(Token t) {
 }
 
 Ad_AST_LetStatement::~Ad_AST_LetStatement() {
-    std::cout << "~Ad_AST_LetStatement: killuiesc un " << value->type;
-    /* ATENTIE!!! trebuie facuta o functie de delete, care face cast inaite ca sa stie ce trebui sa stearga!!! */
     free_Ad_AST_Node_memory(value);
-    //delete (Ad_AST_InfixExpression*)value;
 }
 
 std::string Ad_AST_LetStatement::ToString() {
     std::string out = "LetStatement [";
     out +=  token.literal + "] <" + name.value + ">: ";
     if (value) {
-        std::cout << (*value).type;
+        //std::cout << (*value).type;
         out += (*value).ToString();
     } else {
         out += "null expression in let";
@@ -84,9 +65,8 @@ Ad_AST_ReturnStatement::Ad_AST_ReturnStatement() {
 }
 
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement(Token t) {
-    token = t;
-    // TODO
     type = ST_RETURN_STATEMENT;
+    token = t;
 }
 
 std::string Ad_AST_ReturnStatement::ToString() {
@@ -100,9 +80,8 @@ Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement() {
 }
 
 Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
-    token = t;
-    // TODO
     type = ST_EXPRESSION_STATEMENT;
+    token = t;
 }
 
 std::string Ad_AST_ExpressionStatement::ToString() {
@@ -143,21 +122,56 @@ std::string Ad_AST_Integer::ToString() {
     return std::to_string(value);
 }
 
+Ad_AST_Boolean::Ad_AST_Boolean() {
+    type = ST_BOOLEAN;
+}
+
+Ad_AST_Boolean::Ad_AST_Boolean(Token t, bool val) {
+    type = ST_BOOLEAN;
+    token = t;
+    value = val;
+}
+
+Ad_AST_Boolean::~Ad_AST_Boolean() {
+
+}
+
+std::string Ad_AST_Boolean::ToString() {
+    return std::to_string(value);
+}
+
+
 Ad_AST_InfixExpression::Ad_AST_InfixExpression() {
     type = ST_INFIX_EXPRESSION;
 }
 
 Ad_AST_InfixExpression::~Ad_AST_InfixExpression() {
-    std::cout << "~Ad_AST_InfixExpression: killuiesc un " << left->type;
-    //delete left;
     free_Ad_AST_Node_memory(left);
-    std::cout << "~Ad_AST_InfixExpression: killuiesc un " << right->type;
-    //delete right;
     free_Ad_AST_Node_memory(right);
 }
 
 std::string Ad_AST_InfixExpression::ToString() {
     return "(" + left->ToString() + _operator + right->ToString() + ")";
+}
+
+Ad_AST_PefixExpression::Ad_AST_PefixExpression() {
+    type = ST_PREFIX_EXPRESSION;
+}
+
+Ad_AST_PefixExpression::Ad_AST_PefixExpression(Token t, std::string op) {
+    type = ST_PREFIX_EXPRESSION;
+    token = t;
+    _operator = op;
+}
+
+Ad_AST_PefixExpression::~Ad_AST_PefixExpression() {
+    free_Ad_AST_Node_memory(right);
+}
+
+std::string Ad_AST_PefixExpression::ToString() {
+    std::string out;
+    out = "(" + _operator + right->ToString() + ")";
+    return out;
 }
 
 void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
@@ -177,6 +191,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         case ST_INTEGER:
             delete (Ad_AST_Integer*)obj;
         break;
+        case ST_BOOLEAN:
+            delete (Ad_AST_Boolean*)obj;
+        break;
         case ST_STATEMENT:
             delete (Ad_AST_Statement*)obj;
         break;
@@ -185,6 +202,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         break;
         case ST_INFIX_EXPRESSION:
             delete (Ad_AST_InfixExpression*)obj;
+        break;
+        case ST_PREFIX_EXPRESSION:
+            delete (Ad_AST_PefixExpression*)obj;
         break;
         default:
             std::cout << "MEMORY ERROR!!!: " << obj->type << "\n";

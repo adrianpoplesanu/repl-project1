@@ -59,7 +59,7 @@ public:
     Ad_AST_Statement* ParseLetStatement();
     Ad_AST_Statement* ParseReturnStatement();
     Ad_AST_Statement* ParseExpressionStatement();
-    void PrintStatement(Ad_AST_Statement*);
+    void PrintNode(Ad_AST_Node*);
     Ad_AST_Node* ParseIdentifier();
     Ad_AST_Node* ParseIntegerLiteral();
     Ad_AST_Node* ParsePrefixExpression();
