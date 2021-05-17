@@ -54,6 +54,7 @@ public:
     bool ExpectPeek(TokenType);
     void PeekError(std::string);
     ParseType PeekPrecedence();
+    ParseType CurPrecedence();
     Ad_AST_Statement* ParseStatement();
     Ad_AST_Statement* ParseLetStatement();
     Ad_AST_Statement* ParseReturnStatement();

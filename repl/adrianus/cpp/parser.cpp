@@ -51,10 +51,10 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
         std::cout << current_token.ToString() << "\n";
         Ad_AST_Statement *stmt = ParseStatement();
         if (stmt) {
-            std::cout << "created statement: ";
-            PrintStatement(stmt);
+            //std::cout << "created statement: ";
+            //PrintStatement(stmt);
         } else {
-            std::cout << "unable to create statement\n";
+            //std::cout << "unable to create statement\n";
         }
         if (stmt) program.statements.push_back(stmt);
         NextToken();
@@ -68,7 +68,7 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
 
 void Parser::PrintStatement(Ad_AST_Statement* stmt) {
     Ad_AST_LetStatement* current;
-    switch(stmt->type) {
+    switch(stmt->type) { // nu cred ca mai am nevoie de switch pentru ca ToString() e acum virtuala
         case ST_LET_STATEMENT:
             current = (Ad_AST_LetStatement*)stmt;
             std::cout << stmt << " " << &(current->name) << " " << &(current->value) << " " << current->ToString() << "\n";
@@ -103,22 +103,23 @@ bool Parser::ExpectPeek(TokenType tt) {
         NextToken();
         return true;
     } else {
-        PeekError("mesaj de eroare aici");
+        PeekError("ERROR: mesaj de eroare aici");
         return false;
     }
 }
 
 ParseType Parser::PeekPrecedence() {
-    /*
-        preced = self.precedences.get(self.peekToken.token_type)
-    if preced:
-        return preced
-    return ParseType.LOWEST
-    */
     if (precedences.find(peek_token.type) != precedences.end()) {
-        return PT_LOWEST;
+        return precedences[peek_token.type];
     }
-    return precedences[peek_token.type];
+    return PT_LOWEST;
+}
+
+ParseType Parser::CurPrecedence() {
+    if (precedences.find(current_token.type) != precedences.end()) {
+        return precedences[current_token.type];
+    }
+    return PT_LOWEST;
 }
 
 void Parser::PeekError(std::string msg) {
@@ -149,13 +150,11 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
     }
 
     NextToken();
-    // statement.value = self.parseExpression(ParseType.LOWEST) // original python code
-    //stmt->value = "expression not parsed yet";
     stmt->value = ParseExpression(PT_LOWEST);
     if (CurrentTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
-    std::cout << "aici2\n";
+    //std::cout << "aici2\n";
     return stmt;
 }
 
@@ -177,10 +176,24 @@ Ad_AST_Node* Parser::ParseIdentifier() {
     return identifier;
 }
 
-Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* node) {
+Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* left) {
     // TODO
-    std::cout << "am intrat prin function pointer pe aici\n";
-    return NULL;
+    //std::cout << "am intrat prin function pointer pe aici\n";
+    /*
+    expression = InfixExpression(token=self.curToken, operator=self.curToken.literal, left=left)
+    preced = self.curPrecedence()
+    self.nextToken()
+    expression.right = self.parseExpression(preced)
+    return expression
+    */
+    Ad_AST_InfixExpression* expr = new Ad_AST_InfixExpression();
+    expr->token = current_token;
+    expr->_operator = current_token.literal;
+    expr->left = left;
+    ParseType preced = CurPrecedence();
+    NextToken();
+    expr->right = ParseExpression(preced);
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseCallExpression(Ad_AST_Node* node) {
@@ -221,9 +234,9 @@ Ad_AST_Node* Parser::ParseFunctionLiteral() {
     return NULL;
 }
 
-// nu stiu daca aici trebuie sa returnez un pointer sau un obiect, trebuie verificat
 Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
     if (prefixParseFns.find(current_token.type) == prefixParseFns.end()) {
+        std::cout << token_type_map[current_token.type] << " ";
         std::cout << "oops! 1\n";
         return NULL;
     }
@@ -240,7 +253,8 @@ Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
         NextToken();
         leftExp = (Ad_AST_Expression*)(this->*infix)(leftExp);
     }
-    std::cout << "aici3\n";
-    std::cout << leftExp << " " << leftExp << "\n";
+    //std::cout << leftExp->type << "\n";
+    //std::cout << "aici3\n";
+    //std::cout << leftExp << " " << leftExp << "\n";
     return leftExp;
 }

@@ -8,7 +8,12 @@
 enum StatementType {
     ST_LET_STATEMENT,
     ST_RETURN_STATEMENT,
-    ST_EXPRESSION_STATEMENT
+    ST_EXPRESSION_STATEMENT,
+    ST_IDENTIFIER,
+    ST_INTEGER,
+    ST_STATEMENT,
+    ST_EXPRESSION,
+    ST_INFIX_EXPRESSION
 };
 
 class Ad_AST_Node {
@@ -25,6 +30,7 @@ public:
 
     Ad_AST_Identifier();
     Ad_AST_Identifier(Token, std::string);
+    virtual std::string ToString();
 };
 
 class Ad_AST_Integer : public Ad_AST_Node {
@@ -37,12 +43,33 @@ public:
     virtual std::string ToString();
 };
 
+class Ad_AST_Boolean : public Ad_AST_Node {
+public:
+    Token token;
+    bool value;
+
+    Ad_AST_Boolean();
+    Ad_AST_Boolean(Token, bool);
+    virtual std::string ToString();
+};
+
 class Ad_AST_Statement : public Ad_AST_Node {
 
 };
 
 class Ad_AST_Expression : public Ad_AST_Node {
 
+};
+
+class Ad_AST_InfixExpression : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node *left;
+    std::string _operator;
+    Ad_AST_Node *right;
+
+    Ad_AST_InfixExpression();
+    virtual std::string ToString();
 };
 
 class Ad_AST_Program : public Ad_AST_Node {
@@ -59,7 +86,6 @@ class Ad_AST_LetStatement : public Ad_AST_Statement {
 public:
     Token token;
     Ad_AST_Identifier name;
-    //std::string value;
     Ad_AST_Expression* value;
 
     Ad_AST_LetStatement();
