@@ -20,7 +20,7 @@ Ad_AST_Program::~Ad_AST_Program() {
         switch(generic->type) {
             case ST_LET_STATEMENT:
                 //delete generic;
-                delete ((Ad_AST_LetStatement*)generic)->value;
+                //delete ((Ad_AST_LetStatement*)generic)->value;
                 delete (Ad_AST_LetStatement*)generic; // mi se pare ca merge mai bine asa
             break;
             case ST_RETURN_STATEMENT:
@@ -69,9 +69,12 @@ Ad_AST_LetStatement::Ad_AST_LetStatement() {
 Ad_AST_LetStatement::Ad_AST_LetStatement(Token t) {
     token = t;
     name = Ad_AST_Identifier();
-    //value = "";
-    value = new Ad_AST_Expression();
+    value = NULL;
     type = ST_LET_STATEMENT;
+}
+
+Ad_AST_LetStatement::~Ad_AST_LetStatement() {
+    delete value;
 }
 
 std::string Ad_AST_LetStatement::ToString() {

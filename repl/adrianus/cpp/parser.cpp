@@ -167,7 +167,7 @@ Ad_AST_Statement* Parser::ParseReturnStatement() {
 
 Ad_AST_Statement* Parser::ParseExpressionStatement() {
     // TODO
-    Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
+    //Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
     return NULL;
 }
 

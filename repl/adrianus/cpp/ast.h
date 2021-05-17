@@ -64,6 +64,7 @@ public:
 
     Ad_AST_LetStatement();
     Ad_AST_LetStatement(Token);
+    ~Ad_AST_LetStatement();
     std::string TokenLiteral();
     std::string ToString();
 };
