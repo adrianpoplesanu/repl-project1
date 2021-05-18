@@ -67,9 +67,10 @@ public:
     Ad_AST_Node* ParseGroupedExpression();
     Ad_AST_Node* ParseIfExpression();
     Ad_AST_Node* ParseFunctionLiteral();
-    Ad_AST_Expression* ParseExpression(ParseType);
+    Ad_AST_Node* ParseExpression(ParseType);
     Ad_AST_Node* ParseInfixExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseCallExpression(Ad_AST_Node*);
+    std::vector<Ad_AST_Node*> ParseCallArguments();
 };
 
 #endif

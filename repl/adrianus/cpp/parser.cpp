@@ -131,7 +131,7 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
     }
 
     NextToken();
-    stmt->value = ParseExpression(PT_LOWEST);
+    stmt->value = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
     if (CurrentTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
@@ -141,7 +141,7 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
 Ad_AST_Statement* Parser::ParseReturnStatement() {
     Ad_AST_ReturnStatement* stmt = new Ad_AST_ReturnStatement(current_token);
     NextToken();
-    stmt->value = ParseExpression(PT_LOWEST);
+    stmt->value = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
     while (!CurrentTokenIs(TT_SEMICOLON) && !CurrentTokenIs(TT_EOF)) {
         NextToken();
     }
@@ -149,14 +149,12 @@ Ad_AST_Statement* Parser::ParseReturnStatement() {
 }
 
 Ad_AST_Statement* Parser::ParseExpressionStatement() {
-    //std::cout << current_token.literal;
     Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
-    stmt->expression = ParseExpression(PT_LOWEST);
+    stmt->expression = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
     if (PeekTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
     return stmt;
-    return NULL;
 }
 
 Ad_AST_Node* Parser::ParseIdentifier() {
@@ -175,14 +173,30 @@ Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* left) {
     return expr;
 }
 
-Ad_AST_Node* Parser::ParseCallExpression(Ad_AST_Node* node) {
-    // TODO
-    /*
-    exp = CallExpression(self.curToken, function=function)
-    exp.arguments = self.parseCallArguments()
-    return exp
-    */
-    return NULL;
+Ad_AST_Node* Parser::ParseCallExpression(Ad_AST_Node* function) {
+    Ad_AST_CallExpression* expr = new Ad_AST_CallExpression(current_token, function);
+    expr->arguments = ParseCallArguments();
+    return expr;
+}
+
+std::vector<Ad_AST_Node*> Parser::ParseCallArguments() {
+    std::vector<Ad_AST_Node*> args;
+    if (PeekTokenIs(TT_RPAREN)) {
+        NextToken();
+        return args;
+    }
+    NextToken();
+    args.push_back(ParseExpression(PT_LOWEST));
+    while (PeekTokenIs(TT_COMMA)) {
+        NextToken();
+        NextToken();
+        args.push_back(ParseExpression(PT_LOWEST));
+    }
+    if (!ExpectPeek(TT_RPAREN)) {
+        std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL
+        return empty;
+    }
+    return args;
 }
 
 Ad_AST_Node* Parser::ParseIntegerLiteral() {
@@ -207,7 +221,7 @@ Ad_AST_Node* Parser::ParseBoolean() {
 
 Ad_AST_Node* Parser::ParseGroupedExpression() {
     NextToken();
-    Ad_AST_Expression* expr = ParseExpression(PT_LOWEST);
+    Ad_AST_Expression* expr = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
         return NULL;
     }
@@ -254,13 +268,13 @@ Ad_AST_Node* Parser::ParseFunctionLiteral() {
     return NULL;
 }
 
-Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
+Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {
     if (prefixParseFns.find(current_token.type) == prefixParseFns.end()) {
         return NULL;
     }
     PrefixCallback prefix = prefixParseFns[current_token.type];
 
-    Ad_AST_Expression* leftExp = (Ad_AST_Expression*)(this->*prefix)();
+    Ad_AST_Node* leftExp = (this->*prefix)();
 
     while(!PeekTokenIs(TT_SEMICOLON) && (precedence < PeekPrecedence())) {
         if (infixParseFns.find(peek_token.type) == infixParseFns.end()) {
@@ -268,7 +282,7 @@ Ad_AST_Expression* Parser::ParseExpression(ParseType precedence) {
         }
         InfixCallback infix = infixParseFns[peek_token.type];
         NextToken();
-        leftExp = (Ad_AST_Expression*)(this->*infix)(leftExp);
+        leftExp = (this->*infix)(leftExp);
     }
     return leftExp;
 }

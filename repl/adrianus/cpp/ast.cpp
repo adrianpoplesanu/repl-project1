@@ -93,7 +93,7 @@ Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
 }
 
 Ad_AST_ExpressionStatement::~Ad_AST_ExpressionStatement() {
-    if (expression) { // nu inteleg de ce trebuie if-ul asta aici
+    if (expression) { // TODO: de ce trebuie asta? nu inteleg de ce trebuie if-ul asta aici
         free_Ad_AST_Node_memory(expression);
     }
 }
@@ -188,6 +188,38 @@ Ad_AST_PefixExpression::~Ad_AST_PefixExpression() {
     free_Ad_AST_Node_memory(right);
 }
 
+Ad_AST_CallExpression::Ad_AST_CallExpression() {
+    type = ST_CALL_EXPRESSION;
+}
+
+Ad_AST_CallExpression::Ad_AST_CallExpression(Token t) {
+    type = ST_CALL_EXPRESSION;
+    token = t;
+}
+
+Ad_AST_CallExpression::Ad_AST_CallExpression(Token t, Ad_AST_Node* f) {
+    type = ST_CALL_EXPRESSION;
+    token = t;
+    function = f;
+}
+
+Ad_AST_CallExpression::~Ad_AST_CallExpression() {
+
+}
+
+std::string Ad_AST_CallExpression::ToString() {
+    std::string out = "";
+    out += function->ToString();
+    out += "(";
+    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
+        Ad_AST_Node *current = *it;
+        if (it != arguments.begin()) out += ", ";
+        out += current->ToString();
+    }
+    out += ")";
+    return out;
+}
+
 std::string Ad_AST_PefixExpression::ToString() {
     std::string out;
     out = "(" + _operator + right->ToString() + ")";
@@ -225,6 +257,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         break;
         case ST_PREFIX_EXPRESSION:
             delete (Ad_AST_PefixExpression*)obj;
+        break;
+        case ST_CALL_EXPRESSION:
+            delete (Ad_AST_CallExpression*)obj;
         break;
         default:
             std::cout << "MEMORY ERROR!!!: " << obj->type << "\n";

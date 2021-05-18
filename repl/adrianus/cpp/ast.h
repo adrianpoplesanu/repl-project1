@@ -15,7 +15,8 @@ enum StatementType {
     ST_STATEMENT,
     ST_EXPRESSION,
     ST_INFIX_EXPRESSION,
-    ST_PREFIX_EXPRESSION
+    ST_PREFIX_EXPRESSION,
+    ST_CALL_EXPRESSION
 };
 
 class Ad_AST_Node {
@@ -86,6 +87,31 @@ public:
     Ad_AST_PefixExpression();
     Ad_AST_PefixExpression(Token, std::string);
     ~Ad_AST_PefixExpression();
+    virtual std::string ToString();
+};
+
+class Ad_AST_CallExpression : public Ad_AST_Node {
+public:
+    Token token;
+    std::vector<Ad_AST_Node*> arguments;
+    Ad_AST_Node* function;
+
+    Ad_AST_CallExpression();
+    Ad_AST_CallExpression(Token);
+    Ad_AST_CallExpression(Token, Ad_AST_Node*);
+    ~Ad_AST_CallExpression();
+    virtual std::string ToString();
+};
+
+class Ad_AST_FunctionLiteral : public Ad_AST_Node {
+public:
+    Token token;
+    std::vector<Ad_AST_Node*> parameters;
+    // Ad_AST_BlockStatement body;
+
+    Ad_AST_FunctionLiteral();
+    Ad_AST_FunctionLiteral(Token);
+    ~Ad_AST_FunctionLiteral();
     virtual std::string ToString();
 };
 
