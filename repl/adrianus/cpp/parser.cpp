@@ -139,8 +139,12 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
 }
 
 Ad_AST_Statement* Parser::ParseReturnStatement() {
-    // TODO
-    Ad_AST_ReturnStatement* stmt = new Ad_AST_ReturnStatement();
+    Ad_AST_ReturnStatement* stmt = new Ad_AST_ReturnStatement(current_token);
+    NextToken();
+    stmt->value = ParseExpression(PT_LOWEST);
+    while (!CurrentTokenIs(TT_SEMICOLON)) {
+        NextToken();
+    }
     return stmt;
 }
 

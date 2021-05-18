@@ -115,6 +115,7 @@ public:
 class Ad_AST_ReturnStatement : public Ad_AST_Statement {
 public:
     Token token;
+    Ad_AST_Expression* value;
 
     Ad_AST_ReturnStatement();
     Ad_AST_ReturnStatement(Token);

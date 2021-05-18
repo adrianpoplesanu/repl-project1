@@ -71,7 +71,7 @@ Ad_AST_ReturnStatement::Ad_AST_ReturnStatement(Token t) {
 
 std::string Ad_AST_ReturnStatement::ToString() {
     std::string out = "ReturnStatement [";
-    out +=  token.literal + "]";
+    out +=  token.literal + "] <" + value->ToString() + ">";
     return out;
 }
 
