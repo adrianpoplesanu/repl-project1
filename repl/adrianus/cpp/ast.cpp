@@ -204,7 +204,11 @@ Ad_AST_CallExpression::Ad_AST_CallExpression(Token t, Ad_AST_Node* f) {
 }
 
 Ad_AST_CallExpression::~Ad_AST_CallExpression() {
-
+    free_Ad_AST_Node_memory(function);
+    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        free_Ad_AST_Node_memory(obj);
+    }
 }
 
 std::string Ad_AST_CallExpression::ToString() {

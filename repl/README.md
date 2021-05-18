@@ -9,3 +9,6 @@ How to run make commands in Windows:
 - run the make executable found at step 1 with params: all, clean-win, eg:
     "D:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\mingw32-make.exe" all
     "D:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\mingw32-make.exe" clean-win
+
+Important! Running valgrind will save your life. After installing it with "sudo apt install valgrinf" or whatever, run this:
+valgrind --tool=memcheck --leak-check=full ./main
