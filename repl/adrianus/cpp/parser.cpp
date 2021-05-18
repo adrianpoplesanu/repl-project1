@@ -142,15 +142,20 @@ Ad_AST_Statement* Parser::ParseReturnStatement() {
     Ad_AST_ReturnStatement* stmt = new Ad_AST_ReturnStatement(current_token);
     NextToken();
     stmt->value = ParseExpression(PT_LOWEST);
-    while (!CurrentTokenIs(TT_SEMICOLON)) {
+    while (!CurrentTokenIs(TT_SEMICOLON) && !CurrentTokenIs(TT_EOF)) {
         NextToken();
     }
     return stmt;
 }
 
 Ad_AST_Statement* Parser::ParseExpressionStatement() {
-    // TODO
-    //Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
+    //std::cout << current_token.literal;
+    Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
+    stmt->expression = ParseExpression(PT_LOWEST);
+    if (PeekTokenIs(TT_SEMICOLON)) {
+        NextToken();
+    }
+    return stmt;
     return NULL;
 }
 
@@ -172,6 +177,11 @@ Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* left) {
 
 Ad_AST_Node* Parser::ParseCallExpression(Ad_AST_Node* node) {
     // TODO
+    /*
+    exp = CallExpression(self.curToken, function=function)
+    exp.arguments = self.parseCallArguments()
+    return exp
+    */
     return NULL;
 }
 
@@ -206,11 +216,41 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
 
 Ad_AST_Node* Parser::ParseIfExpression() {
     // TODO
+    /*
+    expression = IfExpression(token=self.curToken)
+    if not self.expectPeek(TokenType.LPAREN):
+        return None
+    self.nextToken()
+    expression.condition = self.parseExpression(ParseType.LOWEST)
+    if not self.expectPeek(TokenType.RPAREN):
+        return None
+    if not self.expectPeek(TokenType.LBRACE):
+        return None
+    expression.consequence = self.parseBlockStatement()
+
+    if self.peekTokenIs(TokenType.ELSE):
+        self.nextToken()
+        if not self.expectPeek(TokenType.LBRACE):
+            return None
+        expression.alternative = self.parseBlockStatement()
+
+    return expression
+    */
     return NULL;
 }
 
 Ad_AST_Node* Parser::ParseFunctionLiteral() {
     // TODO
+    /*
+    function_literal = FunctionLiteral(self.curToken)
+    if not self.expectPeek(TokenType.LPAREN):
+        return None
+    function_literal.parameters = self.parseFunctionParameters()
+    if not self.expectPeek(TokenType.LBRACE):
+        return None
+    function_literal.body = self.parseBlockStatement()
+    return function_literal
+    */
     return NULL;
 }
 

@@ -126,6 +126,7 @@ public:
 class Ad_AST_ExpressionStatement : public Ad_AST_Statement {
 public:
     Token token;
+    Ad_AST_Expression* expression;
 
     Ad_AST_ExpressionStatement();
     Ad_AST_ExpressionStatement(Token);

@@ -86,7 +86,7 @@ Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
 
 std::string Ad_AST_ExpressionStatement::ToString() {
     std::string out = "ExpressionStatement [";
-    out +=  token.literal + "]";
+    out +=  token.literal + "] <" + expression->ToString() + ">";
     return out;
 }
 
