@@ -27,8 +27,10 @@ std::string Ad_AST_Program::TokenLiteral() {
 std::string Ad_AST_Program::ToString() {
     std::string out = "";
     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-        Ad_AST_Node *generic = *it;
-        std::cout << generic->ToString() << "\n";
+        Ad_AST_Node *stmt = *it;
+        if (stmt) {
+            std::cout << stmt->ToString() << "\n";
+        }
     }
     return out;
 }
@@ -69,6 +71,10 @@ Ad_AST_ReturnStatement::Ad_AST_ReturnStatement(Token t) {
     token = t;
 }
 
+Ad_AST_ReturnStatement::~Ad_AST_ReturnStatement() {
+    free_Ad_AST_Node_memory(value);
+}
+
 std::string Ad_AST_ReturnStatement::ToString() {
     std::string out = "ReturnStatement [";
     out +=  token.literal + "] <" + value->ToString() + ">";
@@ -77,16 +83,30 @@ std::string Ad_AST_ReturnStatement::ToString() {
 
 Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement() {
     type = ST_EXPRESSION_STATEMENT;
+    expression = NULL;
 }
 
 Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
     type = ST_EXPRESSION_STATEMENT;
     token = t;
+    expression = NULL;
+}
+
+Ad_AST_ExpressionStatement::~Ad_AST_ExpressionStatement() {
+    if (expression) { // nu inteleg de ce trebuie if-ul asta aici
+        free_Ad_AST_Node_memory(expression);
+    }
 }
 
 std::string Ad_AST_ExpressionStatement::ToString() {
     std::string out = "ExpressionStatement [";
-    out +=  token.literal + "] <" + expression->ToString() + ">";
+    out +=  token.literal + "] <";
+    if (expression) {
+        out += expression->ToString();
+    } else {
+        out += "null";
+    }
+    out += ">";
     return out;
 }
 

@@ -119,6 +119,7 @@ public:
 
     Ad_AST_ReturnStatement();
     Ad_AST_ReturnStatement(Token);
+    ~Ad_AST_ReturnStatement();
     std::string TokenLiteral();
     std::string ToString();
 };
@@ -130,6 +131,7 @@ public:
 
     Ad_AST_ExpressionStatement();
     Ad_AST_ExpressionStatement(Token);
+    ~Ad_AST_ExpressionStatement();
     std::string TokenLiteral();
     std::string ToString();
 };
