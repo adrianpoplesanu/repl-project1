@@ -74,6 +74,7 @@ bool Lexer::IsEOF() {
 Token Lexer::NextToken() {
     Token token;
     SkipWhitespace();
+    bool do_read_char_after_lexing = true;
     switch(current_char) {
         case 0:
             token.type = TT_EOF;
@@ -152,16 +153,18 @@ Token Lexer::NextToken() {
                 std::string ident = ReadIdentifier();
                 token.type = LookupIdent(ident);
                 token.literal = ident;
+                do_read_char_after_lexing = false;
             } else if (IsDigit()) {
                 std::string num = ReadNumber();
                 token.type = TT_INT;
                 token.literal = num;
+                do_read_char_after_lexing = false;
             } else {
                 token.type = TT_ILLEGAL;
                 token.literal = "";
             }
         break;
     }
-    if (token.type != TT_IDENT && token.type != TT_INT) ReadChar();
+    if (do_read_char_after_lexing) ReadChar();
     return token;
 }

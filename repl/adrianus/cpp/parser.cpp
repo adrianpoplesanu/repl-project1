@@ -254,23 +254,12 @@ Ad_AST_Node* Parser::ParseIfExpression() {
 }
 
 Ad_AST_Node* Parser::ParseFunctionLiteral() {
-    //std::cout << "===========\n";
-    //std::cout << token_type_map[current_token.type] << "\n";
-    //std::cout << token_type_map[peek_token.type] << "\n";
-    //std::cout << "===========\n";
     Ad_AST_FunctionLiteral* fun_lit = new Ad_AST_FunctionLiteral(current_token);
-    //NextToken();
-    std::cout << "===========\n";
-    std::cout << token_type_map[current_token.type] << "\n";
-    std::cout << token_type_map[peek_token.type] << "\n";
-    std::cout << "===========\n";
     if (!ExpectPeek(TT_LPAREN)) {
-        std::cout << "bbb\n";
         return NULL;
     }
     fun_lit->parameters = ParseFunctionParameters();
     if (!ExpectPeek(TT_LBRACE)) {
-        std::cout << "ccc\n";
         return NULL;
     }
     fun_lit->body = ParseBlockStatement();
@@ -278,11 +267,10 @@ Ad_AST_Node* Parser::ParseFunctionLiteral() {
 }
 
 std::vector<Ad_AST_Node*> Parser::ParseFunctionParameters() {
-    std::cout << "ddd\n";
     std::vector<Ad_AST_Node*> identifiers;
-    if (!PeekTokenIs(TT_RPAREN)) {
-        std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL
-        return empty;
+    if (PeekTokenIs(TT_RPAREN)) {
+        NextToken();
+        return identifiers;
     }
     NextToken();
     Ad_AST_Identifier* ident = new Ad_AST_Identifier(current_token, current_token.literal);
@@ -293,9 +281,9 @@ std::vector<Ad_AST_Node*> Parser::ParseFunctionParameters() {
         ident = new Ad_AST_Identifier(current_token, current_token.literal);
         identifiers.push_back(ident);
     }
-    if (!PeekTokenIs(TT_RPAREN)) {
+    if (!ExpectPeek(TT_RPAREN)) {
         std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL
-        return empty;        
+        return empty;
     }
     return identifiers;
 }
