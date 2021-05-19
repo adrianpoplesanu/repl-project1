@@ -37,6 +37,7 @@ std::string Ad_AST_Program::ToString() {
 
 Ad_AST_LetStatement::Ad_AST_LetStatement() {
     type = ST_LET_STATEMENT;
+    value = NULL;
 }
 
 Ad_AST_LetStatement::Ad_AST_LetStatement(Token t) {
@@ -64,11 +65,13 @@ std::string Ad_AST_LetStatement::ToString() {
 
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement() {
     type = ST_RETURN_STATEMENT;
+    value = NULL;
 }
 
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement(Token t) {
     type = ST_RETURN_STATEMENT;
     token = t;
+    value = NULL;
 }
 
 Ad_AST_ReturnStatement::~Ad_AST_ReturnStatement() {
@@ -163,6 +166,8 @@ std::string Ad_AST_Boolean::ToString() {
 
 Ad_AST_InfixExpression::Ad_AST_InfixExpression() {
     type = ST_INFIX_EXPRESSION;
+    left = NULL;
+    right = NULL;
 }
 
 Ad_AST_InfixExpression::~Ad_AST_InfixExpression() {
@@ -176,29 +181,51 @@ std::string Ad_AST_InfixExpression::ToString() {
 
 Ad_AST_PefixExpression::Ad_AST_PefixExpression() {
     type = ST_PREFIX_EXPRESSION;
+    right = NULL;
 }
 
 Ad_AST_PefixExpression::Ad_AST_PefixExpression(Token t, std::string op) {
     type = ST_PREFIX_EXPRESSION;
     token = t;
     _operator = op;
+    right = NULL;
 }
 
 Ad_AST_PefixExpression::~Ad_AST_PefixExpression() {
     free_Ad_AST_Node_memory(right);
 }
 
+std::string Ad_AST_PefixExpression::ToString() {
+    std::string out;
+    out = "(" + _operator + right->ToString() + ")";
+    return out;
+}
+
 Ad_AST_IfExpression::Ad_AST_IfExpression() {
     type = ST_IF_EXPRESSION;
+    condition = NULL;
+    consequence = NULL;
+    alternative = NULL;
 }
 
 Ad_AST_IfExpression::Ad_AST_IfExpression(Token t) {
     type = ST_IF_EXPRESSION;
     token = t;
+    condition = NULL;
+    consequence = NULL;
+    alternative = NULL;
 }
 
 Ad_AST_IfExpression::~Ad_AST_IfExpression() {
-
+    if (condition) {
+        free_Ad_AST_Node_memory(condition);
+    }
+    if (consequence) {
+        free_Ad_AST_Node_memory(consequence);
+    }
+    if (alternative) {
+        free_Ad_AST_Node_memory(alternative);
+    }
 }
 
 std::string Ad_AST_IfExpression::ToString() {
@@ -226,7 +253,10 @@ Ad_AST_BlockStatement::Ad_AST_BlockStatement(Token t) {
 }
 
 Ad_AST_BlockStatement::~Ad_AST_BlockStatement() {
-
+    for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        free_Ad_AST_Node_memory(obj);
+    }
 }
 
 std::string Ad_AST_BlockStatement::ToString() {
@@ -240,11 +270,13 @@ std::string Ad_AST_BlockStatement::ToString() {
 
 Ad_AST_CallExpression::Ad_AST_CallExpression() {
     type = ST_CALL_EXPRESSION;
+    function = NULL;
 }
 
 Ad_AST_CallExpression::Ad_AST_CallExpression(Token t) {
     type = ST_CALL_EXPRESSION;
     token = t;
+    function = NULL;
 }
 
 Ad_AST_CallExpression::Ad_AST_CallExpression(Token t, Ad_AST_Node* f) {
@@ -274,9 +306,29 @@ std::string Ad_AST_CallExpression::ToString() {
     return out;
 }
 
-std::string Ad_AST_PefixExpression::ToString() {
-    std::string out;
-    out = "(" + _operator + right->ToString() + ")";
+Ad_AST_FunctionLiteral::Ad_AST_FunctionLiteral() {
+    type = ST_FUNCTION_LITERAL;
+}
+
+Ad_AST_FunctionLiteral::Ad_AST_FunctionLiteral(Token t) {
+    type = ST_FUNCTION_LITERAL;
+    token = t;
+}
+
+Ad_AST_FunctionLiteral::~Ad_AST_FunctionLiteral() {
+
+}
+
+std::string Ad_AST_FunctionLiteral::ToString() {
+    std::string out = "[FunctionLiteral] <";
+    for (std::vector<Ad_AST_Node*>::iterator it = parameters.begin() ; it != parameters.end(); ++it) {
+        Ad_AST_Node *current = *it;
+        if (it != parameters.begin()) out += ", ";
+        out += current->ToString();
+    }
+    out += "><";
+    out += body->ToString();
+    out += ">";
     return out;
 }
 
@@ -320,6 +372,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         break;
         case ST_BLOCK_STATEMENT:
             delete (Ad_AST_BlockStatement*)obj;
+        break;
+        case ST_FUNCTION_LITERAL:
+            delete (Ad_AST_FunctionLiteral*)obj;
         break;
         default:
             std::cout << "MEMORY ERROR!!!: " << obj->type << "\n";

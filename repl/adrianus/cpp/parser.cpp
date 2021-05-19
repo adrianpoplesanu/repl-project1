@@ -229,27 +229,6 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
 }
 
 Ad_AST_Node* Parser::ParseIfExpression() {
-    // TODO
-    /*
-    expression = IfExpression(token=self.curToken)
-    if not self.expectPeek(TokenType.LPAREN):
-        return None
-    self.nextToken()
-    expression.condition = self.parseExpression(ParseType.LOWEST)
-    if not self.expectPeek(TokenType.RPAREN):
-        return None
-    if not self.expectPeek(TokenType.LBRACE):
-        return None
-    expression.consequence = self.parseBlockStatement()
-
-    if self.peekTokenIs(TokenType.ELSE):
-        self.nextToken()
-        if not self.expectPeek(TokenType.LBRACE):
-            return None
-        expression.alternative = self.parseBlockStatement()
-
-    return expression
-    */
     Ad_AST_IfExpression* expr = new Ad_AST_IfExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
         return NULL;
@@ -275,57 +254,54 @@ Ad_AST_Node* Parser::ParseIfExpression() {
 }
 
 Ad_AST_Node* Parser::ParseFunctionLiteral() {
-    // TODO
-    /*
-    function_literal = FunctionLiteral(self.curToken)
-    if not self.expectPeek(TokenType.LPAREN):
-        return None
-    function_literal.parameters = self.parseFunctionParameters()
-    if not self.expectPeek(TokenType.LBRACE):
-        return None
-    function_literal.body = self.parseBlockStatement()
-    return function_literal
-    */
-    return NULL;
+    //std::cout << "===========\n";
+    //std::cout << token_type_map[current_token.type] << "\n";
+    //std::cout << token_type_map[peek_token.type] << "\n";
+    //std::cout << "===========\n";
+    Ad_AST_FunctionLiteral* fun_lit = new Ad_AST_FunctionLiteral(current_token);
+    //NextToken();
+    std::cout << "===========\n";
+    std::cout << token_type_map[current_token.type] << "\n";
+    std::cout << token_type_map[peek_token.type] << "\n";
+    std::cout << "===========\n";
+    if (!ExpectPeek(TT_LPAREN)) {
+        std::cout << "bbb\n";
+        return NULL;
+    }
+    fun_lit->parameters = ParseFunctionParameters();
+    if (!ExpectPeek(TT_LBRACE)) {
+        std::cout << "ccc\n";
+        return NULL;
+    }
+    fun_lit->body = ParseBlockStatement();
+    return fun_lit;
 }
 
 std::vector<Ad_AST_Node*> Parser::ParseFunctionParameters() {
-    // TODO
-    /*
-    identifiers = []
-    if self.peekTokenIs(TokenType.RPAREN):
-        self.nextToken()
-        return identifiers
-    self.nextToken()
-    ident = Identifier(token=self.curToken, value=self.curToken.literal)
-    identifiers.append(ident)
-    while self.peekTokenIs(TokenType.COMMA):
-        self.nextToken()
-        self.nextToken()
-        ident = Identifier(token=self.curToken, value=self.curToken.literal)
-        identifiers.append(ident)
-    if not self.peekTokenIs(TokenType.RPAREN):
-        return None
-    return identifiers
-    */
+    std::cout << "ddd\n";
     std::vector<Ad_AST_Node*> identifiers;
+    if (!PeekTokenIs(TT_RPAREN)) {
+        std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL
+        return empty;
+    }
+    NextToken();
+    Ad_AST_Identifier* ident = new Ad_AST_Identifier(current_token, current_token.literal);
+    identifiers.push_back(ident);
+    while (PeekTokenIs(TT_COMMA)) {
+        NextToken();
+        NextToken();
+        ident = new Ad_AST_Identifier(current_token, current_token.literal);
+        identifiers.push_back(ident);
+    }
+    if (!PeekTokenIs(TT_RPAREN)) {
+        std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL
+        return empty;        
+    }
     return identifiers;
 }
 
 Ad_AST_Node* Parser::ParseBlockStatement() {
-    /*
-    block = BlockStatement(token=self.curToken, statements=None)
-    block.statements = []
-    self.nextToken()
-    while not self.curTokenIs(TokenType.RBRACE) and not self.curTokenIs(TokenType.EOF):
-        statement = self.parseStatement()
-        if statement:
-            block.statements.append(statement)
-        self.nextToken()
-    return block
-    */
     Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(current_token);
-    // block->statements->empty();
     NextToken();
     while(!CurrentTokenIs(TT_RBRACE) && !CurrentTokenIs(TT_EOF)) {
         Ad_AST_Statement* stmt = ParseStatement();

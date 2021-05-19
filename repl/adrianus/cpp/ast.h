@@ -18,7 +18,8 @@ enum StatementType {
     ST_PREFIX_EXPRESSION,
     ST_CALL_EXPRESSION,
     ST_IF_EXPRESSION,
-    ST_BLOCK_STATEMENT
+    ST_BLOCK_STATEMENT,
+    ST_FUNCTION_LITERAL
 };
 
 class Ad_AST_Node {
@@ -133,7 +134,7 @@ class Ad_AST_FunctionLiteral : public Ad_AST_Node {
 public:
     Token token;
     std::vector<Ad_AST_Node*> parameters;
-    // Ad_AST_BlockStatement body;
+    Ad_AST_Node* body;
 
     Ad_AST_FunctionLiteral();
     Ad_AST_FunctionLiteral(Token);
