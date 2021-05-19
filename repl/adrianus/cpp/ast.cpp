@@ -188,6 +188,56 @@ Ad_AST_PefixExpression::~Ad_AST_PefixExpression() {
     free_Ad_AST_Node_memory(right);
 }
 
+Ad_AST_IfExpression::Ad_AST_IfExpression() {
+    type = ST_IF_EXPRESSION;
+}
+
+Ad_AST_IfExpression::Ad_AST_IfExpression(Token t) {
+    type = ST_IF_EXPRESSION;
+    token = t;
+}
+
+Ad_AST_IfExpression::~Ad_AST_IfExpression() {
+
+}
+
+std::string Ad_AST_IfExpression::ToString() {
+    std::string out = "";
+    out += "[IfExpression] ";
+    if (condition) {
+        out += "condition: " + condition->ToString() + " ";
+    }
+    if (consequence) {
+        out += "consequence: " + consequence->ToString() + " ";
+    }
+    if (alternative) {
+        out += "alternative: " + alternative->ToString() + " ";
+    }
+    return out;
+}
+
+Ad_AST_BlockStatement::Ad_AST_BlockStatement() {
+    type = ST_BLOCK_STATEMENT;
+}
+
+Ad_AST_BlockStatement::Ad_AST_BlockStatement(Token t) {
+    type = ST_BLOCK_STATEMENT;
+    token = t;
+}
+
+Ad_AST_BlockStatement::~Ad_AST_BlockStatement() {
+
+}
+
+std::string Ad_AST_BlockStatement::ToString() {
+    std::string out = "";
+    for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        out += obj->ToString();
+    }
+    return out;
+}
+
 Ad_AST_CallExpression::Ad_AST_CallExpression() {
     type = ST_CALL_EXPRESSION;
 }
@@ -212,7 +262,7 @@ Ad_AST_CallExpression::~Ad_AST_CallExpression() {
 }
 
 std::string Ad_AST_CallExpression::ToString() {
-    std::string out = "";
+    std::string out = "[CallExpression] ";
     out += function->ToString();
     out += "(";
     for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
@@ -264,6 +314,12 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         break;
         case ST_CALL_EXPRESSION:
             delete (Ad_AST_CallExpression*)obj;
+        break;
+        case ST_IF_EXPRESSION:
+            delete (Ad_AST_IfExpression*)obj;
+        break;
+        case ST_BLOCK_STATEMENT:
+            delete (Ad_AST_BlockStatement*)obj;
         break;
         default:
             std::cout << "MEMORY ERROR!!!: " << obj->type << "\n";
