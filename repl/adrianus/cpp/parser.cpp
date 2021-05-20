@@ -50,7 +50,7 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
     int limit = 0;
     while (current_token.type != TT_EOF) {
         //std::cout << current_token.ToString() << "\n";
-        Ad_AST_Statement *stmt = ParseStatement();
+        Ad_AST_Statement *stmt = (Ad_AST_Statement*)ParseStatement();
         if (stmt) program.statements.push_back(stmt);
         //if (stmt) PrintNode(stmt);
         NextToken();
@@ -107,7 +107,7 @@ void Parser::PeekError(std::string msg) {
     errors.push_back(msg);
 }
 
-Ad_AST_Statement* Parser::ParseStatement() {
+Ad_AST_Node* Parser::ParseStatement() {
     if (current_token.type == TT_LET)
         return ParseLetStatement();
     if (current_token.type == TT_RETURN)
@@ -115,7 +115,7 @@ Ad_AST_Statement* Parser::ParseStatement() {
     return ParseExpressionStatement();
 }
 
-Ad_AST_Statement* Parser::ParseLetStatement() {
+Ad_AST_Node* Parser::ParseLetStatement() {
     Ad_AST_LetStatement* stmt = new Ad_AST_LetStatement(current_token);
 
     if (!ExpectPeek(TT_IDENT)) {
@@ -131,26 +131,26 @@ Ad_AST_Statement* Parser::ParseLetStatement() {
     }
 
     NextToken();
-    stmt->value = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
+    stmt->value = ParseExpression(PT_LOWEST);
     if (CurrentTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
     return stmt;
 }
 
-Ad_AST_Statement* Parser::ParseReturnStatement() {
+Ad_AST_Node* Parser::ParseReturnStatement() {
     Ad_AST_ReturnStatement* stmt = new Ad_AST_ReturnStatement(current_token);
     NextToken();
-    stmt->value = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
+    stmt->value = ParseExpression(PT_LOWEST);
     while (!CurrentTokenIs(TT_SEMICOLON) && !CurrentTokenIs(TT_EOF)) {
         NextToken();
     }
     return stmt;
 }
 
-Ad_AST_Statement* Parser::ParseExpressionStatement() {
+Ad_AST_Node* Parser::ParseExpressionStatement() {
     Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
-    stmt->expression = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
+    stmt->expression = ParseExpression(PT_LOWEST);
     if (PeekTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
@@ -221,7 +221,7 @@ Ad_AST_Node* Parser::ParseBoolean() {
 
 Ad_AST_Node* Parser::ParseGroupedExpression() {
     NextToken();
-    Ad_AST_Expression* expr = (Ad_AST_Expression *)ParseExpression(PT_LOWEST);
+    Ad_AST_Node* expr = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
         return NULL;
     }
@@ -292,7 +292,7 @@ Ad_AST_Node* Parser::ParseBlockStatement() {
     Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(current_token);
     NextToken();
     while(!CurrentTokenIs(TT_RBRACE) && !CurrentTokenIs(TT_EOF)) {
-        Ad_AST_Statement* stmt = ParseStatement();
+        Ad_AST_Statement* stmt = (Ad_AST_Statement*)ParseStatement();
         if (stmt) {
             block->statements.push_back(stmt);
         }

@@ -55,10 +55,10 @@ public:
     void PeekError(std::string);
     ParseType PeekPrecedence();
     ParseType CurPrecedence();
-    Ad_AST_Statement* ParseStatement();
-    Ad_AST_Statement* ParseLetStatement();
-    Ad_AST_Statement* ParseReturnStatement();
-    Ad_AST_Statement* ParseExpressionStatement();
+    Ad_AST_Node* ParseStatement();
+    Ad_AST_Node* ParseLetStatement();
+    Ad_AST_Node* ParseReturnStatement();
+    Ad_AST_Node* ParseExpressionStatement();
     void PrintNode(Ad_AST_Node*);
     Ad_AST_Node* ParseIdentifier();
     Ad_AST_Node* ParseIntegerLiteral();

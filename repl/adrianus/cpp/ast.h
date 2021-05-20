@@ -157,7 +157,7 @@ class Ad_AST_LetStatement : public Ad_AST_Statement {
 public:
     Token token;
     Ad_AST_Identifier name;
-    Ad_AST_Expression* value;
+    Ad_AST_Node* value;
 
     Ad_AST_LetStatement();
     Ad_AST_LetStatement(Token);
@@ -169,7 +169,7 @@ public:
 class Ad_AST_ReturnStatement : public Ad_AST_Statement {
 public:
     Token token;
-    Ad_AST_Expression* value;
+    Ad_AST_Node* value;
 
     Ad_AST_ReturnStatement();
     Ad_AST_ReturnStatement(Token);
@@ -181,7 +181,7 @@ public:
 class Ad_AST_ExpressionStatement : public Ad_AST_Statement {
 public:
     Token token; // this variable is never instantiated, maybe i don't need to print it in the depth first search
-    Ad_AST_Expression* expression;
+    Ad_AST_Node* expression;
 
     Ad_AST_ExpressionStatement();
     Ad_AST_ExpressionStatement(Token);
