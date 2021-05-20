@@ -6,6 +6,10 @@ all:
 	g++ -std=c++11 objects.cpp -c -o objects.o
 	g++ -std=c++11 evaluator.cpp -c -o evaluator.o
 	g++ -std=c++11 repl.cpp -c -o repl.o
+	g++ -std=c++11 test_objects.cpp -c -o test_objects.o
+	g++ -std=c++11 tests.cpp -c -o tests.o
+	g++ -std=c++11 test_parser.cpp -c -o test_parser.o
+	g++ -std=c++11 utils.cpp -c -o utils.o
 	g++ -std=c++11 main.cpp -c -o main.o
 	g++ -std=c++11 main.o -o main
 

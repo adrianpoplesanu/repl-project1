@@ -10,7 +10,7 @@ std::string Ad_AST_Node::ToString() {
 }
 
 Ad_AST_Program::Ad_AST_Program() {
-
+    type = ST_PROGRAM;
 }
 
 Ad_AST_Program::~Ad_AST_Program() {

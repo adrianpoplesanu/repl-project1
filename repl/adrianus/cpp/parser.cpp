@@ -49,7 +49,7 @@ void Parser::Load(std::string s) {
 void Parser::ParseProgram(Ad_AST_Program &program) {
     int limit = 0;
     while (current_token.type != TT_EOF) {
-        std::cout << current_token.ToString() << "\n";
+        //std::cout << current_token.ToString() << "\n";
         Ad_AST_Statement *stmt = ParseStatement();
         if (stmt) program.statements.push_back(stmt);
         //if (stmt) PrintNode(stmt);

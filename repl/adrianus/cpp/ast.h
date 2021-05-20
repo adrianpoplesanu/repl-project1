@@ -6,6 +6,7 @@
 #include <vector>
 
 enum StatementType {
+    ST_PROGRAM,
     ST_LET_STATEMENT,
     ST_RETURN_STATEMENT,
     ST_EXPRESSION_STATEMENT,
