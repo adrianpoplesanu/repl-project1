@@ -316,7 +316,11 @@ Ad_AST_FunctionLiteral::Ad_AST_FunctionLiteral(Token t) {
 }
 
 Ad_AST_FunctionLiteral::~Ad_AST_FunctionLiteral() {
-
+    free_Ad_AST_Node_memory(body);
+    for (std::vector<Ad_AST_Node*>::iterator it = parameters.begin() ; it != parameters.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        free_Ad_AST_Node_memory(obj);
+    }
 }
 
 std::string Ad_AST_FunctionLiteral::ToString() {
