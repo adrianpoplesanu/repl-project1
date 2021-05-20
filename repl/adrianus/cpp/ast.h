@@ -180,7 +180,7 @@ public:
 
 class Ad_AST_ExpressionStatement : public Ad_AST_Statement {
 public:
-    Token token;
+    Token token; // this variable is never instantiated, maybe i don't need to print it in the depth first search
     Ad_AST_Expression* expression;
 
     Ad_AST_ExpressionStatement();
