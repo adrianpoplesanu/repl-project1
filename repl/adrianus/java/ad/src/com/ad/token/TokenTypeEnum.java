@@ -1,0 +1,30 @@
+package com.ad.token;
+
+public enum TokenTypeEnum {
+	ILLEGAL,
+	EOF,
+	ASSIGN,
+	LET,
+	RETURN,
+	IF,
+	ELSE,
+	FUNCTION,
+	WHILE,
+	TRUE,
+	FALSE,
+	PLUS,
+	MINUS,
+	SLASH,
+	ASTERISK,
+	BANG,
+	GT,
+	LT,
+	COMMA,
+	SEMICOLON,
+	LPAREN,
+	RPAREN,
+	LBRACE,
+	RBRACE,
+	IDENT,
+	INT
+}
