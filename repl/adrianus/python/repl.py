@@ -3,7 +3,7 @@ import sys
 
 
 def signal_ctrl_c_handler(sig, frame):
-	print ("\nleaving \033[1;32;48mAdrianus\033[1;37;0m, bye bye!")
+	print ("\nleaving \033[1;32;48mAd\033[1;37;0m, bye bye!")
 	sys.exit(0)
 
 
@@ -15,7 +15,7 @@ class Repl(object):
 
 	def loop(self):
 		signal.signal(signal.SIGINT, signal_ctrl_c_handler)
-		print ("welcome to \033[1;32;48mAdrianus\033[1;37;0m programming language")
+		print ("\033[1;32;48mAd interpreter\033[1;37;0m [Python]... v1.0")
 		while True:
 			line = input('>> ')
 			self.parser.reset(source=line)

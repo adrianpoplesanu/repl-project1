@@ -2,13 +2,13 @@ import sys
 from repl import Repl
 from lexer import Lexer
 from parser import Parser
-from ast import Program
+from ast import ASTProgram
 
 
 def main(args):
 	lexer = Lexer()
 	parser = Parser()
-	program = Program()
+	program = ASTProgram()
 	repl = Repl(lexer=lexer, parser=parser, program=program)
 	if args:
 		filename = open(args[0], "r")
