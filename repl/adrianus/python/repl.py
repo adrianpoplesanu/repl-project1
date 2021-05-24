@@ -3,21 +3,20 @@ import sys
 
 
 def signal_ctrl_c_handler(sig, frame):
-	print ("\nleaving \033[1;32;48mAd\033[1;37;0m, bye bye!")
+	print ("\nleaving Ad, bye bye!")
 	sys.exit(0)
 
 
 class Repl(object):
-	def __init__(self, lexer=None, parser=None, program=None):
-		self.repl = lexer
+	def __init__(self, parser=None, program=None):
 		self.parser = parser
 		self.program = program
 
 	def loop(self):
 		signal.signal(signal.SIGINT, signal_ctrl_c_handler)
-		print ("\033[1;32;48mAd interpreter\033[1;37;0m [Python]... v1.0")
+		print ("Ad interpreter [Python]... v1.0")
 		while True:
-			line = input('>> ')
+			line = raw_input('>> ')
 			self.parser.reset(source=line)
 			self.program.reset()
 			self.parser.build_program_statements(self.program)
