@@ -149,7 +149,7 @@ Ad_AST_Node* Parser::ParseReturnStatement() {
 }
 
 Ad_AST_Node* Parser::ParseExpressionStatement() {
-    Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement();
+    Ad_AST_ExpressionStatement* stmt = new Ad_AST_ExpressionStatement(current_token);
     stmt->expression = ParseExpression(PT_LOWEST);
     if (PeekTokenIs(TT_SEMICOLON)) {
         NextToken();

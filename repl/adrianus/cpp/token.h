@@ -61,7 +61,7 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_SLASH, "SLASH"},
     {TT_ASTERISK, "ASTERISK"},
     {TT_BANG, "BANG"},
-    {TT_INT, "INTEGER"}
+    {TT_INT, "INT"}
 };
 
 std::map<std::string, TokenType> keywords = {

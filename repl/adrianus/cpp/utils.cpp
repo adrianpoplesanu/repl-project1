@@ -29,7 +29,7 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
         break;
         case ST_EXPRESSION_STATEMENT:
             print_level(level);
-            std::cout << "->ExpressionStatement\n"; // no need to print the token, Ad_AST_ExpressionStatement never instantiates token variable
+            std::cout << "->ExpressionStatement " << ((Ad_AST_ExpressionStatement*)node)->token.ToString() << "\n";
             if (((Ad_AST_ExpressionStatement*)node)->expression) {
                 print_ast_nodes(((Ad_AST_ExpressionStatement*)node)->expression, level + padding);
             }
