@@ -22,3 +22,24 @@ body {
   user-select: none;
   // end make text unselectable
 }
+
+.wrapper {
+    position: relative;
+}
+
+.right,
+.left {
+
+    position: absolute;
+}
+
+.right {
+    width: 70%;
+    background-color: cyan;
+    right: 0;
+}
+
+.left {
+    width: 30%;
+    left: 0;
+}
