@@ -3,7 +3,7 @@ body {
   margin: auto;
   width:100%;
   height: 100%;
-  padding: 3%;
+  padding: 2%;
   overflow: hidden;
   background: #222;
   //display: flex;
@@ -29,17 +29,44 @@ body {
 
 .right,
 .left {
-
     position: absolute;
 }
 
 .right {
     width: 70%;
-    background-color: cyan;
     right: 0;
 }
 
 .left {
     width: 30%;
     left: 0;
+    /*height: 500px;*/
+    height: 90vh;
+    overflow-y: scroll;
+}
+
+.folder span {
+    padding-right: 3%;
+    padding-left: 2%;
+}
+
+.file span {
+    padding-right: 3%;
+    padding-left: 2%;
+}
+
+.folder-color {
+    color: #697891;
+}
+
+.file-color {
+    color: #85888c;
+}
+
+.highlighted {
+    background-color: orange;
+}
+
+.sub-folder{
+    padding-left: 5%;
 }

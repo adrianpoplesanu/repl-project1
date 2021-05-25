@@ -1,9 +1,10 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const { ipcMain } = require('electron');
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
+    width: 1600,
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -30,4 +31,13 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('resized', () => {
+  console.log('window has been resized');
+});
+
+ipcMain.on('synchronous-message', (event, arg) => {
+  console.log(arg) // prints "ping"
+  event.returnValue = 'pongus'
 });
