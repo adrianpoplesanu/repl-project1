@@ -20,7 +20,8 @@ enum StatementType {
     ST_CALL_EXPRESSION,
     ST_IF_EXPRESSION,
     ST_BLOCK_STATEMENT,
-    ST_FUNCTION_LITERAL
+    ST_FUNCTION_LITERAL,
+    ST_WHILE_EXPRESSION
 };
 
 class Ad_AST_Node {
@@ -186,6 +187,19 @@ public:
     Ad_AST_ExpressionStatement();
     Ad_AST_ExpressionStatement(Token);
     ~Ad_AST_ExpressionStatement();
+    std::string TokenLiteral();
+    std::string ToString();
+};
+
+class Ad_AST_WhileExpression : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* condition;
+    Ad_AST_Node* consequence; // Ad_AST_BlockStatement
+
+    Ad_AST_WhileExpression();
+    Ad_AST_WhileExpression(Token);
+    ~Ad_AST_WhileExpression();
     std::string TokenLiteral();
     std::string ToString();
 };

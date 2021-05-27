@@ -14,6 +14,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseGroupedExpression));
     prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
     prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionLiteral));
+    prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -231,14 +232,17 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
 Ad_AST_Node* Parser::ParseIfExpression() {
     Ad_AST_IfExpression* expr = new Ad_AST_IfExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
+        // need to delete expr;
         return NULL;
     }
     NextToken();
     expr->condition = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
+        // need to delete expr;
         return NULL;
     }
     if (!ExpectPeek(TT_LBRACE)) {
+        // need to delete expr;
         return NULL;
     }
     expr->consequence = ParseBlockStatement();
@@ -246,6 +250,7 @@ Ad_AST_Node* Parser::ParseIfExpression() {
     if (PeekTokenIs(TT_ELSE)) {
         NextToken();
         if (!ExpectPeek(TT_LBRACE)) {
+            // need to delete expr;
             return NULL;
         }
         expr->alternative = ParseBlockStatement();
@@ -256,10 +261,12 @@ Ad_AST_Node* Parser::ParseIfExpression() {
 Ad_AST_Node* Parser::ParseFunctionLiteral() {
     Ad_AST_FunctionLiteral* fun_lit = new Ad_AST_FunctionLiteral(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
+        // need to delete fun_lit;
         return NULL;
     }
     fun_lit->parameters = ParseFunctionParameters();
     if (!ExpectPeek(TT_LBRACE)) {
+        // need to delete fun_lit;
         return NULL;
     }
     fun_lit->body = ParseBlockStatement();
@@ -299,6 +306,26 @@ Ad_AST_Node* Parser::ParseBlockStatement() {
         NextToken();
     }
     return block;
+}
+
+Ad_AST_Node* Parser::ParseWhileExpression() {
+    Ad_AST_WhileExpression* expr = new Ad_AST_WhileExpression(current_token);
+    if (!ExpectPeek(TT_LPAREN)) {
+        // need to delete expr
+        return NULL;
+    }
+    NextToken();
+    expr->condition = ParseExpression(PT_LOWEST);
+    if (!ExpectPeek(TT_RPAREN)) {
+        // need to delete expr;
+        return NULL;
+    }
+    if (!ExpectPeek(TT_LBRACE)) {
+        // need to delete expr;
+        return NULL;
+    }
+    expr->consequence = ParseBlockStatement();
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {

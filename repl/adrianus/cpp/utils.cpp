@@ -108,5 +108,11 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             }
             print_ast_nodes(((Ad_AST_FunctionLiteral*)node)->body, level + padding);
         break;
+        case ST_WHILE_EXPRESSION:
+            print_level(level);
+            std::cout << "->WhileExpression " << ((Ad_AST_WhileExpression*)node)->token.ToString() << "\n";
+            print_ast_nodes(((Ad_AST_WhileExpression*)node)->condition, level + padding);
+            print_ast_nodes(((Ad_AST_WhileExpression*)node)->consequence, level + padding);
+        break;
     }
 }

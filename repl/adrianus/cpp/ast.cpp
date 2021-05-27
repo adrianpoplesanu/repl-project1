@@ -336,6 +336,29 @@ std::string Ad_AST_FunctionLiteral::ToString() {
     return out;
 }
 
+Ad_AST_WhileExpression::Ad_AST_WhileExpression() {
+    type = ST_WHILE_EXPRESSION;
+}
+
+Ad_AST_WhileExpression::Ad_AST_WhileExpression(Token t) {
+    type = ST_WHILE_EXPRESSION;
+    token = t;
+}
+
+Ad_AST_WhileExpression::~Ad_AST_WhileExpression() {
+    if (condition) {
+        free_Ad_AST_Node_memory(condition);
+    }
+    if (consequence) {
+        free_Ad_AST_Node_memory(consequence);
+    }
+}
+
+std::string Ad_AST_WhileExpression::ToString() {
+    std::string out = "";
+    return out;
+}
+
 void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
     switch(obj->type) {
         case ST_LET_STATEMENT:
@@ -379,6 +402,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         break;
         case ST_FUNCTION_LITERAL:
             delete (Ad_AST_FunctionLiteral*)obj;
+        break;
+        case ST_WHILE_EXPRESSION:
+            delete (Ad_AST_WhileExpression*)obj;
         break;
         default:
             std::cout << "MEMORY ERROR!!!: " << obj->type << "\n";
