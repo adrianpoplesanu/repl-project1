@@ -15,6 +15,9 @@ void Repl::Loop() {
         std::string line;
         std::cout << ">> ";
         std::getline(std::cin, line);
+        if (line == "exit()") {
+            break;
+        }
         ParseLine(line);
     }
 }
