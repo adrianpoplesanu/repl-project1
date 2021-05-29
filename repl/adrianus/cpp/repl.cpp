@@ -29,5 +29,6 @@ void Repl::ParseLine(std::string line) {
     parser.ParseProgram(program);
     //parser.TestInfixFunction(TT_PLUS);
     //program.ToString();
-    evaluator.Eval((Ad_AST_Node *)&program);
+    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program);
+    delete res; // res is null now because EvalProgram returns NULL
 }

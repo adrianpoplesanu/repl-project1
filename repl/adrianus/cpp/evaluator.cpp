@@ -13,7 +13,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node) {
         case ST_INFIX_EXPRESSION: {
             Ad_Object* left = Eval(((Ad_AST_InfixExpression*)node)->left);
             Ad_Object* right = Eval(((Ad_AST_InfixExpression*)node)->right);
-            return EvalInfixExpression(((Ad_AST_InfixExpression*)node)->_operator, left, right);
+            Ad_Object* result = EvalInfixExpression(((Ad_AST_InfixExpression*)node)->_operator, left, right);
+            delete left; // this is smart
+            delete right; // this is smart
+            return result;
         }
         case ST_INTEGER: {
             Ad_Integer_Object* obj = new Ad_Integer_Object();
@@ -36,6 +39,8 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node) {
             result->Print();
             std::cout << "\n";
         }
+        std::cout << "object to be deleted: " << result->type << "\n";
+        delete result; // i don't think this needs to be here, it needs to be binded with the env if it's an assignment
     }
 
     return NULL;
