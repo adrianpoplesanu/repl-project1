@@ -8,7 +8,7 @@
 // 0 - no test is being run ar startinme, 1 - all tests are run at startime
 #define RUN_TESTS 0
 // 0 - parser test is not run, 1 - run and print AST structure
-#define RUN_PARSER_TESTS 1
+#define RUN_PARSER_TESTS 0
 
 
 int main(int argc, char *argv[]) {
