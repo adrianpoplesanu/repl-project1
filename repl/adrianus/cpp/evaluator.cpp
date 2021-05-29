@@ -3,10 +3,11 @@
 Ad_Object* Evaluator::Eval(Ad_AST_Node* node) {
     switch(node->type) {
         case ST_PROGRAM:
-            std::cout << "evaluating ST_PROGRAM\n";
+            //std::cout << "evaluating ST_PROGRAM\n";
             return EvalProgram(node);
         break;
         case ST_EXPRESSION_STATEMENT:
+            //std::cout << "evaluating ST_EXPRESSION_STATEMENT\n";
             return Eval(((Ad_AST_ExpressionStatement*)node)->expression);
         break;
         case ST_INFIX_EXPRESSION: {
@@ -17,16 +18,18 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node) {
             if isError(right):
                 return right
             return evalInfixExpression(node.operator, left, right)*/
+            //std::cout << "evaluating ST_INFIX_EXPRESSION\n";
             Ad_Object* left = Eval(((Ad_AST_InfixExpression*)node)->left);
             Ad_Object* right = Eval(((Ad_AST_InfixExpression*)node)->right);
             return EvalInfixExpression(((Ad_AST_InfixExpression*)node)->_operator, left, right);
             //break;
         }
-        case ST_INTEGER:
-            Ad_Integer_Object* obj;
+        case ST_INTEGER: {
+            //std::cout << "evaluating ST_INTEGER\n";
+            Ad_Integer_Object* obj = new Ad_Integer_Object();
             obj->value = ((Ad_AST_Integer*)node)->value;
             return obj;
-        break;
+        }
         default:
             std::cout << node->type << "\n";
         break;
@@ -40,8 +43,12 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node) {
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_Program*)node)->statements.begin() ; it != ((Ad_AST_Program*)node)->statements.end(); ++it) {
         Ad_AST_Node *obj = *it;
         result = Eval(obj);
-        result->Print();
-        std::cout << "\n";
+        if (result) {
+            //std::cout << result->type << "\n";
+            //std::cout << result->value << "\n";
+            result->Print();
+            std::cout << "\n";
+        }
     }
 
     return NULL;
@@ -74,16 +81,20 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
     int left_val = ((Ad_Integer_Object*)left)->value;
     int right_val = ((Ad_Integer_Object*)right)->value;
     if (_operator == "+") {
-        return new Ad_Integer_Object(left_val + right_val);
+        Ad_Integer_Object* obj = new Ad_Integer_Object(left_val + right_val);
+        return obj;
     }
     if (_operator == "-") {
-        return new Ad_Integer_Object(left_val - right_val);
+        Ad_Integer_Object* obj = new Ad_Integer_Object(left_val - right_val);
+        return obj;
     }
     if (_operator == "*") {
-        return new Ad_Integer_Object(left_val * right_val);
+        Ad_Integer_Object* obj = new Ad_Integer_Object(left_val * right_val);
+        return obj;
     }
     if (_operator == "/") {
-        return new Ad_Integer_Object(left_val / right_val);
+        Ad_Integer_Object* obj = new Ad_Integer_Object(left_val / right_val);
+        return obj;
     }
     return NULL;
 }

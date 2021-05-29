@@ -29,7 +29,7 @@ std::string Ad_Integer_Object::Inspect() {
 }
 
 void Ad_Integer_Object::Print() {
-
+    std::cout << value;
 }
 
 Ad_Object_Type Ad_Integer_Object::Type() {
