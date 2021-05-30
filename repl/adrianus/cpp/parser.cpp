@@ -120,14 +120,16 @@ Ad_AST_Node* Parser::ParseLetStatement() {
     Ad_AST_LetStatement* stmt = new Ad_AST_LetStatement(current_token);
 
     if (!ExpectPeek(TT_IDENT)) {
-        delete stmt;
+        //delete stmt;
+        free_Ad_AST_Node_memory(stmt);
         return NULL;
     }
 
     stmt->name = Ad_AST_Identifier(current_token, current_token.literal);
 
     if (!ExpectPeek(TT_ASSIGN)) {
-        delete stmt;
+        //delete stmt;
+        free_Ad_AST_Node_memory(stmt);
         return NULL;
     }
 
@@ -224,6 +226,8 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
     NextToken();
     Ad_AST_Node* expr = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
+        //delete expr;
+        free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     return expr;
@@ -232,17 +236,20 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
 Ad_AST_Node* Parser::ParseIfExpression() {
     Ad_AST_IfExpression* expr = new Ad_AST_IfExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
-        // need to delete expr;
+        //delete expr;
+        free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     expr->condition = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
-        // need to delete expr;
+        //delete expr;
+        free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     if (!ExpectPeek(TT_LBRACE)) {
-        // need to delete expr;
+        //delete expr;
+        free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     expr->consequence = ParseBlockStatement();
@@ -250,7 +257,8 @@ Ad_AST_Node* Parser::ParseIfExpression() {
     if (PeekTokenIs(TT_ELSE)) {
         NextToken();
         if (!ExpectPeek(TT_LBRACE)) {
-            // need to delete expr;
+            //delete expr;
+            free_Ad_AST_Node_memory(expr);
             return NULL;
         }
         expr->alternative = ParseBlockStatement();
@@ -261,12 +269,14 @@ Ad_AST_Node* Parser::ParseIfExpression() {
 Ad_AST_Node* Parser::ParseFunctionLiteral() {
     Ad_AST_FunctionLiteral* fun_lit = new Ad_AST_FunctionLiteral(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
-        // need to delete fun_lit;
+        //delete fun_lit;
+        free_Ad_AST_Node_memory(fun_lit);
         return NULL;
     }
     fun_lit->parameters = ParseFunctionParameters();
     if (!ExpectPeek(TT_LBRACE)) {
-        // need to delete fun_lit;
+        //delete fun_lit;
+        free_Ad_AST_Node_memory(fun_lit);
         return NULL;
     }
     fun_lit->body = ParseBlockStatement();
@@ -311,17 +321,20 @@ Ad_AST_Node* Parser::ParseBlockStatement() {
 Ad_AST_Node* Parser::ParseWhileExpression() {
     Ad_AST_WhileExpression* expr = new Ad_AST_WhileExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
-        // need to delete expr
+        //delete expr;
+        free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     expr->condition = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
-        // need to delete expr;
+        //delete expr;
+        free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     if (!ExpectPeek(TT_LBRACE)) {
-        // need to delete expr;
+        //delete expr;
+        free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     expr->consequence = ParseBlockStatement();
