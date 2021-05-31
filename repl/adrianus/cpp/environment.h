@@ -5,4 +5,7 @@ class Environment {
 
 };
 
+Environment NewEnvoronment();
+Environment NewEnclosedEnvironment(Environment);
+
 #endif

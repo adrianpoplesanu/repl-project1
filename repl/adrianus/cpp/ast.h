@@ -24,6 +24,25 @@ enum StatementType {
     ST_WHILE_EXPRESSION
 };
 
+std::map<StatementType, std::string> statement_type_map = {
+    {ST_PROGRAM, "Program"},
+    {ST_LET_STATEMENT, "LetStatement"},
+    {ST_RETURN_STATEMENT, "ReturnStatement"},
+    {ST_EXPRESSION_STATEMENT, "ExpressionStatement"},
+    {ST_IDENTIFIER, "Identifier"},
+    {ST_INTEGER, "Integer"},
+    {ST_BOOLEAN, "Boolean"},
+    {ST_STATEMENT, "Statement"},
+    {ST_EXPRESSION, "Expression"},
+    {ST_INFIX_EXPRESSION, "InfixExpression"},
+    {ST_PREFIX_EXPRESSION, "PrefixExpression"},
+    {ST_CALL_EXPRESSION, "CallExpression"},
+    {ST_IF_EXPRESSION, "IfExpression"},
+    {ST_BLOCK_STATEMENT, "BlockStatement"},
+    {ST_FUNCTION_LITERAL, "FunctionLiteral"},
+    {ST_WHILE_EXPRESSION, "WhileExpression"}
+};
+
 class Ad_AST_Node {
 public:
     StatementType type;

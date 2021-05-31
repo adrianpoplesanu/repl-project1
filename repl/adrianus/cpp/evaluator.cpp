@@ -23,8 +23,23 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node) {
             obj->value = ((Ad_AST_Integer*)node)->value;
             return obj;
         }
+        case ST_BOOLEAN: {
+            Ad_Boolean_Object* obj = new Ad_Boolean_Object();
+            obj->value = ((Ad_AST_Boolean*)node)->value;
+            return obj;
+        }
+        case ST_PREFIX_EXPRESSION: {
+            /*
+            right = Eval(node.right, env)
+            if isError(right):
+                return right
+            return evalPrefixExpression(node.operator, right)
+            */
+            Ad_Object* right = Eval(((Ad_AST_PefixExpression*)node)->right);
+            return EvalPrefixExpression(((Ad_AST_PefixExpression*)node)->_operator, right);
+        }
         default:
-            std::cout << node->type << "\n";
+            std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
     }
     return NULL;
@@ -36,11 +51,12 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node) {
         Ad_AST_Node *obj = *it;
         result = Eval(obj);
         if (result) {
-            result->Print();
+            //result->Print();
+            std::cout << result->Inspect();
             std::cout << "\n";
+            //std::cout << "object to be deleted: " << result->type << "\n";
         }
-        std::cout << "object to be deleted: " << result->type << "\n";
-        delete result; // i don't think this needs to be here, it needs to be binded with the env if it's an assignment
+        //delete result; // i don't think this needs to be here, it needs to be binded with the env if it's an assignment
     }
 
     return NULL;
@@ -72,5 +88,9 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
         Ad_Integer_Object* obj = new Ad_Integer_Object(left_val / right_val);
         return obj;
     }
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalPrefixExpression(std::string _operator, Ad_Object* right) {
     return NULL;
 }

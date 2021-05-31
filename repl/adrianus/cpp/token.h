@@ -32,7 +32,9 @@ enum TokenType {
     TT_FUNCTION,
     TT_LET,
     TT_INT,
-    TT_WHILE
+    TT_WHILE,
+    TT_LBRACKET,
+    TT_RBRACKET
 };
 
 std::map<TokenType, std::string> token_type_map = {
@@ -63,7 +65,9 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_ASTERISK, "ASTERISK"},
     {TT_BANG, "BANG"},
     {TT_INT, "INT"},
-    {TT_WHILE, "WHILE"}
+    {TT_WHILE, "WHILE"},
+    {TT_LBRACKET, "LBRACKET"},
+    {TT_RBRACKET, "RBRACKET"}
 };
 
 std::map<std::string, TokenType> keywords = {

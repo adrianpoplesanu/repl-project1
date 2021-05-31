@@ -25,6 +25,7 @@ Ad_Integer_Object::Ad_Integer_Object(int v) {
 
 std::string Ad_Integer_Object::Inspect() {
     std::string out = "";
+    out = std::to_string(value);
     return out;
 }
 
@@ -47,6 +48,11 @@ Ad_Boolean_Object::Ad_Boolean_Object(bool v) {
 
 std::string Ad_Boolean_Object::Inspect() {
     std::string out = "";
+    if (value) {
+        out = "true";
+    } else {
+        out = "false";
+    }
     return out;
 }
 
