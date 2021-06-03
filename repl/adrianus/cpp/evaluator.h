@@ -11,6 +11,9 @@ public:
     Ad_Object* EvalInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalIntegerInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalPrefixExpression(std::string, Ad_Object*);
+    Ad_Object* NewError(std::string);
+    Ad_Object* EvalBangOperatorExpression(Ad_Object*);
+    Ad_Object* EvalMinusPrefixOperatorExpression(Ad_Object*);
 };
 
 #endif

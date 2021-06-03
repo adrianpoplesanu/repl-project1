@@ -1,5 +1,8 @@
 #include "evaluator.h"
 
+Ad_Boolean_Object TRUE(true);
+Ad_Boolean_Object FALSE(false);
+
 Ad_Object* Evaluator::Eval(Ad_AST_Node* node) {
     switch(node->type) {
         case ST_PROGRAM:
@@ -29,12 +32,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node) {
             return obj;
         }
         case ST_PREFIX_EXPRESSION: {
-            /*
-            right = Eval(node.right, env)
-            if isError(right):
-                return right
-            return evalPrefixExpression(node.operator, right)
-            */
             Ad_Object* right = Eval(((Ad_AST_PefixExpression*)node)->right);
             return EvalPrefixExpression(((Ad_AST_PefixExpression*)node)->_operator, right);
         }
@@ -92,5 +89,25 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
 }
 
 Ad_Object* Evaluator::EvalPrefixExpression(std::string _operator, Ad_Object* right) {
+    if (_operator == "!") {
+        return EvalBangOperatorExpression(right);
+    }
+    if (_operator == "-") {
+        return EvalMinusPrefixOperatorExpression(right);
+    }
+    //return NewError("unknown operator: " + _operator + object_type_map[right->type]);
+    return NewError("prefix expression error");
+}
+
+Ad_Object* Evaluator::EvalBangOperatorExpression(Ad_Object* right) {
     return NULL;
+}
+
+Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
+    return NULL;
+}
+
+Ad_Object* Evaluator::NewError(std::string message) {
+    Ad_Error_Object* obj = new Ad_Error_Object(message);
+    return obj;
 }

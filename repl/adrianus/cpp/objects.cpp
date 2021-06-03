@@ -14,6 +14,10 @@ Ad_Object_Type Ad_Object::Type() {
     return OBJ_NULL;
 }
 
+Ad_Null_Object::Ad_Null_Object() {
+    type = OBJ_NULL;
+}
+
 Ad_Integer_Object::Ad_Integer_Object() {
     type = OBJ_INT;
 }
@@ -61,5 +65,28 @@ void Ad_Boolean_Object::Print() {
 }
 
 Ad_Object_Type Ad_Boolean_Object::Type() {
+    return type;
+}
+
+Ad_Error_Object::Ad_Error_Object() {
+    type = OBJ_ERROR;
+}
+
+Ad_Error_Object::Ad_Error_Object(std::string m) {
+    type = OBJ_ERROR;
+    message = m;
+}
+
+std::string Ad_Error_Object::Inspect() {
+    std::string out;
+    out = message;
+    return out;
+}
+
+void Ad_Error_Object::Print() {
+    std::cout << message;
+}
+
+Ad_Object_Type Ad_Error_Object::Type() {
     return type;
 }
