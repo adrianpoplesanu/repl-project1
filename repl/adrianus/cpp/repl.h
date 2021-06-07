@@ -3,6 +3,7 @@
 
 #include "parser.h"
 #include "evaluator.h"
+#include "environment.h"
 
 class Repl {
 private:
@@ -10,6 +11,7 @@ private:
 public:
     Parser parser;
     Evaluator evaluator;
+    Environment env;
 
     Repl();
     ~Repl();

@@ -90,3 +90,26 @@ void Ad_Error_Object::Print() {
 Ad_Object_Type Ad_Error_Object::Type() {
     return type;
 }
+
+void print_Ad_Object(Ad_Object* obj) {
+    switch(obj->type) {
+        case OBJ_NULL:
+            std::cout << "null\n";
+        break;
+        case OBJ_INT:
+            std::cout << ((Ad_Integer_Object*)obj)->value << "\n";
+        break;
+        case OBJ_BOOL:
+            std::cout << ((Ad_Boolean_Object*)obj)->value << "\n";
+        break;
+        case OBJ_STRING:
+            std::cout << ((Ad_String_Object*)obj)->value << "\n";
+        break;
+        case OBJ_RETURN_VALUE:
+            std::cout << ((Ad_ReturnValue_Object*)obj)->value << "\n";
+        break;
+        case OBJ_ERROR:
+            std::cout << "error object\n";
+        break;
+    }
+}

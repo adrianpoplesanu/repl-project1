@@ -2,6 +2,7 @@
 #include "repl.h"
 #include "parser.cpp"
 #include "evaluator.cpp"
+#include "environment.cpp"
 
 Repl::Repl() {
 
@@ -29,6 +30,6 @@ void Repl::ParseLine(std::string line) {
     parser.ParseProgram(program);
     //parser.TestInfixFunction(TT_PLUS);
     //program.ToString();
-    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program);
+    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);
     delete res; // res is null now because EvalProgram returns NULL
 }
