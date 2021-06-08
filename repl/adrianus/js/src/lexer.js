@@ -1,5 +1,3 @@
-console.log('loaded lexer.js');
-
 function Lexer() {
 	this.source = '';
 	this.position = 0;

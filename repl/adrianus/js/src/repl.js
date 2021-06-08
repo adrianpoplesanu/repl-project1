@@ -1,4 +1,4 @@
-console.log("loaded repl.js");
+//console.log("Ad interpreter [Javascript]... v1.0");
 
 function Repl(lexer) {
 	this.source = '';
