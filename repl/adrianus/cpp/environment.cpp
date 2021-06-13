@@ -1,7 +1,7 @@
 #include "environment.h"
 
 Environment::Environment() {
-    std::cout << "initialize env\n";
+
 }
 
 Environment::~Environment() {

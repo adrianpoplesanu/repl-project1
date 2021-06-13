@@ -1,5 +1,6 @@
 #include "evaluator.h"
 
+Ad_Null_Object NULLOBJECT;
 Ad_Boolean_Object TRUE(true);
 Ad_Boolean_Object FALSE(false);
 
@@ -17,14 +18,16 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             Ad_Object* left = Eval(((Ad_AST_InfixExpression*)node)->left, env);
             Ad_Object* right = Eval(((Ad_AST_InfixExpression*)node)->right, env);
             Ad_Object* result = EvalInfixExpression(((Ad_AST_InfixExpression*)node)->_operator, left, right);
-            delete left; // this is smart
-            delete right; // this is smart
+            // this object deletion process needs to be linked with env clear up and removal of references
+            // probably Ad_INCREF and Ad_DECREF will need to be used here
+            //delete left; // this is smart but here it just deletes pointers that are still referenced in the env
+            //delete right; // this is smart but here it just deletes pointers that are still referenced in the env
             return result;
         }
+        break;
         case ST_LET_STATEMENT: {
             Ad_Object* obj = Eval(((Ad_AST_LetStatement*)node)->value, env);
             env.Set(((Ad_AST_LetStatement*)node)->name.value, obj);
-            std::cout << "doing let statement\n";
             return NULL;
         }
         case ST_INTEGER: {
@@ -32,8 +35,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             obj->value = ((Ad_AST_Integer*)node)->value;
             return obj;
         }
+        break;
         case ST_IDENTIFIER: {
-            std::cout << "doing identifier\n";
             return EvalIdentifier(node, env);
         }
         case ST_BOOLEAN: {
@@ -41,10 +44,12 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             obj->value = ((Ad_AST_Boolean*)node)->value;
             return obj;
         }
+        break;
         case ST_PREFIX_EXPRESSION: {
             Ad_Object* right = Eval(((Ad_AST_PefixExpression*)node)->right, env);
             return EvalPrefixExpression(((Ad_AST_PefixExpression*)node)->_operator, right);
         }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -95,7 +100,23 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
         Ad_Integer_Object* obj = new Ad_Integer_Object(left_val / right_val);
         return obj;
     }
-    return NULL;
+    if (_operator == "<") {
+        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val < right_val);
+        return obj;
+    }
+    if (_operator == ">") {
+        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val > right_val);
+        return obj;
+    }
+    if (_operator == "==") {
+        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val == right_val);
+        return obj;
+    }
+    if (_operator == "!=") {
+        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val != right_val);
+        return obj;
+    }
+    return &NULLOBJECT;
 }
 
 Ad_Object* Evaluator::EvalPrefixExpression(std::string _operator, Ad_Object* right) {
@@ -131,7 +152,6 @@ Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
 }
 
 Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
-    std::cout << "in eval identifier\n";
     return env.Get(((Ad_AST_Identifier*)node)->token.literal);
 }
 
