@@ -22,6 +22,8 @@ std::map<TokenType, ParseType> precedences = {
     {TT_NOT_EQ, PT_EQUALS},
     {TT_LT, PT_LESSGREATER},
     {TT_GT, PT_LESSGREATER},
+    {TT_LTE, PT_LESSGREATER},
+    {TT_GTE, PT_LESSGREATER},
     {TT_PLUS, PT_SUM},
     {TT_MINUS, PT_SUM},
     {TT_SLASH, PT_PRODUCT},

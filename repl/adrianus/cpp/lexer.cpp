@@ -97,12 +97,23 @@ Token Lexer::NextToken() {
             token.literal = current_char;
         break;
         case '<':
-            token.type = TT_LT;
-            token.literal = current_char;
+            if (PeekChar() == '=') {
+                token.type = TT_LTE;
+                token.literal = "<=";
+            } else {
+                token.type = TT_LT;
+                token.literal = current_char;
+            }
         break;
         case '>':
-            token.type = TT_GT;
-            token.literal = current_char;
+            if (PeekChar() == '=') {
+                ReadChar();
+                token.type = TT_GTE;
+                token.literal = ">=";
+            } else {
+                token.type = TT_GT;
+                token.literal = current_char;
+            }
         break;
         case ',':
             token.type = TT_COMMA;

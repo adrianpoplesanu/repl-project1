@@ -108,6 +108,14 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
         Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val > right_val);
         return obj;
     }
+    if (_operator == "<=") {
+        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val <= right_val);
+        return obj;
+    }
+    if (_operator == ">=") {
+        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val >= right_val);
+        return obj;
+    }
     if (_operator == "==") {
         Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val == right_val);
         return obj;

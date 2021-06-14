@@ -12,7 +12,11 @@ Environment::~Environment() {
 }
 
 Ad_Object* Environment::Get(std::string key) {
-    return store[key];
+    if (store.find(key) == store.end() ) {
+        return NULL;
+    } else {
+        return store[key];
+    }
 }
 
 void Environment::Set(std::string key, Ad_Object* obj) {
