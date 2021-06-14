@@ -91,6 +91,14 @@ Ad_Object_Type Ad_Error_Object::Type() {
     return type;
 }
 
+void free_Ad_Object_memory(Ad_Object* obj) {
+    switch(obj->type) {
+        default:
+            std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
+        break;
+    }
+}
+
 void print_Ad_Object(Ad_Object* obj) {
     switch(obj->type) {
         case OBJ_NULL:
