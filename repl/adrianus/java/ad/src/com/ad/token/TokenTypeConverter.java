@@ -22,6 +22,8 @@ public class TokenTypeConverter {
 		put(TokenTypeEnum.SEMICOLON, "SEMICOLON");
 		put(TokenTypeEnum.LT, "LT");
 		put(TokenTypeEnum.GT, "GT");
+		put(TokenTypeEnum.LT, "LTE");
+		put(TokenTypeEnum.GT, "GTE");
 		put(TokenTypeEnum.PLUS, "PLUS");
 		put(TokenTypeEnum.MINUS, "MINUS");
 		put(TokenTypeEnum.SLASH, "SLASH");

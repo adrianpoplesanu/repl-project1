@@ -19,6 +19,8 @@ public enum TokenTypeEnum {
 	BANG,
 	GT,
 	LT,
+	GTE,
+	LTE,
 	COMMA,
 	SEMICOLON,
 	LPAREN,
