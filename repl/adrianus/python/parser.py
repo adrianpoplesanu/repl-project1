@@ -1,6 +1,7 @@
 from lexer import Lexer
 from token_type import TokenType
 from parse_type import ParseType, precedences
+from ast import ASTLetStatement
 
 
 class Parser(object):
@@ -81,7 +82,7 @@ class Parser(object):
 		return self.parse_expression_statement()
 
 	def parse_let_statement(self):
-		pass
+		return ASTLetStatement()
 
 	def parse_return_statement(self):
 		pass

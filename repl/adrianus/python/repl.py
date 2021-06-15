@@ -3,7 +3,7 @@ import sys
 
 
 def signal_ctrl_c_handler(sig, frame):
-	print ("\nleaving Ad, bye bye!")
+	#print ("\nleaving Ad, bye bye!")
 	sys.exit(0)
 
 
