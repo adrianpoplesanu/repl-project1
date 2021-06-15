@@ -34,11 +34,20 @@ class Lexer(object):
 			token.type = TokenType.ASTERISK
 			token.literal = self.ch
 		elif self.ch == '>':
-			token.type = TokenType.GT
-			token.literal = self.ch
+			if self.peek_char() == '=':
+				self.read_char()
+				token.type = TokenType.GTE
+				token.literal = ">="
+			else:
+				token.type = TokenType.GT
+				token.literal = self.ch
 		elif self.ch == '<':
-			token.type = TokenType.LT
-			token.literal = self.ch
+			if self.peek_char() == '=':
+				token.type = TokenType.GTE
+				token.literal = "<="
+			else:
+				token.type = TokenType.LT
+				token.literal = self.ch
 		elif self.ch == ';':
 			token.type = TokenType.SEMICOLON
 			token.literal = self.ch

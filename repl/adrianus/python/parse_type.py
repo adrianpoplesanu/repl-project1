@@ -14,6 +14,8 @@ precedences = {
     TokenType.NOT_EQ: ParseType.EQUALS,
     TokenType.LT: ParseType.LESSGREATER,
     TokenType.GT: ParseType.LESSGREATER,
+    TokenType.LTE: ParseType.LESSGREATER,
+    TokenType.GTE: ParseType.LESSGREATER,
     TokenType.PLUS: ParseType.SUM,
     TokenType.MINUS: ParseType.SUM,
     TokenType.SLASH: ParseType.PRODUCT,

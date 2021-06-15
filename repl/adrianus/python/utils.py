@@ -1,10 +1,12 @@
-from token_type import TokenType
+from ast import StatementType
 
 def print_ast_node(node, level):
     print ' ' * level,
-    if (node.type == TokenType.LET):
+    if (node.type == StatementType.PROGRAM):
         pass
-    if (node.type == TokenType.RETURN):
+    elif (node.type == StatementType.LET_STATEMENT):
+        pass
+    elif (node.type == StatementType.RETURN_STATEMENT):
         pass
     else:
-        pass
+        print 'ERROR: print ast node unknow type'
