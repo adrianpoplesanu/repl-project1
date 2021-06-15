@@ -16,6 +16,7 @@ class StatementType(object):
     FUNCTION_LITERAL = 'FUNCTION_LITERAL'
     WHILE_EXPRESSION = 'WHILE_EXPRESSION'
 
+
 statement_type_map = {
     StatementType.PROGRAM: 'PROGRAM',
     StatementType.LET_STATEMENT: 'LET_STATEMENT',
@@ -35,9 +36,24 @@ statement_type_map = {
     StatementType.WHILE_EXPRESSION: 'WHILE_EXPRESSION'
 }
 
+
 class ASTNode(object):
 	def __init__(self):
 		pass
+
+	def token_literal(self):
+		print 'token_literal unimplemented in subclass'
+
+	def __str__(self):
+		print '__str__ not implmented in subclass'
+
+
+class ASTInteger(ASTNode):
+	pass
+
+
+class ASTBoolean(ASTNode):
+	pass
 
 
 class ASTProgram(ASTNode):
@@ -52,15 +68,49 @@ class ASTProgram(ASTNode):
 			print statement
 
 
+class ASTIdentifier(ASTNode):
+	def __init__(self, token=None, value=''):
+		self.token = token
+		self.value = value
+
+	def token_literal(self):
+		return self.token.literal
+
+	def __str__(self):
+		return 'Identifier [token: ' + str(self.token) + ', value: ' + str(self.value) + ']'
+
+
+class ASTInteger(ASTNode):
+	pass
+
+
+class ASTBoolean(ASTNode):
+	pass
+
+
 class ASTLetStatement(ASTNode):
 	def __init__(self, token=None, name=None, value=None):
 		self.token = token
 		self.name = name
 		self.value = value
 
+	def token_literal(self):
+		return self.token.literal
+
+	def __str__(self):
+		return 'LetStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
+
 
 class ASTReturnStatement(ASTNode):
-	pass
+	def __init__(self, token=None, value=None):
+		self.token = token
+		self.value = value
+
+	def token_literal(self):
+		return self.token.literal
+
+	def __str__(self):
+		return 'ReturnStatement [' + str(self.token.literal) + '] <' + (str(self.value) if self.value else '') + '>'
 
 
 class ASTExpressionStatement(ASTNode):

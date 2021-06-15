@@ -23,4 +23,8 @@ class Repl(object):
 			self.program.debug()
 
 	def execute_file(self, source):
-		print (source)
+		#print (source)
+		self.parser.reset(source=source)
+		self.program.reset()
+		self.parser.build_program_statements(self.program)
+		self.program.debug()
