@@ -16,6 +16,7 @@ public:
     Ad_Object* EvalBangOperatorExpression(Ad_Object*);
     Ad_Object* EvalMinusPrefixOperatorExpression(Ad_Object*);
     Ad_Object* EvalIdentifier(Ad_AST_Node*, Environment&);
+    Ad_Object* EvalIfExpression(Ad_AST_Node*, Environment&);
 };
 
 #endif

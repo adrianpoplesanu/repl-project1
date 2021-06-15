@@ -50,6 +50,15 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalPrefixExpression(((Ad_AST_PefixExpression*)node)->_operator, right);
         }
         break;
+        case ST_IF_EXPRESSION: {
+            //...
+            //Ad_Object* condition = Eval(((Ad_AST_IfExpression*)node)->condition, env);
+            return EvalIfExpression(node, env);
+        }
+        case ST_BLOCK_STATEMENT: {
+            //...
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -161,6 +170,12 @@ Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
 
 Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
     return env.Get(((Ad_AST_Identifier*)node)->token.literal);
+}
+
+Ad_Object* Evaluator::EvalIfExpression(Ad_AST_Node* node, Environment &env) {
+    //...
+    Ad_Object* condition = Eval(((Ad_AST_IfExpression*)node)->condition, env);
+    return NULL;
 }
 
 Ad_Object* Evaluator::NewError(std::string message) {
