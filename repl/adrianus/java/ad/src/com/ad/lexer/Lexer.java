@@ -1,6 +1,7 @@
 package com.ad.lexer;
 
 import com.ad.token.Token;
+import com.ad.token.TokenKeywordConverter;
 import com.ad.token.TokenTypeEnum;
 
 public class Lexer {
@@ -67,8 +68,8 @@ public class Lexer {
 		default:
 			if (isLetter()) {
 				String literal = readIdentifier();
-				token.setType(TokenTypeEnum.IDENT);
-				// token.setType(lookupKeyword(literal));
+				//token.setType(TokenTypeEnum.IDENT);
+				token.setType(lookupKeyword(literal));
 				token.setLiteral(literal);
 			} else
 			if (isDigit()) {
@@ -77,7 +78,7 @@ public class Lexer {
 				token.setLiteral(literal);
 			} else {
 				token.setType(TokenTypeEnum.ILLEGAL);
-				token.setLiteral("");
+				token.setLiteral(String.valueOf(currentChar));
 			}
 		break;
 		}
@@ -110,7 +111,8 @@ public class Lexer {
 	}
 	
 	private TokenTypeEnum lookupKeyword(String literal) {
-		return TokenTypeEnum.ILLEGAL;
+		if (TokenKeywordConverter.keywords.containsKey(literal)) return TokenKeywordConverter.convertToKeyword(literal);
+		return TokenTypeEnum.IDENT;
 	}
 	
 	private void skipWhitespaces() {

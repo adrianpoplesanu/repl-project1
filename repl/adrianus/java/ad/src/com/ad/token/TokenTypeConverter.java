@@ -3,7 +3,7 @@ package com.ad.token;
 import java.util.HashMap;
 
 public class TokenTypeConverter {
-	static HashMap<TokenTypeEnum, String> tokenTypeMap = new HashMap<TokenTypeEnum, String>() {
+	public static HashMap<TokenTypeEnum, String> tokenTypeMap = new HashMap<TokenTypeEnum, String>() {
 		private static final long serialVersionUID = 1L;
 	{
 		put(TokenTypeEnum.ILLEGAL, "ILLEGAL");
