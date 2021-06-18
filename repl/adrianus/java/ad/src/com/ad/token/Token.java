@@ -9,9 +9,9 @@ public class Token {
 		literal = "";
 	}
 	
-	public Token(TokenTypeEnum t, String l) {
-		type = t;
-		literal = l;
+	public Token(TokenTypeEnum type, String literal) {
+		this.type = type;
+		this.literal = literal;
 	}
 	
 	public String toString() {

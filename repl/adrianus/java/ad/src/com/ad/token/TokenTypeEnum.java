@@ -21,6 +21,8 @@ public enum TokenTypeEnum {
 	LT,
 	GTE,
 	LTE,
+	EQ,
+	NOT_EQ,
 	COMMA,
 	SEMICOLON,
 	LPAREN,

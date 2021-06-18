@@ -17,16 +17,16 @@ public class Lexer {
 		readPosition = 0;
 	}
 	
-	public Lexer(String s) {
-		source = s;
+	public Lexer(String source) {
+		this.source = source;
 		currentChar = 0;
 		position = 0;
 		readPosition = 0;
 		readChar();
 	}
 	
-	public void reset(String s) {
-		source = s;
+	public void reset(String source) {
+		this.source = source;
 		currentChar = 0;
 		position = 0;
 		readPosition = 0;
@@ -36,6 +36,7 @@ public class Lexer {
 	public Token nextToken() {
 		Token token = new Token();
 		skipWhitespaces();
+		boolean needs_next_char = true;
 		switch(currentChar) {
 		case 0:
 			token.setType(TokenTypeEnum.EOF);
@@ -65,25 +66,65 @@ public class Lexer {
 			token.setType(TokenTypeEnum.COMMA);
 			token.setLiteral(",");
 		break;
+		case '(':
+			token.setType(TokenTypeEnum.LPAREN);
+			token.setLiteral("(");
+		break;
+		case ')':
+			token.setType(TokenTypeEnum.RPAREN);
+			token.setLiteral(")");
+		break;
+		case '{':
+			token.setType(TokenTypeEnum.LBRACE);
+			token.setLiteral("{");
+		break;
+		case '}':
+			token.setType(TokenTypeEnum.RBRACE);
+			token.setLiteral("}");
+		break;
+		case '<':
+			token.setType(TokenTypeEnum.LT);
+			token.setLiteral("<");
+		break;
+		case '>':
+			token.setType(TokenTypeEnum.GT);
+			token.setLiteral(">");
+		break;
+		case '=':
+			if (peekChar() == '=') {
+				token.setType(TokenTypeEnum.EQ);
+				token.setLiteral("==");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.ASSIGN);
+				token.setLiteral("=");
+			}
+		break;
 		default:
 			if (isLetter()) {
 				String literal = readIdentifier();
-				//token.setType(TokenTypeEnum.IDENT);
 				token.setType(lookupKeyword(literal));
 				token.setLiteral(literal);
+				needs_next_char = false;
 			} else
 			if (isDigit()) {
 				String literal = readNumber();
 				token.setType(TokenTypeEnum.INT);
 				token.setLiteral(literal);
+				needs_next_char = false;
 			} else {
 				token.setType(TokenTypeEnum.ILLEGAL);
 				token.setLiteral(String.valueOf(currentChar));
 			}
 		break;
 		}
-		readChar();
+		if (needs_next_char) readChar();
 		return token;	
+	}
+	
+	private char peekChar() {
+		if (readPosition >= source.length()) return 0;
+		return source.charAt(readPosition);
 	}
 	
 	private boolean isDigit() {
