@@ -383,12 +383,6 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         case ST_BOOLEAN:
             delete (Ad_AST_Boolean*)obj;
         break;
-        case ST_STATEMENT:
-            delete (Ad_AST_Statement*)obj;
-        break;
-        case ST_EXPRESSION:
-            delete (Ad_AST_Expression*)obj;
-        break;
         case ST_INFIX_EXPRESSION:
             delete (Ad_AST_InfixExpression*)obj;
         break;

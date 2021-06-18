@@ -172,8 +172,12 @@ Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
     return env.Get(((Ad_AST_Identifier*)node)->token.literal);
 }
 
+Ad_Object* EvalReturnStatement(Ad_AST_Node* node, Environment &env) {
+    return NULL;
+}
+
 Ad_Object* Evaluator::EvalIfExpression(Ad_AST_Node* node, Environment &env) {
-    //...
+    // TODO
     Ad_Object* condition = Eval(((Ad_AST_IfExpression*)node)->condition, env);
     return NULL;
 }

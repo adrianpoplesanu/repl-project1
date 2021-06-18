@@ -53,7 +53,7 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
     int limit = 0;
     while (current_token.type != TT_EOF) {
         //std::cout << current_token.ToString() << "\n";
-        Ad_AST_Statement *stmt = (Ad_AST_Statement*)ParseStatement();
+        Ad_AST_Node *stmt = (Ad_AST_Node*)ParseStatement();
         if (stmt) program.statements.push_back(stmt);
         //if (stmt) PrintNode(stmt);
         NextToken();
@@ -311,7 +311,7 @@ Ad_AST_Node* Parser::ParseBlockStatement() {
     Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(current_token);
     NextToken();
     while(!CurrentTokenIs(TT_RBRACE) && !CurrentTokenIs(TT_EOF)) {
-        Ad_AST_Statement* stmt = (Ad_AST_Statement*)ParseStatement();
+        Ad_AST_Node* stmt = (Ad_AST_Node*)ParseStatement();
         if (stmt) {
             block->statements.push_back(stmt);
         }

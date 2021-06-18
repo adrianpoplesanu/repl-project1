@@ -82,14 +82,6 @@ public:
     virtual std::string ToString();
 };
 
-class Ad_AST_Statement : public Ad_AST_Node {
-
-};
-
-class Ad_AST_Expression : public Ad_AST_Node {
-
-};
-
 class Ad_AST_InfixExpression : public Ad_AST_Node {
 public:
     Token token;
@@ -173,7 +165,7 @@ public:
     virtual std::string ToString();
 };
 
-class Ad_AST_LetStatement : public Ad_AST_Statement {
+class Ad_AST_LetStatement : public Ad_AST_Node {
 public:
     Token token;
     Ad_AST_Identifier name;
@@ -186,7 +178,7 @@ public:
     std::string ToString();
 };
 
-class Ad_AST_ReturnStatement : public Ad_AST_Statement {
+class Ad_AST_ReturnStatement : public Ad_AST_Node {
 public:
     Token token;
     Ad_AST_Node* value;
@@ -198,7 +190,7 @@ public:
     std::string ToString();
 };
 
-class Ad_AST_ExpressionStatement : public Ad_AST_Statement {
+class Ad_AST_ExpressionStatement : public Ad_AST_Node {
 public:
     Token token; // this variable is never instantiated, maybe i don't need to print it in the depth first search
     Ad_AST_Node* expression;
@@ -223,7 +215,7 @@ public:
     std::string ToString();
 };
 
-bool StatementIs(Ad_AST_Statement *stmt, StatementType st) {
+bool StatementIs(Ad_AST_Node *stmt, StatementType st) {
     return stmt->type == st;
 }
 
