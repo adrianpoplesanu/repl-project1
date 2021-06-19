@@ -7,3 +7,12 @@ class Environment(object):
 
     def set(self, key, value):
         pass
+
+
+def new_environment():
+    env = Environment()
+    return env
+
+def new_enclosed_environment(outer):
+    env = Environment()
+    return env

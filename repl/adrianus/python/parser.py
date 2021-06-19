@@ -1,7 +1,7 @@
 from lexer import Lexer
 from token_type import TokenType
 from parse_type import ParseType, precedences
-from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement
+from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement
 
 
 class Parser(object):
@@ -105,7 +105,11 @@ class Parser(object):
 		return stmt
 
     def parse_expression_statement(self):
-        pass
+        stmt = ASTExpressionStatement(token=self.current_token)
+        stmt.expression = self.parse_expression(ParseType.LOWEST)
+        if self.peek_token_is(TokenType.SEMICOLON):
+            self.next_token()
+        return stmt
 
     def parse_identifier(self):
         pass

@@ -38,80 +38,88 @@ statement_type_map = {
 
 
 class ASTNode(object):
-	def __init__(self):
-		pass
+    def __init__(self):
+        pass
 
-	def token_literal(self):
-		print 'token_literal unimplemented in subclass'
+    def token_literal(self):
+        print 'token_literal unimplemented in subclass'
 
-	def __str__(self):
-		print '__str__ not implmented in subclass'
+    def __str__(self):
+        print '__str__ not implmented in subclass'
 
 
 class ASTInteger(ASTNode):
-	pass
+    pass
 
 
 class ASTBoolean(ASTNode):
-	pass
+    pass
 
 
 class ASTProgram(ASTNode):
-	def __init__(self):
-		self.statements = []
+    def __init__(self):
+        self.statements = []
 
-	def reset(self):
-		self.statements = []
+    def reset(self):
+        self.statements = []
 
-	def debug(self):
-		for statement in self.statements:
-			print statement
+    def debug(self):
+        for statement in self.statements:
+            print statement
 
 
 class ASTIdentifier(ASTNode):
-	def __init__(self, token=None, value=''):
-		self.token = token
-		self.value = value
+    def __init__(self, token=None, value=''):
+        self.token = token
+        self.value = value
 
-	def token_literal(self):
-		return self.token.literal
+    def token_literal(self):
+        return self.token.literal
 
-	def __str__(self):
-		return 'Identifier [token: ' + str(self.token) + ', value: ' + str(self.value) + ']'
+    def __str__(self):
+        return 'Identifier [token: ' + str(self.token) + ', value: ' + str(self.value) + ']'
 
 
 class ASTInteger(ASTNode):
-	pass
+    pass
 
 
 class ASTBoolean(ASTNode):
-	pass
+    pass
 
 
 class ASTLetStatement(ASTNode):
-	def __init__(self, token=None, name=None, value=None):
-		self.token = token
-		self.name = name
-		self.value = value
+    def __init__(self, token=None, name=None, value=None):
+        self.token = token
+        self.name = name
+        self.value = value
 
-	def token_literal(self):
-		return self.token.literal
+    def token_literal(self):
+        return self.token.literal
 
-	def __str__(self):
-		return 'LetStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
+    def __str__(self):
+        return 'LetStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
 
 
 class ASTReturnStatement(ASTNode):
-	def __init__(self, token=None, value=None):
-		self.token = token
-		self.value = value
+    def __init__(self, token=None, value=None):
+        self.token = token
+        self.value = value
 
-	def token_literal(self):
-		return self.token.literal
+    def token_literal(self):
+        return self.token.literal
 
-	def __str__(self):
-		return 'ReturnStatement [' + str(self.token.literal) + '] <' + (str(self.value) if self.value else '') + '>'
+    def __str__(self):
+        return 'ReturnStatement [' + str(self.token.literal) + '] <' + (str(self.value) if self.value else '') + '>'
 
 
 class ASTExpressionStatement(ASTNode):
-	pass
+    def __init__(self, token=None, expression=None):
+        self.token = token
+        self.expression = expression
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'TODO: implemement __str__ in ASTExpressionStatement'
