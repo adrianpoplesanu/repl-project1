@@ -40,9 +40,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalIdentifier(node, env);
         }
         case ST_BOOLEAN: {
-            Ad_Boolean_Object* obj = new Ad_Boolean_Object();
-            obj->value = ((Ad_AST_Boolean*)node)->value;
-            return obj;
+            //Ad_Boolean_Object* obj = new Ad_Boolean_Object();
+            //obj->value = ((Ad_AST_Boolean*)node)->value;
+            //return obj;
+            return NativeBoolToBooleanObject(((Ad_AST_Boolean*)node)->value);
         }
         break;
         case ST_PREFIX_EXPRESSION: {
@@ -51,12 +52,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_IF_EXPRESSION: {
-            //...
-            //Ad_Object* condition = Eval(((Ad_AST_IfExpression*)node)->condition, env);
             return EvalIfExpression(node, env);
         }
         case ST_BLOCK_STATEMENT: {
-            //...
+            return EvalBlockStatement(node, env);
         }
         break;
         default:
@@ -110,28 +109,22 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
         return obj;
     }
     if (_operator == "<") {
-        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val < right_val);
-        return obj;
+        return NativeBoolToBooleanObject(left_val < right_val);
     }
     if (_operator == ">") {
-        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val > right_val);
-        return obj;
+        return NativeBoolToBooleanObject(left_val > right_val);
     }
     if (_operator == "<=") {
-        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val <= right_val);
-        return obj;
+        return NativeBoolToBooleanObject(left_val <= right_val);
     }
     if (_operator == ">=") {
-        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val >= right_val);
-        return obj;
+        return NativeBoolToBooleanObject(left_val >= right_val);
     }
     if (_operator == "==") {
-        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val == right_val);
-        return obj;
+        return NativeBoolToBooleanObject(left_val == right_val);
     }
     if (_operator == "!=") {
-        Ad_Boolean_Object* obj = new Ad_Boolean_Object(left_val != right_val);
-        return obj;
+        return NativeBoolToBooleanObject(left_val != right_val);
     }
     return &NULLOBJECT;
 }
@@ -177,9 +170,44 @@ Ad_Object* EvalReturnStatement(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* Evaluator::EvalIfExpression(Ad_AST_Node* node, Environment &env) {
-    // TODO
     Ad_Object* condition = Eval(((Ad_AST_IfExpression*)node)->condition, env);
+    if (IsError(condition)) {
+        return NULL;
+    }
+    if (IsTruthy(condition)) {
+        return Eval(((Ad_AST_IfExpression*)node)->consequence, env);
+    } else {
+        if (((Ad_AST_IfExpression*)node)->alternative) {
+            return Eval(((Ad_AST_IfExpression*)node)->alternative, env);
+        }
+    }
     return NULL;
+}
+
+Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
+    Ad_Object* result;
+    for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)node)->statements.begin() ; it != ((Ad_AST_BlockStatement*)node)->statements.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        result = Eval(obj, env);
+    }
+    return result;
+}
+
+bool Evaluator::IsTruthy(Ad_Object* obj) {
+    if (obj == NULL) return false;
+    if (obj == &NULLOBJECT) return false;
+    if (obj == &TRUE) return true;
+    if (obj == &FALSE) return false;
+    return true;
+}
+
+bool Evaluator::IsError(Ad_Object* obj) {
+    return obj->type == OBJ_ERROR;
+}
+
+Ad_Object* Evaluator::NativeBoolToBooleanObject(bool value) {
+    if (value) return &TRUE;
+    return &FALSE;
 }
 
 Ad_Object* Evaluator::NewError(std::string message) {

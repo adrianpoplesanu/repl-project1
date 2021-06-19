@@ -37,6 +37,7 @@ Environment NewEnvoronment() {
 }
 
 Environment NewEnclosedEnvironment(Environment outer) {
+    // TODO this
     Environment env;
     return env;
 }
