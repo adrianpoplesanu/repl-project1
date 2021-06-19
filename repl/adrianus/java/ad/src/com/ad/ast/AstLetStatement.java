@@ -4,6 +4,8 @@ import com.ad.token.Token;
 
 public class AstLetStatement extends AstNode {
 	private Token token;
+	private AstNode value;
+	private AstIdentifier node;
 	
 	public AstLetStatement(Token token) {
 		this.token = token;
@@ -16,7 +18,30 @@ public class AstLetStatement extends AstNode {
 
 	@Override
 	public String toString() {
-		return "AstLetStatement [token: ..., value: ...]";
+		return "AstLetStatement [token: " + token + ", value: " + value + "]";
 	}
 
+	public Token getToken() {
+		return token;
+	}
+
+	public void setToken(Token token) {
+		this.token = token;
+	}
+
+	public AstNode getValue() {
+		return value;
+	}
+
+	public void setValue(AstNode value) {
+		this.value = value;
+	}
+
+	public AstIdentifier getNode() {
+		return node;
+	}
+
+	public void setNode(AstIdentifier node) {
+		this.node = node;
+	}
 }
