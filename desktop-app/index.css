@@ -42,31 +42,5 @@ body {
     left: 0;
     /*height: 500px;*/
     height: 90vh;
-    overflow-y: scroll;
-}
-
-.folder span {
-    padding-right: 3%;
-    padding-left: 2%;
-}
-
-.file span {
-    padding-right: 3%;
-    padding-left: 2%;
-}
-
-.folder-color {
-    color: #697891;
-}
-
-.file-color {
-    color: #85888c;
-}
-
-.highlighted {
-    background-color: orange;
-}
-
-.sub-folder{
-    padding-left: 5%;
+    /*overflow-y: scroll;*/
 }

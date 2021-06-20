@@ -2,9 +2,9 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { ipcMain } = require('electron');
 
-var isWin = (process.platform === "win32") || (process.platform === "win64");
-var isMacOs = process.platform === "darwin";
-var isLinux = process.platform === "linux";
+let isWin = (process.platform === "win32") || (process.platform === "win64");
+let isMacOs = process.platform === "darwin";
+let isLinux = process.platform === "linux";
 
 console.log(isWin);
 console.log(isMacOs);
@@ -46,8 +46,6 @@ app.on('resized', () => {
 });
 
 ipcMain.on('synchronous-message', (event, arg) => {
-  //console.log(arg) // prints "ping"
-  //event.returnValue = 'pongus'
   if (arg == 'getPlatform') {
     if (isWin) event.returnValue = 'win';
     if (isMacOs) event.returnValue = "macos";
