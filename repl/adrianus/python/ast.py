@@ -6,8 +6,6 @@ class StatementType(object):
     IDENTIFIER = 'IDENTIFIER'
     INTEGER = 'INTEGER'
     BOOLEAN = 'BOOLEAN'
-    STATEMENT = 'STATEMENT'
-    EXPRESSION = 'EXPRESSION'
     INFIX_EXPRESSION = 'INFIX_EXPRESSION'
     PREFIX_EXPRESSION = 'PREFIX_EXPRESSION'
     CALL_EXPRESSION = 'CALL_EXPRESSION'
@@ -25,8 +23,6 @@ statement_type_map = {
     StatementType.IDENTIFIER: 'IDENTIFIER',
     StatementType.INTEGER: 'INTEGER',
     StatementType.BOOLEAN: 'BOOLEAN',
-    StatementType.STATEMENT: 'STATEMENT',
-    StatementType.EXPRESSION: 'EXPRESSION',
     StatementType.INFIX_EXPRESSION: 'INFIX_EXPRESSION',
     StatementType.PREFIX_EXPRESSION: 'PREFIX_EXPRESSION',
     StatementType.CALL_EXPRESSION: 'CALL_EXPRESSION',
@@ -48,14 +44,6 @@ class ASTNode(object):
         print '__str__ not implmented in subclass'
 
 
-class ASTInteger(ASTNode):
-    pass
-
-
-class ASTBoolean(ASTNode):
-    pass
-
-
 class ASTProgram(ASTNode):
     def __init__(self):
         self.statements = []
@@ -68,8 +56,28 @@ class ASTProgram(ASTNode):
             print statement
 
 
+class ASTBoolean(ASTNode):
+    def __init__(self, token=None, value=None):
+        """
+        @param token: the node's token
+        @param value: native bool value
+        """
+        self.token = token
+        self.value = value
+
+    def token_literal(self):
+        return 'todo: implement this'
+
+    def __str__(self):
+        return 'todo: implement this'
+
+
 class ASTIdentifier(ASTNode):
     def __init__(self, token=None, value=''):
+        """
+        @param token: the node's token
+        @param value: string the name of the "variable"
+        """
         self.token = token
         self.value = value
 
@@ -81,11 +89,19 @@ class ASTIdentifier(ASTNode):
 
 
 class ASTInteger(ASTNode):
-    pass
+    def __init__(self, token=None, value=None):
+        """
+        @param token: the node's token
+        @param value: native int value
+        """
+        self.token = token
+        self.value = value
 
+    def token_literal(self):
+        pass
 
-class ASTBoolean(ASTNode):
-    pass
+    def __str__(self):
+        return 'todo: implement this'
 
 
 class ASTLetStatement(ASTNode):
@@ -123,3 +139,65 @@ class ASTExpressionStatement(ASTNode):
 
     def __str__(self):
         return 'TODO: implemement __str__ in ASTExpressionStatement'
+
+
+class ASTIfExpression(ASTNode):
+    def __init__(self, token=None, condition=None, consequence=None, alternative=None):
+        self.token = token
+        self.condition = condition
+        self.consequence = consequence
+        self.alternative = alternative
+
+    def token_literal(self):
+        return 'todo'
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTIfExpression'
+
+
+class ASTBlockStatement(ASTNode):
+    def __init(self, token=None, statements=[]):
+        self.token = token
+        self.statements = statements
+
+    def token_literal(self):
+        return 'todo'
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTBlockStatement'
+
+
+class ASTFunctionLiteral(ASTNode):
+    def __init__(self, token=None):
+        self.token = token
+
+    def token_literal(self):
+        return 'todo'
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTFunctionLiteral'
+
+
+class ASTCallExpression(ASTNode):
+    pass
+
+
+class ASTPrefixExpression(ASTNode):
+    pass
+
+
+class ASTInfixExpression(ASTNode):
+    pass
+
+
+class ASTWhileExpression(ASTNode):
+    def __init__(self, token=None, condition=None, block=None):
+        self.token = token
+        self.condition = condition
+        self.block = block
+
+    def token_literal(self):
+        return 'todo'
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTWhileExpression'

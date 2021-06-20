@@ -112,10 +112,12 @@ class Parser(object):
         return stmt
 
     def parse_identifier(self):
-        pass
+        stmt = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        return stmt
 
     def parse_integer_literal(self):
-        pass
+        stmt = ASTInteger(token=self.current_token, value=int(self.current_token.literal))
+        return stmt
 
     def parse_prefix_expression(self):
         pass
