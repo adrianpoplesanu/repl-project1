@@ -1,0 +1,16 @@
+{
+  "name": "ad-language",
+  "version": "1.0.0",
+  "description": "Ad programming language typescript interpreter",
+  "main": "ad.js",
+  "dependencies": {
+    "typescript": "^4.3.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adrianus",
+  "license": "ISC"
+}
