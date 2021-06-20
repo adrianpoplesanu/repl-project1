@@ -2,11 +2,15 @@ console.log("buna dimineata!!!");
 
 const Path = require("path");
 const FS   = require("fs");
+let opened_paths = {};
 //let Files  = [];
 //let Folders = [];
 
 const { ipcRenderer } = require('electron')
-console.log(ipcRenderer.sendSync('synchronous-message', 'pingus')) // prints "pong"
+console.log(ipcRenderer.sendSync('synchronous-message', 'pingus')); // prints "pong"
+
+const app_os = ipcRenderer.sendSync('synchronous-message', 'getPlatform');
+console.log(app_os);
 
 function ThroughDirectory(Directory, Files, Folders) {
     FS.readdirSync(Directory).forEach(File => {
@@ -62,6 +66,16 @@ $('#file-explorer').on("click", ".item", function (event) {
 $('#file-explorer').on("dblclick", ".folder", function () {
     let Files = [];
     let Folders = [];
+    let absolute_path = $(this).data('absolute');
+    if (absolute_path in opened_paths) {
+        // i need to close this node
+        console.log("i need to close this node");
+        delete opened_paths[absolute_path];
+        $(this).find(".sub-folder").html("");
+        return;
+    } else {
+        opened_paths[absolute_path] = true;
+    }
     ThroughDirectory($(this).data('absolute'), Files, Folders);
     folder_list = [];
     for (var i = 0; i < Folders.length; i++) {
