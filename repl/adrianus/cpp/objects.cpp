@@ -41,6 +41,10 @@ Ad_Object_Type Ad_Integer_Object::Type() {
     return type;
 }
 
+Ad_ReturnValue_Object::Ad_ReturnValue_Object() {
+
+}
+
 Ad_Boolean_Object::Ad_Boolean_Object() {
     type = OBJ_BOOL;
 }

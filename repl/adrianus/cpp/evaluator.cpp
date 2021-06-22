@@ -36,6 +36,13 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return obj;
         }
         break;
+        case ST_RETURN_STATEMENT: {
+            Ad_Object* val = Eval(((Ad_AST_ReturnStatement*)node)->value, env);
+            Ad_ReturnValue_Object* obj = new Ad_ReturnValue_Object();
+            obj->value = val;
+            return obj;
+        }
+        break;
         case ST_IDENTIFIER: {
             return EvalIdentifier(node, env);
         }
@@ -56,6 +63,18 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         case ST_BLOCK_STATEMENT: {
             return EvalBlockStatement(node, env);
+        }
+        break;
+        case ST_FUNCTION_LITERAL: {
+
+        }
+        break;
+        case ST_CALL_EXPRESSION: {
+
+        }
+        break;
+        case ST_WHILE_EXPRESSION: {
+
         }
         break;
         default:
@@ -86,10 +105,15 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
     if (left->Type() == OBJ_INT && right->Type() == OBJ_INT) {
         return EvalIntegerInfixExpression(_operator, left, right);
     }
+    std::cout << "eval infix expression will return NULL\n";
     return NULL;
 }
 
 Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    if (left == NULL || right == NULL) {
+        std::cout << "nu exista in env variabilele astea\n";
+        return &NULLOBJECT;
+    }
     int left_val = ((Ad_Integer_Object*)left)->value;
     int right_val = ((Ad_Integer_Object*)right)->value;
     if (_operator == "+") {
@@ -166,6 +190,7 @@ Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* EvalReturnStatement(Ad_AST_Node* node, Environment &env) {
+    // TODO
     return NULL;
 }
 
@@ -189,6 +214,9 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)node)->statements.begin() ; it != ((Ad_AST_BlockStatement*)node)->statements.end(); ++it) {
         Ad_AST_Node *obj = *it;
         result = Eval(obj, env);
+        if (result->type == OBJ_RETURN_VALUE) {
+            std::cout << "encountered a return statements, need to stop and return this";
+        }
     }
     return result;
 }

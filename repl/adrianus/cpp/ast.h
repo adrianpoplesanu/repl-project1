@@ -13,8 +13,6 @@ enum StatementType {
     ST_IDENTIFIER,
     ST_INTEGER,
     ST_BOOLEAN,
-    ST_STATEMENT,
-    ST_EXPRESSION,
     ST_INFIX_EXPRESSION,
     ST_PREFIX_EXPRESSION,
     ST_CALL_EXPRESSION,
@@ -32,8 +30,6 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_IDENTIFIER, "Identifier"},
     {ST_INTEGER, "Integer"},
     {ST_BOOLEAN, "Boolean"},
-    {ST_STATEMENT, "Statement"},
-    {ST_EXPRESSION, "Expression"},
     {ST_INFIX_EXPRESSION, "InfixExpression"},
     {ST_PREFIX_EXPRESSION, "PrefixExpression"},
     {ST_CALL_EXPRESSION, "CallExpression"},
@@ -46,6 +42,16 @@ std::map<StatementType, std::string> statement_type_map = {
 class Ad_AST_Node {
 public:
     StatementType type;
+    std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_Program : public Ad_AST_Node {
+public:
+    std::vector<Ad_AST_Node*> statements;
+
+    Ad_AST_Program();
+    ~Ad_AST_Program();
     std::string TokenLiteral();
     virtual std::string ToString();
 };
@@ -152,16 +158,6 @@ public:
     Ad_AST_FunctionLiteral();
     Ad_AST_FunctionLiteral(Token);
     ~Ad_AST_FunctionLiteral();
-    virtual std::string ToString();
-};
-
-class Ad_AST_Program : public Ad_AST_Node {
-public:
-    std::vector<Ad_AST_Node*> statements;
-
-    Ad_AST_Program();
-    ~Ad_AST_Program();
-    std::string TokenLiteral();
     virtual std::string ToString();
 };
 

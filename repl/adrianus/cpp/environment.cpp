@@ -5,7 +5,6 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
-    //... i need to parse throuh all objects from store and delete them
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
         free_Ad_Object_memory(it->second);
     }
@@ -37,7 +36,7 @@ Environment NewEnvoronment() {
 }
 
 Environment NewEnclosedEnvironment(Environment outer) {
-    // TODO this
+    // TODO
     Environment env;
     return env;
 }

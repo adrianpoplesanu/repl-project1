@@ -72,6 +72,7 @@ public:
 	Ad_Object* value;
 
 	Ad_ReturnValue_Object();
+	Ad_ReturnValue_Object(Ad_Object*);
 };
 
 class Ad_Error_Object : public Ad_Object {

@@ -46,18 +46,6 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->Boolean " << ((Ad_AST_Boolean*)node)->token.ToString() << "\n";
         break;
-        case ST_STATEMENT:
-            // Ad_AST_Statement has no token
-            // this type if inherited and only used when polymorphed
-            print_level(level);
-            std::cout << "->Statement\n";
-        break;
-        case ST_EXPRESSION:
-            // Ad_AST_Expression has no token
-            // this type if inherited and only used when polymorphed
-            print_level(level);
-            std::cout << "->Expression\n";
-        break;
         case ST_INFIX_EXPRESSION:
             print_level(level);
             std::cout << "->InfixExpression " << ((Ad_AST_InfixExpression*)node)->token.ToString() << "\n";
