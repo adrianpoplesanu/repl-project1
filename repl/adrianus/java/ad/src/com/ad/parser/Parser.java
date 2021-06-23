@@ -1,5 +1,7 @@
 package com.ad.parser;
 
+import java.util.HashMap;
+
 import com.ad.ast.AstProgram;
 import com.ad.lexer.Lexer;
 import com.ad.token.Token;
@@ -10,10 +12,14 @@ public class Parser {
 	private String source;
 	private Token currentToken;
 	private Token peekToken;
+	private HashMap<TokenTypeEnum, PrefixParseInterface> prefixParseFns = new HashMap<TokenTypeEnum, PrefixParseInterface>();
+	private HashMap<TokenTypeEnum, InfixParseInterface> infixParseFns = new HashMap<TokenTypeEnum, InfixParseInterface>();
 	
 	public Parser() {
 		//... i should instantiate the callback maps here for prefix and infix
 		lexer = new Lexer();
+		prefixParseFns.put(TokenTypeEnum.IDENT, new IdentifierParser());
+		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser());
 	}
 	
 	public void load(String source) {
