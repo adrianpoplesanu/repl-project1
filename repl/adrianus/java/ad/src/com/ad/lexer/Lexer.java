@@ -25,7 +25,7 @@ public class Lexer {
 		readChar();
 	}
 	
-	public void reset(String source) {
+	public void load(String source) {
 		this.source = source;
 		currentChar = 0;
 		position = 0;
@@ -83,12 +83,24 @@ public class Lexer {
 			token.setLiteral("}");
 		break;
 		case '<':
-			token.setType(TokenTypeEnum.LT);
-			token.setLiteral("<");
+			if (peekChar() == '=') {
+				token.setType(TokenTypeEnum.LTE);
+				token.setLiteral("<=");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.LT);
+				token.setLiteral("<");
+			}
 		break;
 		case '>':
-			token.setType(TokenTypeEnum.GT);
-			token.setLiteral(">");
+			if (peekChar() == '=') {
+				token.setType(TokenTypeEnum.GTE);
+				token.setLiteral("==");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.GT);
+				token.setLiteral(">");
+			}
 		break;
 		case '=':
 			if (peekChar() == '=') {

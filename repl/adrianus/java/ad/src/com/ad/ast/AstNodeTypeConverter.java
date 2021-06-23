@@ -8,6 +8,18 @@ public class AstNodeTypeConverter {
 		{
 			put(AstNodeTypeEnum.PROGRAM, "Program");
 			put(AstNodeTypeEnum.LET_STATEMENT, "LetStatement");
+			put(AstNodeTypeEnum.RETURN_STATEMENT, "ReturnStatement");
+			put(AstNodeTypeEnum.IDENTIFIER, "Identifier");
+			put(AstNodeTypeEnum.INTEGER_LITERAL, "IntegerLiteral");
+			put(AstNodeTypeEnum.BOOLEAN, "Boolean");
+			put(AstNodeTypeEnum.EXPRESSION_STATEMENT, "ExpressionStatement");
+			put(AstNodeTypeEnum.INFIX_EXPRESSION, "InfixExpression");
+			put(AstNodeTypeEnum.PREFIX_EXPRESSION, "PrefixExpression");
+			put(AstNodeTypeEnum.IF_EXPRESSION, "IfExpression");
+			put(AstNodeTypeEnum.BLOCK_STATEMENT, "BlockStatement");
+			put(AstNodeTypeEnum.FUNCTION_LITERAL, "FunctionLiteral");
+			put(AstNodeTypeEnum.CALL_EXPRESSION, "CallExpression");
+			put(AstNodeTypeEnum.WHILE_EXPRESSION, "WhileExpression");
 		}
 	};
 	
