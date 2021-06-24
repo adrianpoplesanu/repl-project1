@@ -2,6 +2,8 @@ package com.ad.parser;
 
 import java.util.HashMap;
 
+import com.ad.ast.AstLetStatement;
+import com.ad.ast.AstNode;
 import com.ad.ast.AstProgram;
 import com.ad.lexer.Lexer;
 import com.ad.token.Token;
@@ -39,5 +41,46 @@ public class Parser {
 	public void nextToken() {
 		currentToken = peekToken;
 		peekToken = lexer.nextToken();
+	}
+	
+	public boolean currentTokenIs(TokenTypeEnum tte) {
+		return currentToken.getType() == tte;
+	}
+	
+	public boolean peekTokenIs(TokenTypeEnum tte) {
+		return peekToken.getType() == tte;
+	}
+	
+	public boolean ExpectPeek(TokenTypeEnum tte) {
+		if (peekTokenIs(tte)) {
+			nextToken();
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public AstNode parseStatement() {
+		if (currentToken.getType() == TokenTypeEnum.LET) {
+			return parseLetStatement();
+		} else if (currentToken.getType() == TokenTypeEnum.RETURN) {
+			return parseReturnStatement();
+		} else {
+			return parseExpressionStatement();
+		}
+	}
+	
+	public AstNode parseLetStatement() {
+		// TODO: implement the let statement parsing logic
+		AstLetStatement stmt = new AstLetStatement(currentToken);
+		return stmt;
+	}
+	
+	public AstNode parseReturnStatement() {
+		return null;
+	}
+	
+	public AstNode parseExpressionStatement() {
+		return null;
 	}
 }

@@ -18,7 +18,7 @@ public class AstLetStatement extends AstNode {
 
 	@Override
 	public String toString() {
-		return "AstLetStatement [token: " + token + ", value: " + value + "]";
+		return "LetStatement [token: " + token + ", value: " + value + "]";
 	}
 
 	public Token getToken() {
