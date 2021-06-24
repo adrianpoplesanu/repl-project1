@@ -66,7 +66,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_FUNCTION_LITERAL: {
-
+            Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->body, &env);
+            return obj;
         }
         break;
         case ST_CALL_EXPRESSION: {
@@ -187,11 +188,6 @@ Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
 
 Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
     return env.Get(((Ad_AST_Identifier*)node)->token.literal);
-}
-
-Ad_Object* EvalReturnStatement(Ad_AST_Node* node, Environment &env) {
-    // TODO
-    return NULL;
 }
 
 Ad_Object* Evaluator::EvalIfExpression(Ad_AST_Node* node, Environment &env) {

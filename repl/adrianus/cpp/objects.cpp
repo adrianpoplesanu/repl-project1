@@ -72,6 +72,29 @@ Ad_Object_Type Ad_Boolean_Object::Type() {
     return type;
 }
 
+Ad_Function_Object::Ad_Function_Object() {
+    type = OBJ_FUNCTION;
+}
+
+Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, Ad_AST_Node* b, Environment* e) {
+    type = OBJ_FUNCTION;
+    params = p;
+    body = b;
+    env = e;
+}
+
+std::string Ad_Function_Object::Inspect() {
+    return "aaa";
+}
+
+void Ad_Function_Object::Print() {
+    std::cout << "bbb";
+}
+
+Ad_Object_Type Ad_Function_Object::Type() {
+    return type;
+}
+
 Ad_Error_Object::Ad_Error_Object() {
     type = OBJ_ERROR;
 }
@@ -119,6 +142,10 @@ void print_Ad_Object(Ad_Object* obj) {
         break;
         case OBJ_RETURN_VALUE:
             std::cout << ((Ad_ReturnValue_Object*)obj)->value << "\n";
+        break;
+        case OBJ_FUNCTION:
+            //std::cout << ((Ad_Function_Object*)obj)
+            std::cout << "idk what to print here, will see\n";
         break;
         case OBJ_ERROR:
             std::cout << "error object\n";

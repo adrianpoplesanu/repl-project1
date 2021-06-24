@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
+#include "ast.h"
 
 enum Ad_Object_Type {
 	OBJ_NULL,
@@ -11,6 +13,7 @@ enum Ad_Object_Type {
 	OBJ_BOOL,
 	OBJ_STRING,
 	OBJ_RETURN_VALUE,
+	OBJ_FUNCTION,
 	OBJ_ERROR
 };
 
@@ -20,6 +23,7 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_BOOL, "BoolObject"},
 	{OBJ_STRING, "StringObject"},
 	{OBJ_RETURN_VALUE, "ReturnObject"},
+	{OBJ_FUNCTION, "FunctionObject"},
 	{OBJ_ERROR, "ErrorObject"}
 };
 
@@ -73,6 +77,24 @@ public:
 
 	Ad_ReturnValue_Object();
 	Ad_ReturnValue_Object(Ad_Object*);
+};
+
+class Environment; // forward declaration for Environment
+
+class Ad_Function_Object : public Ad_Object {
+public:
+	std::vector<Ad_AST_Node*> params; // i don't really like using AST nodes here
+	Ad_AST_Node* body; // i don't really like using AST nodes here
+	//parameters;
+	//body;
+	Environment *env; // this works only with forward declaration
+
+	Ad_Function_Object();
+	Ad_Function_Object(std::vector<Ad_AST_Node*>, Ad_AST_Node*, Environment*);
+
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
 };
 
 class Ad_Error_Object : public Ad_Object {
