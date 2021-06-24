@@ -27,6 +27,11 @@ Ad_Integer_Object::Ad_Integer_Object(int v) {
     value = v;
 }
 
+Ad_Integer_Object::~Ad_Integer_Object() {
+    //std::cout << value << "\n";
+    //std::cout << "doing some deletion here\n";
+}
+
 std::string Ad_Integer_Object::Inspect() {
     std::string out = "";
     out = std::to_string(value);
@@ -83,6 +88,19 @@ Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, Ad_AST_Node*
     env = e;
 }
 
+/*Ad_Function_Object::~Ad_Function_Object() { // asta nu e bun
+    if (body) {
+        free_Ad_AST_Node_memory(body);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = params.begin() ; it != params.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        free_Ad_AST_Node_memory(obj);
+    }
+    if (env) {
+        delete env;
+    }
+}*/
+
 std::string Ad_Function_Object::Inspect() {
     return "aaa";
 }
@@ -119,10 +137,33 @@ Ad_Object_Type Ad_Error_Object::Type() {
 }
 
 void free_Ad_Object_memory(Ad_Object* obj) {
-    switch(obj->type) {
-        default:
-            std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
-        break;
+    if (obj) {
+        switch(obj->type) {
+            case OBJ_NULL:
+                delete ((Ad_Null_Object*)obj);
+            break;
+            case OBJ_INT:
+                delete ((Ad_Integer_Object*)obj);
+            break;
+            case OBJ_BOOL:
+                delete ((Ad_Boolean_Object*)obj);
+            break;
+            case OBJ_STRING:
+                delete ((Ad_String_Object*)obj);
+            break;
+            case OBJ_RETURN_VALUE:
+                delete ((Ad_ReturnValue_Object*)obj);
+            break;
+            case OBJ_FUNCTION:
+                delete ((Ad_Function_Object*)obj);
+            break;
+            case OBJ_ERROR:
+                delete ((Ad_Error_Object*)obj);
+            break;
+            default:
+                std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
+            break;
+        }
     }
 }
 
@@ -144,8 +185,7 @@ void print_Ad_Object(Ad_Object* obj) {
             std::cout << ((Ad_ReturnValue_Object*)obj)->value << "\n";
         break;
         case OBJ_FUNCTION:
-            //std::cout << ((Ad_Function_Object*)obj)
-            std::cout << "idk what to print here, will see\n";
+            std::cout << "Function object\n";
         break;
         case OBJ_ERROR:
             std::cout << "error object\n";

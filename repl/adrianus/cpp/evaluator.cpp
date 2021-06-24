@@ -22,6 +22,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             // probably Ad_INCREF and Ad_DECREF will need to be used here
             //delete left; // this is smart but here it just deletes pointers that are still referenced in the env
             //delete right; // this is smart but here it just deletes pointers that are still referenced in the env
+            delete left; // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
+            delete right; // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
             return result;
         }
         break;
@@ -97,6 +99,7 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
             //std::cout << "object to be deleted: " << result->type << "\n";
         }
         //delete result; // i don't think this needs to be here, it needs to be binded with the env if it's an assignment
+        //if (result) delete(result); // i will need to bind this to the env, but how? also, maybe this needs to be free_Ad_Object_memory()
     }
 
     return NULL;

@@ -48,6 +48,7 @@ public:
 
 	Ad_Integer_Object();
 	Ad_Integer_Object(int);
+	~Ad_Integer_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
@@ -85,12 +86,11 @@ class Ad_Function_Object : public Ad_Object {
 public:
 	std::vector<Ad_AST_Node*> params; // i don't really like using AST nodes here
 	Ad_AST_Node* body; // i don't really like using AST nodes here
-	//parameters;
-	//body;
 	Environment *env; // this works only with forward declaration
 
 	Ad_Function_Object();
 	Ad_Function_Object(std::vector<Ad_AST_Node*>, Ad_AST_Node*, Environment*);
+	//~Ad_Function_Object();
 
 	virtual std::string Inspect();
 	virtual void Print();

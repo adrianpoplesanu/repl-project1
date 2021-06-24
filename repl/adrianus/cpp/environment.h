@@ -12,6 +12,7 @@ public:
     ~Environment();
     Ad_Object* Get(std::string);
     void Set(std::string, Ad_Object*);
+    void FreeObjectForKey(std::string);
     void PrintStore();
 };
 
