@@ -2,6 +2,7 @@ package com.ad.parser;
 
 import java.util.HashMap;
 
+import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstLetStatement;
 import com.ad.ast.AstNode;
 import com.ad.ast.AstProgram;
@@ -46,11 +47,11 @@ public class Parser {
 	public boolean currentTokenIs(TokenTypeEnum tte) {
 		return currentToken.getType() == tte;
 	}
-	
+
 	public boolean peekTokenIs(TokenTypeEnum tte) {
 		return peekToken.getType() == tte;
 	}
-	
+
 	public boolean ExpectPeek(TokenTypeEnum tte) {
 		if (peekTokenIs(tte)) {
 			nextToken();
@@ -59,7 +60,7 @@ public class Parser {
 			return false;
 		}
 	}
-	
+
 	public AstNode parseStatement() {
 		if (currentToken.getType() == TokenTypeEnum.LET) {
 			return parseLetStatement();
@@ -69,18 +70,38 @@ public class Parser {
 			return parseExpressionStatement();
 		}
 	}
-	
+
 	public AstNode parseLetStatement() {
-		// TODO: implement the let statement parsing logic
 		AstLetStatement stmt = new AstLetStatement(currentToken);
+		if (!ExpectPeek(TokenTypeEnum.IDENT)) {
+			return null;
+		}
+		stmt.setName(new AstIdentifier(currentToken, currentToken.getLiteral()));
+		if (!ExpectPeek(TokenTypeEnum.ASSIGN)) {
+			return null;
+		}
+		nextToken();
+		stmt.setValue(parseExpression(ParseTypeEnum.LOWEST));
 		return stmt;
 	}
-	
+
 	public AstNode parseReturnStatement() {
 		return null;
 	}
-	
+
 	public AstNode parseExpressionStatement() {
+		return null;
+	}
+
+	public AstNode parsePrefixExpression() {
+		return null;
+	}
+
+	public AstNode parseInfixExpression() {
+		return null;
+	}
+
+	public AstNode parseExpression(ParseTypeEnum pte) {
 		return null;
 	}
 }
