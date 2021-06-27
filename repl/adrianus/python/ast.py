@@ -150,8 +150,8 @@ class ASTIfExpression(ASTNode):
         """
         @param token: the node's token
         @param condition: expression???
-        @param consequence: block statement
-        @param alternative: block statement
+        @param consequence: ASTBlockStatement
+        @param alternative: ASTBlockStatement
         """
         self.token = token
         self.condition = condition
@@ -159,7 +159,7 @@ class ASTIfExpression(ASTNode):
         self.alternative = alternative
 
     def token_literal(self):
-        return 'todo'
+        return self.token.literal
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTIfExpression'
@@ -167,29 +167,54 @@ class ASTIfExpression(ASTNode):
 
 class ASTBlockStatement(ASTNode):
     def __init(self, token=None, statements=[]):
+        """
+        @param token: the node's token
+        @param statements: list
+        """
         self.token = token
         self.statements = statements
 
     def token_literal(self):
-        return 'todo'
+        return self.token.literal
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTBlockStatement'
 
 
 class ASTFunctionLiteral(ASTNode):
-    def __init__(self, token=None):
+    def __init__(self, token=None, parameters=None, body=None):
+        """
+        @param token: the node's token
+        @param parameters: list
+        @param body: ASTBlockStatement
+        """
         self.token = token
+        self.parameters = parameters
+        self.body = body
 
     def token_literal(self):
-        return 'todo'
+        return self.token.literal
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTFunctionLiteral'
 
 
 class ASTCallExpression(ASTNode):
-    pass
+    def __init__(self, token=None, func=None):
+        """
+        @param token: the node's token
+        @param func: ASTNode subclass representing the Function Literal
+        arguments: the list of arguments in the call
+        """
+        self.token = token
+        self.func = func
+        self.arguments = None
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return str(self.func) + '(some arguments here)'
 
 
 class ASTPrefixExpression(ASTNode):
@@ -197,7 +222,7 @@ class ASTPrefixExpression(ASTNode):
         """
         @param token: the node's token
         @param operator: string, the operator
-        @param right: the node that gets "minused" or "banged"
+        @param right: the node(ASTNode subclass) that gets "minused" or "banged"
         """
         self.token = token
         self.operator = operator
@@ -211,17 +236,38 @@ class ASTPrefixExpression(ASTNode):
 
 
 class ASTInfixExpression(ASTNode):
-    pass
+    def __init__(self, token=None, operator=None, left=None, right=None):
+        """
+        @param token: the node's token
+        @param operator: string the infix operator
+        @param left: ASTNode subclass, the left operand
+        @param right: ASTNode subclass, the right operand
+        """
+        self.token = token
+        self.operator = operator
+        self.left = left
+        self.right = right
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return str(self.left) + ' ' + str(self.operator) + ' ' + str(self.right)
 
 
 class ASTWhileExpression(ASTNode):
     def __init__(self, token=None, condition=None, block=None):
+        """
+        @param token: the node's token
+        @param condition: ???
+        @param block: ASTBlockStatement
+        """
         self.token = token
         self.condition = condition
         self.block = block
 
     def token_literal(self):
-        return 'todo'
+        return self.token.literal
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTWhileExpression'

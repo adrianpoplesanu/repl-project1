@@ -2,7 +2,8 @@ from lexer import Lexer
 from token_type import TokenType
 from precedence_type import PrecedenceType, precedences
 from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
-                ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression
+                ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
+                ASTCallExpression, ASTInfixExpression
 
 
 class Parser(object):
@@ -156,15 +157,55 @@ class Parser(object):
         return expr
 
     def parse_block_statement(self):
-        pass
+        block = ASTBlockStatement(token=self.current_token)
+        self.next_token()
+        while (not self.current_token_is(TokenType.RBRACE)) and not (not self.current_token_is(TokenType.EOF)):
+            stmt = self.parse_statement()
+            if stmt:
+                block.statements.append(stmt)
+            self.next_token()
+        return block
 
     def parse_function_literal(self):
-        pass
+        func = ASTFunctionLiteral(token=self.current_token)
+        if not self.expect_peek(TokenType.LPAREN):
+            return None
+        func.parameters = self.parse_function_parameters()
+        if not self.expect_peek(TokenType.LBRACE):
+            return None
+        func.body = self.parse_block_statement()
+        return func
+
+    def parse_function_parameters(self):
+        identifiers = []
+        if self.peek_token_is(TokenType.RPAREN):
+            self.next_token()
+            return identifiers
+        self.next_token()
+        ident = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        identifiers.append(ident)
+        while self.peek_token_is(TokenType.COMMA):
+            self.next_token()
+            self.next_token()
+            ident = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+            identifiers.append(ident)
+        if not self.expect_peek(TokenType.RPAREN):
+            return []
+        return identifiers
 
     def parse_infix_expression(self, left):
-        pass
+        expr = ASTInfixExpression(token=self.current_token, operator=self.current_token.literal, left=left)
+        precedence = self.current_precedence()
+        self.next_token()
+        expr.right = self.parse_expression(precedence)
+        return expr
 
-    def parse_call_expression(self):
+    def parse_call_expression(self, func):
+        expr = ASTCallExpression(self.current_token, func)
+        expr.arguments = self.parse_call_arguments()
+        return expr
+
+    def parse_call_arguments(self):
         pass
 
     def parse_while_expression(self):
