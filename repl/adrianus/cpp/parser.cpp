@@ -213,7 +213,7 @@ Ad_AST_Node* Parser::ParseIntegerLiteral() {
 }
 
 Ad_AST_Node* Parser::ParsePrefixExpression() {
-    Ad_AST_PefixExpression* expr = new Ad_AST_PefixExpression(current_token, current_token.literal);
+    Ad_AST_PrefixExpression* expr = new Ad_AST_PrefixExpression(current_token, current_token.literal);
     NextToken();
     expr->right = ParseExpression(PT_PREFIX);
     return expr;

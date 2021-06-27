@@ -58,9 +58,9 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
         break;
         case ST_PREFIX_EXPRESSION:
             print_level(level);
-            std::cout << "->PrefixExpression " << ((Ad_AST_PefixExpression*)node)->token.ToString() << "\n";
-            if (((Ad_AST_PefixExpression*)node)->right) {
-                print_ast_nodes(((Ad_AST_PefixExpression*)node)->right, level + padding);
+            std::cout << "->PrefixExpression " << ((Ad_AST_PrefixExpression*)node)->token.ToString() << "\n";
+            if (((Ad_AST_PrefixExpression*)node)->right) {
+                print_ast_nodes(((Ad_AST_PrefixExpression*)node)->right, level + padding);
             }
         break;
         case ST_CALL_EXPRESSION:

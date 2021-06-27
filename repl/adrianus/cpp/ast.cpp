@@ -181,23 +181,23 @@ std::string Ad_AST_InfixExpression::ToString() {
     return "(" + left->ToString() + _operator + right->ToString() + ")";
 }
 
-Ad_AST_PefixExpression::Ad_AST_PefixExpression() {
+Ad_AST_PrefixExpression::Ad_AST_PrefixExpression() {
     type = ST_PREFIX_EXPRESSION;
     right = NULL;
 }
 
-Ad_AST_PefixExpression::Ad_AST_PefixExpression(Token t, std::string op) {
+Ad_AST_PrefixExpression::Ad_AST_PrefixExpression(Token t, std::string op) {
     type = ST_PREFIX_EXPRESSION;
     token = t;
     _operator = op;
     right = NULL;
 }
 
-Ad_AST_PefixExpression::~Ad_AST_PefixExpression() {
+Ad_AST_PrefixExpression::~Ad_AST_PrefixExpression() {
     free_Ad_AST_Node_memory(right);
 }
 
-std::string Ad_AST_PefixExpression::ToString() {
+std::string Ad_AST_PrefixExpression::ToString() {
     std::string out;
     out = "(" + _operator + right->ToString() + ")";
     return out;
@@ -387,7 +387,7 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
             delete (Ad_AST_InfixExpression*)obj;
         break;
         case ST_PREFIX_EXPRESSION:
-            delete (Ad_AST_PefixExpression*)obj;
+            delete (Ad_AST_PrefixExpression*)obj;
         break;
         case ST_CALL_EXPRESSION:
             delete (Ad_AST_CallExpression*)obj;

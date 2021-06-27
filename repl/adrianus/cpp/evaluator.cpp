@@ -22,8 +22,13 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             // probably Ad_INCREF and Ad_DECREF will need to be used here
             //delete left; // this is smart but here it just deletes pointers that are still referenced in the env
             //delete right; // this is smart but here it just deletes pointers that are still referenced in the env
-            delete left; // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
-            delete right; // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
+            // PROBLEMA e cand left sau right sunt luate din env, crapa pe macos
+            //free_Ad_Object_memory(left); // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
+            //free_Ad_Object_memory(right); // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
+            //std::cout << ((Ad_AST_InfixExpression*)node)->left->type << "\n";
+            //std::cout << ((Ad_AST_InfixExpression*)node)->right->type << "\n";
+            //if (((Ad_AST_InfixExpression*)node)->left->type != ST_IDENTIFIER) free_Ad_Object_memory(left); // NU MERGE: memory leak in valgrind
+            //if (((Ad_AST_InfixExpression*)node)->right->type != ST_IDENTIFIER) free_Ad_Object_memory(right); // NU MERGE: memory leak in valgrind
             return result;
         }
         break;
@@ -56,8 +61,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_PREFIX_EXPRESSION: {
-            Ad_Object* right = Eval(((Ad_AST_PefixExpression*)node)->right, env);
-            return EvalPrefixExpression(((Ad_AST_PefixExpression*)node)->_operator, right);
+            Ad_Object* right = Eval(((Ad_AST_PrefixExpression*)node)->right, env);
+            return EvalPrefixExpression(((Ad_AST_PrefixExpression*)node)->_operator, right);
         }
         break;
         case ST_IF_EXPRESSION: {
@@ -116,7 +121,8 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
 Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
     if (left == NULL || right == NULL) {
         std::cout << "nu exista in env variabilele astea\n";
-        return &NULLOBJECT;
+        //return &NULLOBJECT;
+        return NULL;
     }
     int left_val = ((Ad_Integer_Object*)left)->value;
     int right_val = ((Ad_Integer_Object*)right)->value;
@@ -154,7 +160,8 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
     if (_operator == "!=") {
         return NativeBoolToBooleanObject(left_val != right_val);
     }
-    return &NULLOBJECT;
+    //return &NULLOBJECT;
+    return NULL;
 }
 
 Ad_Object* Evaluator::EvalPrefixExpression(std::string _operator, Ad_Object* right) {

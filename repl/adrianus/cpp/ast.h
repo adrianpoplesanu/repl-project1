@@ -100,15 +100,15 @@ public:
     virtual std::string ToString();
 };
 
-class Ad_AST_PefixExpression : public Ad_AST_Node {
+class Ad_AST_PrefixExpression : public Ad_AST_Node {
 public:
     Token token;
     std::string _operator;
     Ad_AST_Node *right;
 
-    Ad_AST_PefixExpression();
-    Ad_AST_PefixExpression(Token, std::string);
-    ~Ad_AST_PefixExpression();
+    Ad_AST_PrefixExpression();
+    Ad_AST_PrefixExpression(Token, std::string);
+    ~Ad_AST_PrefixExpression();
     virtual std::string ToString();
 };
 
