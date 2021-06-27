@@ -66,10 +66,10 @@ class ASTBoolean(ASTNode):
         self.value = value
 
     def token_literal(self):
-        return 'todo: implement this'
+        return self.token.literal
 
     def __str__(self):
-        return 'todo: implement this'
+        return str(self.value)
 
 
 class ASTIdentifier(ASTNode):
@@ -98,10 +98,12 @@ class ASTInteger(ASTNode):
         self.value = value
 
     def token_literal(self):
-        pass
+        return self.token.literal
 
     def __str__(self):
-        return 'todo: implement this'
+        #print type(self.token.literal)
+        #print type(self.value)
+        return 'IntegerLiteral [' + str(self.token.literal) + '] <' + str(self.value) + '>'
 
 
 class ASTLetStatement(ASTNode):
@@ -138,11 +140,19 @@ class ASTExpressionStatement(ASTNode):
         return self.token.literal
 
     def __str__(self):
-        return 'TODO: implemement __str__ in ASTExpressionStatement'
+        #return 'TODO: implemement __str__ in ASTExpressionStatement'
+        print type(self.expression)
+        return str(self.expression)
 
 
 class ASTIfExpression(ASTNode):
     def __init__(self, token=None, condition=None, consequence=None, alternative=None):
+        """
+        @param token: the node's token
+        @param condition: expression???
+        @param consequence: block statement
+        @param alternative: block statement
+        """
         self.token = token
         self.condition = condition
         self.consequence = consequence
@@ -183,7 +193,21 @@ class ASTCallExpression(ASTNode):
 
 
 class ASTPrefixExpression(ASTNode):
-    pass
+    def __init__(self, token=None, operator=None, right=None):
+        """
+        @param token: the node's token
+        @param operator: string, the operator
+        @param right: the node that gets "minused" or "banged"
+        """
+        self.token = token
+        self.operator = operator
+        self.right = right
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return '(' + self.operator + str(self.right) + ')'
 
 
 class ASTInfixExpression(ASTNode):

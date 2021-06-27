@@ -1,7 +1,8 @@
 from lexer import Lexer
 from token_type import TokenType
-from parse_type import ParseType, precedences
-from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement
+from precedence_type import PrecedenceType, precedences
+from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
+                ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression
 
 
 class Parser(object):
@@ -69,12 +70,12 @@ class Parser(object):
     def peek_precedence(self):
         if self.peek_token.type in precedences:
             return precedences[self.peek_token.type]
-        return ParseType.LOWEST
+        return PrecedenceType.LOWEST
 
     def current_precedence(self):
         if self.current_token.type in precedences:
             return precedences[self.current_token.type]
-        return ParseType.LOWEST
+        return PrecedenceType.LOWEST
 
     def parse_statement(self):
         if self.current_token.type == TokenType.LET:
@@ -91,22 +92,22 @@ class Parser(object):
         if not self.expect_peek(TokenType.ASSIGN):
             return None
         self.next_token()
-        stmt.value = self.parse_expression(ParseType.LOWEST)
+        stmt.value = self.parse_expression(PrecedenceType.LOWEST)
         if self.current_token_is(TokenType.SEMICOLON):
             self.next_token()
         return stmt
 
     def parse_return_statement(self):
-		stmt = ASTReturnStatement(token=self.current_token)
-		self.next_token()
-		stmt.value = self.parse_expression(ParseType.LOWEST)
-		while not self.current_token_is(TokenType.SEMICOLON) and not self.current_token_is(TokenType.EOF):
-			self.next_token()
-		return stmt
+        stmt = ASTReturnStatement(token=self.current_token)
+        self.next_token()
+        stmt.value = self.parse_expression(PrecedenceType.LOWEST)
+        while not self.current_token_is(TokenType.SEMICOLON) and not self.current_token_is(TokenType.EOF):
+            self.next_token()
+        return stmt
 
     def parse_expression_statement(self):
         stmt = ASTExpressionStatement(token=self.current_token)
-        stmt.expression = self.parse_expression(ParseType.LOWEST)
+        stmt.expression = self.parse_expression(PrecedenceType.LOWEST)
         if self.peek_token_is(TokenType.SEMICOLON):
             self.next_token()
         return stmt
@@ -120,25 +121,64 @@ class Parser(object):
         return stmt
 
     def parse_prefix_expression(self):
-        pass
+        expr = ASTPrefixExpression(token=self.current_token, operator=self.current_token.literal)
+        self.next_token()
+        expr.right = self.parse_expression(PrecedenceType.PREFIX)
+        return expr
 
     def parse_boolean(self):
-        pass
+        stmt = ASTBoolean(token=self.current_token, value=self.current_token_is(TokenType.TRUE))
+        return stmt
 
     def parse_grouped_expression(self):
-        pass
+        self.next_token()
+        expr = self.parse_expression(PrecedenceType.LOWEST)
+        if not self.expect_peek(TokenType.RPAREN):
+            return None
+        return expr
 
     def parse_if_expression(self):
+        expr = ASTIfExpression(token=self.current_token)
+        if not self.expect_peek(TokenType.LPAREN):
+            return None
+        self.next_token()
+        expr.condition = self.parse_expression(PrecedenceType.LOWEST)
+        if not self.expect_peek(TokenType.RPAREN):
+            return None
+        if not self.expect_peek(TokenType.LBRACE):
+            return None
+        expr.consequence = self.parse_block_statement()
+        if self.peek_token_is(TokenType.ELSE):
+            self.next_token()
+            if not self.expect_peek(TokenType.LBRACE):
+                return None
+            expr.alternative = self.parse_block_statement()
+        return expr
+
+    def parse_block_statement(self):
         pass
 
     def parse_function_literal(self):
         pass
 
-    def parse_infix_expression(self):
+    def parse_infix_expression(self, left):
         pass
 
     def parse_call_expression(self):
         pass
 
-    def parse_expression(self, parse_type):
-        return 'TODO: implement this'
+    def parse_while_expression(self):
+        pass
+
+    def parse_expression(self, precedence):
+        if self.current_token.type not in self.prefix_parse_functions:
+            return None
+        prefix = self.prefix_parse_functions[self.current_token.type]
+        left_exp = prefix()
+        while (not self.peek_token_is(TokenType.SEMICOLON)) and precedence < self.peek_precedence():
+            if self.peek_token.type not in self.infix_parse_functions:
+                return left_exp
+            infix = self.infix_parse_functions[self.peek_token.type]
+            self.next_token()
+            left_exp = infix(left_exp)
+        return left_exp
