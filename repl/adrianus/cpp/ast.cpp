@@ -203,6 +203,44 @@ std::string Ad_AST_PrefixExpression::ToString() {
     return out;
 }
 
+Ad_AST_CallExpression::Ad_AST_CallExpression() {
+    type = ST_CALL_EXPRESSION;
+    function = NULL;
+}
+
+Ad_AST_CallExpression::Ad_AST_CallExpression(Token t) {
+    type = ST_CALL_EXPRESSION;
+    token = t;
+    function = NULL;
+}
+
+Ad_AST_CallExpression::Ad_AST_CallExpression(Token t, Ad_AST_Node* f) {
+    type = ST_CALL_EXPRESSION;
+    token = t;
+    function = f;
+}
+
+Ad_AST_CallExpression::~Ad_AST_CallExpression() {
+    free_Ad_AST_Node_memory(function);
+    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        free_Ad_AST_Node_memory(obj);
+    }
+}
+
+std::string Ad_AST_CallExpression::ToString() {
+    std::string out = "[CallExpression] ";
+    out += function->ToString();
+    out += "(";
+    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
+        Ad_AST_Node *current = *it;
+        if (it != arguments.begin()) out += ", ";
+        out += current->ToString();
+    }
+    out += ")";
+    return out;
+}
+
 Ad_AST_IfExpression::Ad_AST_IfExpression() {
     type = ST_IF_EXPRESSION;
     condition = NULL;
@@ -267,44 +305,6 @@ std::string Ad_AST_BlockStatement::ToString() {
         Ad_AST_Node *obj = *it;
         out += obj->ToString();
     }
-    return out;
-}
-
-Ad_AST_CallExpression::Ad_AST_CallExpression() {
-    type = ST_CALL_EXPRESSION;
-    function = NULL;
-}
-
-Ad_AST_CallExpression::Ad_AST_CallExpression(Token t) {
-    type = ST_CALL_EXPRESSION;
-    token = t;
-    function = NULL;
-}
-
-Ad_AST_CallExpression::Ad_AST_CallExpression(Token t, Ad_AST_Node* f) {
-    type = ST_CALL_EXPRESSION;
-    token = t;
-    function = f;
-}
-
-Ad_AST_CallExpression::~Ad_AST_CallExpression() {
-    free_Ad_AST_Node_memory(function);
-    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
-        Ad_AST_Node *obj = *it;
-        free_Ad_AST_Node_memory(obj);
-    }
-}
-
-std::string Ad_AST_CallExpression::ToString() {
-    std::string out = "[CallExpression] ";
-    out += function->ToString();
-    out += "(";
-    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
-        Ad_AST_Node *current = *it;
-        if (it != arguments.begin()) out += ", ";
-        out += current->ToString();
-    }
-    out += ")";
     return out;
 }
 

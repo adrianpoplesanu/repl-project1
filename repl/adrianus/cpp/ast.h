@@ -66,6 +66,43 @@ public:
     virtual std::string ToString();
 };
 
+class Ad_AST_LetStatement : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Identifier name;
+    Ad_AST_Node* value;
+
+    Ad_AST_LetStatement();
+    Ad_AST_LetStatement(Token);
+    ~Ad_AST_LetStatement();
+    std::string TokenLiteral();
+    std::string ToString();
+};
+
+class Ad_AST_ReturnStatement : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* value;
+
+    Ad_AST_ReturnStatement();
+    Ad_AST_ReturnStatement(Token);
+    ~Ad_AST_ReturnStatement();
+    std::string TokenLiteral();
+    std::string ToString();
+};
+
+class Ad_AST_ExpressionStatement : public Ad_AST_Node {
+public:
+    Token token; // this variable is never instantiated, maybe i don't need to print it in the depth first search
+    Ad_AST_Node* expression;
+
+    Ad_AST_ExpressionStatement();
+    Ad_AST_ExpressionStatement(Token);
+    ~Ad_AST_ExpressionStatement();
+    std::string TokenLiteral();
+    std::string ToString();
+};
+
 class Ad_AST_Integer : public Ad_AST_Node {
 public:
     Token token;
@@ -112,6 +149,19 @@ public:
     virtual std::string ToString();
 };
 
+class Ad_AST_CallExpression : public Ad_AST_Node {
+public:
+    Token token;
+    std::vector<Ad_AST_Node*> arguments;
+    Ad_AST_Node* function;
+
+    Ad_AST_CallExpression();
+    Ad_AST_CallExpression(Token);
+    Ad_AST_CallExpression(Token, Ad_AST_Node*);
+    ~Ad_AST_CallExpression();
+    virtual std::string ToString();
+};
+
 class Ad_AST_IfExpression : public Ad_AST_Node {
 public:
     Token token;
@@ -136,19 +186,6 @@ public:
     virtual std::string ToString();
 };
 
-class Ad_AST_CallExpression : public Ad_AST_Node {
-public:
-    Token token;
-    std::vector<Ad_AST_Node*> arguments;
-    Ad_AST_Node* function;
-
-    Ad_AST_CallExpression();
-    Ad_AST_CallExpression(Token);
-    Ad_AST_CallExpression(Token, Ad_AST_Node*);
-    ~Ad_AST_CallExpression();
-    virtual std::string ToString();
-};
-
 class Ad_AST_FunctionLiteral : public Ad_AST_Node {
 public:
     Token token;
@@ -159,43 +196,6 @@ public:
     Ad_AST_FunctionLiteral(Token);
     ~Ad_AST_FunctionLiteral();
     virtual std::string ToString();
-};
-
-class Ad_AST_LetStatement : public Ad_AST_Node {
-public:
-    Token token;
-    Ad_AST_Identifier name;
-    Ad_AST_Node* value;
-
-    Ad_AST_LetStatement();
-    Ad_AST_LetStatement(Token);
-    ~Ad_AST_LetStatement();
-    std::string TokenLiteral();
-    std::string ToString();
-};
-
-class Ad_AST_ReturnStatement : public Ad_AST_Node {
-public:
-    Token token;
-    Ad_AST_Node* value;
-
-    Ad_AST_ReturnStatement();
-    Ad_AST_ReturnStatement(Token);
-    ~Ad_AST_ReturnStatement();
-    std::string TokenLiteral();
-    std::string ToString();
-};
-
-class Ad_AST_ExpressionStatement : public Ad_AST_Node {
-public:
-    Token token; // this variable is never instantiated, maybe i don't need to print it in the depth first search
-    Ad_AST_Node* expression;
-
-    Ad_AST_ExpressionStatement();
-    Ad_AST_ExpressionStatement(Token);
-    ~Ad_AST_ExpressionStatement();
-    std::string TokenLiteral();
-    std::string ToString();
 };
 
 class Ad_AST_WhileExpression : public Ad_AST_Node {
