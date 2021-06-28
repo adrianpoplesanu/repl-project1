@@ -3,7 +3,8 @@ from token_type import TokenType
 from precedence_type import PrecedenceType, precedences
 from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
-                ASTCallExpression, ASTInfixExpression
+                ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
+                ASTBlockStatement
 
 
 class Parser(object):

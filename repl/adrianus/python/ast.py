@@ -45,6 +45,8 @@ class ASTNode(object):
 
 
 class ASTProgram(ASTNode):
+    type = StatementType.PROGRAM
+
     def __init__(self):
         self.statements = []
 
@@ -56,12 +58,25 @@ class ASTProgram(ASTNode):
             print statement
 
 
-class ASTBoolean(ASTNode):
+class ASTLetStatement(ASTNode):
+    type = StatementType.LET_STATEMENT
+
+    def __init__(self, token=None, name=None, value=None):
+        self.token = token
+        self.name = name
+        self.value = value
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'LetStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
+
+
+class ASTReturnStatement(ASTNode):
+    type = StatementType.RETURN_STATEMENT
+
     def __init__(self, token=None, value=None):
-        """
-        @param token: the node's token
-        @param value: native bool value
-        """
         self.token = token
         self.value = value
 
@@ -69,10 +84,28 @@ class ASTBoolean(ASTNode):
         return self.token.literal
 
     def __str__(self):
-        return str(self.value)
+        return 'ReturnStatement [' + str(self.token.literal) + '] <' + (str(self.value) if self.value else '') + '>'
+
+
+class ASTExpressionStatement(ASTNode):
+    type = StatementType.EXPRESSION_STATEMENT
+
+    def __init__(self, token=None, expression=None):
+        self.token = token
+        self.expression = expression
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        #return 'TODO: implemement __str__ in ASTExpressionStatement'
+        print type(self.expression)
+        return str(self.expression)
 
 
 class ASTIdentifier(ASTNode):
+    type = StatementType.IDENTIFIER
+
     def __init__(self, token=None, value=''):
         """
         @param token: the node's token
@@ -89,6 +122,8 @@ class ASTIdentifier(ASTNode):
 
 
 class ASTInteger(ASTNode):
+    type = StatementType.IDENTIFIER
+
     def __init__(self, token=None, value=None):
         """
         @param token: the node's token
@@ -106,21 +141,14 @@ class ASTInteger(ASTNode):
         return 'IntegerLiteral [' + str(self.token.literal) + '] <' + str(self.value) + '>'
 
 
-class ASTLetStatement(ASTNode):
-    def __init__(self, token=None, name=None, value=None):
-        self.token = token
-        self.name = name
-        self.value = value
+class ASTBoolean(ASTNode):
+    type = StatementType.BOOLEAN
 
-    def token_literal(self):
-        return self.token.literal
-
-    def __str__(self):
-        return 'LetStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
-
-
-class ASTReturnStatement(ASTNode):
     def __init__(self, token=None, value=None):
+        """
+        @param token: the node's token
+        @param value: native bool value
+        """
         self.token = token
         self.value = value
 
@@ -128,24 +156,74 @@ class ASTReturnStatement(ASTNode):
         return self.token.literal
 
     def __str__(self):
-        return 'ReturnStatement [' + str(self.token.literal) + '] <' + (str(self.value) if self.value else '') + '>'
+        return str(self.value)
 
 
-class ASTExpressionStatement(ASTNode):
-    def __init__(self, token=None, expression=None):
+class ASTInfixExpression(ASTNode):
+    type = StatementType.INFIX_EXPRESSION
+
+    def __init__(self, token=None, operator=None, left=None, right=None):
+        """
+        @param token: the node's token
+        @param operator: string the infix operator
+        @param left: ASTNode subclass, the left operand
+        @param right: ASTNode subclass, the right operand
+        """
         self.token = token
-        self.expression = expression
+        self.operator = operator
+        self.left = left
+        self.right = right
 
     def token_literal(self):
         return self.token.literal
 
     def __str__(self):
-        #return 'TODO: implemement __str__ in ASTExpressionStatement'
-        print type(self.expression)
-        return str(self.expression)
+        return str(self.left) + ' ' + str(self.operator) + ' ' + str(self.right)
+
+
+class ASTPrefixExpression(ASTNode):
+    type = StatementType.PREFIX_EXPRESSION
+
+    def __init__(self, token=None, operator=None, right=None):
+        """
+        @param token: the node's token
+        @param operator: string, the operator
+        @param right: the node(ASTNode subclass) that gets "minused" or "banged"
+        """
+        self.token = token
+        self.operator = operator
+        self.right = right
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return '(' + self.operator + str(self.right) + ')'
+
+
+class ASTCallExpression(ASTNode):
+    type = StatementType.CALL_EXPRESSION
+
+    def __init__(self, token=None, func=None):
+        """
+        @param token: the node's token
+        @param func: ASTNode subclass representing the Function Literal
+        arguments: the list of arguments in the call
+        """
+        self.token = token
+        self.func = func
+        self.arguments = None
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return str(self.func) + '(some arguments here)'
 
 
 class ASTIfExpression(ASTNode):
+    type = StatementType.IF_EXPRESSION
+
     def __init__(self, token=None, condition=None, consequence=None, alternative=None):
         """
         @param token: the node's token
@@ -166,7 +244,9 @@ class ASTIfExpression(ASTNode):
 
 
 class ASTBlockStatement(ASTNode):
-    def __init(self, token=None, statements=[]):
+    type = StatementType.BLOCK_STATEMENT
+
+    def __init__(self, token=None, statements=[]):
         """
         @param token: the node's token
         @param statements: list
@@ -182,6 +262,8 @@ class ASTBlockStatement(ASTNode):
 
 
 class ASTFunctionLiteral(ASTNode):
+    type = StatementType.FUNCTION_LITERAL
+
     def __init__(self, token=None, parameters=None, body=None):
         """
         @param token: the node's token
@@ -199,63 +281,9 @@ class ASTFunctionLiteral(ASTNode):
         return 'TODO: implement __str__ in ASTFunctionLiteral'
 
 
-class ASTCallExpression(ASTNode):
-    def __init__(self, token=None, func=None):
-        """
-        @param token: the node's token
-        @param func: ASTNode subclass representing the Function Literal
-        arguments: the list of arguments in the call
-        """
-        self.token = token
-        self.func = func
-        self.arguments = None
-
-    def token_literal(self):
-        return self.token.literal
-
-    def __str__(self):
-        return str(self.func) + '(some arguments here)'
-
-
-class ASTPrefixExpression(ASTNode):
-    def __init__(self, token=None, operator=None, right=None):
-        """
-        @param token: the node's token
-        @param operator: string, the operator
-        @param right: the node(ASTNode subclass) that gets "minused" or "banged"
-        """
-        self.token = token
-        self.operator = operator
-        self.right = right
-
-    def token_literal(self):
-        return self.token.literal
-
-    def __str__(self):
-        return '(' + self.operator + str(self.right) + ')'
-
-
-class ASTInfixExpression(ASTNode):
-    def __init__(self, token=None, operator=None, left=None, right=None):
-        """
-        @param token: the node's token
-        @param operator: string the infix operator
-        @param left: ASTNode subclass, the left operand
-        @param right: ASTNode subclass, the right operand
-        """
-        self.token = token
-        self.operator = operator
-        self.left = left
-        self.right = right
-
-    def token_literal(self):
-        return self.token.literal
-
-    def __str__(self):
-        return str(self.left) + ' ' + str(self.operator) + ' ' + str(self.right)
-
-
 class ASTWhileExpression(ASTNode):
+    type = StatementType.WHILE_EXPRESSION
+
     def __init__(self, token=None, condition=None, block=None):
         """
         @param token: the node's token
