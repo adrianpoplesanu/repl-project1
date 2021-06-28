@@ -206,7 +206,19 @@ class Parser(object):
         return expr
 
     def parse_call_arguments(self):
-        pass
+        args = []
+        if self.peek_token_is(TokenType.RPAREN):
+            self.next_token()
+            return args
+        self.next_token()
+        args.append(self.parse_expression(PrecedenceType.LOWEST))
+        while self.peek_token_is(TokenType.COMMA):
+            self.next_token()
+            self.next_token()
+            args.append(self.parse_expression(PrecedenceType.LOWEST))
+        if not self.expect_peek(TokenType.RPAREN):
+            return []
+        return args
 
     def parse_while_expression(self):
         pass
