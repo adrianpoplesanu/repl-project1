@@ -160,7 +160,7 @@ class Parser(object):
     def parse_block_statement(self):
         block = ASTBlockStatement(token=self.current_token)
         self.next_token()
-        while (not self.current_token_is(TokenType.RBRACE)) and not (not self.current_token_is(TokenType.EOF)):
+        while (not self.current_token_is(TokenType.RBRACE)) and (not self.current_token_is(TokenType.EOF)):
             stmt = self.parse_statement()
             if stmt:
                 block.statements.append(stmt)

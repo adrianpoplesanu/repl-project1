@@ -122,7 +122,7 @@ class ASTIdentifier(ASTNode):
 
 
 class ASTInteger(ASTNode):
-    type = StatementType.IDENTIFIER
+    type = StatementType.INTEGER
 
     def __init__(self, token=None, value=None):
         """
@@ -246,13 +246,16 @@ class ASTIfExpression(ASTNode):
 class ASTBlockStatement(ASTNode):
     type = StatementType.BLOCK_STATEMENT
 
-    def __init__(self, token=None, statements=[]):
+    def __init__(self, token=None, statements=None):
         """
         @param token: the node's token
         @param statements: list
         """
         self.token = token
-        self.statements = statements
+        if statements:
+            self.statements = statements
+        else:
+            self.statements = []
 
     def token_literal(self):
         return self.token.literal

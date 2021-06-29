@@ -49,4 +49,4 @@ class Token(object):
 		self.literal = literal
 
 	def __str__(self):
-		return "Token[type: {0}, literal: {1}]".format(self.type, self.literal)
+		return "Token[type: {0}, literal: {1}]".format(token_type_map[self.type], self.literal)
