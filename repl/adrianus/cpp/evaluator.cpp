@@ -9,10 +9,40 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_PROGRAM:
             return EvalProgram(node, env);
         break;
+        case ST_LET_STATEMENT: {
+            Ad_Object* obj = Eval(((Ad_AST_LetStatement*)node)->value, env);
+            env.Set(((Ad_AST_LetStatement*)node)->name.value, obj);
+            return NULL;
+        }
+        break;
+        case ST_RETURN_STATEMENT: {
+            Ad_Object* val = Eval(((Ad_AST_ReturnStatement*)node)->value, env);
+            Ad_ReturnValue_Object* obj = new Ad_ReturnValue_Object();
+            obj->value = val;
+            return obj;
+        }
+        break;
         case ST_EXPRESSION_STATEMENT:
             if (((Ad_AST_ExpressionStatement*)node)->expression) {
                 return Eval(((Ad_AST_ExpressionStatement*)node)->expression, env);
             }
+        break;
+        case ST_IDENTIFIER: {
+            return EvalIdentifier(node, env);
+        }
+        break;
+        case ST_INTEGER: {
+            Ad_Integer_Object* obj = new Ad_Integer_Object();
+            obj->value = ((Ad_AST_Integer*)node)->value;
+            return obj;
+        }
+        break;
+        case ST_BOOLEAN: {
+            //Ad_Boolean_Object* obj = new Ad_Boolean_Object();
+            //obj->value = ((Ad_AST_Boolean*)node)->value;
+            //return obj;
+            return NativeBoolToBooleanObject(((Ad_AST_Boolean*)node)->value);
+        }
         break;
         case ST_INFIX_EXPRESSION: {
             Ad_Object* left = Eval(((Ad_AST_InfixExpression*)node)->left, env);
@@ -32,34 +62,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return result;
         }
         break;
-        case ST_LET_STATEMENT: {
-            Ad_Object* obj = Eval(((Ad_AST_LetStatement*)node)->value, env);
-            env.Set(((Ad_AST_LetStatement*)node)->name.value, obj);
-            return NULL;
-        }
-        case ST_INTEGER: {
-            Ad_Integer_Object* obj = new Ad_Integer_Object();
-            obj->value = ((Ad_AST_Integer*)node)->value;
-            return obj;
-        }
-        break;
-        case ST_RETURN_STATEMENT: {
-            Ad_Object* val = Eval(((Ad_AST_ReturnStatement*)node)->value, env);
-            Ad_ReturnValue_Object* obj = new Ad_ReturnValue_Object();
-            obj->value = val;
-            return obj;
-        }
-        break;
-        case ST_IDENTIFIER: {
-            return EvalIdentifier(node, env);
-        }
-        case ST_BOOLEAN: {
-            //Ad_Boolean_Object* obj = new Ad_Boolean_Object();
-            //obj->value = ((Ad_AST_Boolean*)node)->value;
-            //return obj;
-            return NativeBoolToBooleanObject(((Ad_AST_Boolean*)node)->value);
-        }
-        break;
         case ST_PREFIX_EXPRESSION: {
             Ad_Object* right = Eval(((Ad_AST_PrefixExpression*)node)->right, env);
             return EvalPrefixExpression(((Ad_AST_PrefixExpression*)node)->_operator, right);
@@ -68,6 +70,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_IF_EXPRESSION: {
             return EvalIfExpression(node, env);
         }
+        break;
         case ST_BLOCK_STATEMENT: {
             return EvalBlockStatement(node, env);
         }
