@@ -21,6 +21,7 @@ class Evaluator(object):
         elif node.type == StatementType.EXPRESSION_STATEMENT:
             if node.expression:
                 return self.eval(node.expression, env)
+            return None
         elif node.type == StatementType.IDENTIFIER:
             return self.eval_identifier(node, env)
         elif node.type == StatementType.INTEGER:
@@ -35,13 +36,14 @@ class Evaluator(object):
         elif node.type == StatementType.PREFIX_EXPRESSION:
             right = self.eval(node.right, env)
             return self.eval_prefix_expression(node.operator, right)
-        elif node.type == StatementType.CALL_EXPRESSION:
-            pass
         elif node.type == StatementType.IF_EXPRESSION:
             return self.eval_if_expression(node, env)
         elif node.type == StatementType.BLOCK_STATEMENT:
             return self.eval_block_statement(node, env)
         elif node.type == StatementType.FUNCTION_LITERAL:
+            obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
+            return obj
+        elif node.type == StatementType.CALL_EXPRESSION:
             pass
         elif node.type == StatementType.WHILE_EXPRESSION:
             pass
@@ -49,13 +51,17 @@ class Evaluator(object):
             print 'unknown AST node'
 
     def eval_program(self, node, env):
-        pass
+        for statement in node.statements:
+            result = self.eval(statement, env)
+            if result:
+                print result.inspect()
 
     def eval_identifier(self, node, env):
-        pass
+        return env.get(node.token.literal)
 
     def eval_integer(self, node, env):
-        pass
+        obj = Ad_Integer_Object(value=node.value)
+        return obj
 
     def eval_boolean(self, node, env):
         pass

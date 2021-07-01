@@ -17,12 +17,12 @@ class Repl(object):
 	def loop(self):
 		signal.signal(signal.SIGINT, signal_ctrl_c_handler)
 		print ("Ad interpreter [Python]... v1.0")
+		env = new_environment()
 		while True:
 			line = raw_input('>> ')
 			self.parser.reset(source=line)
 			self.program.reset()
 			self.parser.build_program_statements(self.program)
-			env = new_environment()
 			self.evaluator.eval(self.program, env)
 			#self.program.debug()
 

@@ -4,10 +4,10 @@ class Environment(object):
         self.store = {}
 
     def get(self, key):
-        return None
+        return self.store.get(key)
 
     def set(self, key, value):
-        pass
+        self.store[key] = value
 
 
 def new_environment():
