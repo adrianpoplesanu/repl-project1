@@ -2,9 +2,10 @@ import sys
 from repl import Repl
 from parser import Parser
 from ast import ASTProgram
+from evaluator import Evaluator
 from test_parser import test_parser
 
-DEBUG = True
+DEBUG = False
 
 
 def main(args):
@@ -12,7 +13,8 @@ def main(args):
         test_parser()
     parser = Parser()
     program = ASTProgram()
-    repl = Repl(parser=parser, program=program)
+    evaluator = Evaluator()
+    repl = Repl(parser=parser, program=program, evaluator=evaluator)
     if args:
         filename = open(args[0], "r")
         source = filename.read()
