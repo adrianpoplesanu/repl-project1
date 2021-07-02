@@ -22,6 +22,15 @@ public class Parser {
 		//... i should instantiate the callback maps here for prefix and infix
 		lexer = new Lexer();
 		prefixParseFns.put(TokenTypeEnum.IDENT, new IdentifierParser());
+		prefixParseFns.put(TokenTypeEnum.INT, new IntegerLiteralParser());
+		prefixParseFns.put(TokenTypeEnum.BANG, new PrefixExpressionParser());
+		prefixParseFns.put(TokenTypeEnum.MINUS, new PrefixExpressionParser());
+		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser());
+		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser());
+		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser());
+	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser());
+	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser());
+	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser());
 	}
 	
