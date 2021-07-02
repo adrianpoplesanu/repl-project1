@@ -6,9 +6,12 @@ import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstLetStatement;
 import com.ad.ast.AstNode;
 import com.ad.ast.AstProgram;
+import com.ad.ast.AstReturnStatement;
 import com.ad.lexer.Lexer;
 import com.ad.token.Token;
 import com.ad.token.TokenTypeEnum;
+
+import jdk.nashorn.internal.parser.TokenType;
 
 public class Parser {
 	private Lexer lexer;
@@ -32,6 +35,14 @@ public class Parser {
 	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser());
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.ASTERISK, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.SLASH, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.LT, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.GT, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.LTE, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.GTE, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.LPAREN, new CallExpressionParser());
 	}
 	
 	public void load(String source) {
@@ -90,12 +101,18 @@ public class Parser {
 			return null;
 		}
 		nextToken();
-		stmt.setValue(parseExpression(ParseTypeEnum.LOWEST));
+		stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
 		return stmt;
 	}
 
 	public AstNode parseReturnStatement() {
-		return null;
+		AstReturnStatement stmt = new AstReturnStatement(currentToken);
+		nextToken();
+		stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
+		while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.EOF)) {
+			nextToken();
+		}
+		return stmt;
 	}
 
 	public AstNode parseExpressionStatement() {
@@ -110,7 +127,7 @@ public class Parser {
 		return null;
 	}
 
-	public AstNode parseExpression(ParseTypeEnum pte) {
+	public AstNode parseExpression(PrecedenceTypeEnum pte) {
 		return null;
 	}
 }

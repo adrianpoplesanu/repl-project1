@@ -1,6 +1,6 @@
 package com.ad.parser;
 
-public enum ParseTypeEnum {
+public enum PrecedenceTypeEnum {
 	LOWEST,
 	EQUALS,
 	LESSGREATER,

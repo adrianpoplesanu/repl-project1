@@ -12,6 +12,7 @@ public class TokenKeywordConverter {
 		put("else", TokenTypeEnum.ELSE);
 		put("true", TokenTypeEnum.TRUE);
 		put("false", TokenTypeEnum.FALSE);
+		put("while", TokenTypeEnum.WHILE);
 	}};
 	
 	public static TokenTypeEnum convertToKeyword(String ident) {
