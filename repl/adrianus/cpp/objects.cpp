@@ -153,6 +153,7 @@ Ad_Object_Type Ad_Error_Object::Type() {
 }
 
 void free_Ad_Object_memory(Ad_Object* obj) {
+    return;
     if (obj) {
         switch(obj->type) {
             case OBJ_NULL:

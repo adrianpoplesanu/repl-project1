@@ -53,6 +53,10 @@ Ad_AST_LetStatement::~Ad_AST_LetStatement() {
     }
 }
 
+std::string Ad_AST_LetStatement::TokenLiteral() {
+    return "";
+}
+
 std::string Ad_AST_LetStatement::ToString() {
     std::string out = "LetStatement [";
     out +=  token.literal + "] <" + name.value + ">: ";
@@ -80,6 +84,10 @@ Ad_AST_ReturnStatement::~Ad_AST_ReturnStatement() {
     free_Ad_AST_Node_memory(value);
 }
 
+std::string Ad_AST_ReturnStatement::TokenLiteral() {
+    return "";
+}
+
 std::string Ad_AST_ReturnStatement::ToString() {
     std::string out = "ReturnStatement [";
     out +=  token.literal + "] <" + value->ToString() + ">";
@@ -103,6 +111,10 @@ Ad_AST_ExpressionStatement::~Ad_AST_ExpressionStatement() {
     }
 }
 
+std::string Ad_AST_ExpressionStatement::TokenLiteral() {
+    return "";
+}
+
 std::string Ad_AST_ExpressionStatement::ToString() {
     std::string out = "ExpressionStatement [";
     out +=  token.literal + "] <";
@@ -123,6 +135,10 @@ Ad_AST_Identifier::Ad_AST_Identifier(Token t, std::string val) {
     type = ST_IDENTIFIER;
     token = t;
     value = val;
+}
+
+std::string Ad_AST_Identifier::TokenLiteral() {
+    return token.GetLiteral();
 }
 
 std::string Ad_AST_Identifier::ToString() {
@@ -358,12 +374,17 @@ Ad_AST_WhileExpression::~Ad_AST_WhileExpression() {
     }
 }
 
+std::string Ad_AST_WhileExpression::TokenLiteral() {
+    return "";
+}
+
 std::string Ad_AST_WhileExpression::ToString() {
     std::string out = "";
     return out;
 }
 
 void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
+    return;
     switch(obj->type) {
         case ST_LET_STATEMENT:
             delete (Ad_AST_LetStatement*)obj;

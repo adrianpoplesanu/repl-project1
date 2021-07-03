@@ -42,7 +42,7 @@ std::map<StatementType, std::string> statement_type_map = {
 class Ad_AST_Node {
 public:
     StatementType type;
-    std::string TokenLiteral();
+    virtual std::string TokenLiteral();
     virtual std::string ToString();
 };
 
@@ -52,7 +52,7 @@ public:
 
     Ad_AST_Program();
     ~Ad_AST_Program();
-    std::string TokenLiteral();
+    virtual std::string TokenLiteral();
     virtual std::string ToString();
 };
 
@@ -63,6 +63,7 @@ public:
 
     Ad_AST_Identifier();
     Ad_AST_Identifier(Token, std::string);
+    virtual std::string TokenLiteral();
     virtual std::string ToString();
 };
 
@@ -75,8 +76,8 @@ public:
     Ad_AST_LetStatement();
     Ad_AST_LetStatement(Token);
     ~Ad_AST_LetStatement();
-    std::string TokenLiteral();
-    std::string ToString();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
 };
 
 class Ad_AST_ReturnStatement : public Ad_AST_Node {
@@ -87,8 +88,8 @@ public:
     Ad_AST_ReturnStatement();
     Ad_AST_ReturnStatement(Token);
     ~Ad_AST_ReturnStatement();
-    std::string TokenLiteral();
-    std::string ToString();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
 };
 
 class Ad_AST_ExpressionStatement : public Ad_AST_Node {
@@ -99,8 +100,8 @@ public:
     Ad_AST_ExpressionStatement();
     Ad_AST_ExpressionStatement(Token);
     ~Ad_AST_ExpressionStatement();
-    std::string TokenLiteral();
-    std::string ToString();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
 };
 
 class Ad_AST_Integer : public Ad_AST_Node {
@@ -207,8 +208,8 @@ public:
     Ad_AST_WhileExpression();
     Ad_AST_WhileExpression(Token);
     ~Ad_AST_WhileExpression();
-    std::string TokenLiteral();
-    std::string ToString();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
 };
 
 bool StatementIs(Ad_AST_Node *stmt, StatementType st) {

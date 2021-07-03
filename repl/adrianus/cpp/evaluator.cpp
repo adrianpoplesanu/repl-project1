@@ -83,15 +83,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_CALL_EXPRESSION: {
             std::cout << "call expression eval\n";
-            /*
-            function = Eval(node.function, env)
-            if isError(function):
-                return function
-            args = evalExpressions(node.arguments, env)
-            if len(args) == 1 and isError(args[0]):
-                return args[0]
-            return applyFunction(function, args)
-            */
             Ad_Object* func = Eval(((Ad_AST_CallExpression*)node)->function, env);
             if (IsError(func)) return func;
             std::vector<Ad_Object*> args_objs = EvalExpressions(((Ad_AST_CallExpression*)node)->arguments, env);
@@ -288,7 +279,7 @@ def unwrapReturnValue(obj):
 Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args) {
     if (func->type == OBJ_FUNCTION) {
         Environment extendedEnv = ExtendFunctionEnv(func, args);
-        Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *((Ad_Function_Object*)func)->env);
+        Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, extendedEnv);
         return evaluated;
     }
     return NULL;
@@ -305,7 +296,10 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
     Environment extended = NewEnclosedEnvironment(*((Ad_Function_Object*)func)->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_Function_Object*)func)->params.begin() ; it != ((Ad_Function_Object*)func)->params.end(); ++it) {
+        //std::cout << (*it)->TokenLiteral() << "\n";
         extended.Set((*it)->TokenLiteral(), args[i]);
+        //std::cout << statement_type_map[(*it)->type] << "\n";
+        //extended.Set("x", args[i]); // aici e problema
         ++i;
     }
     return extended;

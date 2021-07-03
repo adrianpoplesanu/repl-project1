@@ -24,6 +24,7 @@ Ad_Object* Environment::Get(std::string key) {
 }
 
 void Environment::Set(std::string key, Ad_Object* obj) {
+    std::cout << key << "\n";
     if (Get(key) != NULL) {
         // sterge obiectul vechi daca e o suprascriere de element
         FreeObjectForKey(key);
