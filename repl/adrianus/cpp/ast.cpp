@@ -399,7 +399,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
             delete (Ad_AST_BlockStatement*)obj;
         break;
         case ST_FUNCTION_LITERAL:
-            delete (Ad_AST_FunctionLiteral*)obj;
+            //delete (Ad_AST_FunctionLiteral*)obj;
+            // ATENTION: this needs to be deleted only when there's no env referencing it
+            // this should be left in the hand of Ad_INCREF/Ad_DECREF logic and free object which deletes the AST nodes contained in Ad_Function_Object
         break;
         case ST_WHILE_EXPRESSION:
             delete (Ad_AST_WhileExpression*)obj;

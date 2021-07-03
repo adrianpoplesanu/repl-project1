@@ -57,8 +57,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             //free_Ad_Object_memory(right); // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
             //std::cout << ((Ad_AST_InfixExpression*)node)->left->type << "\n";
             //std::cout << ((Ad_AST_InfixExpression*)node)->right->type << "\n";
-            if (((Ad_AST_InfixExpression*)node)->left->type == ST_INTEGER) free_Ad_Object_memory(left); // macos vrea if-ul asta, in linux nu e nicio problema
-            if (((Ad_AST_InfixExpression*)node)->right->type == ST_INTEGER) free_Ad_Object_memory(right); // macos vrea if-ul asta, in linux nu e nicio problema
+            //if (((Ad_AST_InfixExpression*)node)->left->type == ST_INTEGER) free_Ad_Object_memory(left); // macos vrea if-ul asta, in linux nu e nicio problema
+            //if (((Ad_AST_InfixExpression*)node)->right->type == ST_INTEGER) free_Ad_Object_memory(right); // macos vrea if-ul asta, in linux nu e nicio problema
             return result;
         }
         break;
@@ -92,18 +92,12 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
                 return args[0]
             return applyFunction(function, args)
             */
-            std::cout << "aaa\n";
             Ad_Object* func = Eval(((Ad_AST_CallExpression*)node)->function, env);
-            std::cout << "bbb\n";
             if (IsError(func)) return func;
-            std::cout << "ccc\n";
             std::vector<Ad_Object*> args_objs = EvalExpressions(((Ad_AST_CallExpression*)node)->arguments, env);
-            std::cout << "ddd\n";
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
-                std::cout << "eee\n";
                 return args_objs[0];
             }
-            std::cout << "fff\n";
             return ApplyFunction(func, args_objs);
         }
         break;
