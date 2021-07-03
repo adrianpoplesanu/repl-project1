@@ -78,6 +78,10 @@ public:
 
 	Ad_ReturnValue_Object();
 	Ad_ReturnValue_Object(Ad_Object*);
+
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
 };
 
 class Environment; // forward declaration for Environment

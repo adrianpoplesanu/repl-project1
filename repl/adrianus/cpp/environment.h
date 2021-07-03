@@ -7,11 +7,13 @@
 class Environment {
 private:
     std::map<std::string, Ad_Object*> store;
+    std::map<std::string, Ad_Object*> outer;
 public:
     Environment();
     ~Environment();
     Ad_Object* Get(std::string);
     void Set(std::string, Ad_Object*);
+    void SetOuterEnvironment(Environment);
     void FreeObjectForKey(std::string);
     void PrintStore();
 };

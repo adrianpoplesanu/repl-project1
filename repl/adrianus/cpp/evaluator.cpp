@@ -252,7 +252,11 @@ std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> arg
     for (std::vector<Ad_AST_Node*>::iterator it = args.begin() ; it != args.end(); ++it) {
         Ad_AST_Node *obj = *it;
         Ad_Object* evaluated = Eval(obj, env);
-        //if (IsError(evaluated)) return evaluated; // TODO: fix this
+        if (IsError(evaluated)) {
+            std::vector<Ad_Object*> error_res;
+            error_res.push_back(evaluated);
+            return error_res;
+        }
         res.push_back(evaluated);
     }
     return res;
@@ -283,10 +287,28 @@ def unwrapReturnValue(obj):
 
 Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args) {
     if (func->type == OBJ_FUNCTION) {
+        Environment extendedEnv = ExtendFunctionEnv(func, args);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *((Ad_Function_Object*)func)->env);
         return evaluated;
     }
     return NULL;
+}
+
+Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj) {
+    if (obj->Type() == OBJ_RETURN_VALUE) {
+        return ((Ad_ReturnValue_Object*)obj)->value;
+    }
+    return obj;
+}
+
+Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
+    Environment extended = NewEnclosedEnvironment(*((Ad_Function_Object*)func)->env);
+    int i = 0;
+    for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_Function_Object*)func)->params.begin() ; it != ((Ad_Function_Object*)func)->params.end(); ++it) {
+        extended.Set((*it)->TokenLiteral(), args[i]);
+        ++i;
+    }
+    return extended;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

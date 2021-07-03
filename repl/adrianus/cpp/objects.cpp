@@ -50,6 +50,22 @@ Ad_ReturnValue_Object::Ad_ReturnValue_Object() {
 
 }
 
+std::string Ad_ReturnValue_Object::Inspect() {
+    // TODO: fix this
+    return "todo: implement inspect in Ad_ReturnValue_Object";
+    /*std::string out = "";
+    out = std::to_string(value->value);
+    return out;*/
+}
+
+void Ad_ReturnValue_Object::Print() {
+    std::cout << value;
+}
+
+Ad_Object_Type Ad_ReturnValue_Object::Type() {
+    return type;
+}
+
 Ad_Boolean_Object::Ad_Boolean_Object() {
     type = OBJ_BOOL;
 }

@@ -12,7 +12,12 @@ Environment::~Environment() {
 
 Ad_Object* Environment::Get(std::string key) {
     if (store.find(key) == store.end() ) {
-        return NULL;
+        //return NULL;
+        if (outer.find(key) == outer.end()) {
+            return NULL;
+        } else {
+            return outer[key];
+        }
     } else {
         return store[key];
     }
@@ -24,6 +29,13 @@ void Environment::Set(std::string key, Ad_Object* obj) {
         FreeObjectForKey(key);
     }
     store[key] = obj;
+}
+
+void Environment::SetOuterEnvironment(Environment o) {
+    outer.clear();
+    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
+        outer[it->first] = it->second;
+    }
 }
 
 void Environment::FreeObjectForKey(std::string key) {
@@ -46,5 +58,6 @@ Environment NewEnvoronment() {
 Environment NewEnclosedEnvironment(Environment outer) {
     // TODO
     Environment env;
+    env.SetOuterEnvironment(outer);
     return env;
 }
