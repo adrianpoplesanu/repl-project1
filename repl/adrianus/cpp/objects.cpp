@@ -62,9 +62,9 @@ Ad_Boolean_Object::Ad_Boolean_Object(bool v) {
 std::string Ad_Boolean_Object::Inspect() {
     std::string out = "";
     if (value) {
-        out = "true";
+        out = "true"; // this needs to be the token literal for true, i should do: out = token_type_map[TT_TRUE] and lower it
     } else {
-        out = "false";
+        out = "false"; // this needs to be the token literal for false, i should do: out = token_type_map[TT_FALSE] and lower it
     }
     return out;
 }

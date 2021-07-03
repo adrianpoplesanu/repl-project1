@@ -76,12 +76,35 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_FUNCTION_LITERAL: {
+            std::cout << "function literal eval\n";
             Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->body, &env);
             return obj;
         }
         break;
         case ST_CALL_EXPRESSION: {
-
+            std::cout << "call expression eval\n";
+            /*
+            function = Eval(node.function, env)
+            if isError(function):
+                return function
+            args = evalExpressions(node.arguments, env)
+            if len(args) == 1 and isError(args[0]):
+                return args[0]
+            return applyFunction(function, args)
+            */
+            std::cout << "aaa\n";
+            Ad_Object* func = Eval(((Ad_AST_CallExpression*)node)->function, env);
+            std::cout << "bbb\n";
+            if (IsError(func)) return func;
+            std::cout << "ccc\n";
+            std::vector<Ad_Object*> args_objs = EvalExpressions(((Ad_AST_CallExpression*)node)->arguments, env);
+            std::cout << "ddd\n";
+            if (args_objs.size() == 1 && IsError(args_objs[0])) {
+                std::cout << "eee\n";
+                return args_objs[0];
+            }
+            std::cout << "fff\n";
+            return ApplyFunction(func, args_objs);
         }
         break;
         case ST_WHILE_EXPRESSION: {
@@ -230,6 +253,48 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
     return result;
 }
 
+std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> args, Environment &env) {
+    std::vector<Ad_Object*> res;
+    for (std::vector<Ad_AST_Node*>::iterator it = args.begin() ; it != args.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        Ad_Object* evaluated = Eval(obj, env);
+        //if (IsError(evaluated)) return evaluated; // TODO: fix this
+        res.push_back(evaluated);
+    }
+    return res;
+}
+
+/*
+def applyFunction(fn, args):
+    if type(fn) == FunctionObject:
+        extendedEnv = extendFunctionEnv(fn, args)
+        evaluated = Eval(fn.body, extendedEnv)
+        return unwrapReturnValue(evaluated)
+    elif type(fn) == BuiltinObject:
+        return fn.builtin_function(*args)
+    return newError("not a function {0}".format(fn.Type()))
+
+def extendFunctionEnv(fn, args):
+    env = NewEnclosedEnvironment(fn.env)
+
+    for i, param in enumerate(fn.parameters):
+        env.Set(param.value, args[i])
+    return env
+
+def unwrapReturnValue(obj):
+    if type(obj) == ReturnValue:
+        return obj.Value
+    return obj
+*/
+
+Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args) {
+    if (func->type == OBJ_FUNCTION) {
+        Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *((Ad_Function_Object*)func)->env);
+        return evaluated;
+    }
+    return NULL;
+}
+
 bool Evaluator::IsTruthy(Ad_Object* obj) {
     if (obj == NULL) return false;
     if (obj == &NULLOBJECT) return false;
@@ -239,6 +304,7 @@ bool Evaluator::IsTruthy(Ad_Object* obj) {
 }
 
 bool Evaluator::IsError(Ad_Object* obj) {
+    std::cout << "error check\n";
     return obj->type == OBJ_ERROR;
 }
 
