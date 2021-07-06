@@ -22,10 +22,19 @@ class Ad_Boolean_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
-        return str(self.value)
+        if self.value:
+            return 'true' # this might be tied with the keyword mapping, would make it easier to change in the future
+        else:
+            return 'false' # this might be ties with the keyword mapping, would make it easier to change in the future
 
 class Ad_String_Object(Ad_Object):
     type = ObjectType.STRING
+
+    def __init__(self, value=None):
+        self.value = value
+
+    def inspect(self):
+        return None
 
 class Ad_ReturnValue_Object(Ad_Object):
     type = ObjectType.RETURN_VALUE
@@ -43,3 +52,9 @@ class Ad_Function_Object(Ad_Object):
 
 class Ad_Error_Object(Ad_Object):
     type = ObjectType.ERROR
+
+    def __init__(self, message=None):
+        self.message = message
+
+    def inspect(self):
+        return self.message

@@ -1,7 +1,11 @@
 from object import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                    Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
                    Ad_Error_Object
+from object_type import ObjectType
 from ast import StatementType
+
+TRUE = Ad_Boolean_Object(value=True)
+FALSE = Ad_Boolean_Object(value=False)
 
 class Evaluator(object):
     def __init__(self):
@@ -64,10 +68,42 @@ class Evaluator(object):
         return obj
 
     def eval_boolean(self, node, env):
-        pass
+        obj = Ad_Boolean_Object(value=node.value)
+        return obj
 
     def eval_infix_expression(self, operator, left, right):
-        pass
+        if left.type == ObjectType.INTEGER and right.type == ObjectType.INTEGER:
+            return self.eval_integer_infix_expression(operator, left, right)
+
+    def eval_integer_infix_expression(self, operator, left, right):
+        left_val = left.value
+        right_val = right.value
+        if operator == '+':
+            return Ad_Integer_Object(value=left_val + right_val)
+        if operator == '-':
+            return Ad_Integer_Object(value=left_val - right_val)
+        if operator == '*':
+            return Ad_Integer_Object(value=left_val * right_val)
+        if operator == '/':
+            return Ad_Integer_Object(value=left_val / right_val)
+        if operator == '<':
+            return self.native_bool_to_boolean_object(left_val < right_val)
+        if operator == '>':
+            return self.native_bool_to_boolean_object(left_val < right_val)
+        if operator == '<=':
+            return self.native_bool_to_boolean_object(left_val < right_val)
+        if operator == '>=':
+            return self.native_bool_to_boolean_object(left_val < right_val)
+        if operator == '==':
+            return self.native_bool_to_boolean_object(left_val < right_val)
+        if operator == '!=':
+            return self.native_bool_to_boolean_object(left_val < right_val)
+        return None
+
+    def native_bool_to_boolean_object(value):
+        if value:
+            return TRUE
+        return FALSE
 
     def eval_prefix_expression(self, operator, right):
         pass

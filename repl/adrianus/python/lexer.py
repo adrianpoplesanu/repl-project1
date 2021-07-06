@@ -117,7 +117,7 @@ class Lexer(object):
 		return ('a' <= self.ch and self.ch <= 'z') or ('A' <= self.ch and self.ch <= 'Z') or self.ch == '_'
 
 	def is_digit(self):
-		return '0' <= self.ch and self.ch < '9'
+		return '0' <= self.ch and self.ch <= '9'
 
 	def lookup_ident(self, ident):
 		if ident in keywords_map:
