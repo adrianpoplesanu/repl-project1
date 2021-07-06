@@ -47,7 +47,7 @@ Ad_Object_Type Ad_Integer_Object::Type() {
 }
 
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {
-
+    type = OBJ_RETURN_VALUE;
 }
 
 std::string Ad_ReturnValue_Object::Inspect() {
