@@ -3,9 +3,11 @@ from object import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                    Ad_Error_Object
 from object_type import ObjectType
 from ast import StatementType
+from environment import new_enclosed_environment
 
 TRUE = Ad_Boolean_Object(value=True)
 FALSE = Ad_Boolean_Object(value=False)
+
 
 class Evaluator(object):
     def __init__(self):
@@ -48,7 +50,7 @@ class Evaluator(object):
             obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
             return obj
         elif node.type == StatementType.CALL_EXPRESSION:
-            func = self.eval(node.function, env)
+            func = self.eval(node.func, env)
             if self.is_error(func):
                 return func
             args_objs = self.eval_expressions(node.arguments, env)
@@ -165,10 +167,32 @@ class Evaluator(object):
         return True
 
     def eval_expressions(self, args, env):
-        pass
+        res = []
+        for arg in args:
+            evaluated = self.eval(arg, env)
+            if self.is_error(evaluated):
+                error_res = [evaluated]
+                return error_res
+            res.append(evaluated)
+        return res
 
     def apply_function(self, func, args_objs):
-        pass
+        if func.type == ObjectType.FUNCTION:
+            extended_env = self.extend_function_env(func, args_objs)
+            evaluated = self.eval(func.body, extended_env)
+            return self.unwrap_return_value(evaluated)
+        return None
+
+    def unwrap_return_value(self, obj):
+        if obj.type == ObjectType.RETURN_VALUE:
+            return obj.value
+        return obj
+
+    def extend_function_env(self, func, args_objs):
+        extended = new_enclosed_environment(func.env)
+        for i, param in enumerate(func.parameters):
+            extended.set(param.token_literal(), args_objs[i])
+        return extended
 
     def new_error(self, msg):
         return Ad_Error_Object(message=msg)
