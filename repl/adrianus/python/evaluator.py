@@ -48,7 +48,13 @@ class Evaluator(object):
             obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
             return obj
         elif node.type == StatementType.CALL_EXPRESSION:
-            pass
+            func = self.eval(node.function, env)
+            if self.is_error(func):
+                return func
+            args_objs = self.eval_expressions(node.arguments, env)
+            if len(args_objs) == 1 and self.is_error(args_objs[0]):
+                return args_objs[0]
+            return self.apply_function(func, args_objs)
         elif node.type == StatementType.WHILE_EXPRESSION:
             pass
         else:
@@ -89,27 +95,83 @@ class Evaluator(object):
         if operator == '<':
             return self.native_bool_to_boolean_object(left_val < right_val)
         if operator == '>':
-            return self.native_bool_to_boolean_object(left_val < right_val)
+            return self.native_bool_to_boolean_object(left_val > right_val)
         if operator == '<=':
-            return self.native_bool_to_boolean_object(left_val < right_val)
+            return self.native_bool_to_boolean_object(left_val <= right_val)
         if operator == '>=':
-            return self.native_bool_to_boolean_object(left_val < right_val)
+            return self.native_bool_to_boolean_object(left_val >= right_val)
         if operator == '==':
-            return self.native_bool_to_boolean_object(left_val < right_val)
+            return self.native_bool_to_boolean_object(left_val == right_val)
         if operator == '!=':
-            return self.native_bool_to_boolean_object(left_val < right_val)
+            return self.native_bool_to_boolean_object(left_val != right_val)
         return None
 
-    def native_bool_to_boolean_object(value):
+    def native_bool_to_boolean_object(self, value):
         if value:
             return TRUE
         return FALSE
 
     def eval_prefix_expression(self, operator, right):
-        pass
+        if operator == '!':
+            return self.eval_bang_operator_expression(right)
+        if operator == '-':
+            return self.eval_minus_operator_expression(right)
+        return self.new_error("unkowm prefix expression for this type")
+
+    def eval_bang_operator_expression(self, right):
+        if not right:
+            return TRUE
+        if right.type == ObjectType.BOOLEAN:
+            if right == TRUE:
+                return FALSE
+            if right == FALSE:
+                return TRUE
+        return FALSE
+
+    def eval_minus_operator_expression(self, right):
+        if right.type != ObjectType.INTEGER:
+            return None
+        val = right.value
+        return Ad_Integer_Object(value=-val)
 
     def eval_if_expression(self, node, env):
-        pass
+        condition = self.eval(node.condition, env)
+        if self.is_error(condition):
+            return None
+        if self.is_truthy(condition):
+            return self.eval(node.consequence, env)
+        else:
+            if node.alternative:
+                return self.eval(node.alternative, env)
+        return None
 
     def eval_block_statement(self, node, env):
+        result = None
+        for statement in node.statements:
+            result = self.eval(statement, env)
+            if result.type == ObjectType.RETURN_VALUE:
+                return result;
+        return result
+
+    def is_truthy(self, obj):
+        if not obj:
+            return False
+        if obj == TRUE:
+            return True
+        if obj == FALSE:
+            return False
+        if obj.type == ObjectType.NULL:
+            return False
+        return True
+
+    def eval_expressions(self, args, env):
         pass
+
+    def apply_function(self, func, args_objs):
+        pass
+
+    def new_error(self, msg):
+        return Ad_Error_Object(message=msg)
+
+    def is_error(self, obj):
+        return obj.type == ObjectType.ERROR
