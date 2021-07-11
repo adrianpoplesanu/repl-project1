@@ -13,6 +13,7 @@ class StatementType(object):
     BLOCK_STATEMENT = 'BLOCK_STATEMENT'
     FUNCTION_LITERAL = 'FUNCTION_LITERAL'
     WHILE_EXPRESSION = 'WHILE_EXPRESSION'
+    STRING_LITERAL = 'STRING_LITERAL'
 
 
 statement_type_map = {
@@ -29,7 +30,8 @@ statement_type_map = {
     StatementType.IF_EXPRESSION: 'IF_EXPRESSION',
     StatementType.BLOCK_STATEMENT: 'BLOCK_STATEMENT',
     StatementType.FUNCTION_LITERAL: 'FUNCTION_LITERAL',
-    StatementType.WHILE_EXPRESSION: 'WHILE_EXPRESSION'
+    StatementType.WHILE_EXPRESSION: 'WHILE_EXPRESSION',
+    StatementType.STRING_LITERAL: 'STRING_LITERAL'
 }
 
 
@@ -302,3 +304,21 @@ class ASTWhileExpression(ASTNode):
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTWhileExpression'
+
+
+class ASTStringLiteral(ASTNode):
+    type = StatementType.STRING_LITERAL
+
+    def __init__(self, token=None, value=None):
+        """
+        @param token: the node's token
+        @param value: string
+        """
+        self.token = token
+        self.value = value
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTStringLiteral'

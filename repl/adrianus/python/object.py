@@ -75,6 +75,16 @@ class Ad_Function_Object(Ad_Object):
         self.env = env
 
 
+class Ad_String_Object(Ad_Object):
+    type = ObjectType.STRING
+
+    def __init__(self, value=None):
+        self.value = value
+
+    def inspect(self):
+        return self.value
+
+
 class Ad_Error_Object(Ad_Object):
     type = ObjectType.ERROR
 

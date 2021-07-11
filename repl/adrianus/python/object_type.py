@@ -5,4 +5,5 @@ class ObjectType(object):
     STRING = "STRING"
     RETURN_VALUE = "RETURN_VALUE"
     FUNCTION = "FUNCTION"
+    STRING = "STRING"
     ERROR = "ERROR"

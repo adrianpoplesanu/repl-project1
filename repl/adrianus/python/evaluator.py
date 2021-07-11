@@ -59,6 +59,8 @@ class Evaluator(object):
             return self.apply_function(func, args_objs)
         elif node.type == StatementType.WHILE_EXPRESSION:
             pass
+        elif node.type == StatementType.STRING_LITERAL:
+            return self.eval_string(node, env)
         else:
             print 'unknown AST node'
 
@@ -79,9 +81,21 @@ class Evaluator(object):
         obj = Ad_Boolean_Object(value=node.value)
         return obj
 
+    def eval_string(self, node, env):
+        obj = Ad_String_Object(value=node.value)
+        return obj
+
     def eval_infix_expression(self, operator, left, right):
         if left.type == ObjectType.INTEGER and right.type == ObjectType.INTEGER:
             return self.eval_integer_infix_expression(operator, left, right)
+        if left.type == ObjectType.STRING and right.type == ObjectType.STRING:
+            return self.eval_string_infix_expression(operator, left, right)
+        if left.type == ObjectType.BOOLEAN and right.type == ObjectType.BOOLEAN:
+            return self.eval_boolean_infix_expression(operator, left, right)
+        #if operator == '==':
+        #    return self.native_bool_to_boolean_object(left == right)
+        #if operator == '!=':
+        #    return self.native_bool_to_boolean_object(left != right)
 
     def eval_integer_infix_expression(self, operator, left, right):
         left_val = left.value
@@ -164,6 +178,16 @@ class Evaluator(object):
             return False
         if obj.type == ObjectType.NULL:
             return False
+        if obj.type == ObjectType.INTEGER:
+            if obj.value != 0:
+                return True
+            else:
+                return False
+        if obj.type == ObjectType.STRING:
+            if obj.value != '':
+                return True
+            else:
+                return False
         return True
 
     def eval_expressions(self, args, env):
@@ -193,6 +217,17 @@ class Evaluator(object):
         for i, param in enumerate(func.parameters):
             extended.set(param.token_literal(), args_objs[i])
         return extended
+
+    def eval_boolean_infix_expression(self, operator, left, right):
+        # if operator == AND
+        # val = left.value and right.value
+        # return Ad_Boolean_Object(value=val)
+        pass
+
+    def eval_string_infix_expression(self, operator, left, right):
+        if operator == "+":
+            val = left.value + right.value
+            return Ad_String_Object(value=val)
 
     def new_error(self, msg):
         return Ad_Error_Object(message=msg)

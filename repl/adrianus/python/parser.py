@@ -4,7 +4,7 @@ from precedence_type import PrecedenceType, precedences
 from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
-                ASTBlockStatement
+                ASTBlockStatement, ASTStringLiteral
 
 
 class Parser(object):
@@ -25,6 +25,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
         self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
+        self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
@@ -236,3 +237,6 @@ class Parser(object):
             self.next_token()
             left_exp = infix(left_exp)
         return left_exp
+
+    def parse_string_literal(self):
+        return ASTStringLiteral(token=self.current_token, value=str(self.current_token.literal))

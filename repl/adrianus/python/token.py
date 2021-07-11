@@ -28,7 +28,10 @@ token_type_map = {
 	TokenType.IF: "IF",
 	TokenType.ELSE: "ELSE",
 	TokenType.TRUE: "TRUE",
-	TokenType.FALSE: "FALSE"
+	TokenType.FALSE: "FALSE",
+	TokenType.STRING: "STRING",
+	TokenType.AND: "AND",
+	TokenType.OR: "OR"
 }
 
 keywords_map = {
@@ -39,7 +42,11 @@ keywords_map = {
 	"fn": TokenType.FUNCTION,
 	"while": TokenType.WHILE,
 	"true": TokenType.TRUE,
-	"false": TokenType.FALSE
+	"false": TokenType.FALSE,
+	# context
+	# "context": TokenType.ILLEGAL, context ar trebui sa fie un builtin
+	"and": TokenType.AND,
+	"or": TokenType.OR
 }
 
 
