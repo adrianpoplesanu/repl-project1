@@ -26,6 +26,8 @@ public:
     Ad_Object* ApplyFunction(Ad_Object*, std::vector<Ad_Object*>);
     Environment ExtendFunctionEnv(Ad_Object*, std::vector<Ad_Object*>);
     Ad_Object* UnwrapReturnValue(Ad_Object*);
+    Ad_Object* EvalString(Ad_AST_Node*, Environment&);
+    Ad_Object* EvalStringInfixExpression(std::string, Ad_Object*, Ad_Object*);
 };
 
 #endif

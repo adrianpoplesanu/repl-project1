@@ -383,6 +383,28 @@ std::string Ad_AST_WhileExpression::ToString() {
     return out;
 }
 
+Ad_AST_String::Ad_AST_String() {
+    type = ST_STRING_LITERAL;
+}
+
+Ad_AST_String::Ad_AST_String(Token t) {
+    type = ST_STRING_LITERAL;
+    token = t;
+}
+
+Ad_AST_String::~Ad_AST_String() {
+
+}
+
+std::string Ad_AST_String::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_String::ToString() {
+    std::string out = "";
+    return out;
+}
+
 void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
     return;
     switch(obj->type) {

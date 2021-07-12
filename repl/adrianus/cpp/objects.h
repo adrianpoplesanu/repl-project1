@@ -24,6 +24,7 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_STRING, "StringObject"},
 	{OBJ_RETURN_VALUE, "ReturnObject"},
 	{OBJ_FUNCTION, "FunctionObject"},
+	{OBJ_STRING, "StringObject"},
 	{OBJ_ERROR, "ErrorObject"}
 };
 
@@ -70,6 +71,10 @@ public:
 	std::string value;
 
 	Ad_String_Object();
+	Ad_String_Object(std::string);
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
 };
 
 class Ad_ReturnValue_Object : public Ad_Object {

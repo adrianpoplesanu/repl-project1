@@ -19,7 +19,8 @@ enum StatementType {
     ST_IF_EXPRESSION,
     ST_BLOCK_STATEMENT,
     ST_FUNCTION_LITERAL,
-    ST_WHILE_EXPRESSION
+    ST_WHILE_EXPRESSION,
+    ST_STRING_LITERAL
 };
 
 std::map<StatementType, std::string> statement_type_map = {
@@ -36,7 +37,8 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_IF_EXPRESSION, "IfExpression"},
     {ST_BLOCK_STATEMENT, "BlockStatement"},
     {ST_FUNCTION_LITERAL, "FunctionLiteral"},
-    {ST_WHILE_EXPRESSION, "WhileExpression"}
+    {ST_WHILE_EXPRESSION, "WhileExpression"},
+    {ST_STRING_LITERAL, "StringLiteral"}
 };
 
 class Ad_AST_Node {
@@ -208,6 +210,18 @@ public:
     Ad_AST_WhileExpression();
     Ad_AST_WhileExpression(Token);
     ~Ad_AST_WhileExpression();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_String : public Ad_AST_Node {
+public:
+    Token token;
+    std::string value;
+
+    Ad_AST_String();
+    Ad_AST_String(Token);
+    ~Ad_AST_String();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
 };

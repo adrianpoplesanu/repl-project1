@@ -129,6 +129,27 @@ Ad_Object_Type Ad_Function_Object::Type() {
     return type;
 }
 
+Ad_String_Object::Ad_String_Object() {
+    type = OBJ_STRING;
+}
+
+Ad_String_Object::Ad_String_Object(std::string val) {
+    type = OBJ_STRING;
+    value = val;
+}
+
+std::string Ad_String_Object::Inspect() {
+    return value;
+}
+
+void Ad_String_Object::Print() {
+    std::cout << "todo Ad string Print()";
+}
+
+Ad_Object_Type Ad_String_Object::Type() {
+    return type;
+}
+
 Ad_Error_Object::Ad_Error_Object() {
     type = OBJ_ERROR;
 }

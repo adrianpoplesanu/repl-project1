@@ -91,6 +91,11 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
 
         }
         break;
+        case ST_STRING_LITERAL: {
+            // pass
+            return EvalString(node, env);
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -119,6 +124,9 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
 Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
     if (left->Type() == OBJ_INT && right->Type() == OBJ_INT) {
         return EvalIntegerInfixExpression(_operator, left, right);
+    }
+    if (left->Type() == OBJ_STRING && right->Type() == OBJ_STRING) {
+        return EvalStringInfixExpression(_operator, left, right);
     }
     std::cout << "eval infix expression will return NULL\n";
     return NULL;
@@ -167,6 +175,16 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
         return NativeBoolToBooleanObject(left_val != right_val);
     }
     //return &NULLOBJECT;
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalStringInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    std::string left_val = ((Ad_String_Object*)left)->value;
+    std::string right_val = ((Ad_String_Object*)right)->value;
+    if (_operator == "+") {
+        Ad_String_Object* obj = new Ad_String_Object(left_val + right_val);
+        return obj;
+    }
     return NULL;
 }
 
@@ -292,6 +310,11 @@ bool Evaluator::IsError(Ad_Object* obj) {
 Ad_Object* Evaluator::NativeBoolToBooleanObject(bool value) {
     if (value) return &TRUE;
     return &FALSE;
+}
+
+Ad_Object* Evaluator::EvalString(Ad_AST_Node* node, Environment &env) {
+    Ad_String_Object* obj = new Ad_String_Object(((Ad_AST_String*)node)->value);
+    return obj;
 }
 
 Ad_Object* Evaluator::NewError(std::string message) {

@@ -1,5 +1,6 @@
 #include "lexer.h"
 #include "token.cpp"
+#include <iostream>
 
 Lexer::Lexer() {
 
@@ -64,7 +65,12 @@ TokenType Lexer::LookupIdent(std::string ident) {
 }
 
 std::string Lexer::ReadString() {
-    return "some string needs reading";
+    ReadChar();
+    int start = position;
+    while (current_char != '"') {
+        ReadChar();
+    }
+    return source.substr(start, position - start);
 }
 
 char Lexer::PeekChar() {

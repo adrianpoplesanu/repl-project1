@@ -15,6 +15,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
     prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionLiteral));
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
+    prefixParseFns.insert(std::make_pair(TT_STRING, &Parser::ParseStringLiteral));
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -341,6 +342,12 @@ Ad_AST_Node* Parser::ParseWhileExpression() {
     }
     expr->consequence = ParseBlockStatement();
     return expr;
+}
+
+Ad_AST_Node* Parser::ParseStringLiteral() {
+    Ad_AST_String *string_node = new Ad_AST_String(current_token);
+    string_node->value = current_token.GetLiteral();
+    return string_node;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {
