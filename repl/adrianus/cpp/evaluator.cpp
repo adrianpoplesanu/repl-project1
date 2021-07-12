@@ -38,9 +38,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_BOOLEAN: {
-            //Ad_Boolean_Object* obj = new Ad_Boolean_Object();
-            //obj->value = ((Ad_AST_Boolean*)node)->value;
-            //return obj;
             return NativeBoolToBooleanObject(((Ad_AST_Boolean*)node)->value);
         }
         break;
@@ -250,29 +247,6 @@ std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> arg
     }
     return res;
 }
-
-/*
-def applyFunction(fn, args):
-    if type(fn) == FunctionObject:
-        extendedEnv = extendFunctionEnv(fn, args)
-        evaluated = Eval(fn.body, extendedEnv)
-        return unwrapReturnValue(evaluated)
-    elif type(fn) == BuiltinObject:
-        return fn.builtin_function(*args)
-    return newError("not a function {0}".format(fn.Type()))
-
-def extendFunctionEnv(fn, args):
-    env = NewEnclosedEnvironment(fn.env)
-
-    for i, param in enumerate(fn.parameters):
-        env.Set(param.value, args[i])
-    return env
-
-def unwrapReturnValue(obj):
-    if type(obj) == ReturnValue:
-        return obj.Value
-    return obj
-*/
 
 Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args) {
     if (func->type == OBJ_FUNCTION) {

@@ -36,7 +36,10 @@ enum TokenType {
     TT_INT,
     TT_WHILE,
     TT_LBRACKET,
-    TT_RBRACKET
+    TT_RBRACKET,
+    TT_STRING,
+    TT_AND,
+    TT_OR
 };
 
 std::map<TokenType, std::string> token_type_map = {
@@ -71,7 +74,10 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_INT, "INT"},
     {TT_WHILE, "WHILE"},
     {TT_LBRACKET, "LBRACKET"},
-    {TT_RBRACKET, "RBRACKET"}
+    {TT_RBRACKET, "RBRACKET"},
+    {TT_STRING, "STRING"},
+    {TT_AND, "AND"},
+    {TT_OR, "OR"}
 };
 
 std::map<std::string, TokenType> keywords = {
@@ -82,7 +88,9 @@ std::map<std::string, TokenType> keywords = {
     {"false", TT_FALSE},
     {"fn", TT_FUNCTION},
     {"let", TT_LET},
-    {"while", TT_WHILE}
+    {"while", TT_WHILE},
+    {"and", TT_AND},
+    {"or", TT_OR}
 };
 
 class Token {

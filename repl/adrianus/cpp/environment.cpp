@@ -56,7 +56,6 @@ Environment NewEnvoronment() {
 }
 
 Environment NewEnclosedEnvironment(Environment outer) {
-    // TODO
     Environment env;
     env.SetOuterEnvironment(outer);
     return env;

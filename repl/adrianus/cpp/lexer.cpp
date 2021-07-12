@@ -63,6 +63,10 @@ TokenType Lexer::LookupIdent(std::string ident) {
     return TT_IDENT;
 }
 
+std::string Lexer::ReadString() {
+    return "some string needs reading";
+}
+
 char Lexer::PeekChar() {
     return source[readPosition];
 }
@@ -138,6 +142,10 @@ Token Lexer::NextToken() {
         case '}':
             token.type = TT_RBRACE;
             token.literal = current_char;
+        break;
+        case '"':
+            token.type = TT_STRING;
+            token.literal = ReadString();
         break;
         case '=':
             if (PeekChar() == '=') {
