@@ -219,10 +219,12 @@ class Evaluator(object):
         return extended
 
     def eval_boolean_infix_expression(self, operator, left, right):
-        # if operator == AND
-        # val = left.value and right.value
-        # return Ad_Boolean_Object(value=val)
-        pass
+        left_val = left.value
+        right_val = right.value
+        if operator == 'and':
+            return Ad_Boolean_Object(value=left_val and right_val)
+        if operator == 'or':
+            return Ad_Boolean_Object(value=left_val or right_val)
 
     def eval_string_infix_expression(self, operator, left, right):
         if operator == "+":
