@@ -2,12 +2,21 @@ package com.ad.ast;
 
 import com.ad.token.Token;
 
-public class AstIdentifier extends AstNode {
+public class AstBoolean extends AstNode {
 	private Token token;
-	private String value;
+	private boolean value;
+	
+	public AstBoolean() {
+		type = AstNodeTypeEnum.BOOLEAN;
+	}
+	
+	public AstBoolean(Token token) {
+		type = AstNodeTypeEnum.BOOLEAN;
+		this.token = token;
+	}
 
-	public AstIdentifier(Token token, String value) {
-		type = AstNodeTypeEnum.IDENTIFIER;
+	public AstBoolean(Token token, boolean value) {
+		type = AstNodeTypeEnum.BOOLEAN;
 		this.token = token;
 		this.value = value;
 	}
@@ -30,11 +39,11 @@ public class AstIdentifier extends AstNode {
 		this.token = token;
 	}
 
-	public String getValue() {
+	public boolean isValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(boolean value) {
 		this.value = value;
 	}
 }

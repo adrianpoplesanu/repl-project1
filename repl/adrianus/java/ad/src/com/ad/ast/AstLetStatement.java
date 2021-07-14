@@ -8,6 +8,7 @@ public class AstLetStatement extends AstNode {
 	private AstIdentifier name;
 	
 	public AstLetStatement(Token token) {
+		type = AstNodeTypeEnum.LET_STATEMENT;
 		this.token = token;
 	}
 
