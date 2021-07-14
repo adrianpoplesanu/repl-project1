@@ -95,7 +95,7 @@ public class Lexer {
 		case '>':
 			if (peekChar() == '=') {
 				token.setType(TokenTypeEnum.GTE);
-				token.setLiteral("==");
+				token.setLiteral(">=");
 				readChar();
 			} else {
 				token.setType(TokenTypeEnum.GT);
