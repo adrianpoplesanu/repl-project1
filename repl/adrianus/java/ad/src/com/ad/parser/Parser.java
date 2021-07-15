@@ -2,6 +2,7 @@ package com.ad.parser;
 
 import java.util.HashMap;
 
+import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstLetStatement;
 import com.ad.ast.AstNode;
@@ -10,8 +11,6 @@ import com.ad.ast.AstReturnStatement;
 import com.ad.lexer.Lexer;
 import com.ad.token.Token;
 import com.ad.token.TokenTypeEnum;
-
-import jdk.nashorn.internal.parser.TokenType;
 
 public class Parser {
 	private Lexer lexer;
@@ -80,6 +79,11 @@ public class Parser {
 			return false;
 		}
 	}
+	
+	private PrecedenceTypeEnum peekPrecedence() {
+		// TODO: implement this
+		return PrecedenceTypeEnum.LOWEST;
+	}
 
 	public AstNode parseStatement() {
 		if (currentToken.getType() == TokenTypeEnum.LET) {
@@ -116,7 +120,12 @@ public class Parser {
 	}
 
 	public AstNode parseExpressionStatement() {
-		return null;
+		AstExpressionStatement stmt = new AstExpressionStatement(currentToken);
+		stmt.setExpression(parseExpression(PrecedenceTypeEnum.LOWEST));
+		if (peekTokenIs(TokenTypeEnum.SEMICOLON)) {
+			nextToken();
+		}
+		return stmt;
 	}
 
 	public AstNode parsePrefixExpression() {
@@ -128,6 +137,12 @@ public class Parser {
 	}
 
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {
-		return null;
+		if (!prefixParseFns.containsKey(pte)) return null;
+		PrefixParseInterface prefixParser = prefixParseFns.get(pte);
+		AstNode left_expression = prefixParser.parse();
+		while(!peekTokenIs(TokenTypeEnum.SEMICOLON) && (pte.ordinal() < peekPrecedence().ordinal())) {
+			//TODO: finish this
+		}
+		return left_expression;
 	}
 }
