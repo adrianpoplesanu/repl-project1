@@ -37,6 +37,7 @@ class Parser(object):
         self.infix_parse_functions[TokenType.LTE] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.GTE] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.AND] = self.parse_infix_expression
+        self.infix_parse_functions[TokenType.OR] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.LPAREN] = self.parse_call_expression
 
     def reset(self, source):

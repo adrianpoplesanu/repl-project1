@@ -3,8 +3,8 @@ from token_type import TokenType
 class PrecedenceType(object):
     LOWEST = 1
     EQUALS = 2
-    LESSGREATER = 3
-    CONDITIONAL = 4
+    CONDITIONAL = 3
+    LESSGREATER = 4
     SUM = 5
     PRODUCT = 6
     PREFIX = 7
@@ -18,6 +18,7 @@ precedences = {
     TokenType.LTE: PrecedenceType.LESSGREATER,
     TokenType.GTE: PrecedenceType.LESSGREATER,
     TokenType.AND: PrecedenceType.CONDITIONAL,
+    TokenType.OR: PrecedenceType.CONDITIONAL,
     TokenType.PLUS: PrecedenceType.SUM,
     TokenType.MINUS: PrecedenceType.SUM,
     TokenType.SLASH: PrecedenceType.PRODUCT,
