@@ -96,3 +96,16 @@ class Ad_Error_Object(Ad_Object):
 
     def inspect(self):
         return self.message
+
+
+class Ad_Builtin_Object(Ad_Object):
+    type = ObjectType.BUILTIN
+
+    def __init__(self, builtin_function=None):
+        """
+        @param builtin_function: reference to a function
+        """
+        self.builtin_function = builtin_function
+
+    def inspect(self):
+        return str(self.builtin_function)

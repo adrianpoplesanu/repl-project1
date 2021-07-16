@@ -7,3 +7,4 @@ class ObjectType(object):
     FUNCTION = "FUNCTION"
     STRING = "STRING"
     ERROR = "ERROR"
+    BUILTIN = "BUILTIN"

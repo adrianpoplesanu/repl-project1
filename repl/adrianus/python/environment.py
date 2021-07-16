@@ -4,6 +4,9 @@ class Environment(object):
         self.store = {}
         self.outer = {}
 
+    def check(self, key):
+        return key in self.store or key in self.outer
+
     def get(self, key):
         if key in self.store:
             return self.store.get(key)

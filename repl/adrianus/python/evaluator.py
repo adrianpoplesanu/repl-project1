@@ -1,9 +1,10 @@
-from object import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
-                   Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
-                   Ad_Error_Object
+from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
+                    Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
+                    Ad_Error_Object
 from object_type import ObjectType
 from ast import StatementType
 from environment import new_enclosed_environment
+from builtins import builtins_map
 
 TRUE = Ad_Boolean_Object(value=True)
 FALSE = Ad_Boolean_Object(value=False)
@@ -71,7 +72,11 @@ class Evaluator(object):
                 print result.inspect()
 
     def eval_identifier(self, node, env):
-        return env.get(node.token.literal)
+        if env.check(node.token.literal):
+            return env.get(node.token.literal)
+        if node.token.literal in builtins_map:
+            return builtins_map[node.value]
+        return None
 
     def eval_integer(self, node, env):
         obj = Ad_Integer_Object(value=node.value)
@@ -205,6 +210,9 @@ class Evaluator(object):
             extended_env = self.extend_function_env(func, args_objs)
             evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
+        if func.type == ObjectType.BUILTIN:
+            return func.builtin_function(args_objs) # asta ar putea fi si func.builtin_function(*args_objs)
+            # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
         return None
 
     def unwrap_return_value(self, obj):
