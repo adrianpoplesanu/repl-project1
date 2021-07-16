@@ -3,5 +3,7 @@ let add = fn(a, b) { return a + b; }
 add(2, 3);
 1 + 2 - 3 * 4;
 if ( 3 > 1 ) { 1001; } else { 1002; }
+let bebe = "dexiciul"
+len(bebe)
 let check = true;
 let test = false;

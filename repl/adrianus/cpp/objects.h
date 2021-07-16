@@ -14,7 +14,8 @@ enum Ad_Object_Type {
 	OBJ_STRING,
 	OBJ_RETURN_VALUE,
 	OBJ_FUNCTION,
-	OBJ_ERROR
+	OBJ_ERROR,
+	OBJ_BUILTIN
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
@@ -25,7 +26,8 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_RETURN_VALUE, "ReturnObject"},
 	{OBJ_FUNCTION, "FunctionObject"},
 	{OBJ_STRING, "StringObject"},
-	{OBJ_ERROR, "ErrorObject"}
+	{OBJ_ERROR, "ErrorObject"},
+	{OBJ_BUILTIN, "BuiltinObject"}
 };
 
 class Ad_Object {
@@ -122,5 +124,17 @@ void Ad_DECREF(Ad_Object*);
 
 void free_Ad_Object_memory(Ad_Object*);
 void print_Ad_Object(Ad_Object*);
+
+class Ad_Builtin_Object : public Ad_Object {
+public:
+	//...
+	Ad_Object* (*builtin_function)(std::vector<Ad_Object*>);
+
+	Ad_Builtin_Object();
+	Ad_Builtin_Object(Ad_Object* (*)(std::vector<Ad_Object*>));
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+};
 
 #endif

@@ -173,6 +173,27 @@ Ad_Object_Type Ad_Error_Object::Type() {
     return type;
 }
 
+Ad_Builtin_Object::Ad_Builtin_Object() {
+    type = OBJ_BUILTIN;
+}
+
+Ad_Builtin_Object::Ad_Builtin_Object(Ad_Object* (*bf)(std::vector<Ad_Object*>)) {
+    type = OBJ_BUILTIN;
+    builtin_function = bf;
+}
+
+std::string Ad_Builtin_Object::Inspect() {
+    return "todo: implement this";
+}
+
+void Ad_Builtin_Object::Print() {
+    std::cout << "todo: implement this\n";
+}
+
+Ad_Object_Type Ad_Builtin_Object::Type() {
+    return type;
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     obj->ref_count++;
 }
@@ -206,6 +227,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             case OBJ_ERROR:
                 delete ((Ad_Error_Object*)obj);
             break;
+            case OBJ_BUILTIN:
+                delete ((Ad_Builtin_Object*)obj);
+            break;
             default:
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
             break;
@@ -235,6 +259,9 @@ void print_Ad_Object(Ad_Object* obj) {
         break;
         case OBJ_ERROR:
             std::cout << "error object\n";
+        break;
+        case OBJ_BUILTIN:
+            std::cout << "builtin object\n";
         break;
     }
 }

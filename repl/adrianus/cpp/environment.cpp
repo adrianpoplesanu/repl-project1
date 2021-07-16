@@ -10,6 +10,13 @@ Environment::~Environment() {
     }
 }
 
+bool Environment::Check(std::string key) {
+    if (store.find(key) == store.end() ) {
+        return false;
+    }
+    return true;
+}
+
 Ad_Object* Environment::Get(std::string key) {
     if (store.find(key) == store.end() ) {
         //return NULL;

@@ -11,6 +11,7 @@ all:
 	g++ -g -std=c++11 tests.cpp -c -o tests.o
 	g++ -g -std=c++11 test_parser.cpp -c -o test_parser.o
 	g++ -g -std=c++11 utils.cpp -c -o utils.o
+	g++ -g -std=c++11 builtins.cpp -c -o builtins.o
 	g++ -g -std=c++11 main.cpp -c -o main.o
 	g++ -g -std=c++11 main.o -o main
 

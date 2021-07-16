@@ -4,20 +4,17 @@ if exists("b:current_syntax")
     finish
 endif
 
-hi BooleanTrue ctermfg=Green
-hi BooleanFalse ctermfg=Red
-hi LetReturn ctermfg=Magenta
+hi Boolean ctermfg=Red
+hi Let ctermfg=Magenta
 
-syntax keyword adFunction fn
-syntax keyword adKeyword if else
-syntax keyword adLetReturn let return
-syntax keyword adBooleanTrue true
-syntax keyword adBooleanFalse false
+syntax keyword adFunction fn len
+syntax keyword adKeyword if else return
+syntax keyword adLet let
+syntax keyword adBoolean true false
 
 highlight link adKeyword Keyword
 highlight link adFunction Function
-highlight link adLetReturn LetReturn
-highlight link adBooleanTrue BooleanTrue
-highlight link adBooleanFalse BooleanFalse
+highlight link adLet Let
+highlight link adBoolean Boolean
 
 let b:current_syntax = "ad"

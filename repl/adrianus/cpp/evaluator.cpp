@@ -1,4 +1,5 @@
 #include "evaluator.h"
+#include "builtins.cpp"
 
 Ad_Null_Object NULLOBJECT;
 Ad_Boolean_Object TRUE(true);
@@ -92,7 +93,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_STRING_LITERAL: {
-            // pass
             return EvalString(node, env);
         }
         break;
@@ -221,7 +221,14 @@ Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
 }
 
 Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
-    return env.Get(((Ad_AST_Identifier*)node)->token.literal);
+    Ad_Object* obj;
+    if (env.Check(((Ad_AST_Identifier*)node)->token.literal)) {
+        obj = env.Get(((Ad_AST_Identifier*)node)->token.literal);
+    }
+    if (builtins_map.find(((Ad_AST_Identifier*)node)->token.literal) != builtins_map.end()) {
+        return builtins_map[((Ad_AST_Identifier*)node)->token.literal];
+    }
+    return obj;
 }
 
 Ad_Object* Evaluator::EvalIfExpression(Ad_AST_Node* node, Environment &env) {
@@ -271,6 +278,9 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         Environment extendedEnv = ExtendFunctionEnv(func, args);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, extendedEnv);
         return UnwrapReturnValue(evaluated);
+    }
+    if (func->type == OBJ_BUILTIN) {
+        return ((Ad_Builtin_Object*)func)->builtin_function(args);
     }
     return NULL;
 }

@@ -12,6 +12,7 @@ public:
     Environment();
     ~Environment();
     Ad_Object* Get(std::string);
+    bool Check(std::string);
     void Set(std::string, Ad_Object*);
     void SetOuterEnvironment(Environment);
     void FreeObjectForKey(std::string);

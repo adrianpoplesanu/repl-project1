@@ -4,6 +4,7 @@
 #include "parser.h"
 #include "evaluator.h"
 #include "environment.h"
+#include "objects.h"
 
 class Repl {
 private:
