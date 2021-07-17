@@ -80,8 +80,17 @@ public class Parser {
 		}
 	}
 	
+	private PrecedenceTypeEnum currentPrecedence() {
+		if (TokenPrecedenceConverter.precedenceMap.containsKey(currentToken.getType())) {
+			return TokenPrecedenceConverter.precedenceMap.get(currentToken.getType());
+		}
+		return PrecedenceTypeEnum.LOWEST;
+	}
+
 	private PrecedenceTypeEnum peekPrecedence() {
-		// TODO: implement this
+		if (TokenPrecedenceConverter.precedenceMap.containsKey(peekToken.getType())) {
+			return TokenPrecedenceConverter.precedenceMap.get(peekToken.getType());
+		}
 		return PrecedenceTypeEnum.LOWEST;
 	}
 
@@ -141,7 +150,10 @@ public class Parser {
 		PrefixParseInterface prefixParser = prefixParseFns.get(pte);
 		AstNode left_expression = prefixParser.parse();
 		while(!peekTokenIs(TokenTypeEnum.SEMICOLON) && (pte.ordinal() < peekPrecedence().ordinal())) {
-			//TODO: finish this
+			if (!infixParseFns.containsKey(peekToken.getType())) return left_expression;
+			InfixParseInterface infixParser = infixParseFns.get(peekToken.getType());
+			nextToken();
+			left_expression = infixParser.parse(left_expression);
 		}
 		return left_expression;
 	}
