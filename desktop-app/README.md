@@ -7,3 +7,4 @@ npm i --save-dev electron
 npm start
 
 sau chiar, npm run start
+

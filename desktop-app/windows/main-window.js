@@ -99,10 +99,21 @@ function test_logic() {
     reference_structure[reference_structure['/Users/adrianpoplesanu'].children[5].absolute_path] = reference_structure['/Users/adrianpoplesanu'].children[5];
 }
 
+function walk_folder(folder, level) {
+    var children = folder.children, i;
+    console.log(folder.absolute_path);
+    for (i = 0; i < children.length; i++) {
+        walk_folder(children[i]);
+    }
+}
+
 function display_folder_structure() {
     //... parse folder_structure and create divs
+    //console.log(folder_structure);
+    walk_folder(folder_structure[0], 0);
 }
 
 $(document).ready(function () {
     test_logic();
+    display_folder_structure();
 });
