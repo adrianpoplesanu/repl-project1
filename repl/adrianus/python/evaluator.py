@@ -1,6 +1,6 @@
 from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                     Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
-                    Ad_Error_Object
+                    Ad_Error_Object, Ad_List_Object
 from object_type import ObjectType
 from ast import StatementType
 from environment import new_enclosed_environment
@@ -62,6 +62,20 @@ class Evaluator(object):
             pass
         elif node.type == StatementType.STRING_LITERAL:
             return self.eval_string(node, env)
+        elif node.type == StatementType.LIST_LITERAL:
+            elements = self.eval_expressions(node.elements, env)
+            if len(elements) == 1 and self.is_error(elements[0]):
+                return elements[0]
+            list_obj = Ad_List_Object(elements=elements)
+            return list_obj
+        elif node.type == StatementType.INDEX_EXPRESSION:
+            left = self.eval(node.left, env)
+            if self.is_error(left):
+                return left
+            index = self.eval(node.index, env)
+            if self.is_error(index):
+                return index
+            return self.eval_index_expression(left, index)
         else:
             print 'unknown AST node'
 
@@ -244,3 +258,16 @@ class Evaluator(object):
 
     def is_error(self, obj):
         return obj.type == ObjectType.ERROR
+
+    def eval_index_expression(self, left, index):
+        if left.type == ObjectType.LIST and index.type == ObjectType.INTEGER:
+            return self.eval_list_index_expression(left, index)
+        return None
+
+    def eval_list_index_expression(self, left, index):
+        list_obj = left
+        idx = index.value
+        max = len(list_obj.elements) - 1
+        if idx < 0 or idx > max:
+            return None
+        return list_obj.elements[idx]

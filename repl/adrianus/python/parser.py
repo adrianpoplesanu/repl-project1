@@ -4,7 +4,7 @@ from precedence_type import PrecedenceType, precedences
 from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
-                ASTBlockStatement, ASTStringLiteral
+                ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression
 
 
 class Parser(object):
@@ -26,6 +26,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
+        self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
@@ -39,6 +40,7 @@ class Parser(object):
         self.infix_parse_functions[TokenType.AND] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.OR] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.LPAREN] = self.parse_call_expression
+        self.infix_parse_functions[TokenType.LBRACKET] = self.parse_index_expression
 
     def reset(self, source):
         self.source = source
@@ -242,3 +244,31 @@ class Parser(object):
 
     def parse_string_literal(self):
         return ASTStringLiteral(token=self.current_token, value=str(self.current_token.literal))
+
+    def parse_list_literal(self):
+        expr = ASTListLiteral(self.current_token)
+        expr.elements = self.parse_expression_list()
+        return expr
+
+    def parse_expression_list(self):
+        elements = []
+        if self.peek_token_is(TokenType.RBRACKET):
+            self.next_token()
+            return elements
+        self.next_token()
+        elements.append(self.parse_expression(PrecedenceType.LOWEST))
+        while self.peek_token_is(TokenType.COMMA):
+            self.next_token()
+            self.next_token()
+            elements.append(self.parse_expression(PrecedenceType.LOWEST))
+        if not self.expect_peek(TokenType.RBRACKET):
+            return None
+        return elements
+
+    def parse_index_expression(self, left):
+        expr = ASTIndexExpression(token=self.current_token, left=left)
+        self.next_token()
+        expr.index = self.parse_expression(PrecedenceType.LOWEST)
+        if not self.expect_peek(TokenType.RBRACKET):
+            return None
+        return expr

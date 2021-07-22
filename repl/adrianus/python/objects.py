@@ -109,3 +109,19 @@ class Ad_Builtin_Object(Ad_Object):
 
     def inspect(self):
         return str(self.builtin_function)
+
+
+class Ad_List_Object(Ad_Object):
+    type = ObjectType.LIST
+
+    def __init__(self, elements=None):
+        """
+        @param elements: list of Ad_Objects
+        """
+        self.elements = elements
+
+    def inspect(self):
+        out = "["
+        out += ', '.join([element.inspect() for element in self.elements])
+        out += "]"
+        return out

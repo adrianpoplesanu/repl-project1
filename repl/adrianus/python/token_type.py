@@ -33,3 +33,5 @@ class TokenType(object):
 	STRING = "STRING"
 	AND = "AND"
 	OR = "OR"
+	LBRACKET = "["
+	RBRACKET = "]"

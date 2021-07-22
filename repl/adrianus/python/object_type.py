@@ -8,3 +8,4 @@ class ObjectType(object):
     STRING = "STRING"
     ERROR = "ERROR"
     BUILTIN = "BUILTIN"
+    LIST = "LIST"

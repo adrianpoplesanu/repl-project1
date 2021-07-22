@@ -9,6 +9,7 @@ class PrecedenceType(object):
     PRODUCT = 6
     PREFIX = 7
     CALL = 8
+    INDEX = 9
 
 precedences = {
     TokenType.EQ: PrecedenceType.EQUALS,
@@ -23,5 +24,6 @@ precedences = {
     TokenType.MINUS: PrecedenceType.SUM,
     TokenType.SLASH: PrecedenceType.PRODUCT,
     TokenType.ASTERISK: PrecedenceType.PRODUCT,
-    TokenType.LPAREN: PrecedenceType.CALL
+    TokenType.LPAREN: PrecedenceType.CALL,
+    TokenType.LBRACKET: PrecedenceType.INDEX
 }

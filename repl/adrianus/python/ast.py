@@ -14,6 +14,8 @@ class StatementType(object):
     FUNCTION_LITERAL = 'FUNCTION_LITERAL'
     WHILE_EXPRESSION = 'WHILE_EXPRESSION'
     STRING_LITERAL = 'STRING_LITERAL'
+    LIST_LITERAL = 'LIST_LITERAL'
+    INDEX_EXPRESSION = 'INDEX_EXPRESSION'
 
 
 statement_type_map = {
@@ -31,7 +33,9 @@ statement_type_map = {
     StatementType.BLOCK_STATEMENT: 'BLOCK_STATEMENT',
     StatementType.FUNCTION_LITERAL: 'FUNCTION_LITERAL',
     StatementType.WHILE_EXPRESSION: 'WHILE_EXPRESSION',
-    StatementType.STRING_LITERAL: 'STRING_LITERAL'
+    StatementType.STRING_LITERAL: 'STRING_LITERAL',
+    StatementType.LIST_LITERAL: 'LIST_LITERAL',
+    StatementType.INDEX_EXPRESSION: 'INDEX_EXPRESSION'
 }
 
 
@@ -322,3 +326,41 @@ class ASTStringLiteral(ASTNode):
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTStringLiteral'
+
+
+class ASTListLiteral(ASTNode):
+    type = StatementType.LIST_LITERAL
+
+    def __init__(self, token=None, elements=None):
+        """
+        @param token: the node's token
+        @param elements: the list of Ad objects
+        """
+        self.token = token
+        self.elements = elements
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTListLiteral'
+
+
+class ASTIndexExpression(ASTNode):
+    type = StatementType.INDEX_EXPRESSION
+
+    def __init__(self, token=None, left=None, index=None):
+        """
+        @param token: the node's token
+        @param left: ASTListLiteral
+        @param index: int, which element is indexed
+        """
+        self.token = token
+        self.left = left
+        self.index = index
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTIndexExpression'
