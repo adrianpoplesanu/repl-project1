@@ -35,3 +35,4 @@ class TokenType(object):
 	OR = "OR"
 	LBRACKET = "["
 	RBRACKET = "]"
+	COLON = ":"

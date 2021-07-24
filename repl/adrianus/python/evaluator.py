@@ -1,6 +1,6 @@
 from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                     Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
-                    Ad_Error_Object, Ad_List_Object
+                    Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Hash_Pair
 from object_type import ObjectType
 from ast import StatementType
 from environment import new_enclosed_environment
@@ -76,6 +76,8 @@ class Evaluator(object):
             if self.is_error(index):
                 return index
             return self.eval_index_expression(left, index)
+        elif node.type == StatementType.HASH_LITERAL:
+            return self.eval_hash_literal(node, env)
         else:
             print 'unknown AST node'
 
@@ -262,7 +264,9 @@ class Evaluator(object):
     def eval_index_expression(self, left, index):
         if left.type == ObjectType.LIST and index.type == ObjectType.INTEGER:
             return self.eval_list_index_expression(left, index)
-        return None
+        if left.type == ObjectType.HASH:
+            return self.eval_hash_index_expressions(left, index)
+        return self.new_error("index expression error for type: {0}".format(left.type))
 
     def eval_list_index_expression(self, left, index):
         list_obj = left
@@ -271,3 +275,23 @@ class Evaluator(object):
         if idx < 0 or idx > max:
             return None
         return list_obj.elements[idx]
+
+
+    def eval_hash_literal(self, node, env):
+        pairs = {}
+        for node_key in node.pairs.keys():
+            node_value = node.pairs[node_key]
+            key = self.eval(node_key, env)
+            if self.is_error(key):
+                return key
+            hashed = key.hash_key()
+            value = self.eval(node_value, env)
+            if self.is_error(value):
+                return value
+            pairs[hashed.value] = Hash_Pair(key=key, value=value)
+        return Ad_Hash_Object(pairs=pairs)
+
+    def eval_hash_index_expressions(self, left, index):
+        hashed = index.hash_key()
+        pair = left.pairs[hashed.value]
+        return pair.value

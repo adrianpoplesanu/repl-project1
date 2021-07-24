@@ -9,3 +9,4 @@ class ObjectType(object):
     ERROR = "ERROR"
     BUILTIN = "BUILTIN"
     LIST = "LIST"
+    HASH = "HASH"

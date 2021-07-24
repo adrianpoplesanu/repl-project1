@@ -1,4 +1,5 @@
 from object_type import ObjectType
+from hash_utils import HashKey
 
 
 class Ad_Object(object):
@@ -21,6 +22,9 @@ class Ad_Integer_Object(Ad_Object):
     def inspect(self):
         return str(self.value)
 
+    def hash_key(self):
+        return HashKey(type=type, value=hash(self.value))
+
 
 class Ad_Boolean_Object(Ad_Object):
     type = ObjectType.BOOLEAN
@@ -37,18 +41,8 @@ class Ad_Boolean_Object(Ad_Object):
         else:
             return 'false' # this might be ties with the keyword mapping, would make it easier to change in the future
 
-
-class Ad_String_Object(Ad_Object):
-    type = ObjectType.STRING
-
-    def __init__(self, value=None):
-        """
-        @param value: string
-        """
-        self.value = value
-
-    def inspect(self):
-        return None
+    def hash_key(self):
+        return HashKey(type=type, value=hash(self.value))
 
 
 class Ad_ReturnValue_Object(Ad_Object):
@@ -79,10 +73,16 @@ class Ad_String_Object(Ad_Object):
     type = ObjectType.STRING
 
     def __init__(self, value=None):
+        """
+        @param value: string
+        """
         self.value = value
 
     def inspect(self):
         return self.value
+
+    def hash_key(self):
+        return HashKey(type=type, value=hash(self.value))
 
 
 class Ad_Error_Object(Ad_Object):
@@ -124,4 +124,23 @@ class Ad_List_Object(Ad_Object):
         out = "["
         out += ', '.join([element.inspect() for element in self.elements])
         out += "]"
+        return out
+
+
+class Hash_Pair(object):
+    def __init__(self, key=None, value=None):
+        self.key = key
+        self.value = value
+
+
+class Ad_Hash_Object(Ad_Object):
+    type = ObjectType.HASH
+
+    def __init__(self, pairs=None):
+        self.pairs = pairs
+
+    def inspect(self):
+        out = "{"
+        out += ', '.join(['{0}: {1}'.format(pair.key.inspect(), pair.value.inspect()) for pair in self.pairs.values()])
+        out += "}"
         return out

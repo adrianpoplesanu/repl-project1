@@ -78,6 +78,9 @@ class Lexer(object):
         elif self.ch == ']':
             token.type = TokenType.RBRACKET
             token.literal = self.ch
+        elif self.ch == ':':
+            token.type = TokenType.COLON
+            token.literal = self.ch
         elif self.ch == '=':
             if self.peek_char() == '=':
                 self.read_char()

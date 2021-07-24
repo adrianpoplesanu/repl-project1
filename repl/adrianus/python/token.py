@@ -33,7 +33,8 @@ token_type_map = {
 	TokenType.AND: "AND",
 	TokenType.OR: "OR",
 	TokenType.LBRACKET: 'LBRACKET',
-	TokenType.RBRACKET: 'RBRACKET'
+	TokenType.RBRACKET: 'RBRACKET',
+	TokenType.COLON: "COLON"
 }
 
 keywords_map = {

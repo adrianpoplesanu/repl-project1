@@ -4,7 +4,8 @@ from precedence_type import PrecedenceType, precedences
 from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
-                ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression
+                ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
+                ASTHashLiteral
 
 
 class Parser(object):
@@ -27,6 +28,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
+        self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
@@ -272,3 +274,20 @@ class Parser(object):
         if not self.expect_peek(TokenType.RBRACKET):
             return None
         return expr
+
+    def parse_hash_literal(self):
+        hash = ASTHashLiteral(token=self.current_token)
+        hash.pairs = {}
+        while not self.peek_token_is(TokenType.RBRACE):
+            self.next_token()
+            key = self.parse_expression(PrecedenceType.LOWEST)
+            if not self.expect_peek(TokenType.COLON):
+                return None
+            self.next_token()
+            value = self.parse_expression(PrecedenceType.LOWEST)
+            hash.pairs[key] = value
+            if not self.peek_token_is(TokenType.RBRACE) and not self.expect_peek(TokenType.COMMA):
+                return None
+        if not self.expect_peek(TokenType.RBRACE):
+            return None
+        return hash

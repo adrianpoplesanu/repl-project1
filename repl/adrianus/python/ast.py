@@ -16,6 +16,7 @@ class StatementType(object):
     STRING_LITERAL = 'STRING_LITERAL'
     LIST_LITERAL = 'LIST_LITERAL'
     INDEX_EXPRESSION = 'INDEX_EXPRESSION'
+    HASH_LITERAL = 'HASH_LITERAL'
 
 
 statement_type_map = {
@@ -35,7 +36,8 @@ statement_type_map = {
     StatementType.WHILE_EXPRESSION: 'WHILE_EXPRESSION',
     StatementType.STRING_LITERAL: 'STRING_LITERAL',
     StatementType.LIST_LITERAL: 'LIST_LITERAL',
-    StatementType.INDEX_EXPRESSION: 'INDEX_EXPRESSION'
+    StatementType.INDEX_EXPRESSION: 'INDEX_EXPRESSION',
+    StatementType.HASH_LITERAL: 'HASH_LITERAL'
 }
 
 
@@ -364,3 +366,21 @@ class ASTIndexExpression(ASTNode):
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTIndexExpression'
+
+
+class ASTHashLiteral(ASTNode):
+    type = StatementType.HASH_LITERAL
+
+    def __init__(self, token=None, pairs=None):
+        """
+        @param token: the node's token
+        @param pairs: map [Expression] => Expression
+        """
+        self.token = token
+        self.pairs = pairs
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'TODO: implement __str__ in ASTHashLiteral'
