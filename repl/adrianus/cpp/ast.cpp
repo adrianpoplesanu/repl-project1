@@ -360,10 +360,12 @@ Ad_AST_FunctionLiteral::Ad_AST_FunctionLiteral(Token t) {
 
 Ad_AST_FunctionLiteral::~Ad_AST_FunctionLiteral() {
     if (body) {
+        //Ad_DECREF(body); // asta nu merge, dar ar trebui sa mearga
         free_Ad_AST_Node_memory(body);
     }
     for (std::vector<Ad_AST_Node*>::iterator it = parameters.begin() ; it != parameters.end(); ++it) {
         Ad_AST_Node *obj = *it;
+        //Ad_DECREF(obj); // asta nu merge, dar ar trebui sa mearga
         free_Ad_AST_Node_memory(obj);
     }
 }
@@ -435,14 +437,19 @@ std::string Ad_AST_String::ToString() {
 }
 
 void Ad_INCREF(Ad_AST_Node* node) {
-    node->ref_count++;
+    if (node) {
+        node->ref_count++;
+    }
 }
 
 void Ad_DECREF(Ad_AST_Node* node){
-    node->ref_count--;
+    if (node) {
+        node->ref_count--;
+    }
 }
 
 void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
+    return;
     if (obj->ref_count > 0) return;
     switch(obj->type) {
         case ST_LET_STATEMENT:

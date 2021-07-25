@@ -115,8 +115,6 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
             std::cout << "\n";
             //std::cout << "object to be deleted: " << result->type << "\n";
         }
-        //delete result; // i don't think this needs to be here, it needs to be binded with the env if it's an assignment
-        //if (result) delete(result); // i will need to bind this to the env, but how? also, maybe this needs to be free_Ad_Object_memory()
         if (result && result->ref_count <= 0) free_Ad_Object_memory(result);
     }
 

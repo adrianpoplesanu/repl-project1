@@ -7,7 +7,8 @@
 class Environment {
 private:
     std::map<std::string, Ad_Object*> store;
-    std::map<std::string, Ad_Object*> outer;
+    std::map<std::string, Ad_Object*> outer; // aici e gresit, se construieste outer-ul iar alteratii ulterioare nu sunt luate in considerare, at trebui sa fie:
+    //Environment* outer;
 public:
     Environment();
     ~Environment();

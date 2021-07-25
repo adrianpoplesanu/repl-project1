@@ -40,7 +40,7 @@ void Environment::Set(std::string key, Ad_Object* obj) {
     Ad_INCREF(obj);
 }
 
-void Environment::SetOuterEnvironment(Environment o) {
+void Environment::SetOuterEnvironment(Environment o) { // Environment o nu e folosit la nimic???
     outer.clear();
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
         outer[it->first] = it->second;
