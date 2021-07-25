@@ -1,18 +1,19 @@
 #include "environment.h"
 
 Environment::Environment() {
-
+    outer = NULL;
 }
 
 Environment::~Environment() {
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        Ad_DECREF(it->second);
+        Ad_DECREF(it->second); // asta nu merge dar ar trebui sa mearga, se plange la NewEnclosedEnvironment si ExtendFunctionEnv
         free_Ad_Object_memory(it->second);
     }
 }
 
 bool Environment::Check(std::string key) {
-    if (store.find(key) == store.end() ) {
+    if (store.find(key) == store.end()) {
+        if (outer && outer->store.find(key) != outer->store.end()) return true;
         return false;
     }
     return true;
@@ -20,19 +21,17 @@ bool Environment::Check(std::string key) {
 
 Ad_Object* Environment::Get(std::string key) {
     if (store.find(key) == store.end() ) {
-        //return NULL;
-        if (outer.find(key) == outer.end()) {
-            return NULL;
-        } else {
-            return outer[key];
+        if (outer && outer->store.find(key) != outer->store.end()) {
+            return outer->store[key];
         }
+        return NULL;
     } else {
         return store[key];
     }
 }
 
 void Environment::Set(std::string key, Ad_Object* obj) {
-    if (Get(key) != NULL) {
+    if (store.find(key) != store.end()) {
         // sterge obiectul vechi daca e o suprascriere de element
         FreeObjectForKey(key);
     }
@@ -40,11 +39,8 @@ void Environment::Set(std::string key, Ad_Object* obj) {
     Ad_INCREF(obj);
 }
 
-void Environment::SetOuterEnvironment(Environment o) { // Environment o nu e folosit la nimic???
-    outer.clear();
-    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        outer[it->first] = it->second;
-    }
+void Environment::SetOuterEnvironment(Environment* o) {
+    outer = o;
 }
 
 void Environment::FreeObjectForKey(std::string key) {
@@ -65,8 +61,8 @@ Environment NewEnvoronment() {
     return env;
 }
 
-Environment NewEnclosedEnvironment(Environment outer) {
+Environment NewEnclosedEnvironment(Environment *o) {
     Environment env;
-    env.SetOuterEnvironment(outer);
+    env.SetOuterEnvironment(o);
     return env;
 }

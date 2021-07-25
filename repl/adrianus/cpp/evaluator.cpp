@@ -107,15 +107,16 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
 Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
     Ad_Object* result;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_Program*)node)->statements.begin() ; it != ((Ad_AST_Program*)node)->statements.end(); ++it) {
+        result = NULL;
         Ad_AST_Node *obj = *it;
         result = Eval(obj, env);
-        if (result) {
+        if (result != NULL) {
             //result->Print();
             std::cout << result->Inspect();
             std::cout << "\n";
             //std::cout << "object to be deleted: " << result->type << "\n";
         }
-        if (result && result->ref_count <= 0) free_Ad_Object_memory(result);
+        if (result != NULL && result->ref_count <= 0) free_Ad_Object_memory(result);
     }
 
     return NULL;
@@ -224,6 +225,7 @@ Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
 
 Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
     Ad_Object* obj;
+    obj = NULL;
     if (env.Check(((Ad_AST_Identifier*)node)->token.literal)) {
         obj = env.Get(((Ad_AST_Identifier*)node)->token.literal);
     }
@@ -250,6 +252,7 @@ Ad_Object* Evaluator::EvalIfExpression(Ad_AST_Node* node, Environment &env) {
 
 Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
     Ad_Object* result;
+    result = NULL;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)node)->statements.begin() ; it != ((Ad_AST_BlockStatement*)node)->statements.end(); ++it) {
         Ad_AST_Node *obj = *it;
         result = Eval(obj, env);
@@ -297,7 +300,7 @@ Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj) {
 }
 
 Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
-    Environment extended = NewEnclosedEnvironment(*((Ad_Function_Object*)func)->env);
+    Environment extended = NewEnclosedEnvironment(&(*((Ad_Function_Object*)func)->env));
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_Function_Object*)func)->params.begin() ; it != ((Ad_Function_Object*)func)->params.end(); ++it) {
         //std::cout << (*it)->TokenLiteral() << "\n";

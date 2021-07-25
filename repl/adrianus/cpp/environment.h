@@ -5,22 +5,21 @@
 #include "objects.h"
 
 class Environment {
-private:
-    std::map<std::string, Ad_Object*> store;
-    std::map<std::string, Ad_Object*> outer; // aici e gresit, se construieste outer-ul iar alteratii ulterioare nu sunt luate in considerare, at trebui sa fie:
-    //Environment* outer;
 public:
+    std::map<std::string, Ad_Object*> store;
+    Environment* outer;
+
     Environment();
     ~Environment();
     Ad_Object* Get(std::string);
     bool Check(std::string);
     void Set(std::string, Ad_Object*);
-    void SetOuterEnvironment(Environment);
+    void SetOuterEnvironment(Environment*);
     void FreeObjectForKey(std::string);
     void PrintStore();
 };
 
 Environment NewEnvoronment();
-Environment NewEnclosedEnvironment(Environment);
+Environment NewEnclosedEnvironment(Environment*);
 
 #endif
