@@ -486,6 +486,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
         case ST_WHILE_EXPRESSION:
             delete (Ad_AST_WhileExpression*)obj;
         break;
+        case ST_STRING_LITERAL:
+            delete (Ad_AST_String*)obj;
+        break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << obj->type << "\n";
         break;
