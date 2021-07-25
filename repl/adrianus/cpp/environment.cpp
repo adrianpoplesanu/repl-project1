@@ -36,6 +36,7 @@ void Environment::Set(std::string key, Ad_Object* obj) {
         FreeObjectForKey(key);
     }
     store[key] = obj;
+    Ad_INCREF(obj);
 }
 
 void Environment::SetOuterEnvironment(Environment o) {
@@ -46,6 +47,7 @@ void Environment::SetOuterEnvironment(Environment o) {
 }
 
 void Environment::FreeObjectForKey(std::string key) {
+    Ad_DECREF(store[key]);
     free_Ad_Object_memory(store[key]);
 }
 

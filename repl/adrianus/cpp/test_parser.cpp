@@ -10,6 +10,15 @@ void test_parse_program() {
     print_ast_nodes(&program, 0);
 }
 
+void test_funtion_literal() {
+    Parser parser;
+    parser.Load("let a = fn(x) { return x+1; }");
+    //parser.Load("while (3 < 10) { 1; }");
+    Ad_AST_Program program;
+    parser.ParseProgram(program);
+    print_ast_nodes(&program, 0);
+}
+
 void run_parser_tests() {
     test_parse_program();
 }

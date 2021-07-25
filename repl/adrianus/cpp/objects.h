@@ -85,6 +85,7 @@ public:
 
 	Ad_ReturnValue_Object();
 	Ad_ReturnValue_Object(Ad_Object*);
+	~Ad_ReturnValue_Object();
 
 	virtual std::string Inspect();
 	virtual void Print();
@@ -101,7 +102,7 @@ public:
 
 	Ad_Function_Object();
 	Ad_Function_Object(std::vector<Ad_AST_Node*>, Ad_AST_Node*, Environment*);
-	//~Ad_Function_Object();
+	~Ad_Function_Object();
 
 	virtual std::string Inspect();
 	virtual void Print();
@@ -132,6 +133,7 @@ public:
 
 	Ad_Builtin_Object();
 	Ad_Builtin_Object(Ad_Object* (*)(std::vector<Ad_Object*>));
+	~Ad_Builtin_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();

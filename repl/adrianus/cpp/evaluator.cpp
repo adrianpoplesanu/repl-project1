@@ -55,8 +55,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             //free_Ad_Object_memory(right); // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
             //std::cout << ((Ad_AST_InfixExpression*)node)->left->type << "\n";
             //std::cout << ((Ad_AST_InfixExpression*)node)->right->type << "\n";
-            //if (((Ad_AST_InfixExpression*)node)->left->type == ST_INTEGER) free_Ad_Object_memory(left); // macos vrea if-ul asta, in linux nu e nicio problema
-            //if (((Ad_AST_InfixExpression*)node)->right->type == ST_INTEGER) free_Ad_Object_memory(right); // macos vrea if-ul asta, in linux nu e nicio problema
+            if (((Ad_AST_InfixExpression*)node)->left->type == ST_INTEGER) free_Ad_Object_memory(left); // macos vrea if-ul asta, in linux nu e nicio problema
+            if (((Ad_AST_InfixExpression*)node)->right->type == ST_INTEGER) free_Ad_Object_memory(right); // macos vrea if-ul asta, in linux nu e nicio problema
             return result;
         }
         break;
@@ -75,6 +75,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_FUNCTION_LITERAL: {
             Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->body, &env);
+            //Ad_INCREF(obj);
             return obj;
         }
         break;
@@ -116,6 +117,7 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         }
         //delete result; // i don't think this needs to be here, it needs to be binded with the env if it's an assignment
         //if (result) delete(result); // i will need to bind this to the env, but how? also, maybe this needs to be free_Ad_Object_memory()
+        if (result && result->ref_count <= 0) free_Ad_Object_memory(result);
     }
 
     return NULL;
@@ -287,7 +289,9 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
 
 Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj) {
     if (obj->Type() == OBJ_RETURN_VALUE) {
-        return ((Ad_ReturnValue_Object*)obj)->value;
+        Ad_Object* returned_obj = ((Ad_ReturnValue_Object*)obj)->value;
+        free_Ad_Object_memory(obj);
+        return returned_obj;
     }
     return obj;
 }

@@ -283,6 +283,7 @@ Ad_AST_Node* Parser::ParseFunctionLiteral() {
         return NULL;
     }
     fun_lit->body = ParseBlockStatement();
+    Ad_INCREF(fun_lit->body);
     return fun_lit;
 }
 
@@ -295,11 +296,13 @@ std::vector<Ad_AST_Node*> Parser::ParseFunctionParameters() {
     NextToken();
     Ad_AST_Identifier* ident = new Ad_AST_Identifier(current_token, current_token.literal);
     identifiers.push_back(ident);
+    Ad_INCREF(ident);
     while (PeekTokenIs(TT_COMMA)) {
         NextToken();
         NextToken();
         ident = new Ad_AST_Identifier(current_token, current_token.literal);
         identifiers.push_back(ident);
+        Ad_INCREF(ident);
     }
     if (!ExpectPeek(TT_RPAREN)) {
         std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL

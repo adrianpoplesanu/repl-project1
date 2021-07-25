@@ -44,6 +44,7 @@ std::map<StatementType, std::string> statement_type_map = {
 class Ad_AST_Node {
 public:
     StatementType type;
+    int ref_count;
     virtual std::string TokenLiteral();
     virtual std::string ToString();
 };
@@ -229,6 +230,9 @@ public:
 bool StatementIs(Ad_AST_Node *stmt, StatementType st) {
     return stmt->type == st;
 }
+
+void Ad_INCREF(Ad_AST_Node*);
+void Ad_DECREF(Ad_AST_Node*);
 
 void free_Ad_AST_Node_memory(Ad_AST_Node*);
 

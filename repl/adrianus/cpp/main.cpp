@@ -9,6 +9,7 @@
 #define RUN_TESTS 0
 // 0 - parser test is not run, 1 - run and print AST structure
 #define RUN_PARSER_TESTS 0
+#define RUN_FUNCTION_LITERAL_TESTS 0
 
 
 int main(int argc, char *argv[]) {
@@ -20,6 +21,9 @@ int main(int argc, char *argv[]) {
 	}
 	if (RUN_PARSER_TESTS) {
 		test_parse_program();
+	}
+	if (RUN_FUNCTION_LITERAL_TESTS) {
+		test_funtion_literal();
 	}
 	Repl repl;
 	repl.Loop();

@@ -11,6 +11,7 @@ std::string Ad_AST_Node::ToString() {
 
 Ad_AST_Program::Ad_AST_Program() {
     type = ST_PROGRAM;
+    ref_count = 0;
 }
 
 Ad_AST_Program::~Ad_AST_Program() {
@@ -37,14 +38,16 @@ std::string Ad_AST_Program::ToString() {
 
 Ad_AST_LetStatement::Ad_AST_LetStatement() {
     type = ST_LET_STATEMENT;
+    ref_count = 0;
     value = NULL;
 }
 
 Ad_AST_LetStatement::Ad_AST_LetStatement(Token t) {
+    type = ST_LET_STATEMENT;
+    ref_count = 0;
     token = t;
     name = Ad_AST_Identifier();
     value = NULL;
-    type = ST_LET_STATEMENT;
 }
 
 Ad_AST_LetStatement::~Ad_AST_LetStatement() {
@@ -71,11 +74,13 @@ std::string Ad_AST_LetStatement::ToString() {
 
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement() {
     type = ST_RETURN_STATEMENT;
+    ref_count = 0;
     value = NULL;
 }
 
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement(Token t) {
     type = ST_RETURN_STATEMENT;
+    ref_count = 0;
     token = t;
     value = NULL;
 }
@@ -96,11 +101,13 @@ std::string Ad_AST_ReturnStatement::ToString() {
 
 Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement() {
     type = ST_EXPRESSION_STATEMENT;
+    ref_count = 0;
     expression = NULL;
 }
 
 Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
     type = ST_EXPRESSION_STATEMENT;
+    ref_count = 0;
     token = t;
     expression = NULL;
 }
@@ -129,10 +136,12 @@ std::string Ad_AST_ExpressionStatement::ToString() {
 
 Ad_AST_Identifier::Ad_AST_Identifier() {
     type = ST_IDENTIFIER;
+    ref_count = 0;
 }
 
 Ad_AST_Identifier::Ad_AST_Identifier(Token t, std::string val) {
     type = ST_IDENTIFIER;
+    ref_count = 0;
     token = t;
     value = val;
 }
@@ -147,10 +156,12 @@ std::string Ad_AST_Identifier::ToString() {
 
 Ad_AST_Integer::Ad_AST_Integer() {
     type = ST_INTEGER;
+    ref_count = 0;
 }
 
 Ad_AST_Integer::Ad_AST_Integer(Token t, int val) {
     type = ST_INTEGER;
+    ref_count = 0;
     token = t;
     value = val;
 }
@@ -165,10 +176,12 @@ std::string Ad_AST_Integer::ToString() {
 
 Ad_AST_Boolean::Ad_AST_Boolean() {
     type = ST_BOOLEAN;
+    ref_count = 0;
 }
 
 Ad_AST_Boolean::Ad_AST_Boolean(Token t, bool val) {
     type = ST_BOOLEAN;
+    ref_count = 0;
     token = t;
     value = val;
 }
@@ -184,6 +197,7 @@ std::string Ad_AST_Boolean::ToString() {
 
 Ad_AST_InfixExpression::Ad_AST_InfixExpression() {
     type = ST_INFIX_EXPRESSION;
+    ref_count = 0;
     left = NULL;
     right = NULL;
 }
@@ -199,11 +213,13 @@ std::string Ad_AST_InfixExpression::ToString() {
 
 Ad_AST_PrefixExpression::Ad_AST_PrefixExpression() {
     type = ST_PREFIX_EXPRESSION;
+    ref_count = 0;
     right = NULL;
 }
 
 Ad_AST_PrefixExpression::Ad_AST_PrefixExpression(Token t, std::string op) {
     type = ST_PREFIX_EXPRESSION;
+    ref_count = 0;
     token = t;
     _operator = op;
     right = NULL;
@@ -221,17 +237,20 @@ std::string Ad_AST_PrefixExpression::ToString() {
 
 Ad_AST_CallExpression::Ad_AST_CallExpression() {
     type = ST_CALL_EXPRESSION;
+    ref_count = 0;
     function = NULL;
 }
 
 Ad_AST_CallExpression::Ad_AST_CallExpression(Token t) {
     type = ST_CALL_EXPRESSION;
+    ref_count = 0;
     token = t;
     function = NULL;
 }
 
 Ad_AST_CallExpression::Ad_AST_CallExpression(Token t, Ad_AST_Node* f) {
     type = ST_CALL_EXPRESSION;
+    ref_count = 0;
     token = t;
     function = f;
 }
@@ -259,6 +278,7 @@ std::string Ad_AST_CallExpression::ToString() {
 
 Ad_AST_IfExpression::Ad_AST_IfExpression() {
     type = ST_IF_EXPRESSION;
+    ref_count = 0;
     condition = NULL;
     consequence = NULL;
     alternative = NULL;
@@ -266,6 +286,7 @@ Ad_AST_IfExpression::Ad_AST_IfExpression() {
 
 Ad_AST_IfExpression::Ad_AST_IfExpression(Token t) {
     type = ST_IF_EXPRESSION;
+    ref_count = 0;
     token = t;
     condition = NULL;
     consequence = NULL;
@@ -301,10 +322,12 @@ std::string Ad_AST_IfExpression::ToString() {
 
 Ad_AST_BlockStatement::Ad_AST_BlockStatement() {
     type = ST_BLOCK_STATEMENT;
+    ref_count = 0;
 }
 
 Ad_AST_BlockStatement::Ad_AST_BlockStatement(Token t) {
     type = ST_BLOCK_STATEMENT;
+    ref_count = 0;
     token = t;
 }
 
@@ -326,10 +349,12 @@ std::string Ad_AST_BlockStatement::ToString() {
 
 Ad_AST_FunctionLiteral::Ad_AST_FunctionLiteral() {
     type = ST_FUNCTION_LITERAL;
+    ref_count = 0; // poate aici ar trebui sa fie 1
 }
 
 Ad_AST_FunctionLiteral::Ad_AST_FunctionLiteral(Token t) {
     type = ST_FUNCTION_LITERAL;
+    ref_count = 0; // poate aici ar trebui sa fie 1
     token = t;
 }
 
@@ -358,10 +383,12 @@ std::string Ad_AST_FunctionLiteral::ToString() {
 
 Ad_AST_WhileExpression::Ad_AST_WhileExpression() {
     type = ST_WHILE_EXPRESSION;
+    ref_count = 0;
 }
 
 Ad_AST_WhileExpression::Ad_AST_WhileExpression(Token t) {
     type = ST_WHILE_EXPRESSION;
+    ref_count = 0;
     token = t;
 }
 
@@ -385,10 +412,12 @@ std::string Ad_AST_WhileExpression::ToString() {
 
 Ad_AST_String::Ad_AST_String() {
     type = ST_STRING_LITERAL;
+    ref_count = 0;
 }
 
 Ad_AST_String::Ad_AST_String(Token t) {
     type = ST_STRING_LITERAL;
+    ref_count = 0;
     token = t;
 }
 
@@ -405,8 +434,16 @@ std::string Ad_AST_String::ToString() {
     return out;
 }
 
+void Ad_INCREF(Ad_AST_Node* node) {
+    node->ref_count++;
+}
+
+void Ad_DECREF(Ad_AST_Node* node){
+    node->ref_count--;
+}
+
 void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
-    return;
+    if (obj->ref_count > 0) return;
     switch(obj->type) {
         case ST_LET_STATEMENT:
             delete (Ad_AST_LetStatement*)obj;
@@ -442,7 +479,7 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
             delete (Ad_AST_BlockStatement*)obj;
         break;
         case ST_FUNCTION_LITERAL:
-            //delete (Ad_AST_FunctionLiteral*)obj;
+            delete (Ad_AST_FunctionLiteral*)obj;
             // ATENTION: this needs to be deleted only when there's no env referencing it
             // this should be left in the hand of Ad_INCREF/Ad_DECREF logic and free object which deletes the AST nodes contained in Ad_Function_Object
         break;

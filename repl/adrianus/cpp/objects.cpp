@@ -16,14 +16,17 @@ Ad_Object_Type Ad_Object::Type() {
 
 Ad_Null_Object::Ad_Null_Object() {
     type = OBJ_NULL;
+    ref_count = 0; // maybe this should be 1 and decreased along the way?
 }
 
 Ad_Integer_Object::Ad_Integer_Object() {
     type = OBJ_INT;
+    ref_count = 0;
 }
 
 Ad_Integer_Object::Ad_Integer_Object(int v) {
     type = OBJ_INT;
+    ref_count = 0;
     value = v;
 }
 
@@ -48,6 +51,11 @@ Ad_Object_Type Ad_Integer_Object::Type() {
 
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {
     type = OBJ_RETURN_VALUE;
+    ref_count = 0;
+}
+
+Ad_ReturnValue_Object::~Ad_ReturnValue_Object() {
+    //free_Ad_Object_memory(value);
 }
 
 std::string Ad_ReturnValue_Object::Inspect() {
@@ -68,10 +76,12 @@ Ad_Object_Type Ad_ReturnValue_Object::Type() {
 
 Ad_Boolean_Object::Ad_Boolean_Object() {
     type = OBJ_BOOL;
+    ref_count = 0;
 }
 
 Ad_Boolean_Object::Ad_Boolean_Object(bool v) {
     type = OBJ_BOOL;
+    ref_count = 0;
     value = v;
 }
 
@@ -95,34 +105,46 @@ Ad_Object_Type Ad_Boolean_Object::Type() {
 
 Ad_Function_Object::Ad_Function_Object() {
     type = OBJ_FUNCTION;
+    ref_count = 0;
 }
 
 Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, Ad_AST_Node* b, Environment* e) {
     type = OBJ_FUNCTION;
+    ref_count = 0;
     params = p;
     body = b;
     env = e;
+
+    if (body) {
+        Ad_INCREF(body);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = params.begin() ; it != params.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        Ad_INCREF(obj);
+    }
 }
 
-/*Ad_Function_Object::~Ad_Function_Object() { // asta nu e bun
+Ad_Function_Object::~Ad_Function_Object() {
     if (body) {
+        Ad_DECREF(body);
         free_Ad_AST_Node_memory(body);
     }
     for (std::vector<Ad_AST_Node*>::iterator it = params.begin() ; it != params.end(); ++it) {
         Ad_AST_Node *obj = *it;
+        Ad_DECREF(obj);
         free_Ad_AST_Node_memory(obj);
     }
-    if (env) {
-        delete env;
-    }
-}*/
+    //if (env) {
+    //    delete env;
+    //}
+}
 
 std::string Ad_Function_Object::Inspect() {
-    return "aaa";
+    return "todo: implement Inspect in Ad_Function_Object";
 }
 
 void Ad_Function_Object::Print() {
-    std::cout << "bbb";
+    std::cout << "todo: implement Print in Ad_Function_Object\n";
 }
 
 Ad_Object_Type Ad_Function_Object::Type() {
@@ -131,10 +153,12 @@ Ad_Object_Type Ad_Function_Object::Type() {
 
 Ad_String_Object::Ad_String_Object() {
     type = OBJ_STRING;
+    ref_count = 0;
 }
 
 Ad_String_Object::Ad_String_Object(std::string val) {
     type = OBJ_STRING;
+    ref_count = 0;
     value = val;
 }
 
@@ -152,10 +176,12 @@ Ad_Object_Type Ad_String_Object::Type() {
 
 Ad_Error_Object::Ad_Error_Object() {
     type = OBJ_ERROR;
+    ref_count = 0;
 }
 
 Ad_Error_Object::Ad_Error_Object(std::string m) {
     type = OBJ_ERROR;
+    ref_count = 0;
     message = m;
 }
 
@@ -175,11 +201,17 @@ Ad_Object_Type Ad_Error_Object::Type() {
 
 Ad_Builtin_Object::Ad_Builtin_Object() {
     type = OBJ_BUILTIN;
+    ref_count = 0;
 }
 
 Ad_Builtin_Object::Ad_Builtin_Object(Ad_Object* (*bf)(std::vector<Ad_Object*>)) {
     type = OBJ_BUILTIN;
+    ref_count = 0;
     builtin_function = bf;
+}
+
+Ad_Builtin_Object::~Ad_Builtin_Object() {
+
 }
 
 std::string Ad_Builtin_Object::Inspect() {
@@ -203,7 +235,6 @@ void Ad_DECREF(Ad_Object* obj) {
 }
 
 void free_Ad_Object_memory(Ad_Object* obj) {
-    return;
     if (obj) {
         switch(obj->type) {
             case OBJ_NULL:
@@ -222,7 +253,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete ((Ad_ReturnValue_Object*)obj);
             break;
             case OBJ_FUNCTION:
-                delete ((Ad_Function_Object*)obj);
+                if (obj->ref_count <= 0) delete ((Ad_Function_Object*)obj);
             break;
             case OBJ_ERROR:
                 delete ((Ad_Error_Object*)obj);
