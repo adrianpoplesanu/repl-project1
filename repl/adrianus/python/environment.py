@@ -25,5 +25,5 @@ def new_environment():
 
 def new_enclosed_environment(outer):
     env = Environment()
-    env.outer = outer
+    env.outer = outer.store
     return env

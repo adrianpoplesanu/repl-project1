@@ -186,7 +186,7 @@ class Evaluator(object):
         result = None
         for statement in node.statements:
             result = self.eval(statement, env)
-            if result.type == ObjectType.RETURN_VALUE:
+            if result and result.type == ObjectType.RETURN_VALUE:
                 return result;
         return result
 
@@ -232,7 +232,7 @@ class Evaluator(object):
         return None
 
     def unwrap_return_value(self, obj):
-        if obj.type == ObjectType.RETURN_VALUE:
+        if obj and obj.type == ObjectType.RETURN_VALUE:
             return obj.value
         return obj
 
