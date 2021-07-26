@@ -450,6 +450,7 @@ void Ad_DECREF(Ad_AST_Node* node){
 
 void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
     return;
+    if (obj == NULL) return;
     if (obj->ref_count > 0) return;
     switch(obj->type) {
         case ST_LET_STATEMENT:

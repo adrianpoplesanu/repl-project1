@@ -255,8 +255,9 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
     result = NULL;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)node)->statements.begin() ; it != ((Ad_AST_BlockStatement*)node)->statements.end(); ++it) {
         Ad_AST_Node *obj = *it;
+        result = NULL;
         result = Eval(obj, env);
-        if (result->type == OBJ_RETURN_VALUE) {
+        if (result && result->type == OBJ_RETURN_VALUE) {
             return result;
         }
     }

@@ -240,6 +240,7 @@ void Ad_DECREF(Ad_Object* obj) {
 
 void free_Ad_Object_memory(Ad_Object* obj) {
     return;
+    if (obj == NULL) return;
     if (obj->ref_count > 0) return;
     if (obj) {
         switch(obj->type) {
