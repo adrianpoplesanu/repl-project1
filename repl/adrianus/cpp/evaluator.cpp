@@ -175,8 +175,6 @@ Ad_Object* Evaluator::EvalStringInfixExpression(std::string _operator, Ad_Object
     std::string right_val = ((Ad_String_Object*)right)->value;
     if (_operator == "+") {
         Ad_String_Object* obj = new Ad_String_Object(left_val + right_val);
-        free_Ad_Object_memory(left);
-        free_Ad_Object_memory(right);
         return obj;
     }
     return NULL;
