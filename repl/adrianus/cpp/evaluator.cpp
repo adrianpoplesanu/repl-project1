@@ -46,17 +46,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             Ad_Object* left = Eval(((Ad_AST_InfixExpression*)node)->left, env);
             Ad_Object* right = Eval(((Ad_AST_InfixExpression*)node)->right, env);
             Ad_Object* result = EvalInfixExpression(((Ad_AST_InfixExpression*)node)->_operator, left, right);
-            // this object deletion process needs to be linked with env clear up and removal of references
-            // probably Ad_INCREF and Ad_DECREF will need to be used here
-            //delete left; // this is smart but here it just deletes pointers that are still referenced in the env
-            //delete right; // this is smart but here it just deletes pointers that are still referenced in the env
-            // PROBLEMA e cand left sau right sunt luate din env, crapa pe macos
-            //free_Ad_Object_memory(left); // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
-            //free_Ad_Object_memory(right); // this should be fine?, it's an object created based on an AST node, and i guess it's not still refenreced
-            //std::cout << ((Ad_AST_InfixExpression*)node)->left->type << "\n";
-            //std::cout << ((Ad_AST_InfixExpression*)node)->right->type << "\n";
-            if (((Ad_AST_InfixExpression*)node)->left->type == ST_INTEGER) free_Ad_Object_memory(left); // macos vrea if-ul asta, in linux nu e nicio problema
-            if (((Ad_AST_InfixExpression*)node)->right->type == ST_INTEGER) free_Ad_Object_memory(right); // macos vrea if-ul asta, in linux nu e nicio problema
+            free_Ad_Object_memory(right);
+            free_Ad_Object_memory(left);
             return result;
         }
         break;

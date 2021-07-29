@@ -6,7 +6,7 @@ Environment::Environment() {
 
 Environment::~Environment() {
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        Ad_DECREF(it->second); // asta nu merge dar ar trebui sa mearga, se plange la NewEnclosedEnvironment si ExtendFunctionEnv
+        Ad_DECREF(it->second); // asta merge
         free_Ad_Object_memory(it->second);
     }
 }
