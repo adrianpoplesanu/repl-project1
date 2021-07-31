@@ -14,12 +14,12 @@ public class AstIdentifier extends AstNode {
 
 	@Override
 	public String tokenLiteral() {
-		return null;
+		return token.getLiteral();
 	}
 
 	@Override
 	public String toString() {
-		return null;
+		return "todo: implement toString in AstIdentifier";
 	}
 
 	public Token getToken() {

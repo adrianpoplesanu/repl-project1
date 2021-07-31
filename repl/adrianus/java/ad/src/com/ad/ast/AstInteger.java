@@ -18,17 +18,17 @@ public class AstInteger extends AstNode {
 	public AstInteger(Token token, int value) {
 		type = AstNodeTypeEnum.INTEGER_LITERAL;
 		this.token = token;
-		
+		this.value = value;
 	}
 
 	@Override
 	public String tokenLiteral() {
-		return null;
+		return token.getLiteral();
 	}
 
 	@Override
 	public String toString() {
-		return null;
+		return "IntegerLiteral [" + token.getLiteral() + "] <" + String.valueOf(value)  + ">";
 	}
 
 	public Token getToken() {

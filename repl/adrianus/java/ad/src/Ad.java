@@ -5,7 +5,8 @@ public class Ad {
 
 	public static void main(String[] args) {
 		System.out.println("Ad intepreter [JAVA]... v1.0");
-		String source = "let a = 1; let b=45; if(a==b) { 10; }";
+		//String source = "let a = 1; let b=45; if(a==b) { 10; }";
+		String source = "101; 123 456 67;";
 		//lexer.load(source);
 		//Token currentToken = lexer.nextToken();
 		//while(currentToken.getType() != TokenTypeEnum.EOF) {

@@ -112,6 +112,16 @@ public class Lexer {
 				token.setLiteral("=");
 			}
 		break;
+		case '!':
+			if (peekChar() == '=') {
+				token.setType(TokenTypeEnum.NOT_EQ);
+				token.setLiteral("!=");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.BANG);
+				token.setLiteral("!");
+			}
+		break;
 		default:
 			if (isLetter()) {
 				String literal = readIdentifier();

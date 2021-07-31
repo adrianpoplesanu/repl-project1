@@ -23,10 +23,10 @@ public class Parser {
 	public Parser() {
 		//... i should instantiate the callback maps here for prefix and infix
 		lexer = new Lexer();
-		prefixParseFns.put(TokenTypeEnum.IDENT, new IdentifierParser());
-		prefixParseFns.put(TokenTypeEnum.INT, new IntegerLiteralParser());
-		prefixParseFns.put(TokenTypeEnum.BANG, new PrefixExpressionParser());
-		prefixParseFns.put(TokenTypeEnum.MINUS, new PrefixExpressionParser());
+		prefixParseFns.put(TokenTypeEnum.IDENT, new IdentifierParser(this));
+		prefixParseFns.put(TokenTypeEnum.INT, new IntegerLiteralParser(this));
+		prefixParseFns.put(TokenTypeEnum.BANG, new PrefixExpressionParser(this));
+		prefixParseFns.put(TokenTypeEnum.MINUS, new PrefixExpressionParser(this));
 		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser());
 		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser());
 		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser());
@@ -43,7 +43,7 @@ public class Parser {
 		infixParseFns.put(TokenTypeEnum.GTE, new InfixExpressionParser());
 		infixParseFns.put(TokenTypeEnum.LPAREN, new CallExpressionParser());
 	}
-	
+
 	public void load(String source) {
 		this.source = source;
 		lexer.load(this.source);
@@ -53,7 +53,10 @@ public class Parser {
 	
 	public void buildProgramStatements(AstProgram program) {
 		while (currentToken.getType() != TokenTypeEnum.EOF) {
-			System.out.println(currentToken);
+			//System.out.println(currentToken);
+			//nextToken();
+			AstNode node = parseStatement();
+			System.out.println(node);
 			nextToken();
 		}
 	}
@@ -146,15 +149,66 @@ public class Parser {
 	}
 
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {
-		if (!prefixParseFns.containsKey(pte)) return null;
-		PrefixParseInterface prefixParser = prefixParseFns.get(pte);
+		if (!prefixParseFns.containsKey(currentToken.getType())) {
+			System.out.println("no prefixParseFns mapping found for " + pte);
+			return null;
+		}
+		PrefixParseInterface prefixParser = prefixParseFns.get(currentToken.getType());
 		AstNode left_expression = prefixParser.parse();
 		while(!peekTokenIs(TokenTypeEnum.SEMICOLON) && (pte.ordinal() < peekPrecedence().ordinal())) {
 			if (!infixParseFns.containsKey(peekToken.getType())) return left_expression;
 			InfixParseInterface infixParser = infixParseFns.get(peekToken.getType());
 			nextToken();
-			left_expression = infixParser.parse(left_expression);
+			System.out.println(left_expression);
 		}
 		return left_expression;
+	}
+
+	public Lexer getLexer() {
+		return lexer;
+	}
+
+	public void setLexer(Lexer lexer) {
+		this.lexer = lexer;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public Token getCurrentToken() {
+		return currentToken;
+	}
+
+	public void setCurrentToken(Token currentToken) {
+		this.currentToken = currentToken;
+	}
+
+	public Token getPeekToken() {
+		return peekToken;
+	}
+
+	public void setPeekToken(Token peekToken) {
+		this.peekToken = peekToken;
+	}
+
+	public HashMap<TokenTypeEnum, PrefixParseInterface> getPrefixParseFns() {
+		return prefixParseFns;
+	}
+
+	public void setPrefixParseFns(HashMap<TokenTypeEnum, PrefixParseInterface> prefixParseFns) {
+		this.prefixParseFns = prefixParseFns;
+	}
+
+	public HashMap<TokenTypeEnum, InfixParseInterface> getInfixParseFns() {
+		return infixParseFns;
+	}
+
+	public void setInfixParseFns(HashMap<TokenTypeEnum, InfixParseInterface> infixParseFns) {
+		this.infixParseFns = infixParseFns;
 	}
 }
