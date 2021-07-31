@@ -23,12 +23,12 @@ public class AstBoolean extends AstNode {
 
 	@Override
 	public String tokenLiteral() {
-		return null;
+		return token.getLiteral();
 	}
 
 	@Override
 	public String toString() {
-		return null;
+		return "Boolean [" + token.getLiteral() + "] <" + String.valueOf(value) + ">";
 	}
 
 	public Token getToken() {

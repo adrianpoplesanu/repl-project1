@@ -19,7 +19,7 @@ public class AstIdentifier extends AstNode {
 
 	@Override
 	public String toString() {
-		return "todo: implement toString in AstIdentifier";
+		return "Identifier [" + token.getLiteral() + "] <" + value + ">";
 	}
 
 	public Token getToken() {

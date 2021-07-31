@@ -27,8 +27,8 @@ public class Parser {
 		prefixParseFns.put(TokenTypeEnum.INT, new IntegerLiteralParser(this));
 		prefixParseFns.put(TokenTypeEnum.BANG, new PrefixExpressionParser(this));
 		prefixParseFns.put(TokenTypeEnum.MINUS, new PrefixExpressionParser(this));
-		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser());
-		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser());
+		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser(this));
+		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser());
 	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser());
 	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser());
@@ -159,7 +159,7 @@ public class Parser {
 			if (!infixParseFns.containsKey(peekToken.getType())) return left_expression;
 			InfixParseInterface infixParser = infixParseFns.get(peekToken.getType());
 			nextToken();
-			System.out.println(left_expression);
+			left_expression = infixParser.parse(left_expression);
 		}
 		return left_expression;
 	}
