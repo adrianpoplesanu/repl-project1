@@ -14,8 +14,8 @@ public class TokenPrecedenceConverter {
 			put(TokenTypeEnum.GT, PrecedenceTypeEnum.LESSGREATER);
 			put(TokenTypeEnum.LTE, PrecedenceTypeEnum.LESSGREATER);
 			put(TokenTypeEnum.GTE, PrecedenceTypeEnum.LESSGREATER);
-			//put(TokenTypeEnum.AND, PrecedenceTypeEnum.CONDITIONAL);
-			//put(TokenTypeEnum.OR, PrecedenceTypeEnum.CONDITIONAL);
+			put(TokenTypeEnum.AND, PrecedenceTypeEnum.CONDITIONAL);
+			put(TokenTypeEnum.OR, PrecedenceTypeEnum.CONDITIONAL);
 			put(TokenTypeEnum.PLUS, PrecedenceTypeEnum.SUM);
 			put(TokenTypeEnum.MINUS, PrecedenceTypeEnum.SUM);
 			put(TokenTypeEnum.ASTERISK, PrecedenceTypeEnum.PRODUCT);

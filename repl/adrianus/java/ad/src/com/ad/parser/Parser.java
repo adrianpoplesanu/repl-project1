@@ -29,7 +29,7 @@ public class Parser {
 		prefixParseFns.put(TokenTypeEnum.MINUS, new PrefixExpressionParser(this));
 		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser(this));
-		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser());
+		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser());
 	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser());
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
@@ -140,13 +140,13 @@ public class Parser {
 		return stmt;
 	}
 
-	public AstNode parsePrefixExpression() {
+	/*public AstNode parsePrefixExpression() {
 		return null;
 	}
 
 	public AstNode parseInfixExpression() {
 		return null;
-	}
+	}*/
 
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {
 		if (!prefixParseFns.containsKey(currentToken.getType())) {

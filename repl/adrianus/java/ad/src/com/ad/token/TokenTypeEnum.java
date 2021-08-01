@@ -30,5 +30,10 @@ public enum TokenTypeEnum {
 	LBRACE,
 	RBRACE,
 	IDENT,
-	INT
+	INT,
+	LBRACKET,
+	RBRACKET,
+	STRING,
+	AND,
+	OR
 }

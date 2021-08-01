@@ -36,6 +36,11 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.RBRACE, "RBRACE");
 			put(TokenTypeEnum.BANG, "BANG");
 			put(TokenTypeEnum.EOF, "EOF");
+			put(TokenTypeEnum.LBRACKET, "LBRACKET");
+			put(TokenTypeEnum.RBRACKET, "RBRACKET");
+			put(TokenTypeEnum.STRING, "STRING");
+			put(TokenTypeEnum.AND, "AND");
+			put(TokenTypeEnum.OR, "OR");
 		}
 	};
 	
