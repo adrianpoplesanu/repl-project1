@@ -298,7 +298,7 @@ class ASTWhileExpression(ASTNode):
     def __init__(self, token=None, condition=None, block=None):
         """
         @param token: the node's token
-        @param condition: ???
+        @param condition: expression???
         @param block: ASTBlockStatement
         """
         self.token = token

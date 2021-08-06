@@ -59,7 +59,7 @@ class Evaluator(object):
                 return args_objs[0]
             return self.apply_function(func, args_objs)
         elif node.type == StatementType.WHILE_EXPRESSION:
-            pass
+            return self.eval_while_expression(node, env)
         elif node.type == StatementType.STRING_LITERAL:
             return self.eval_string(node, env)
         elif node.type == StatementType.LIST_LITERAL:
@@ -187,8 +187,16 @@ class Evaluator(object):
         for statement in node.statements:
             result = self.eval(statement, env)
             if result and result.type == ObjectType.RETURN_VALUE:
-                return result;
+                return result
         return result
+
+    def eval_while_expression(self, node, env):
+        condition = self.eval(node.condition, env)
+        if self.is_error(condition):
+            return None
+        while self.is_truthy(condition):
+            self.eval(node.block, env)
+            condition = self.eval(node.condition, env)
 
     def is_truthy(self, obj):
         if not obj:

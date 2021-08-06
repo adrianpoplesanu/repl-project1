@@ -5,7 +5,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
-                ASTHashLiteral
+                ASTHashLiteral, ASTWhileExpression
 
 
 class Parser(object):
@@ -25,6 +25,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.FALSE] = self.parse_boolean
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
         self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
+        self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
@@ -229,7 +230,17 @@ class Parser(object):
         return args
 
     def parse_while_expression(self):
-        pass
+        expr = ASTWhileExpression(token=self.current_token)
+        if not self.expect_peek(TokenType.LPAREN):
+            return None
+        self.next_token()
+        expr.condition = self.parse_expression(PrecedenceType.LOWEST)
+        if not self.expect_peek(TokenType.RPAREN):
+            return None
+        if not self.expect_peek(TokenType.LBRACE):
+            return None
+        expr.block = self.parse_block_statement()
+        return expr
 
     def parse_expression(self, precedence):
         if self.current_token.type not in self.prefix_parse_functions:
