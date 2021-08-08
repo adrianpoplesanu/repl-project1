@@ -11,8 +11,7 @@ public class GroupExpressionParser implements PrefixParseInterface {
 
 	@Override
 	public AstNode parse() {
-		// TODO: implement this
-		return null;
+		return parser.parseGroupedExpression();
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.ad.parser;
 
-import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstNode;
 
 public class IdentifierParser implements PrefixParseInterface {
@@ -12,6 +11,6 @@ public class IdentifierParser implements PrefixParseInterface {
 
 	@Override
 	public AstNode parse() {
-		return new AstIdentifier(parser.getCurrentToken(), parser.getCurrentToken().getLiteral());
+		return parser.parseIdentifier();
 	}
 }
