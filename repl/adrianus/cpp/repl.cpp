@@ -22,6 +22,7 @@ void Repl::Loop() {
         }
         ParseLine(line);
     }
+    free_builtin_map();
 }
 
 void Repl::ParseLine(std::string line) {
