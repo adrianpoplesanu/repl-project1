@@ -19,11 +19,16 @@ def first_builtin(args):
         return obj.elements[0]
     return Ad_Null_Object
 
+def print_builtin(args):
+    for obj in args:
+        print obj.inspect()
+
 def exit_builtin(args):
     sys.exit(0)
 
 builtins_map = {
     "len": Ad_Builtin_Object(len_builtin),
     "first": Ad_Builtin_Object(first_builtin),
+    "print": Ad_Builtin_Object(print_builtin),
     "exit": Ad_Builtin_Object(exit_builtin)
 }
