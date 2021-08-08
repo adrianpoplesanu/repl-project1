@@ -226,6 +226,23 @@ Ad_Object_Type Ad_Builtin_Object::Type() {
     return type;
 }
 
+Ad_Exit_Object::Ad_Exit_Object() {
+    type = OBJ_EXIT;
+    ref_count = 0;
+}
+
+std::string Ad_Exit_Object::Inspect() {
+    return "todo: implement Inspect in Ad_Exit_Object";
+}
+
+void Ad_Exit_Object::Print() {
+    std::cout << "todo: implement Print in Ad_Exit_Object";
+}
+
+Ad_Object_Type Ad_Exit_Object::Type() {
+    return type;
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
@@ -266,6 +283,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_BUILTIN:
                 delete ((Ad_Builtin_Object*)obj);
+            break;
+            case OBJ_EXIT:
+                delete ((Ad_Exit_Object*)obj);
             break;
             default:
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";

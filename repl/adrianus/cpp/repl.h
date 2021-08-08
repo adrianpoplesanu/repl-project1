@@ -8,7 +8,7 @@
 
 class Repl {
 private:
-    void ParseLine(std::string);
+    bool ParseLine(std::string);
 public:
     Parser parser;
     Evaluator evaluator;
