@@ -2,10 +2,14 @@ package com.ad.parser;
 
 import java.util.HashMap;
 
+import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstIdentifier;
+import com.ad.ast.AstIfExpression;
+import com.ad.ast.AstInteger;
 import com.ad.ast.AstLetStatement;
 import com.ad.ast.AstNode;
+import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
 import com.ad.ast.AstReturnStatement;
 import com.ad.lexer.Lexer;
@@ -30,7 +34,7 @@ public class Parser {
 		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser());
+	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this)); // currently working on
 	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser());
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser());
@@ -74,7 +78,7 @@ public class Parser {
 		return peekToken.getType() == tte;
 	}
 
-	public boolean ExpectPeek(TokenTypeEnum tte) {
+	public boolean expectPeek(TokenTypeEnum tte) {
 		if (peekTokenIs(tte)) {
 			nextToken();
 			return true;
@@ -109,11 +113,11 @@ public class Parser {
 
 	public AstNode parseLetStatement() {
 		AstLetStatement stmt = new AstLetStatement(currentToken);
-		if (!ExpectPeek(TokenTypeEnum.IDENT)) {
+		if (!expectPeek(TokenTypeEnum.IDENT)) {
 			return null;
 		}
 		stmt.setName(new AstIdentifier(currentToken, currentToken.getLiteral()));
-		if (!ExpectPeek(TokenTypeEnum.ASSIGN)) {
+		if (!expectPeek(TokenTypeEnum.ASSIGN)) {
 			return null;
 		}
 		nextToken();
@@ -140,13 +144,71 @@ public class Parser {
 		return stmt;
 	}
 
-	/*public AstNode parsePrefixExpression() {
+    // TODO: PrefixParseInterface and InfixParseInterface should call specific public methods from wuthing the parser
+    // it makes more sense to have the logic that is responsible with parsing here and not in the interfaces
+
+	public AstNode parseIdentifier() {
+		return new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
+	}
+
+	public AstNode parseInteger() {
+		String value = getCurrentToken().getLiteral();
+		return new AstInteger(getCurrentToken(), Integer.parseInt(value));
+	}
+
+	public AstNode parsePrefixExpression() {
+		AstPrefixExpression expr = new AstPrefixExpression(getCurrentToken(),
+				getCurrentToken().getLiteral());
+		nextToken();
+		expr.setRight(parseExpression(PrecedenceTypeEnum.PREFIX));
+		return expr;
+	}
+
+	public AstNode parseBoolean() {
+		return new AstBoolean(getCurrentToken(), currentTokenIs(TokenTypeEnum.TRUE));
+	}
+
+	public AstNode parseGroupedExpression() {
+		nextToken();
+		AstNode expr = parseExpression(PrecedenceTypeEnum.LOWEST);
+		if (!expectPeek(TokenTypeEnum.RPAREN)) {
+			return null;
+		}
+		return expr;
+	}
+
+	public AstNode parseIfExpression() {
+		AstIfExpression expr = new AstIfExpression(getCurrentToken());
+		if (!expectPeek(TokenTypeEnum.LPAREN)) {
+			return null;
+		}
+		nextToken();
+		expr.setCondition(parseExpression(PrecedenceTypeEnum.PREFIX));
+		if (!expectPeek(TokenTypeEnum.RBRACE)) {
+			return null;
+		}
+		if (!expectPeek(TokenTypeEnum.LBRACKET)) {
+			return null;
+		}
+		expr.setConsequence(parseBlockStatement());
+		if (peekTokenIs(TokenTypeEnum.ELSE)) {
+			nextToken();
+			if (!expectPeek(TokenTypeEnum.LBRACE)) {
+				return null;
+			}
+			expr.setAlternative(parseBlockStatement());
+		}
+		return expr;
+	}
+
+	private AstNode parseBlockStatement() {
+		// TODO: implement block statement parsing
 		return null;
 	}
 
 	public AstNode parseInfixExpression() {
 		return null;
-	}*/
+	}
 
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {
 		if (!prefixParseFns.containsKey(currentToken.getType())) {
