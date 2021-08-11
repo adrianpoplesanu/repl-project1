@@ -1,4 +1,5 @@
 #include "objects.h"
+#include "signal.h"
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
@@ -17,12 +18,14 @@ Ad_Object* len_builtin(std::vector<Ad_Object*> args) {
 Ad_Object* exit_builtin(std::vector<Ad_Object*> args) {
     // TODO: i need to free all args, cred ca toate builtin-urile care primesc args, ar trebui sa faca un free pe ele
     free_builtin_arguments(args);
-    return new Ad_Exit_Object();
+    Ad_Signal_Object* signal = new Ad_Signal_Object();
+    signal->signal_type = SIGNAL_EXIT;
+    return signal;
 }
 
 Ad_Object* print_builtin(std::vector<Ad_Object*> args) {
     Ad_Object* obj = args[0];
-    std::cout << obj->Inspect();
+    std::cout << obj->Inspect() << "\n";
     free_builtin_arguments(args);
     return NULL;
 }

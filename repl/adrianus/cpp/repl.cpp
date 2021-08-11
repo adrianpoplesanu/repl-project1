@@ -35,7 +35,8 @@ bool Repl::ParseLine(std::string line) {
     //parser.TestInfixFunction(TT_PLUS);
     //program.ToString();
     Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);
-    if (res && res->Type() == OBJ_EXIT) {
+    if (res && res->Type() == OBJ_SIGNAL) {
+        // if res->signal_type == SIGNAL_EXIT, else it's a different signal
         free_Ad_Object_memory(res);
         return true;
     }

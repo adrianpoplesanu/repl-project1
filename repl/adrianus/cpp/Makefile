@@ -6,6 +6,7 @@ all:
 	g++ -g -std=c++11 objects.cpp -c -o objects.o
 	g++ -g -std=c++11 environment.cpp -c -o environment.o
 	g++ -g -std=c++11 evaluator.cpp -c -o evaluator.o
+	g++ -g -std=c++11 signal.cpp -c -o signal.o
 	g++ -g -std=c++11 repl.cpp -c -o repl.o
 	g++ -g -std=c++11 test_objects.cpp -c -o test_objects.o
 	g++ -g -std=c++11 tests.cpp -c -o tests.o

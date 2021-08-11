@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include "ast.h"
+#include "signal.h"
 
 enum Ad_Object_Type {
 	OBJ_NULL,
@@ -16,7 +17,7 @@ enum Ad_Object_Type {
 	OBJ_FUNCTION,
 	OBJ_ERROR,
 	OBJ_BUILTIN,
-	OBJ_EXIT
+	OBJ_SIGNAL
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
@@ -29,7 +30,7 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_STRING, "StringObject"},
 	{OBJ_ERROR, "ErrorObject"},
 	{OBJ_BUILTIN, "BuiltinObject"},
-	{OBJ_EXIT, "ExitObject"}
+	{OBJ_SIGNAL, "SignalObject"}
 };
 
 class Ad_Object {
@@ -141,9 +142,11 @@ public:
 	virtual Ad_Object_Type Type();
 };
 
-class Ad_Exit_Object : public Ad_Object {
+class Ad_Signal_Object : public Ad_Object {
 public:
-	Ad_Exit_Object();
+	Ad_Signal_Type signal_type;
+
+	Ad_Signal_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();

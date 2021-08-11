@@ -226,20 +226,20 @@ Ad_Object_Type Ad_Builtin_Object::Type() {
     return type;
 }
 
-Ad_Exit_Object::Ad_Exit_Object() {
-    type = OBJ_EXIT;
+Ad_Signal_Object::Ad_Signal_Object() {
+    type = OBJ_SIGNAL;
     ref_count = 0;
 }
 
-std::string Ad_Exit_Object::Inspect() {
-    return "todo: implement Inspect in Ad_Exit_Object";
+std::string Ad_Signal_Object::Inspect() {
+    return "todo: implement Inspect in Ad_Signal_Object";
 }
 
-void Ad_Exit_Object::Print() {
-    std::cout << "todo: implement Print in Ad_Exit_Object";
+void Ad_Signal_Object::Print() {
+    std::cout << "todo: implement Print in Ad_Signal_Object";
 }
 
-Ad_Object_Type Ad_Exit_Object::Type() {
+Ad_Object_Type Ad_Signal_Object::Type() {
     return type;
 }
 
@@ -284,8 +284,8 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             case OBJ_BUILTIN:
                 delete ((Ad_Builtin_Object*)obj);
             break;
-            case OBJ_EXIT:
-                delete ((Ad_Exit_Object*)obj);
+            case OBJ_SIGNAL:
+                delete ((Ad_Signal_Object*)obj);
             break;
             default:
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
@@ -319,6 +319,12 @@ void print_Ad_Object(Ad_Object* obj) {
         break;
         case OBJ_BUILTIN:
             std::cout << "builtin object\n";
+        break;
+        case OBJ_SIGNAL:
+            std::cout << "signal object\n";
+        break;
+        default:
+            std::cout << "no print implmentation for this object type";
         break;
     }
 }
