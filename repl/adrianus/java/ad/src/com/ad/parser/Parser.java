@@ -2,6 +2,7 @@ package com.ad.parser;
 
 import java.util.HashMap;
 
+import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstIdentifier;
@@ -34,8 +35,8 @@ public class Parser {
 		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this)); // currently working on
-	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser());
+	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this));
+	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this));
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser());
 		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser());
@@ -144,7 +145,7 @@ public class Parser {
 		return stmt;
 	}
 
-    // TODO: PrefixParseInterface and InfixParseInterface should call specific public methods from wuthing the parser
+    // TODO: PrefixParseInterface and InfixParseInterface should call specific public methods from within the parser
     // it makes more sense to have the logic that is responsible with parsing here and not in the interfaces
 
 	public AstNode parseIdentifier() {
@@ -202,7 +203,19 @@ public class Parser {
 	}
 
 	private AstNode parseBlockStatement() {
-		// TODO: implement block statement parsing
+		AstBlockStatement block = new AstBlockStatement(getCurrentToken());
+		while(!currentTokenIs(TokenTypeEnum.RBRACKET) && !currentTokenIs(TokenTypeEnum.EOF)) {
+			AstNode statement = parseStatement();
+			if (statement != null) {
+				block.addStatement(statement);
+			}
+			nextToken();
+		}
+		return null;
+	}
+	
+	public AstNode parseFunctionLiteral() {
+		// TODO: parse function literals
 		return null;
 	}
 
