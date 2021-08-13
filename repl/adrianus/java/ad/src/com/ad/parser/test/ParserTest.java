@@ -1,0 +1,17 @@
+package com.ad.parser.test;
+
+import com.ad.ast.AstNodeUtils;
+import com.ad.ast.AstProgram;
+import com.ad.parser.Parser;
+
+public class ParserTest {
+    public static void testParser() {
+    	//String source = "let a = 1; let add = fn(a,b) { 1+2+3; } ; werty; ; 1 + 2 - 3 * 4; add(a, 747); if (3 > 1) { 1001; } else { 1002; } let a = true; let b = false;";
+    	String source = "let a = 1;";
+        Parser parser = new Parser();
+        AstProgram program = new AstProgram();
+		parser.load(source);
+		parser.buildProgramStatements(program);
+		AstNodeUtils.PrintASTNode(program, 0);
+    }
+}

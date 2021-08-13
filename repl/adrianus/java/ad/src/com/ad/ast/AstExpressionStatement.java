@@ -22,7 +22,8 @@ public class AstExpressionStatement extends AstNode {
 
 	@Override
 	public String toString() {
-		return expression.toString();
+		if (expression != null) expression.toString();
+		return null;
 	}
 
 	public Token getToken() {

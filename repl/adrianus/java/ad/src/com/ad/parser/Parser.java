@@ -58,10 +58,13 @@ public class Parser {
 	
 	public void buildProgramStatements(AstProgram program) {
 		while (currentToken.getType() != TokenTypeEnum.EOF) {
-			//System.out.println(currentToken);
-			//nextToken();
 			AstNode node = parseStatement();
-			System.out.println(node);
+			if (node != null) {
+				//System.out.println(node); // i really don't like this
+				String output = node.toString();
+				if (output != null) System.out.println(output); // i like this a bit more, but i still don't fully like it
+				program.statements.add(node);
+			}
 			nextToken();
 		}
 	}
@@ -123,6 +126,9 @@ public class Parser {
 		}
 		nextToken();
 		stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
+		if (currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+			nextToken();
+		}
 		return stmt;
 	}
 
@@ -225,7 +231,6 @@ public class Parser {
 
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {
 		if (!prefixParseFns.containsKey(currentToken.getType())) {
-			System.out.println("no prefixParseFns mapping found for " + pte);
 			return null;
 		}
 		PrefixParseInterface prefixParser = prefixParseFns.get(currentToken.getType());
