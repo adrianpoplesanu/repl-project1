@@ -17,9 +17,6 @@ void Repl::Loop() {
         std::string line;
         std::cout << ">> ";
         std::getline(std::cin, line);
-        /*if (line == "exit()") {
-            break;
-        }*/
         bool end_singal = ParseLine(line);
         if (end_singal) {
             break;
@@ -34,6 +31,7 @@ bool Repl::ParseLine(std::string line) {
     parser.ParseProgram(program);
     //parser.TestInfixFunction(TT_PLUS);
     //program.ToString();
+
     Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);
     if (res && res->Type() == OBJ_SIGNAL) {
         // if res->signal_type == SIGNAL_EXIT, else it's a different signal
@@ -41,6 +39,4 @@ bool Repl::ParseLine(std::string line) {
         return true;
     }
     return false;
-    //delete res; // res is null now because EvalProgram returns NULL
-    //free_Ad_Object_memory(res);
 }

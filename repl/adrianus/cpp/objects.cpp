@@ -276,7 +276,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete ((Ad_ReturnValue_Object*)obj);
             break;
             case OBJ_FUNCTION:
-                if (obj->ref_count <= 0) delete ((Ad_Function_Object*)obj);
+                delete ((Ad_Function_Object*)obj);
             break;
             case OBJ_ERROR:
                 delete ((Ad_Error_Object*)obj);
