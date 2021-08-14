@@ -36,16 +36,16 @@ public class Parser {
 		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this));
+	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this)); // TODO: implement this
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
-		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser());
-		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser());
-		infixParseFns.put(TokenTypeEnum.ASTERISK, new InfixExpressionParser());
-		infixParseFns.put(TokenTypeEnum.SLASH, new InfixExpressionParser());
-		infixParseFns.put(TokenTypeEnum.LT, new InfixExpressionParser());
-		infixParseFns.put(TokenTypeEnum.GT, new InfixExpressionParser());
-		infixParseFns.put(TokenTypeEnum.LTE, new InfixExpressionParser());
-		infixParseFns.put(TokenTypeEnum.GTE, new InfixExpressionParser());
+		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.ASTERISK, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.SLASH, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.LT, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.GT, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.LTE, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.GTE, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.LPAREN, new CallExpressionParser());
 	}
 
@@ -225,7 +225,7 @@ public class Parser {
 		return null;
 	}
 
-	public AstNode parseInfixExpression() {
+	public AstNode parseInfixExpression(AstNode node) {
 		return null;
 	}
 
