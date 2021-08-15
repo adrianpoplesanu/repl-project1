@@ -1,10 +1,12 @@
 package com.ad.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
+import com.ad.ast.AstFunctionLiteral;
 import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstIfExpression;
 import com.ad.ast.AstInteger;
@@ -221,7 +223,19 @@ public class Parser {
 	}
 	
 	public AstNode parseFunctionLiteral() {
-		// TODO: parse function literals
+		AstFunctionLiteral func = new AstFunctionLiteral(getCurrentToken());
+		if (expectPeek(TokenTypeEnum.LPAREN)) {
+			return null;
+		}
+		func.setParameters(parseFunctionParameters());
+		if (!expectPeek(TokenTypeEnum.LBRACE)) {
+			return null;
+		}
+		func.setBody(parseBlockStatement());
+		return func;
+	}
+	
+	public ArrayList<AstNode> parseFunctionParameters() {
 		return null;
 	}
 
