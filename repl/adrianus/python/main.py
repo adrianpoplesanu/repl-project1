@@ -3,14 +3,15 @@ from repl import Repl
 from parser import Parser
 from ast import ASTProgram
 from evaluator import Evaluator
-from test_parser import test_parser
+from test_parser import test_parser, test_parser2
 
 DEBUG = False
 
 
 def main(args):
     if DEBUG:
-        test_parser()
+        #test_parser()
+        test_parser2()
     parser = Parser()
     program = ASTProgram()
     evaluator = Evaluator()
