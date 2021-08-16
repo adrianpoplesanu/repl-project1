@@ -17,7 +17,8 @@ enum Ad_Object_Type {
 	OBJ_FUNCTION,
 	OBJ_ERROR,
 	OBJ_BUILTIN,
-	OBJ_SIGNAL
+	OBJ_SIGNAL,
+	OBJ_LIST
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
@@ -30,7 +31,8 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_STRING, "StringObject"},
 	{OBJ_ERROR, "ErrorObject"},
 	{OBJ_BUILTIN, "BuiltinObject"},
-	{OBJ_SIGNAL, "SignalObject"}
+	{OBJ_SIGNAL, "SignalObject"},
+	{OBJ_LIST, "ListObject"}
 };
 
 class Ad_Object {
@@ -147,6 +149,19 @@ public:
 	Ad_Signal_Type signal_type;
 
 	Ad_Signal_Object();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+};
+
+class Ad_List;
+
+class Ad_List_Object : public Ad_Object {
+public:
+	Ad_List *list;
+
+	Ad_List_Object();
+	~Ad_List_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();

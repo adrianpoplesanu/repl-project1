@@ -4,6 +4,7 @@ all:
 	g++ -g -std=c++11 ast.cpp -c -o ast.o
 	g++ -g -std=c++11 parser.cpp -c -o parser.o
 	g++ -g -std=c++11 objects.cpp -c -o objects.o
+	g++ -g -std=c++11 listobject.cpp -c -o listobject.o
 	g++ -g -std=c++11 environment.cpp -c -o environment.o
 	g++ -g -std=c++11 evaluator.cpp -c -o evaluator.o
 	g++ -g -std=c++11 signal.cpp -c -o signal.o
