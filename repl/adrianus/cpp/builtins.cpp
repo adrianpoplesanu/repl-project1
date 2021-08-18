@@ -46,6 +46,8 @@ void free_builtin_arguments(std::vector<Ad_Object*> args) {
 
 void free_builtin_map() {
     for (std::map<std::string, Ad_Object*>::iterator it = builtins_map.begin(); it != builtins_map.end(); ++it) {
-        delete it->second;
+        //delete it->second;
+        free_Ad_Object_memory(it->second);
+        // maybe this should be: free_Ad_Object_memory(it->second); // for consistency
     }
 }

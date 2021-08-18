@@ -23,11 +23,30 @@ void Ad_List::Set(Ad_Object* obj, int i) {
 }
 
 void Ad_List::Add(Ad_Object* obj, int i) {
-
+    if (!IsValidBounds(i)) {
+        std::cout << "Out of bounds, i should return an Ad Error Object\n";
+        return;
+    }
+    if (size == capacity) {
+        Resize(capacity * 2);
+    }
+    for (int j = size - 1; j > i; j--) data[j] = data[j - 1];
+    data[i] = obj;
+    size++;
 }
 
 Ad_Object* Ad_List::Remove(int i) {
-    return NULL;
+    if (!IsValidBounds(i)) {
+        std::cout << "Out of bounds, i should return an Ad Error Object\n";
+        return NULL;
+    }
+    Ad_Object* obj = data[i];
+    for (int j = i; j < size - 1; j++) data[j] = data[j + 1];
+    size--;
+    if (size < capacity / 2 && capacity > 4) {
+        Resize(capacity / 2);
+    }
+    return obj;
 }
 
 int Ad_List::Size() {
@@ -47,11 +66,15 @@ void Ad_List::Sort() {
 }
 
 void Ad_List::Resize(int n) {
-
+    Ad_Object** current = data;
+    data = new Ad_Object*[n];
+    for (int i = 0; i < size; i++) data[i] = current[i];
+    capacity = n;
+    delete[] current;
 }
 
 void Ad_List::Append(Ad_Object* obj) {
-
+    Add(obj, size);
 }
 
 bool Ad_List::IsValidBounds(int i) {
