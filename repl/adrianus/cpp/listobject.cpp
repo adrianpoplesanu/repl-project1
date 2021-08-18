@@ -53,6 +53,10 @@ int Ad_List::Size() {
     return size;
 }
 
+int Ad_List::Capacity() {
+    return capacity;
+}
+
 bool Ad_List::IsEmpty() {
     return size == 0;
 }
