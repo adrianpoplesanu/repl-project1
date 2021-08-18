@@ -24,6 +24,7 @@ public:
     void Append(Ad_Object*);
 
     bool IsValidBounds(int);
+    void PseudoInspect();
 };
 
 #endif
