@@ -24,7 +24,8 @@ public:
     void Append(Ad_Object*);
 
     bool IsValidBounds(int);
-    void PseudoInspect();
+    std::string Inspect();
+    void Print();
 };
 
 #endif

@@ -88,7 +88,17 @@ bool Ad_List::IsValidBounds(int i) {
     return true;
 }
 
-void Ad_List::PseudoInspect() {
+std::string Ad_List::Inspect() {
+    std::string out = "[";
+    for (int i = 0; i < size; i++) {
+        out += data[i]->Inspect();
+        if (i < size - 1) out += ", ";
+    }
+    out += "]";
+    return out;
+}
+
+void Ad_List::Print() {
     std::string out = "[";
     for (int i = 0; i < size; i++) {
         out += data[i]->Inspect();

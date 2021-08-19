@@ -106,5 +106,9 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->StringLiteral " << ((Ad_AST_String*)node)->token.ToString() << "\n";
         break;
+        case ST_LIST_LITERAL:
+            print_level(level);
+            std::cout << "->ListLiteral " << "\n";
+        break;
     }
 }

@@ -158,7 +158,7 @@ class Ad_List;
 
 class Ad_List_Object : public Ad_Object {
 public:
-	Ad_List *list;
+	Ad_List *elements; // forward declaration
 
 	Ad_List_Object();
 	~Ad_List_Object();

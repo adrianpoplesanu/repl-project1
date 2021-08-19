@@ -11,7 +11,7 @@
 // 0 - parser test is not run, 1 - run and print AST structure
 #define RUN_PARSER_TESTS 0
 #define RUN_FUNCTION_LITERAL_TESTS 0
-#define RUN_LISTOBJECT_TESTS 1
+#define RUN_LISTOBJECT_TESTS 0
 
 
 int main(int argc, char *argv[]) {

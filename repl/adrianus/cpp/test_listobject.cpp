@@ -20,18 +20,18 @@ void test_simple_list_object() {
     Ad_Integer_Object* num = new Ad_Integer_Object(55);
     list->Append(num);
 
-    list->PseudoInspect();
+    list->Print();
     std::cout << list->Size() << " " << list->Capacity() << "\n";
 
     Ad_Object *res = list->Remove(0);
     free_Ad_Object_memory(res);
 
-    list->PseudoInspect();
+    list->Print();
 
     res = list->Remove(0);
     free_Ad_Object_memory(res);
 
-    list->PseudoInspect();
+    list->Print();
     std::cout << list->Size() << " " << list->Capacity() << "\n";
 
     delete list;
