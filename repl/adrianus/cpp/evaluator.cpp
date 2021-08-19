@@ -87,6 +87,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalString(node, env);
         }
         break;
+        case ST_LIST_LITERAL:
+            //std::cout << node->ToString() << "\n";
+            //return EvalList(node, env);
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;

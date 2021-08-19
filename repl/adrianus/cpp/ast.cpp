@@ -456,7 +456,12 @@ std::string Ad_AST_ListLiteral::TokenLiteral() {
 }
 
 std::string Ad_AST_ListLiteral::ToString() {
-    std::string out = "todo: implement this";
+    std::string out = "[";
+    for (std::vector<Ad_AST_Node*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
+        Ad_AST_Node *current = *it;
+        out += current->ToString() + ", ";
+    }
+    out += "]";
     return out;
 }
 

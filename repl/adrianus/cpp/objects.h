@@ -158,7 +158,8 @@ class Ad_List;
 
 class Ad_List_Object : public Ad_Object {
 public:
-	Ad_List *elements; // forward declaration
+	//Ad_List *elements; // forward declaration
+	std::vector<Ad_Object*> elements;
 
 	Ad_List_Object();
 	~Ad_List_Object();

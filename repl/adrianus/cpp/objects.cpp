@@ -250,19 +250,20 @@ Ad_Object_Type Ad_Signal_Object::Type() {
 Ad_List_Object::Ad_List_Object() {
     type = OBJ_LIST;
     ref_count = 0;
-    elements = new Ad_List();
+    //elements = new Ad_List();
 }
 
 Ad_List_Object::~Ad_List_Object() {
-    delete elements;
+    //delete elements;
 }
 
 std::string Ad_List_Object::Inspect() {
-    return elements->Inspect();
+    //return elements->Inspect();
+    return "todo: implement Inspect() in Ad_List_Object";
 }
 
 void Ad_List_Object::Print() {
-    std::cout << elements->Inspect();
+    //std::cout << elements->Inspect();
 }
 
 Ad_Object_Type Ad_List_Object::Type() {

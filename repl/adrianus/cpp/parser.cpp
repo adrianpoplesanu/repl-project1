@@ -355,6 +355,7 @@ Ad_AST_Node* Parser::ParseStringLiteral() {
 }
 
 Ad_AST_Node* Parser::ParseListLiteral() {
+    std::cout << "aaa\n";
     Ad_AST_ListLiteral* expr = new Ad_AST_ListLiteral(current_token);
     expr->elements = ParseListExpressions();
     return expr;
@@ -362,6 +363,21 @@ Ad_AST_Node* Parser::ParseListLiteral() {
 
 std::vector<Ad_AST_Node*> Parser::ParseListExpressions() {
     std::vector<Ad_AST_Node*> elements;
+    if (PeekTokenIs(TT_RBRACKET)) {
+        NextToken();
+        return elements;
+    }
+    NextToken();
+    elements.push_back(ParseExpression(PT_LOWEST));
+    while(PeekTokenIs(TT_COMMA)) {
+        NextToken();
+        NextToken();
+        elements.push_back(ParseExpression(PT_LOWEST));
+    }
+    if (!ExpectPeek(TT_RBRACKET)) {
+        std::vector<Ad_AST_Node*> empty;
+        return empty;
+    }
     return elements;
 }
 
