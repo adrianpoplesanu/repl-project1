@@ -248,6 +248,7 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
         if (result && result->type == OBJ_RETURN_VALUE) {
             return result;
         }
+        free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
     }
     return result;
 }
@@ -302,15 +303,17 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
 }
 
 Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
-    /*Ad_Object* condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
+    Ad_Object* condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     if (IsError(condition)) {
         return NULL;
     }
     while (IsTruthy(condition)) {
-        Eval(((Ad_AST_WhileExpression*)node)->consequence, env);
-        //free_Ad_Object_memory(condition);
+        // this needs to be handled just like EvalProgram or else i'll have a memory leak
+        Ad_Object* result;
+        result = Eval(((Ad_AST_WhileExpression*)node)->consequence, env);
+        if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
-    }*/
+    }
     return NULL;
 }
 
