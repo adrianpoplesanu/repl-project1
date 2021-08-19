@@ -436,6 +436,30 @@ std::string Ad_AST_String::ToString() {
     return out;
 }
 
+Ad_AST_ListLiteral::Ad_AST_ListLiteral() {
+    type = ST_LIST_LITERAL;
+    ref_count = 0;
+}
+
+Ad_AST_ListLiteral::Ad_AST_ListLiteral(Token t) {
+    type = ST_LIST_LITERAL;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_ListLiteral::~Ad_AST_ListLiteral() {
+    // TODO: implement this
+}
+
+std::string Ad_AST_ListLiteral::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_ListLiteral::ToString() {
+    std::string out = "todo: implement this";
+    return out;
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;

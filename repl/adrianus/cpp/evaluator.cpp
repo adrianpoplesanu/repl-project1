@@ -66,7 +66,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_FUNCTION_LITERAL: {
             Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->body, &env);
-            //Ad_INCREF(obj);
             return obj;
         }
         break;
@@ -81,7 +80,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_WHILE_EXPRESSION: {
-
+            return EvalWhileExpression(node, env);
         }
         break;
         case ST_STRING_LITERAL: {
@@ -300,6 +299,19 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
         ++i;
     }
     return extended;
+}
+
+Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
+    /*Ad_Object* condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
+    if (IsError(condition)) {
+        return NULL;
+    }
+    while (IsTruthy(condition)) {
+        Eval(((Ad_AST_WhileExpression*)node)->consequence, env);
+        //free_Ad_Object_memory(condition);
+        condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
+    }*/
+    return NULL;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

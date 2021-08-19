@@ -1,6 +1,9 @@
 #include "objects.h"
 #include "listobject.h"
 #include "listobject.cpp"
+#include <sstream>
+
+#define VERBOSE_MEMORY_CLEANUP 0
 
 std::string Ad_Object::Inspect() {
     std::cout << "not implemented Inspect() in subclass\n";
@@ -136,13 +139,12 @@ Ad_Function_Object::~Ad_Function_Object() {
         Ad_DECREF(obj);
         free_Ad_AST_Node_memory(obj);
     }
-    //if (env) {
-    //    delete env;
-    //}
 }
 
 std::string Ad_Function_Object::Inspect() {
-    return "todo: implement Inspect in Ad_Function_Object";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "function at memory address " + ss.str();
 }
 
 void Ad_Function_Object::Print() {
@@ -282,6 +284,9 @@ void Ad_DECREF(Ad_Object* obj) {
 void free_Ad_Object_memory(Ad_Object* obj) {
     if (obj == NULL) return;
     if (obj->ref_count > 0) return;
+    if (VERBOSE_MEMORY_CLEANUP) {
+        std::cout << "freeing up some memory\n";
+    }
     if (obj) {
         switch(obj->type) {
             case OBJ_NULL:

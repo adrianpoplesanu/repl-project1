@@ -208,7 +208,7 @@ class Ad_AST_WhileExpression : public Ad_AST_Node {
 public:
     Token token;
     Ad_AST_Node* condition;
-    Ad_AST_Node* consequence; // Ad_AST_BlockStatement
+    Ad_AST_Node* consequence; // Ad_AST_BlockStatement, maybe rename this
 
     Ad_AST_WhileExpression();
     Ad_AST_WhileExpression(Token);
@@ -232,7 +232,7 @@ public:
 class Ad_AST_ListLiteral : public Ad_AST_Node {
 public:
     Token token;
-    // TODO: add necessary data for list ast node
+    std::vector<Ad_AST_Node*> elements;
 
     Ad_AST_ListLiteral();
     Ad_AST_ListLiteral(Token);
