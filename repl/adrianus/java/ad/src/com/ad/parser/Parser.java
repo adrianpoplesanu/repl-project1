@@ -9,6 +9,7 @@ import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstFunctionLiteral;
 import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstIfExpression;
+import com.ad.ast.AstInfixExpression;
 import com.ad.ast.AstInteger;
 import com.ad.ast.AstLetStatement;
 import com.ad.ast.AstNode;
@@ -38,7 +39,7 @@ public class Parser {
 		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser(this));
 		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this)); // TODO: implement this
+	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this));
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser(this));
@@ -236,11 +237,32 @@ public class Parser {
 	}
 	
 	public ArrayList<AstNode> parseFunctionParameters() {
-		return null;
+		ArrayList<AstNode> identifiers = new ArrayList<AstNode>();
+		if (peekTokenIs(TokenTypeEnum.RPAREN)) {
+			nextToken();
+			return identifiers;
+		}
+		nextToken();
+		AstIdentifier ident = new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
+		identifiers.add(ident);
+		while(peekTokenIs(TokenTypeEnum.COMMA)) {
+			nextToken();
+			nextToken();
+			ident = new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
+			identifiers.add(ident);
+		}
+		if (!expectPeek(TokenTypeEnum.RPAREN)) {
+			return new ArrayList<AstNode>(); // return an empty list
+		}
+		return identifiers;
 	}
 
-	public AstNode parseInfixExpression(AstNode node) {
-		return null;
+	public AstNode parseInfixExpression(AstNode left) {
+		AstInfixExpression expr = new AstInfixExpression(getCurrentToken(), getCurrentToken().getLiteral(), left);
+		PrecedenceTypeEnum precedence = currentPrecedence();
+		nextToken();
+		expr.setRight(parseExpression(precedence));
+		return expr;
 	}
 
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {

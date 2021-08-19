@@ -10,7 +10,7 @@ public class InfixExpressionParser implements InfixParseInterface {
 	}
 
 	@Override
-	public AstNode parse(AstNode node) {
-		return parser.parseInfixExpression(node);
+	public AstNode parse(AstNode left) {
+		return parser.parseInfixExpression(left);
 	}
 }
