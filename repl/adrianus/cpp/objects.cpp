@@ -253,6 +253,12 @@ Ad_List_Object::Ad_List_Object() {
     //elements = new Ad_List();
 }
 
+Ad_List_Object::Ad_List_Object(std::vector<Ad_Object*> e) {
+    type = OBJ_LIST;
+    ref_count = 0;
+    elements = e;
+}
+
 Ad_List_Object::~Ad_List_Object() {
     //delete elements;
 }

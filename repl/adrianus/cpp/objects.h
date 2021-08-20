@@ -154,7 +154,7 @@ public:
 	virtual Ad_Object_Type Type();
 };
 
-class Ad_List;
+//class Ad_List;
 
 class Ad_List_Object : public Ad_Object {
 public:
@@ -162,6 +162,7 @@ public:
 	std::vector<Ad_Object*> elements;
 
 	Ad_List_Object();
+	Ad_List_Object(std::vector<Ad_Object*>);
 	~Ad_List_Object();
 	virtual std::string Inspect();
 	virtual void Print();
