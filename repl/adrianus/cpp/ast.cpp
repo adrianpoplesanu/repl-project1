@@ -526,7 +526,7 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
             delete (Ad_AST_String*)obj;
         break;
         default:
-            std::cout << "MEMORY ERROR!!! ast: " << obj->type << "\n";
+            std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[obj->type] << "\n";
         break;
     }
 }

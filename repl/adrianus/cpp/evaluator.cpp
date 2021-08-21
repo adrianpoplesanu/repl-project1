@@ -88,8 +88,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_LIST_LITERAL: {
-            //std::cout << node->ToString() << "\n";
-            //return EvalList(node, env);
             std::vector<Ad_Object*> elements = EvalExpressions(((Ad_AST_ListLiteral*)node)->elements, env);
             Ad_List_Object* obj = new Ad_List_Object(elements);
             return obj;

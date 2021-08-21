@@ -264,8 +264,15 @@ Ad_List_Object::~Ad_List_Object() {
 }
 
 std::string Ad_List_Object::Inspect() {
-    //return elements->Inspect();
-    return "todo: implement Inspect() in Ad_List_Object";
+    std::string out = "[";
+    int idx = 0;
+    for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
+        Ad_Object *obj = *it;
+        if (idx++ > 0) out += ", ";
+        out += obj->Inspect();
+    }
+    out += "]";
+    return out;
 }
 
 void Ad_List_Object::Print() {

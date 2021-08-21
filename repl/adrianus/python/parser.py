@@ -206,10 +206,6 @@ class Parser(object):
         return identifiers
 
     def parse_infix_expression(self, left):
-        #if self.current_token.type == TokenType.ASSIGN:
-        #    self.next_token()
-        #    expr = self.parse_expression_statement()
-        #    return None
         expr = ASTInfixExpression(token=self.current_token, operator=self.current_token.literal, left=left)
         precedence = self.current_precedence()
         self.next_token()
