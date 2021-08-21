@@ -21,6 +21,10 @@ class Evaluator(object):
             obj = self.eval(node.value, env)
             env.set(node.name.value, obj)
             return None
+        elif node.type == StatementType.ASSIGN_STATEMENT:
+            obj = self.eval(node.value, env)
+            env.set(node.name.value, obj)
+            return None
         elif node.type == StatementType.RETURN_STATEMENT:
             val = self.eval(node.value, env)
             obj = Ad_ReturnValue_Object(value=val)

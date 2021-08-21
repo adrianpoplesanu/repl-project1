@@ -68,6 +68,9 @@ class Ad_Function_Object(Ad_Object):
         self.body = body
         self.env = env
 
+    def inspect(self):
+        return "function at memory address: " + str(hex(id(self)))
+
 
 class Ad_String_Object(Ad_Object):
     type = ObjectType.STRING

@@ -17,6 +17,7 @@ class StatementType(object):
     LIST_LITERAL = 'LIST_LITERAL'
     INDEX_EXPRESSION = 'INDEX_EXPRESSION'
     HASH_LITERAL = 'HASH_LITERAL'
+    ASSIGN_STATEMENT = 'ASSIGN_STATEMENT'
 
 
 statement_type_map = {
@@ -37,7 +38,8 @@ statement_type_map = {
     StatementType.STRING_LITERAL: 'STRING_LITERAL',
     StatementType.LIST_LITERAL: 'LIST_LITERAL',
     StatementType.INDEX_EXPRESSION: 'INDEX_EXPRESSION',
-    StatementType.HASH_LITERAL: 'HASH_LITERAL'
+    StatementType.HASH_LITERAL: 'HASH_LITERAL',
+    StatementType.ASSIGN_STATEMENT: 'ASSIGN_STATEMENT'
 }
 
 
@@ -79,6 +81,21 @@ class ASTLetStatement(ASTNode):
 
     def __str__(self):
         return 'LetStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
+
+
+class ASTAssignStatement(ASTNode):
+    type = StatementType.ASSIGN_STATEMENT
+
+    def __init__(self, token=None, name=None, value=None):
+        self.token = token
+        self.name = name
+        self.value = value
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'AssignStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
 
 
 class ASTReturnStatement(ASTNode):

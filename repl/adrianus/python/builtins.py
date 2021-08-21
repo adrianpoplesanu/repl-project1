@@ -26,9 +26,17 @@ def print_builtin(args):
 def exit_builtin(args):
     sys.exit(0)
 
+def ref_count_builtin(args):
+    print 'ref_count not available in Python implementation'
+
+def type_builtin(args):
+    return Ad_String_Object("type 'aaa'")
+
 builtins_map = {
     "len": Ad_Builtin_Object(len_builtin),
     "first": Ad_Builtin_Object(first_builtin),
     "print": Ad_Builtin_Object(print_builtin),
-    "exit": Ad_Builtin_Object(exit_builtin)
+    "exit": Ad_Builtin_Object(exit_builtin),
+    "ref_count": Ad_Builtin_Object(ref_count_builtin),
+    "type": Ad_Builtin_Object(type_builtin)
 }

@@ -5,7 +5,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
-                ASTHashLiteral, ASTWhileExpression
+                ASTHashLiteral, ASTWhileExpression, ASTAssignStatement
 
 
 class Parser(object):
@@ -32,6 +32,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
+        self.infix_parse_functions[TokenType.ASSIGN] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.ASTERISK] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.EQ] = self.parse_infix_expression
@@ -92,6 +93,8 @@ class Parser(object):
             return self.parse_let_statement()
         elif self.current_token.type == TokenType.RETURN:
             return self.parse_return_statement()
+        elif self.current_token.type == TokenType.IDENT and self.peek_token_is(TokenType.ASSIGN):
+            return self.parse_simple_assign()
         return self.parse_expression_statement()
 
     def parse_let_statement(self):
@@ -203,6 +206,10 @@ class Parser(object):
         return identifiers
 
     def parse_infix_expression(self, left):
+        #if self.current_token.type == TokenType.ASSIGN:
+        #    self.next_token()
+        #    expr = self.parse_expression_statement()
+        #    return None
         expr = ASTInfixExpression(token=self.current_token, operator=self.current_token.literal, left=left)
         precedence = self.current_precedence()
         self.next_token()
@@ -302,3 +309,15 @@ class Parser(object):
         if not self.expect_peek(TokenType.RBRACE):
             return None
         return hash
+
+    def parse_simple_assign(self):
+        # an empty ASTLetStatement because the evaluator already know what to do with it, maybe this should be a different statement
+        #stmt = ASTLetStatement()
+        stmt = ASTAssignStatement(token=self.peek_token, value=self.peek_token.literal)
+        stmt.name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        self.next_token()
+        self.next_token()
+        stmt.value = self.parse_expression(PrecedenceType.LOWEST)
+        if self.current_token_is(TokenType.SEMICOLON):
+            self.next_token()
+        return stmt
