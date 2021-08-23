@@ -465,6 +465,26 @@ std::string Ad_AST_ListLiteral::ToString() {
     return out;
 }
 
+Ad_AST_IndexExpression::Ad_AST_IndexExpression() {
+
+}
+
+Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token) {
+
+}
+
+Ad_AST_IndexExpression::~Ad_AST_IndexExpression() {
+
+}
+
+std::string Ad_AST_IndexExpression::TokenLiteral() {
+    return "todo: implement Ad_AST_IndexExpression TokenLiteral()";
+}
+
+std::string Ad_AST_IndexExpression::ToString() {
+    return "todo: implement Ad_AST_IndexExpression ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;
