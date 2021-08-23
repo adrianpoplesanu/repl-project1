@@ -79,6 +79,7 @@ public:
     std::vector<Ad_AST_Node*> ParseCallArguments();
     std::vector<Ad_AST_Node*> ParseFunctionParameters();
     std::vector<Ad_AST_Node*> ParseListExpressions();
+    Ad_AST_Node* ParseIndexExpression(Ad_AST_Node*);
 };
 
 #endif

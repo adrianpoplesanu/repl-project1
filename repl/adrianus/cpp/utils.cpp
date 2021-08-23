@@ -110,5 +110,9 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->ListLiteral " << "\n";
         break;
+        case ST_INDEX_EXPRESSION:
+            print_level(level);
+            std::cout << "->IndexExpression " << "\n";
+        break;
     }
 }

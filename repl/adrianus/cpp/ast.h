@@ -251,6 +251,7 @@ public:
 
     Ad_AST_IndexExpression();
     Ad_AST_IndexExpression(Token);
+    Ad_AST_IndexExpression(Token, Ad_AST_Node*);
     ~Ad_AST_IndexExpression();
     virtual std::string TokenLiteral();
     virtual std::string ToString();

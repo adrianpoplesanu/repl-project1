@@ -16,8 +16,8 @@ Ad_AST_Program::Ad_AST_Program() {
 
 Ad_AST_Program::~Ad_AST_Program() {
     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-        Ad_AST_Node *obj = *it;
-        free_Ad_AST_Node_memory(obj);
+        Ad_AST_Node *node = *it;
+        free_Ad_AST_Node_memory(node);
     }
 }
 
@@ -258,8 +258,8 @@ Ad_AST_CallExpression::Ad_AST_CallExpression(Token t, Ad_AST_Node* f) {
 Ad_AST_CallExpression::~Ad_AST_CallExpression() {
     free_Ad_AST_Node_memory(function);
     for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
-        Ad_AST_Node *obj = *it;
-        free_Ad_AST_Node_memory(obj);
+        Ad_AST_Node *node = *it;
+        free_Ad_AST_Node_memory(node);
     }
 }
 
@@ -333,16 +333,16 @@ Ad_AST_BlockStatement::Ad_AST_BlockStatement(Token t) {
 
 Ad_AST_BlockStatement::~Ad_AST_BlockStatement() {
     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-        Ad_AST_Node *obj = *it;
-        free_Ad_AST_Node_memory(obj);
+        Ad_AST_Node *node = *it;
+        free_Ad_AST_Node_memory(node);
     }
 }
 
 std::string Ad_AST_BlockStatement::ToString() {
     std::string out = "";
     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-        Ad_AST_Node *obj = *it;
-        out += obj->ToString();
+        Ad_AST_Node *node = *it;
+        out += node->ToString();
     }
     return out;
 }
@@ -364,9 +364,9 @@ Ad_AST_FunctionLiteral::~Ad_AST_FunctionLiteral() {
         free_Ad_AST_Node_memory(body);
     }
     for (std::vector<Ad_AST_Node*>::iterator it = parameters.begin() ; it != parameters.end(); ++it) {
-        Ad_AST_Node *obj = *it;
-        Ad_DECREF(obj); // asta merge si e super cool
-        free_Ad_AST_Node_memory(obj);
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
     }
 }
 
@@ -466,15 +466,22 @@ std::string Ad_AST_ListLiteral::ToString() {
 }
 
 Ad_AST_IndexExpression::Ad_AST_IndexExpression() {
-
+    type = ST_INDEX_EXPRESSION;
 }
 
-Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token) {
+Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t) {
+    type = ST_INDEX_EXPRESSION;
+    token = t;
+}
 
+Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t, Ad_AST_Node* l) {
+    type = ST_INDEX_EXPRESSION;
+    token = t;
+    left = l;
 }
 
 Ad_AST_IndexExpression::~Ad_AST_IndexExpression() {
-
+    free_Ad_AST_Node_memory(left);
 }
 
 std::string Ad_AST_IndexExpression::TokenLiteral() {
@@ -497,56 +504,56 @@ void Ad_DECREF(Ad_AST_Node* node){
     }
 }
 
-void free_Ad_AST_Node_memory(Ad_AST_Node* obj) {
-    if (obj == NULL) return;
-    if (obj->ref_count > 0) return;
-    switch(obj->type) {
+void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
+    if (node == NULL) return;
+    if (node->ref_count > 0) return;
+    switch(node->type) {
         case ST_LET_STATEMENT:
-            delete (Ad_AST_LetStatement*)obj;
+            delete (Ad_AST_LetStatement*)node;
         break;
         case ST_RETURN_STATEMENT:
-            delete (Ad_AST_ReturnStatement*)obj;
+            delete (Ad_AST_ReturnStatement*)node;
         break;
         case ST_EXPRESSION_STATEMENT:
-            delete (Ad_AST_ExpressionStatement*)obj;
+            delete (Ad_AST_ExpressionStatement*)node;
         break;
         case ST_IDENTIFIER:
-            delete (Ad_AST_Identifier*)obj;
+            delete (Ad_AST_Identifier*)node;
         break;
         case ST_INTEGER:
-            delete (Ad_AST_Integer*)obj;
+            delete (Ad_AST_Integer*)node;
         break;
         case ST_BOOLEAN:
-            delete (Ad_AST_Boolean*)obj;
+            delete (Ad_AST_Boolean*)node;
         break;
         case ST_INFIX_EXPRESSION:
-            delete (Ad_AST_InfixExpression*)obj;
+            delete (Ad_AST_InfixExpression*)node;
         break;
         case ST_PREFIX_EXPRESSION:
-            delete (Ad_AST_PrefixExpression*)obj;
+            delete (Ad_AST_PrefixExpression*)node;
         break;
         case ST_CALL_EXPRESSION:
-            delete (Ad_AST_CallExpression*)obj;
+            delete (Ad_AST_CallExpression*)node;
         break;
         case ST_IF_EXPRESSION:
-            delete (Ad_AST_IfExpression*)obj;
+            delete (Ad_AST_IfExpression*)node;
         break;
         case ST_BLOCK_STATEMENT:
-            delete (Ad_AST_BlockStatement*)obj;
+            delete (Ad_AST_BlockStatement*)node;
         break;
         case ST_FUNCTION_LITERAL:
-            delete (Ad_AST_FunctionLiteral*)obj;
+            delete (Ad_AST_FunctionLiteral*)node;
             // ATENTION: this needs to be deleted only when there's no env referencing it
             // this should be left in the hand of Ad_INCREF/Ad_DECREF logic and free object which deletes the AST nodes contained in Ad_Function_Object
         break;
         case ST_WHILE_EXPRESSION:
-            delete (Ad_AST_WhileExpression*)obj;
+            delete (Ad_AST_WhileExpression*)node;
         break;
         case ST_STRING_LITERAL:
-            delete (Ad_AST_String*)obj;
+            delete (Ad_AST_String*)node;
         break;
         default:
-            std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[obj->type] << "\n";
+            std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";
         break;
     }
 }

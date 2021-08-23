@@ -28,6 +28,7 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_LTE, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_GTE, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseCallExpression));
+    infixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseIndexExpression));
 }
 
 Parser::~Parser() {
@@ -235,6 +236,11 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
         return NULL;
     }
     return expr;
+}
+
+Ad_AST_Node* Parser::ParseIndexExpression(Ad_AST_Node* left) {
+    Ad_AST_IndexExpression* expr = new Ad_AST_IndexExpression(current_token, left);
+    return NULL;
 }
 
 Ad_AST_Node* Parser::ParseIfExpression() {
