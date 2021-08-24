@@ -112,7 +112,9 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
         break;
         case ST_INDEX_EXPRESSION:
             print_level(level);
-            std::cout << "->IndexExpression " << "\n";
+            std::cout << "->IndexExpression " << ((Ad_AST_WhileExpression*)node)->token.ToString() << "\n";
+            print_ast_nodes(((Ad_AST_IndexExpression*)node)->left, level + padding);
+            print_ast_nodes(((Ad_AST_IndexExpression*)node)->index, level + padding);
         break;
     }
 }

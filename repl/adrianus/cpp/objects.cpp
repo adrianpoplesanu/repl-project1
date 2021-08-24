@@ -257,6 +257,10 @@ Ad_List_Object::Ad_List_Object(std::vector<Ad_Object*> e) {
     type = OBJ_LIST;
     ref_count = 0;
     elements = e;
+    // this is not efficient
+    for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
+        Ad_INCREF(*it);
+    }
 }
 
 Ad_List_Object::~Ad_List_Object() {

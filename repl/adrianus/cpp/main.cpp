@@ -12,6 +12,7 @@
 #define RUN_PARSER_TESTS 0
 #define RUN_FUNCTION_LITERAL_TESTS 0
 #define RUN_LISTOBJECT_TESTS 0
+#define RUN_LIST_TESTS 0
 
 
 int main(int argc, char *argv[]) {
@@ -29,6 +30,9 @@ int main(int argc, char *argv[]) {
 	}
 	if (RUN_LISTOBJECT_TESTS) {
 		test_simple_list_object();
+	}
+	if (RUN_LIST_TESTS) {
+		test_list_parsing();
 	}
 	Repl repl;
 	repl.Loop();

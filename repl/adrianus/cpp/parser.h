@@ -10,11 +10,13 @@
 enum ParseType {
     PT_LOWEST,
     PT_EQUALS,
+    PT_CONDITIONAL,
     PT_LESSGREATER,
     PT_SUM,
     PT_PRODUCT,
     PT_PREFIX,
-    PT_CALL
+    PT_CALL,
+    PT_INDEX
 };
 
 std::map<TokenType, ParseType> precedences = {
@@ -24,11 +26,14 @@ std::map<TokenType, ParseType> precedences = {
     {TT_GT, PT_LESSGREATER},
     {TT_LTE, PT_LESSGREATER},
     {TT_GTE, PT_LESSGREATER},
+    {TT_AND, PT_CONDITIONAL},
+    {TT_OR, PT_CONDITIONAL},
     {TT_PLUS, PT_SUM},
     {TT_MINUS, PT_SUM},
     {TT_SLASH, PT_PRODUCT},
     {TT_ASTERISK, PT_PRODUCT},
-    {TT_LPAREN, PT_CALL}
+    {TT_LPAREN, PT_CALL},
+    {TT_LBRACKET, PT_INDEX}
 };
 
 class Parser {

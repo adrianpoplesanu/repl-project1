@@ -332,11 +332,18 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* Evaluator::EvalIndexExpression(Ad_Object* left, Ad_Object* index) {
+    if (left->type == OBJ_LIST && index->type == OBJ_INT) {
+        return EvalListIndexExpression(left, index);
+    }
+    // this should return an Ad_Error_Object
     return NULL;
 }
 
 Ad_Object* Evaluator::EvalListIndexExpression(Ad_Object* left, Ad_Object* index) {
-    return NULL;
+    int max = ((Ad_List_Object*)left)->elements.size();
+    int idx = ((Ad_Integer_Object*)index)->value;
+    if (idx < 0 || idx >= max) return NULL;
+    return ((Ad_List_Object*)left)->elements.at(idx);
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {
