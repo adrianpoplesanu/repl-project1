@@ -247,7 +247,7 @@ class Ad_AST_IndexExpression : public Ad_AST_Node {
 public:
     Token token;
     Ad_AST_Node *left;
-    int index;
+    Ad_AST_Node *index;
 
     Ad_AST_IndexExpression();
     Ad_AST_IndexExpression(Token);

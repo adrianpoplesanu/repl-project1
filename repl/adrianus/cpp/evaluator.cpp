@@ -93,6 +93,14 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return obj;
         }
         break;
+        case ST_INDEX_EXPRESSION: {
+            Ad_Object* left = Eval(((Ad_AST_IndexExpression*)node)->left, env);
+            if (IsError(left)) return left;
+            Ad_Object* index = Eval(((Ad_AST_IndexExpression*)node)->index, env);
+            if (IsError(index)) return index;
+            return EvalIndexExpression(left, index);
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -320,6 +328,14 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalIndexExpression(Ad_Object* left, Ad_Object* index) {
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalListIndexExpression(Ad_Object* left, Ad_Object* index) {
     return NULL;
 }
 

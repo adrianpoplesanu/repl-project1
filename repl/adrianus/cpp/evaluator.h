@@ -29,6 +29,8 @@ public:
     Ad_Object* EvalWhileExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalString(Ad_AST_Node*, Environment&);
     Ad_Object* EvalStringInfixExpression(std::string, Ad_Object*, Ad_Object*);
+    Ad_Object* EvalIndexExpression(Ad_Object*, Ad_Object*);
+    Ad_Object* EvalListIndexExpression(Ad_Object*, Ad_Object*);
 };
 
 #endif

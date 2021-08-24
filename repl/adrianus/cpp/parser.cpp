@@ -240,7 +240,12 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
 
 Ad_AST_Node* Parser::ParseIndexExpression(Ad_AST_Node* left) {
     Ad_AST_IndexExpression* expr = new Ad_AST_IndexExpression(current_token, left);
-    return NULL;
+    NextToken();
+    expr->index = ParseExpression(PT_LOWEST);
+    if (!ExpectPeek(TT_RBRACKET)) {
+        return NULL;
+    }
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseIfExpression() {
