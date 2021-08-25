@@ -335,6 +335,10 @@ Ad_Object* Evaluator::EvalIndexExpression(Ad_Object* left, Ad_Object* index) {
     if (left->type == OBJ_LIST && index->type == OBJ_INT) {
         return EvalListIndexExpression(left, index);
     }
+    // addig free calls here for freeing temp objects(like the index int) were allocated for evaluating an index expression
+    free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
+    free_Ad_Object_memory(index);
+
     // this should return an Ad_Error_Object
     return NULL;
 }
@@ -343,6 +347,8 @@ Ad_Object* Evaluator::EvalListIndexExpression(Ad_Object* left, Ad_Object* index)
     int max = ((Ad_List_Object*)left)->elements.size();
     int idx = ((Ad_Integer_Object*)index)->value;
     if (idx < 0 || idx >= max) return NULL;
+    free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
+    free_Ad_Object_memory(index);
     return ((Ad_List_Object*)left)->elements.at(idx);
 }
 

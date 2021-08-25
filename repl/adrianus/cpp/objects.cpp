@@ -264,7 +264,11 @@ Ad_List_Object::Ad_List_Object(std::vector<Ad_Object*> e) {
 }
 
 Ad_List_Object::~Ad_List_Object() {
-    //delete elements;
+    for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
+        Ad_Object* obj = *it;
+        Ad_DECREF(obj);
+        free_Ad_Object_memory(obj);
+    }
 }
 
 std::string Ad_List_Object::Inspect() {
@@ -333,6 +337,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_SIGNAL:
                 delete ((Ad_Signal_Object*)obj);
+            break;
+            case OBJ_LIST:
+                delete ((Ad_List_Object*)obj);
             break;
             default:
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";

@@ -448,7 +448,10 @@ Ad_AST_ListLiteral::Ad_AST_ListLiteral(Token t) {
 }
 
 Ad_AST_ListLiteral::~Ad_AST_ListLiteral() {
-    // TODO: implement this
+    for (std::vector<Ad_AST_Node*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        free_Ad_AST_Node_memory(node);
+    }
 }
 
 std::string Ad_AST_ListLiteral::TokenLiteral() {
@@ -467,21 +470,25 @@ std::string Ad_AST_ListLiteral::ToString() {
 
 Ad_AST_IndexExpression::Ad_AST_IndexExpression() {
     type = ST_INDEX_EXPRESSION;
+    ref_count = 0;
 }
 
 Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t) {
     type = ST_INDEX_EXPRESSION;
+    ref_count = 0;
     token = t;
 }
 
 Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t, Ad_AST_Node* l) {
     type = ST_INDEX_EXPRESSION;
+    ref_count = 0;
     token = t;
     left = l;
 }
 
 Ad_AST_IndexExpression::~Ad_AST_IndexExpression() {
     free_Ad_AST_Node_memory(left);
+    free_Ad_AST_Node_memory(index);
 }
 
 std::string Ad_AST_IndexExpression::TokenLiteral() {
@@ -551,6 +558,12 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_STRING_LITERAL:
             delete (Ad_AST_String*)node;
+        break;
+        case ST_LIST_LITERAL:
+            delete (Ad_AST_ListLiteral*)node;
+        break;
+        case ST_INDEX_EXPRESSION:
+            delete (Ad_AST_IndexExpression*)node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";
