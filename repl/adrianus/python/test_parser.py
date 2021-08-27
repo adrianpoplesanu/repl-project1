@@ -21,3 +21,12 @@ def test_parser2():
     program.reset()
     parser.build_program_statements(program)
     print_ast_nodes(program, 0)
+
+def test_parser3():
+    source = "let a = [1, 2, 3]; a[0];"
+    parser = Parser()
+    program = ASTProgram()
+    parser.reset(source=source)
+    program.reset()
+    parser.build_program_statements(program)
+    print_ast_nodes(program, 0)

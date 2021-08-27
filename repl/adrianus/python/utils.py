@@ -57,6 +57,12 @@ def print_ast_nodes(node, level):
         print '->WhileExpression ' + str(node.token)
         print_ast_nodes(node.condition, level + 2)
         print_ast_nodes(node.consequence, level + 2)
+    elif node.type == StatementType.LIST_LITERAL:
+        print '->ListLiteral'
+    elif node.type == StatementType.INDEX_EXPRESSION:
+        print '->IndexExpression ' + str(node.token)
+        print_ast_nodes(node.left, level + 2)
+        print_ast_nodes(node.index, level + 2)
     else:
         print 'ERROR: print ast node unknow type'
 

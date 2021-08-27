@@ -5,6 +5,7 @@ from object_type import ObjectType
 from ast import StatementType
 from environment import new_enclosed_environment
 from builtins import builtins_map
+from utils import print_ast_nodes
 
 TRUE = Ad_Boolean_Object(value=True)
 FALSE = Ad_Boolean_Object(value=False)
@@ -287,7 +288,6 @@ class Evaluator(object):
         if idx < 0 or idx > max:
             return None
         return list_obj.elements[idx]
-
 
     def eval_hash_literal(self, node, env):
         pairs = {}
