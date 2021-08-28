@@ -44,6 +44,7 @@ class Parser(object):
         self.infix_parse_functions[TokenType.AND] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.OR] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.LPAREN] = self.parse_call_expression
+        self.infix_parse_functions[TokenType.ASSIGN] = self.parse_assign_expression
         self.infix_parse_functions[TokenType.LBRACKET] = self.parse_index_expression
 
     def reset(self, source):
@@ -312,6 +313,15 @@ class Parser(object):
         stmt = ASTAssignStatement(token=self.peek_token, value=self.peek_token.literal)
         stmt.name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
         self.next_token()
+        self.next_token()
+        stmt.value = self.parse_expression(PrecedenceType.LOWEST)
+        if self.current_token_is(TokenType.SEMICOLON):
+            self.next_token()
+        return stmt
+
+    def parse_assign_expression(self, left):
+        stmt = ASTAssignStatement(token=self.current_token, value=self.current_token.literal)
+        stmt.name = left
         self.next_token()
         stmt.value = self.parse_expression(PrecedenceType.LOWEST)
         if self.current_token_is(TokenType.SEMICOLON):

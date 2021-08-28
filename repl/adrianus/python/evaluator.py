@@ -23,9 +23,7 @@ class Evaluator(object):
             env.set(node.name.value, obj)
             return None
         elif node.type == StatementType.ASSIGN_STATEMENT:
-            obj = self.eval(node.value, env)
-            env.set(node.name.value, obj)
-            return None
+            return self.eval_assign_statement(node, env)
         elif node.type == StatementType.RETURN_STATEMENT:
             val = self.eval(node.value, env)
             obj = Ad_ReturnValue_Object(value=val)
@@ -307,3 +305,23 @@ class Evaluator(object):
         hashed = index.hash_key()
         pair = left.pairs[hashed.value]
         return pair.value
+
+    def eval_assign_statement(self, node, env):
+        if node.name.type == StatementType.INDEX_EXPRESSION:
+            self.eval_index_expression_assing(node, env)
+        else:
+            obj = self.eval(node.value, env)
+            env.set(node.name.value, obj)
+        return None
+
+    def eval_index_expression_assing(self, node, env):
+        list_obj = self.eval(node.name.left, env)
+        if self.is_error(list_obj):
+            return list_obj
+        index = self.eval(node.name.index, env)
+        if self.is_error(index):
+            return index
+        idx = index.value
+        obj = self.eval(node.value, env)
+        list_obj.elements[idx] = obj
+        return None

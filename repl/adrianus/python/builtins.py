@@ -32,11 +32,18 @@ def ref_count_builtin(args):
 def type_builtin(args):
     return Ad_String_Object("type 'aaa'")
 
+def append_builtin(args):
+    list_obj = args[0]
+    obj = args[1]
+    if list_obj.type == ObjectType.LIST:
+        list_obj.elements.append(obj)
+
 builtins_map = {
     "len": Ad_Builtin_Object(len_builtin),
     "first": Ad_Builtin_Object(first_builtin),
     "print": Ad_Builtin_Object(print_builtin),
     "exit": Ad_Builtin_Object(exit_builtin),
     "ref_count": Ad_Builtin_Object(ref_count_builtin),
-    "type": Ad_Builtin_Object(type_builtin)
+    "type": Ad_Builtin_Object(type_builtin),
+    "append": Ad_Builtin_Object(append_builtin)
 }

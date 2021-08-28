@@ -2,16 +2,18 @@ from token_type import TokenType
 
 class PrecedenceType(object):
     LOWEST = 1
-    EQUALS = 2
-    CONDITIONAL = 3
-    LESSGREATER = 4
-    SUM = 5
-    PRODUCT = 6
-    PREFIX = 7
-    CALL = 8
-    INDEX = 9
+    ASSIGN = 2
+    EQUALS = 3
+    CONDITIONAL = 4
+    LESSGREATER = 5
+    SUM = 6
+    PRODUCT = 7
+    PREFIX = 8
+    CALL = 9
+    INDEX = 10
 
 precedences = {
+    TokenType.ASSIGN: PrecedenceType.ASSIGN,
     TokenType.EQ: PrecedenceType.EQUALS,
     TokenType.NOT_EQ: PrecedenceType.EQUALS,
     TokenType.LT: PrecedenceType.LESSGREATER,
