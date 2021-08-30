@@ -94,8 +94,6 @@ class Parser(object):
             return self.parse_let_statement()
         elif self.current_token.type == TokenType.RETURN:
             return self.parse_return_statement()
-        elif self.current_token.type == TokenType.IDENT and self.peek_token_is(TokenType.ASSIGN):
-            return self.parse_simple_assign()
         return self.parse_expression_statement()
 
     def parse_let_statement(self):
@@ -306,18 +304,6 @@ class Parser(object):
         if not self.expect_peek(TokenType.RBRACE):
             return None
         return hash
-
-    def parse_simple_assign(self):
-        # an empty ASTLetStatement because the evaluator already know what to do with it, maybe this should be a different statement
-        #stmt = ASTLetStatement()
-        stmt = ASTAssignStatement(token=self.peek_token, value=self.peek_token.literal)
-        stmt.name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
-        self.next_token()
-        self.next_token()
-        stmt.value = self.parse_expression(PrecedenceType.LOWEST)
-        if self.current_token_is(TokenType.SEMICOLON):
-            self.next_token()
-        return stmt
 
     def parse_assign_expression(self, left):
         stmt = ASTAssignStatement(token=self.current_token, value=self.current_token.literal)
