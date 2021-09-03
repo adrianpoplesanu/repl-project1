@@ -499,6 +499,31 @@ std::string Ad_AST_IndexExpression::ToString() {
     return "todo: implement Ad_AST_IndexExpression ToString()";
 }
 
+
+Ad_AST_HashLiteral::Ad_AST_HashLiteral() {
+
+}
+
+Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token) {
+
+}
+
+Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token, std::map<Ad_AST_Node*, Ad_AST_Node*>) {
+
+}
+
+Ad_AST_HashLiteral::~Ad_AST_HashLiteral() {
+
+}
+
+std::string Ad_AST_HashLiteral::TokenLiteral() {
+    return "todo: implement Ad_AST_HashLiteral TokenLiteral()";
+}
+
+std::string Ad_AST_HashLiteral::ToString() {
+    return "todo: implement Ad_AST_HashLiteral ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;

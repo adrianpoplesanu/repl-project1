@@ -22,7 +22,8 @@ enum StatementType {
     ST_WHILE_EXPRESSION,
     ST_STRING_LITERAL,
     ST_LIST_LITERAL,
-    ST_INDEX_EXPRESSION
+    ST_INDEX_EXPRESSION,
+    ST_HASH_LITERAL
 };
 
 std::map<StatementType, std::string> statement_type_map = {
@@ -42,7 +43,8 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_WHILE_EXPRESSION, "WhileExpression"},
     {ST_STRING_LITERAL, "StringLiteral"},
     {ST_LIST_LITERAL, "ListLiteral"},
-    {ST_INDEX_EXPRESSION, "IndexExpression"}
+    {ST_INDEX_EXPRESSION, "IndexExpression"},
+    {ST_HASH_LITERAL, "HashLiteral"}
 };
 
 class Ad_AST_Node {
@@ -253,6 +255,19 @@ public:
     Ad_AST_IndexExpression(Token);
     Ad_AST_IndexExpression(Token, Ad_AST_Node*);
     ~Ad_AST_IndexExpression();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_HashLiteral : public Ad_AST_Node {
+public:
+    Token token;
+    std::map<Ad_AST_Node*, Ad_AST_Node*> pairs;
+
+    Ad_AST_HashLiteral();
+    Ad_AST_HashLiteral(Token);
+    Ad_AST_HashLiteral(Token, std::map<Ad_AST_Node*, Ad_AST_Node*>);
+    ~Ad_AST_HashLiteral();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
 };

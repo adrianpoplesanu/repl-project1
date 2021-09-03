@@ -17,6 +17,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
     prefixParseFns.insert(std::make_pair(TT_STRING, &Parser::ParseStringLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseListLiteral));
+    prefixParseFns.insert(std::make_pair(TT_LBRACE, &Parser::ParseHashLiteral));
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -393,6 +394,27 @@ std::vector<Ad_AST_Node*> Parser::ParseListExpressions() {
         return empty;
     }
     return elements;
+}
+
+Ad_AST_Node* Parser::ParseHashLiteral() {
+    Ad_AST_HashLiteral* hash = new Ad_AST_HashLiteral(current_token);
+    while (!PeekTokenIs(TT_RBRACE)) {
+        NextToken();
+        Ad_AST_Node* key = ParseExpression(PT_LOWEST);
+        if (!ExpectPeek(TT_COLON)) {
+            return NULL;
+        }
+        NextToken();
+        Ad_AST_Node* value = ParseExpression(PT_LOWEST);
+        hash->pairs.insert(std::make_pair(key, value));
+        if (!PeekTokenIs(TT_RBRACE) && !ExpectPeek(TT_COMMA)) {
+            return NULL;
+        }
+    }
+    if (!ExpectPeek(TT_RBRACE)) {
+        return NULL;
+    }
+    return hash;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {

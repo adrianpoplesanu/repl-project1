@@ -169,4 +169,16 @@ public:
 	virtual Ad_Object_Type Type();
 };
 
+class Ad_Hash_Object : public Ad_Object {
+public:
+	std::map<Ad_Object*, Ad_Object*> pairs; // do i need a HashPair implementation also?
+
+	Ad_Hash_Object();
+	Ad_Hash_Object(std::map<Ad_Object*, Ad_Object*>);
+	~Ad_Hash_Object();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+};
+
 #endif

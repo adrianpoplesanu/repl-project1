@@ -81,6 +81,7 @@ public:
     Ad_AST_Node* ParseWhileExpression();
     Ad_AST_Node* ParseStringLiteral();
     Ad_AST_Node* ParseListLiteral();
+    Ad_AST_Node* ParseHashLiteral();
     std::vector<Ad_AST_Node*> ParseCallArguments();
     std::vector<Ad_AST_Node*> ParseFunctionParameters();
     std::vector<Ad_AST_Node*> ParseListExpressions();
