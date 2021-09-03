@@ -18,7 +18,8 @@ enum Ad_Object_Type {
 	OBJ_ERROR,
 	OBJ_BUILTIN,
 	OBJ_SIGNAL,
-	OBJ_LIST
+	OBJ_LIST,
+	OBJ_HASH
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
@@ -32,7 +33,8 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_ERROR, "ErrorObject"},
 	{OBJ_BUILTIN, "BuiltinObject"},
 	{OBJ_SIGNAL, "SignalObject"},
-	{OBJ_LIST, "ListObject"}
+	{OBJ_LIST, "ListObject"},
+	{OBJ_HASH, "HashObject"}
 };
 
 class Ad_Object {

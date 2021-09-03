@@ -149,6 +149,10 @@ Token Lexer::NextToken() {
             token.type = TT_RBRACE;
             token.literal = current_char;
         break;
+        case ':':
+            token.type = TT_COLON;
+            token.literal = current_char;
+        break;
         case '"':
             token.type = TT_STRING;
             token.literal = ReadString();

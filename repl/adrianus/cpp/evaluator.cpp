@@ -101,6 +101,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalIndexExpression(left, index);
         }
         break;
+        case ST_HASH_LITERAL: {
+            std::cout << "evaluating a hash\n";
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;

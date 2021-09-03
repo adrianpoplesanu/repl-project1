@@ -501,19 +501,25 @@ std::string Ad_AST_IndexExpression::ToString() {
 
 
 Ad_AST_HashLiteral::Ad_AST_HashLiteral() {
-
+    type = ST_HASH_LITERAL;
+    ref_count = 0;
 }
 
-Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token) {
-
+Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token t) {
+    type = ST_HASH_LITERAL;
+    ref_count = 0;
+    token = t;
 }
 
-Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token, std::map<Ad_AST_Node*, Ad_AST_Node*>) {
-
+Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token t, std::map<Ad_AST_Node*, Ad_AST_Node*> p) {
+    type = ST_HASH_LITERAL;
+    ref_count = 0;
+    token = t;
+    pairs = p;
 }
 
 Ad_AST_HashLiteral::~Ad_AST_HashLiteral() {
-
+    std::cout << "destructor for Ad_AST_HashLiteral not implemented yet\n";
 }
 
 std::string Ad_AST_HashLiteral::TokenLiteral() {

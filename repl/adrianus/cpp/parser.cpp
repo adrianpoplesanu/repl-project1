@@ -406,6 +406,8 @@ Ad_AST_Node* Parser::ParseHashLiteral() {
         }
         NextToken();
         Ad_AST_Node* value = ParseExpression(PT_LOWEST);
+        //Ad_INCREF(key);
+        //Ad_INCREF(value);
         hash->pairs.insert(std::make_pair(key, value));
         if (!PeekTokenIs(TT_RBRACE) && !ExpectPeek(TT_COMMA)) {
             return NULL;

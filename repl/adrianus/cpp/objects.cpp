@@ -291,6 +291,33 @@ Ad_Object_Type Ad_List_Object::Type() {
     return type;
 }
 
+Ad_Hash_Object::Ad_Hash_Object() {
+    type = OBJ_HASH;
+    ref_count = 0;
+}
+
+Ad_Hash_Object::Ad_Hash_Object(std::map<Ad_Object*, Ad_Object*> p) {
+    type = OBJ_HASH;
+    ref_count = 0;
+    pairs = p;
+}
+
+Ad_Hash_Object::~Ad_Hash_Object() {
+    // TODO: implement destructor for Ad_Hash_Object
+}
+
+std::string Ad_Hash_Object::Inspect() {
+    return "todo: implmement Inspect() in Ad_Hash_Object";
+}
+
+void Ad_Hash_Object::Print() {
+    std::cout << "todo: implement Print() in Ad_Hash_Object\n";
+}
+
+Ad_Object_Type Ad_Hash_Object::Type() {
+    return type;
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
