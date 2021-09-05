@@ -103,6 +103,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_HASH_LITERAL: {
             std::cout << "evaluating a hash\n";
+            return EvalHashLiteral(node, env);
         }
         break;
         default:
@@ -339,6 +340,9 @@ Ad_Object* Evaluator::EvalIndexExpression(Ad_Object* left, Ad_Object* index) {
     if (left->type == OBJ_LIST && index->type == OBJ_INT) {
         return EvalListIndexExpression(left, index);
     }
+    if (left->type == OBJ_HASH) {
+        return EvalHashIndexExpression(left, index);
+    }
     // addig free calls here for freeing temp objects(like the index int) were allocated for evaluating an index expression
     free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
     free_Ad_Object_memory(index);
@@ -354,6 +358,36 @@ Ad_Object* Evaluator::EvalListIndexExpression(Ad_Object* left, Ad_Object* index)
     free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
     free_Ad_Object_memory(index);
     return ((Ad_List_Object*)left)->elements.at(idx);
+}
+
+Ad_Object* Evaluator::EvalHashLiteral(Ad_AST_Node* node, Environment &env) {
+    std::map<std::string, Ad_Object*> pairs;
+    for(std::map<Ad_AST_Node*, Ad_AST_Node*>::iterator it = ((Ad_AST_HashLiteral*)node)->pairs.begin(); it != ((Ad_AST_HashLiteral*)node)->pairs.end(); ++it) {
+        std::cout << it->first->ToString() << "\n";
+        std::cout << it->second->ToString() << "\n";
+        Ad_Object* key = Eval(it->first, env);
+        if (IsError(key)) {
+            return key;
+        }
+        Ad_Object* value = Eval(it->second, env);
+        Ad_INCREF(value);
+        if (IsError(value)) {
+            return value;
+        }
+        //pairs.insert(std::make_pair(std::hash<std::string>(key->Inspect()), value));
+        pairs.insert(std::make_pair("some hash function output", value));
+    }
+    Ad_Hash_Object* hash = new Ad_Hash_Object(pairs);
+    return hash;
+}
+
+Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index) {
+    // TODO: check this and rewrite
+    std::cout << "eval hash index expression\n";
+    std::cout << left->Inspect() << "\n";
+    std::cout << index->Inspect() << "\n";
+    //return ((Ad_Hash_Object*)left)->pairs[std::hash<std::string>(index->Inspect())];
+    return ((Ad_Hash_Object*)left)->pairs["some hash function output"];
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

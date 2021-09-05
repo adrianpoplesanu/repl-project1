@@ -31,6 +31,8 @@ public:
     Ad_Object* EvalStringInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalIndexExpression(Ad_Object*, Ad_Object*);
     Ad_Object* EvalListIndexExpression(Ad_Object*, Ad_Object*);
+    Ad_Object* EvalHashLiteral(Ad_AST_Node*, Environment&);
+    Ad_Object* EvalHashIndexExpression(Ad_Object*, Ad_Object*);
 };
 
 #endif

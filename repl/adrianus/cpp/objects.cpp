@@ -296,7 +296,7 @@ Ad_Hash_Object::Ad_Hash_Object() {
     ref_count = 0;
 }
 
-Ad_Hash_Object::Ad_Hash_Object(std::map<Ad_Object*, Ad_Object*> p) {
+Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, Ad_Object*> p) {
     type = OBJ_HASH;
     ref_count = 0;
     pairs = p;
@@ -307,7 +307,12 @@ Ad_Hash_Object::~Ad_Hash_Object() {
 }
 
 std::string Ad_Hash_Object::Inspect() {
-    return "todo: implmement Inspect() in Ad_Hash_Object";
+    std::string out = "{";
+    for(std::map<std::string, Ad_Object*>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+        out += it->first + ": " + it->second->Inspect();
+    }
+    out += "}";
+    return out;
 }
 
 void Ad_Hash_Object::Print() {

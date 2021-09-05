@@ -173,10 +173,10 @@ public:
 
 class Ad_Hash_Object : public Ad_Object {
 public:
-	std::map<Ad_Object*, Ad_Object*> pairs; // do i need a HashPair implementation also?
+	std::map<std::string, Ad_Object*> pairs; // do i need a HashPair implementation also? the answer is yes, i do need it
 
 	Ad_Hash_Object();
-	Ad_Hash_Object(std::map<Ad_Object*, Ad_Object*>);
+	Ad_Hash_Object(std::map<std::string, Ad_Object*>);
 	~Ad_Hash_Object();
 	virtual std::string Inspect();
 	virtual void Print();
