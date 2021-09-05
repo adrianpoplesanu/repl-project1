@@ -1,12 +1,20 @@
 package com.ad.evaluator;
 
 import com.ad.ast.AstNode;
+import com.ad.ast.AstProgram;
 import com.ad.environment.Environment;
+import com.ad.objects.AdBooleanObject;
 import com.ad.objects.AdObject;
 
 public class Evaluator {
-    public AdObject eval(AstNode node, Environment env) {
+	public static AdBooleanObject TrueObject = new AdBooleanObject(true);
+	public static AdBooleanObject FalseObject = new AdBooleanObject(false);
+	
+    public AdObject eval(AstNode node, Environment env) {    	
     	switch(node.getType()) {
+		case PROGRAM:
+			evalProgram((AstProgram)node, env);
+			break;
 		case BLOCK_STATEMENT:
 			System.out.println("eval BlockStatement");
 			break;
@@ -40,9 +48,6 @@ public class Evaluator {
 		case PREFIX_EXPRESSION:
 			System.out.println("eval PrefixExpression");
 			break;
-		case PROGRAM:
-			System.out.println("eval Program");
-			break;
 		case RETURN_STATEMENT:
 			System.out.println("eval ReturnStatement");
 			break;
@@ -56,5 +61,11 @@ public class Evaluator {
 			break;
     	}
     	return null;
+    }
+    
+    private void evalProgram(AstProgram program, Environment env) {
+    	for (AstNode stmt : program.statements) {
+    		AdObject result = eval(stmt, env);
+    	}
     }
 }
