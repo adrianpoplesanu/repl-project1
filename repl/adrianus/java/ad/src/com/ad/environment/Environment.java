@@ -29,8 +29,8 @@ public class Environment {
 		return null;
 	}
 	
-	public void set() {
-		
+	public void set(String key, AdObject value) {
+		store.put(key, value);
 	}
 	
 	public static Environment newEnvironment() {

@@ -39,7 +39,7 @@ public class AstBoolean extends AstNode {
 		this.token = token;
 	}
 
-	public boolean isValue() {
+	public boolean getValue() {
 		return value;
 	}
 
