@@ -59,7 +59,7 @@ Ad_Object_Type Ad_Integer_Object::Type() {
 }
 
 std::string Ad_Integer_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {

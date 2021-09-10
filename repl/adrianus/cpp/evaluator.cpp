@@ -374,20 +374,17 @@ Ad_Object* Evaluator::EvalHashLiteral(Ad_AST_Node* node, Environment &env) {
         if (IsError(value)) {
             return value;
         }
-        //pairs.insert(std::make_pair(std::hash<std::string>(key->Inspect()), value));
-        pairs.insert(std::make_pair("some hash function output", value));
+        std::hash<std::string> hash_string;
+        pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), value)); // value needs to be a HashPair
     }
     Ad_Hash_Object* hash = new Ad_Hash_Object(pairs);
     return hash;
 }
 
 Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index) {
-    // TODO: check this and rewrite
-    std::cout << "eval hash index expression\n";
-    std::cout << left->Inspect() << "\n";
-    std::cout << index->Inspect() << "\n";
-    //return ((Ad_Hash_Object*)left)->pairs[std::hash<std::string>(index->Inspect())];
-    return ((Ad_Hash_Object*)left)->pairs["some hash function output"];
+    std::hash<std::string> hash_string;
+
+    return ((Ad_Hash_Object*)left)->pairs[std::to_string(hash_string(index->Hash()))];
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {
