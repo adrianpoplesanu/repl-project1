@@ -45,6 +45,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_Null_Object : public Ad_Object {
@@ -62,6 +63,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_Boolean_Object : public Ad_Object {
@@ -73,6 +75,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_String_Object : public Ad_Object {
@@ -84,6 +87,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_ReturnValue_Object : public Ad_Object {
@@ -97,6 +101,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Environment; // forward declaration for Environment
@@ -114,6 +119,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_Error_Object : public Ad_Object {
@@ -125,6 +131,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 void Ad_INCREF(Ad_Object*);
@@ -144,6 +151,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_Signal_Object : public Ad_Object {
@@ -154,6 +162,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 //class Ad_List;
@@ -169,6 +178,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_Hash_Object : public Ad_Object {
@@ -181,6 +191,7 @@ public:
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 #endif

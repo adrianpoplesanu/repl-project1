@@ -3,6 +3,7 @@ all:
 	g++ -g -std=c++11 lexer.cpp -c -o lexer.o
 	g++ -g -std=c++11 ast.cpp -c -o ast.o
 	g++ -g -std=c++11 parser.cpp -c -o parser.o
+	g++ -g -std=c++11 hashpair.cpp -c -o hashpair.o
 	g++ -g -std=c++11 objects.cpp -c -o objects.o
 	g++ -g -std=c++11 listobject.cpp -c -o listobject.o
 	g++ -g -std=c++11 environment.cpp -c -o environment.o

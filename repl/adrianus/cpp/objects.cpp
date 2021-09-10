@@ -19,6 +19,10 @@ Ad_Object_Type Ad_Object::Type() {
     return OBJ_NULL;
 }
 
+std::string Ad_Object::Hash() {
+    return "not implementd Hash() in subclass";
+}
+
 Ad_Null_Object::Ad_Null_Object() {
     type = OBJ_NULL;
     ref_count = 0; // maybe this should be 1 and decreased along the way?
@@ -54,6 +58,10 @@ Ad_Object_Type Ad_Integer_Object::Type() {
     return type;
 }
 
+std::string Ad_Integer_Object::Hash() {
+    return "unimplemented yet";
+}
+
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {
     type = OBJ_RETURN_VALUE;
     ref_count = 0;
@@ -77,6 +85,10 @@ void Ad_ReturnValue_Object::Print() {
 
 Ad_Object_Type Ad_ReturnValue_Object::Type() {
     return type;
+}
+
+std::string Ad_ReturnValue_Object::Hash() {
+    return "unimplemented yet";
 }
 
 Ad_Boolean_Object::Ad_Boolean_Object() {
@@ -106,6 +118,10 @@ void Ad_Boolean_Object::Print() {
 
 Ad_Object_Type Ad_Boolean_Object::Type() {
     return type;
+}
+
+std::string Ad_Boolean_Object::Hash() {
+    return "unimplemented yet";
 }
 
 Ad_Function_Object::Ad_Function_Object() {
@@ -155,6 +171,10 @@ Ad_Object_Type Ad_Function_Object::Type() {
     return type;
 }
 
+std::string Ad_Function_Object::Hash() {
+    return "unimplemented yet";
+}
+
 Ad_String_Object::Ad_String_Object() {
     type = OBJ_STRING;
     ref_count = 0;
@@ -176,6 +196,10 @@ void Ad_String_Object::Print() {
 
 Ad_Object_Type Ad_String_Object::Type() {
     return type;
+}
+
+std::string Ad_String_Object::Hash() {
+    return "unimplemented yet";
 }
 
 Ad_Error_Object::Ad_Error_Object() {
@@ -201,6 +225,10 @@ void Ad_Error_Object::Print() {
 
 Ad_Object_Type Ad_Error_Object::Type() {
     return type;
+}
+
+std::string Ad_Error_Object::Hash() {
+    return "unimplemented yet";
 }
 
 Ad_Builtin_Object::Ad_Builtin_Object() {
@@ -230,6 +258,10 @@ Ad_Object_Type Ad_Builtin_Object::Type() {
     return type;
 }
 
+std::string Ad_Builtin_Object::Hash() {
+    return "unimplemented yet";
+}
+
 Ad_Signal_Object::Ad_Signal_Object() {
     type = OBJ_SIGNAL;
     ref_count = 0;
@@ -245,6 +277,10 @@ void Ad_Signal_Object::Print() {
 
 Ad_Object_Type Ad_Signal_Object::Type() {
     return type;
+}
+
+std::string Ad_Signal_Object::Hash() {
+    return "unimplemented yet";
 }
 
 Ad_List_Object::Ad_List_Object() {
@@ -291,6 +327,10 @@ Ad_Object_Type Ad_List_Object::Type() {
     return type;
 }
 
+std::string Ad_List_Object::Hash() {
+    return "unimplemented yet";
+}
+
 Ad_Hash_Object::Ad_Hash_Object() {
     type = OBJ_HASH;
     ref_count = 0;
@@ -321,6 +361,10 @@ void Ad_Hash_Object::Print() {
 
 Ad_Object_Type Ad_Hash_Object::Type() {
     return type;
+}
+
+std::string Ad_Hash_Object::Hash() {
+    return "unimplemented yet";
 }
 
 void Ad_INCREF(Ad_Object* obj) {
