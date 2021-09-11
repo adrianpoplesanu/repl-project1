@@ -88,7 +88,7 @@ Ad_Object_Type Ad_ReturnValue_Object::Type() {
 }
 
 std::string Ad_ReturnValue_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_Boolean_Object::Ad_Boolean_Object() {
@@ -121,7 +121,7 @@ Ad_Object_Type Ad_Boolean_Object::Type() {
 }
 
 std::string Ad_Boolean_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_Function_Object::Ad_Function_Object() {
@@ -172,7 +172,7 @@ Ad_Object_Type Ad_Function_Object::Type() {
 }
 
 std::string Ad_Function_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();;
 }
 
 Ad_String_Object::Ad_String_Object() {
@@ -199,7 +199,7 @@ Ad_Object_Type Ad_String_Object::Type() {
 }
 
 std::string Ad_String_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_Error_Object::Ad_Error_Object() {
@@ -228,7 +228,7 @@ Ad_Object_Type Ad_Error_Object::Type() {
 }
 
 std::string Ad_Error_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_Builtin_Object::Ad_Builtin_Object() {
@@ -259,7 +259,7 @@ Ad_Object_Type Ad_Builtin_Object::Type() {
 }
 
 std::string Ad_Builtin_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_Signal_Object::Ad_Signal_Object() {
@@ -280,7 +280,7 @@ Ad_Object_Type Ad_Signal_Object::Type() {
 }
 
 std::string Ad_Signal_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_List_Object::Ad_List_Object() {
@@ -328,7 +328,7 @@ Ad_Object_Type Ad_List_Object::Type() {
 }
 
 std::string Ad_List_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_Hash_Object::Ad_Hash_Object() {
@@ -336,7 +336,7 @@ Ad_Hash_Object::Ad_Hash_Object() {
     ref_count = 0;
 }
 
-Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, Ad_Object*> p) {
+Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, HashPair> p) {
     type = OBJ_HASH;
     ref_count = 0;
     pairs = p;
@@ -348,8 +348,9 @@ Ad_Hash_Object::~Ad_Hash_Object() {
 
 std::string Ad_Hash_Object::Inspect() {
     std::string out = "{";
-    for(std::map<std::string, Ad_Object*>::iterator it = pairs.begin(); it != pairs.end(); it++) {
-        out += it->first + ": " + it->second->Inspect();
+    for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+        //out += it->first + ": " + it->second->Inspect();
+        out += it->second.key->Inspect() + ": " + it->second.value->Inspect();
     }
     out += "}";
     return out;
@@ -364,7 +365,7 @@ Ad_Object_Type Ad_Hash_Object::Type() {
 }
 
 std::string Ad_Hash_Object::Hash() {
-    return "unimplemented yet";
+    return object_type_map[type] + Inspect();
 }
 
 void Ad_INCREF(Ad_Object* obj) {

@@ -7,6 +7,7 @@
 #include <vector>
 #include "ast.h"
 #include "signal.h"
+#include "hashpair.h"
 
 enum Ad_Object_Type {
 	OBJ_NULL,
@@ -183,10 +184,10 @@ public:
 
 class Ad_Hash_Object : public Ad_Object {
 public:
-	std::map<std::string, Ad_Object*> pairs; // do i need a HashPair implementation also? the answer is yes, i do need it
+	std::map<std::string, HashPair> pairs; // do i need a HashPair implementation also? the answer is yes, i do need it
 
 	Ad_Hash_Object();
-	Ad_Hash_Object(std::map<std::string, Ad_Object*>);
+	Ad_Hash_Object(std::map<std::string, HashPair>);
 	~Ad_Hash_Object();
 	virtual std::string Inspect();
 	virtual void Print();

@@ -1,4 +1,5 @@
 #include "evaluator.h"
+#include "hashpair.cpp" // nu-mi place importul asta, as fi preferat sa import doar headerul
 #include "builtins.cpp"
 
 Ad_Null_Object NULLOBJECT;
@@ -102,7 +103,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_HASH_LITERAL: {
-            std::cout << "evaluating a hash\n";
             return EvalHashLiteral(node, env);
         }
         break;
@@ -361,21 +361,21 @@ Ad_Object* Evaluator::EvalListIndexExpression(Ad_Object* left, Ad_Object* index)
 }
 
 Ad_Object* Evaluator::EvalHashLiteral(Ad_AST_Node* node, Environment &env) {
-    std::map<std::string, Ad_Object*> pairs;
+    std::map<std::string, HashPair> pairs;
     for(std::map<Ad_AST_Node*, Ad_AST_Node*>::iterator it = ((Ad_AST_HashLiteral*)node)->pairs.begin(); it != ((Ad_AST_HashLiteral*)node)->pairs.end(); ++it) {
-        std::cout << it->first->ToString() << "\n";
-        std::cout << it->second->ToString() << "\n";
         Ad_Object* key = Eval(it->first, env);
         if (IsError(key)) {
             return key;
         }
         Ad_Object* value = Eval(it->second, env);
+        Ad_INCREF(key);
         Ad_INCREF(value);
         if (IsError(value)) {
             return value;
         }
         std::hash<std::string> hash_string;
-        pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), value)); // value needs to be a HashPair
+        HashPair hash_pair(key, value);
+        pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair)); // value needs to be a HashPair
     }
     Ad_Hash_Object* hash = new Ad_Hash_Object(pairs);
     return hash;
@@ -384,7 +384,7 @@ Ad_Object* Evaluator::EvalHashLiteral(Ad_AST_Node* node, Environment &env) {
 Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index) {
     std::hash<std::string> hash_string;
 
-    return ((Ad_Hash_Object*)left)->pairs[std::to_string(hash_string(index->Hash()))];
+    return ((Ad_Hash_Object*)left)->pairs[std::to_string(hash_string(index->Hash()))].value;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {
