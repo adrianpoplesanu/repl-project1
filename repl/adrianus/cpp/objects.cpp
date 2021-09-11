@@ -187,7 +187,7 @@ Ad_String_Object::Ad_String_Object(std::string val) {
 }
 
 std::string Ad_String_Object::Inspect() {
-    return value;
+    return "\"" + value + "\"";
 }
 
 void Ad_String_Object::Print() {
@@ -348,8 +348,10 @@ Ad_Hash_Object::~Ad_Hash_Object() {
 
 std::string Ad_Hash_Object::Inspect() {
     std::string out = "{";
+    bool displayed_first = false;
     for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
-        //out += it->first + ": " + it->second->Inspect();
+        if (displayed_first) out += ", ";
+        else displayed_first = true;
         out += it->second.key->Inspect() + ": " + it->second.value->Inspect();
     }
     out += "}";
