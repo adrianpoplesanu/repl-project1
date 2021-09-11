@@ -383,8 +383,11 @@ Ad_Object* Evaluator::EvalHashLiteral(Ad_AST_Node* node, Environment &env) {
 
 Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index) {
     std::hash<std::string> hash_string;
+    Ad_Object* result = ((Ad_Hash_Object*)left)->pairs[std::to_string(hash_string(index->Hash()))].value;
 
-    return ((Ad_Hash_Object*)left)->pairs[std::to_string(hash_string(index->Hash()))].value;
+    free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
+    free_Ad_Object_memory(index);
+    return result;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

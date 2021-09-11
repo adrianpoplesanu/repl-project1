@@ -519,7 +519,12 @@ Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token t, std::map<Ad_AST_Node*, Ad_AST_No
 }
 
 Ad_AST_HashLiteral::~Ad_AST_HashLiteral() {
-    std::cout << "destructor for Ad_AST_HashLiteral not implemented yet\n";
+    for(std::map<Ad_AST_Node*, Ad_AST_Node*>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+        Ad_DECREF(it->first);
+        Ad_DECREF(it->second);
+        free_Ad_AST_Node_memory(it->first);
+        free_Ad_AST_Node_memory(it->second);
+    }
 }
 
 std::string Ad_AST_HashLiteral::TokenLiteral() {
@@ -595,6 +600,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_INDEX_EXPRESSION:
             delete (Ad_AST_IndexExpression*)node;
+        break;
+        case ST_HASH_LITERAL:
+            delete (Ad_AST_HashLiteral*)node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";

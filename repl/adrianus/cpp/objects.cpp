@@ -343,7 +343,12 @@ Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, HashPair> p) {
 }
 
 Ad_Hash_Object::~Ad_Hash_Object() {
-    // TODO: implement destructor for Ad_Hash_Object
+    for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+        Ad_DECREF(it->second.key);
+        Ad_DECREF(it->second.value);
+        free_Ad_Object_memory(it->second.key);
+        free_Ad_Object_memory(it->second.value);
+    }
 }
 
 std::string Ad_Hash_Object::Inspect() {
@@ -419,6 +424,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_LIST:
                 delete ((Ad_List_Object*)obj);
+            break;
+            case OBJ_HASH:
+                delete ((Ad_Hash_Object*)obj);
             break;
             default:
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
