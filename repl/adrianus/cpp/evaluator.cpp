@@ -18,9 +18,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_ASSIGN_STATEMENT: {
-            Ad_Object* obj = Eval(((Ad_AST_AssignStatement*)node)->value, env);
-            env.Set(((Ad_AST_Identifier*)((Ad_AST_AssignStatement*)node)->name)->value, obj);
-            return NULL;
+            return EvalAssignStatement(node, env);
         }
         break;
         case ST_RETURN_STATEMENT: {
@@ -394,6 +392,27 @@ Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index)
     free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
     free_Ad_Object_memory(index);
     return result;
+}
+
+Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
+    if (((Ad_AST_AssignStatement*)node)->name->type == ST_INDEX_EXPRESSION) {
+        return EvalIndexExpressionAssign(node, env);
+    } else {
+        Ad_Object* obj = Eval(((Ad_AST_AssignStatement*)node)->value, env);
+        env.Set(((Ad_AST_Identifier*)((Ad_AST_AssignStatement*)node)->name)->value, obj);
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &env) {
+    Ad_List_Object* list_obj = (Ad_List_Object*)Eval(((Ad_AST_IndexExpression*)(((Ad_AST_AssignStatement*)node)->name))->left, env);
+    if (IsError(list_obj)) return list_obj;
+    Ad_Integer_Object* index = (Ad_Integer_Object*)Eval(((Ad_AST_IndexExpression*)(((Ad_AST_AssignStatement*)node)->name))->index, env);
+    if (IsError(index)) return index;
+    int idx = index->value;
+    Ad_Object* obj = Eval(((Ad_AST_AssignStatement*)node)->value, env);
+    list_obj->elements[idx] = obj;
+    return NULL;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

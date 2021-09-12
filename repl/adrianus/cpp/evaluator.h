@@ -33,6 +33,8 @@ public:
     Ad_Object* EvalListIndexExpression(Ad_Object*, Ad_Object*);
     Ad_Object* EvalHashLiteral(Ad_AST_Node*, Environment&);
     Ad_Object* EvalHashIndexExpression(Ad_Object*, Ad_Object*);
+    Ad_Object* EvalAssignStatement(Ad_AST_Node*, Environment&);
+    Ad_Object* EvalIndexExpressionAssign(Ad_AST_Node*, Environment&);
 };
 
 #endif
