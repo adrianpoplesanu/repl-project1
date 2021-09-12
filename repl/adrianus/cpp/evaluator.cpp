@@ -17,6 +17,12 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return NULL;
         }
         break;
+        case ST_ASSIGN_STATEMENT: {
+            Ad_Object* obj = Eval(((Ad_AST_AssignStatement*)node)->value, env);
+            env.Set(((Ad_AST_Identifier*)((Ad_AST_AssignStatement*)node)->name)->value, obj);
+            return NULL;
+        }
+        break;
         case ST_RETURN_STATEMENT: {
             Ad_Object* val = Eval(((Ad_AST_ReturnStatement*)node)->value, env);
             Ad_ReturnValue_Object* obj = new Ad_ReturnValue_Object();

@@ -23,7 +23,8 @@ enum StatementType {
     ST_STRING_LITERAL,
     ST_LIST_LITERAL,
     ST_INDEX_EXPRESSION,
-    ST_HASH_LITERAL
+    ST_HASH_LITERAL,
+    ST_ASSIGN_STATEMENT
 };
 
 std::map<StatementType, std::string> statement_type_map = {
@@ -44,7 +45,8 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_STRING_LITERAL, "StringLiteral"},
     {ST_LIST_LITERAL, "ListLiteral"},
     {ST_INDEX_EXPRESSION, "IndexExpression"},
-    {ST_HASH_LITERAL, "HashLiteral"}
+    {ST_HASH_LITERAL, "HashLiteral"},
+    {ST_ASSIGN_STATEMENT, "AssignStatement"}
 };
 
 class Ad_AST_Node {
@@ -85,6 +87,19 @@ public:
     Ad_AST_LetStatement();
     Ad_AST_LetStatement(Token);
     ~Ad_AST_LetStatement();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_AssignStatement : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* name;
+    Ad_AST_Node* value;
+
+    Ad_AST_AssignStatement();
+    Ad_AST_AssignStatement(Token);
+    ~Ad_AST_AssignStatement();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
 };

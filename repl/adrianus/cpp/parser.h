@@ -9,6 +9,7 @@
 
 enum ParseType {
     PT_LOWEST,
+    PT_ASSIGN,
     PT_EQUALS,
     PT_CONDITIONAL,
     PT_LESSGREATER,
@@ -20,6 +21,7 @@ enum ParseType {
 };
 
 std::map<TokenType, ParseType> precedences = {
+    {TT_ASSIGN, PT_ASSIGN},
     {TT_EQ, PT_EQUALS},
     {TT_NOT_EQ, PT_EQUALS},
     {TT_LT, PT_LESSGREATER},
@@ -86,6 +88,7 @@ public:
     std::vector<Ad_AST_Node*> ParseFunctionParameters();
     std::vector<Ad_AST_Node*> ParseListExpressions();
     Ad_AST_Node* ParseIndexExpression(Ad_AST_Node*);
+    Ad_AST_Node* ParseAssignExpression(Ad_AST_Node*);
 };
 
 #endif

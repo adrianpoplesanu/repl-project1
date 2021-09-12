@@ -22,6 +22,11 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             std::cout << "->LetStatement " << ((Ad_AST_LetStatement*)node)->token.ToString() << " " << ((Ad_AST_LetStatement*)node)->name.token.ToString() << "\n";
             print_ast_nodes(((Ad_AST_LetStatement*)node)->value, level + padding);
         break;
+        case ST_ASSIGN_STATEMENT:
+            print_level(level);
+            std::cout << "->AssignStatement " << ((Ad_AST_AssignStatement*)node)->token.ToString() << " " << ((Ad_AST_Identifier*)((Ad_AST_AssignStatement*)node)->name)->token.ToString() << "\n";
+            print_ast_nodes(((Ad_AST_LetStatement*)node)->value, level + padding);
+        break;
         case ST_RETURN_STATEMENT:
             print_level(level);
             std::cout << "->ReturnStatement " << ((Ad_AST_LetStatement*)node)->token.ToString() << "\n";
@@ -115,6 +120,11 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             std::cout << "->IndexExpression " << ((Ad_AST_WhileExpression*)node)->token.ToString() << "\n";
             print_ast_nodes(((Ad_AST_IndexExpression*)node)->left, level + padding);
             print_ast_nodes(((Ad_AST_IndexExpression*)node)->index, level + padding);
+        break;
+        case ST_HASH_LITERAL:
+            print_level(level);
+            std::cout << "->HashLiteral " << "\n";
+            // TODO: parse all hashpairs and print hashpair.key + ": " + hashpair.value
         break;
     }
 }

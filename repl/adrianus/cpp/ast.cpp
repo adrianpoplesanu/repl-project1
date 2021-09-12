@@ -72,6 +72,43 @@ std::string Ad_AST_LetStatement::ToString() {
     return out;
 }
 
+Ad_AST_AssignStatement::Ad_AST_AssignStatement() {
+    type = ST_ASSIGN_STATEMENT;
+    ref_count = 0;
+    value = NULL;
+}
+
+Ad_AST_AssignStatement::Ad_AST_AssignStatement(Token t) {
+    type = ST_ASSIGN_STATEMENT;
+    ref_count = 0;
+    token = t;
+    //name = new Ad_AST_Identifier();
+    name = NULL;
+    value = NULL;
+}
+
+Ad_AST_AssignStatement::~Ad_AST_AssignStatement() {
+    if (value) {
+        free_Ad_AST_Node_memory(value);
+    }
+}
+
+std::string Ad_AST_AssignStatement::TokenLiteral() {
+    return "";
+}
+
+std::string Ad_AST_AssignStatement::ToString() {
+    std::string out = "AssignStatement [";
+    out +=  token.literal + "] <" + ((Ad_AST_Identifier*)name)->value + ">: ";
+    if (value) {
+        //std::cout << (*value).type;
+        out += (*value).ToString();
+    } else {
+        out += "null expression in let";
+    }
+    return out;
+}
+
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement() {
     type = ST_RETURN_STATEMENT;
     ref_count = 0;
@@ -553,6 +590,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
     switch(node->type) {
         case ST_LET_STATEMENT:
             delete (Ad_AST_LetStatement*)node;
+        break;
+        case ST_ASSIGN_STATEMENT:
+            delete (Ad_AST_AssignStatement*)node;
         break;
         case ST_RETURN_STATEMENT:
             delete (Ad_AST_ReturnStatement*)node;

@@ -30,6 +30,7 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_GTE, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseCallExpression));
     infixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseIndexExpression));
+    infixParseFns.insert(std::make_pair(TT_ASSIGN, &Parser::ParseAssignExpression));
 }
 
 Parser::~Parser() {
@@ -417,6 +418,17 @@ Ad_AST_Node* Parser::ParseHashLiteral() {
         return NULL;
     }
     return hash;
+}
+
+Ad_AST_Node* Parser::ParseAssignExpression(Ad_AST_Node* left) {
+    Ad_AST_AssignStatement* stmt = new Ad_AST_AssignStatement(current_token);
+    stmt->name = left;
+    NextToken();
+    stmt->value = ParseExpression(PT_LOWEST);
+    if (CurrentTokenIs(TT_SEMICOLON)) {
+        NextToken();
+    }
+    return stmt;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {
