@@ -11,7 +11,7 @@ public class AstProgram extends AstNode {
 	}
 
 	public void reset() {
-		
+		statements.clear();
 	}
 
 	@Override

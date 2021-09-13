@@ -29,6 +29,7 @@ public class Repl {
     		String source = getNextLine();
     		if (source.equals("exit()")) break;
     		parser.load(source);
+    		program.reset();
     		parser.buildProgramStatements(program);
     		this.evaluator.eval(program, env);
     	}
