@@ -9,7 +9,7 @@ public class Environment {
 	public static HashMap<String, AdObject> store;
 	
 	public Environment() {
-		
+		store = new HashMap<String, AdObject>();
 	}
 	
 	public Environment(Environment outer) {

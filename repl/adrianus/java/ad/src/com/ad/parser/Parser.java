@@ -63,9 +63,6 @@ public class Parser {
 		while (currentToken.getType() != TokenTypeEnum.EOF) {
 			AstNode node = parseStatement();
 			if (node != null) {
-				//System.out.println(node); // i really don't like this
-				String output = node.toString();
-				if (output != null) System.out.println(output); // i like this a bit more, but i still don't fully like it
 				program.statements.add(node);
 			}
 			nextToken();

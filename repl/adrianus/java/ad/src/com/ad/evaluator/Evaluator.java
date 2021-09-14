@@ -2,7 +2,9 @@ package com.ad.evaluator;
 
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
+import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstInteger;
+import com.ad.ast.AstLetStatement;
 import com.ad.ast.AstNode;
 import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
@@ -23,20 +25,17 @@ public class Evaluator {
 			System.out.println("eval BlockStatement");
 			break;
 		case BOOLEAN:
-			AstBoolean bool = (AstBoolean)node;
-			return evalBoolean(bool, env);
+			return evalBoolean(node, env);
 		case CALL_EXPRESSION:
 			System.out.println("eval CallExpression");
 			break;
 		case EXPRESSION_STATEMENT:
-			AstExpressionStatement stmt = (AstExpressionStatement)node;
-			return evalExpressionStatement(stmt, env);
+			return evalExpressionStatement(node, env);
 		case FUNCTION_LITERAL:
 			System.out.println("eval FunctionLiteral");
 			break;
 		case IDENTIFIER:
-			System.out.println("eval Identifier");
-			break;
+			return evalIdentifier(node, env);
 		case IF_EXPRESSION:
 			System.out.println("eval IfExpression");
 			break;
@@ -44,11 +43,9 @@ public class Evaluator {
 			System.out.println("eval InfixExpression");
 			break;
 		case INTEGER_LITERAL:
-			AstInteger lit = (AstInteger)node;
-			return evalInteger(lit, env);
+			return evalInteger(node, env);
 		case LET_STATEMENT:
-			System.out.println("eval LetStatement");
-			break;
+			return evalLetStatement(node, env);
 		case PREFIX_EXPRESSION:
 			AdObject right = eval(((AstPrefixExpression)node).getRight(), env);
 			return evalPrefixExpression(((AstPrefixExpression)node).getOperator(), right);
@@ -75,19 +72,22 @@ public class Evaluator {
     	return null;
     }
     
-    private AdObject evalBoolean(AstBoolean node, Environment env) {
-    	return new AdBooleanObject(node.getValue());
+    private AdObject evalBoolean(AstNode node, Environment env) {
+    	AstBoolean booleanLiteral = (AstBoolean)node;
+    	return new AdBooleanObject(booleanLiteral.getValue());
     }
     
-    private AdObject evalExpressionStatement(AstExpressionStatement node, Environment env) {
-    	if (node.getExpression() != null) {
-    		return eval(node.getExpression(), env);
+    private AdObject evalExpressionStatement(AstNode node, Environment env) {
+    	AstExpressionStatement stmt = (AstExpressionStatement)node;
+    	if (stmt.getExpression() != null) {
+    		return eval(stmt.getExpression(), env);
     	}
     	return null;
     }
     
-    private AdObject evalInteger(AstInteger node, Environment env) {
-    	return new AdIntegerObject(node.getValue());
+    private AdObject evalInteger(AstNode node, Environment env) {
+    	AstInteger integerLiteral = (AstInteger)node;
+    	return new AdIntegerObject(integerLiteral.getValue());
     }
     
     private AdObject evalPrefixExpression(String operator, AdObject right) {
@@ -105,7 +105,20 @@ public class Evaluator {
     }
     
     private AdObject evalMinusPrefixExpression(AdObject right) {
+    	return new AdIntegerObject(-((AdIntegerObject)right).getValue());
+    }
+    
+    private AdObject evalLetStatement(AstNode node, Environment env) {
+		AstLetStatement letStatement = (AstLetStatement)node;
+		AdObject obj = eval(letStatement.getValue(), env);
+		env.set(letStatement.getName().getValue(), obj);
     	return null;
+    }
+    
+    private AdObject evalIdentifier(AstNode node, Environment env) {
+    	AstIdentifier ident = (AstIdentifier)node;
+    	AdObject obj = env.get(ident.getValue());
+    	return obj;
     }
     
     private AdObject newError(String msg) {
