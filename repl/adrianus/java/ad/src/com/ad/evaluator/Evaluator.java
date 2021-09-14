@@ -2,10 +2,13 @@ package com.ad.evaluator;
 
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
+import com.ad.ast.AstInteger;
 import com.ad.ast.AstNode;
+import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
 import com.ad.environment.Environment;
 import com.ad.objects.AdBooleanObject;
+import com.ad.objects.AdIntegerObject;
 import com.ad.objects.AdObject;
 
 public class Evaluator {
@@ -41,14 +44,14 @@ public class Evaluator {
 			System.out.println("eval InfixExpression");
 			break;
 		case INTEGER_LITERAL:
-			System.out.println("eval IntegerLiteral");
-			break;
+			AstInteger lit = (AstInteger)node;
+			return evalInteger(lit, env);
 		case LET_STATEMENT:
 			System.out.println("eval LetStatement");
 			break;
 		case PREFIX_EXPRESSION:
-			System.out.println("eval PrefixExpression");
-			break;
+			AdObject right = eval(((AstPrefixExpression)node).getRight(), env);
+			return evalPrefixExpression(((AstPrefixExpression)node).getOperator(), right);
 		case RETURN_STATEMENT:
 			System.out.println("eval ReturnStatement");
 			break;
@@ -80,6 +83,33 @@ public class Evaluator {
     	if (node.getExpression() != null) {
     		return eval(node.getExpression(), env);
     	}
+    	return null;
+    }
+    
+    private AdObject evalInteger(AstInteger node, Environment env) {
+    	return new AdIntegerObject(node.getValue());
+    }
+    
+    private AdObject evalPrefixExpression(String operator, AdObject right) {
+    	if (operator == "!") {
+    		return evalBangPrefixExpression(right);
+    	}
+    	if (operator == "-") {
+    		return evalMinusPrefixExpression(right);
+    	}
+    	return newError("unknown prefix operator");
+    }
+    
+    private AdObject evalBangPrefixExpression(AdObject right) {
+    	return new AdBooleanObject(!((AdBooleanObject)right).getValue());
+    }
+    
+    private AdObject evalMinusPrefixExpression(AdObject right) {
+    	return null;
+    }
+    
+    private AdObject newError(String msg) {
+    	// TODO: instantiate an error object with msh message
     	return null;
     }
 }

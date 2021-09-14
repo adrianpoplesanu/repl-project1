@@ -16,4 +16,12 @@ public class AdBooleanObject extends AdObject {
 	public void print() {
 		System.out.println(value);
 	}
+
+	public boolean getValue() {
+		return value;
+	}
+
+	public void setValue(boolean value) {
+		this.value = value;
+	}
 }
