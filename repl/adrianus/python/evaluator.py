@@ -308,13 +308,13 @@ class Evaluator(object):
 
     def eval_assign_statement(self, node, env):
         if node.name.type == StatementType.INDEX_EXPRESSION:
-            self.eval_index_expression_assing(node, env)
+            self.eval_index_expression_assign(node, env)
         else:
             obj = self.eval(node.value, env)
             env.set(node.name.value, obj)
         return None
 
-    def eval_index_expression_assing(self, node, env):
+    def eval_index_expression_assign(self, node, env):
         list_obj = self.eval(node.name.left, env)
         if self.is_error(list_obj):
             return list_obj

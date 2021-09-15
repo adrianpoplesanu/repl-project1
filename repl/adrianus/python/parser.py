@@ -32,7 +32,6 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
-        self.infix_parse_functions[TokenType.ASSIGN] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.ASTERISK] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.EQ] = self.parse_infix_expression
