@@ -3,7 +3,7 @@ package com.ad.objects;
 public class AdErrorObject extends AdObject {
 	private String msg;
 	
-	AdErrorObject(String msg) {
+	public AdErrorObject(String msg) {
 		this.msg = msg;
 	}
 

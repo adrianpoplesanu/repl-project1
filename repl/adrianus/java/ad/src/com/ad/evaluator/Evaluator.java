@@ -3,6 +3,7 @@ package com.ad.evaluator;
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstIdentifier;
+import com.ad.ast.AstInfixExpression;
 import com.ad.ast.AstInteger;
 import com.ad.ast.AstLetStatement;
 import com.ad.ast.AstNode;
@@ -10,8 +11,10 @@ import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
 import com.ad.environment.Environment;
 import com.ad.objects.AdBooleanObject;
+import com.ad.objects.AdErrorObject;
 import com.ad.objects.AdIntegerObject;
 import com.ad.objects.AdObject;
+import com.ad.objects.ObjectTypeEnum;
 
 public class Evaluator {
 	public static AdBooleanObject TrueObject = new AdBooleanObject(true);
@@ -40,8 +43,7 @@ public class Evaluator {
 			System.out.println("eval IfExpression");
 			break;
 		case INFIX_EXPRESSION:
-			System.out.println("eval InfixExpression");
-			break;
+			return evalInfixExpression(node, env);
 		case INTEGER_LITERAL:
 			return evalInteger(node, env);
 		case LET_STATEMENT:
@@ -121,8 +123,53 @@ public class Evaluator {
     	return obj;
     }
     
-    private AdObject newError(String msg) {
-    	// TODO: instantiate an error object with msh message
+    private AdObject evalInfixExpression(AstNode node, Environment env) {
+    	AstInfixExpression expr = (AstInfixExpression)node;
+    	AdObject left = eval(expr.getLeft(), env);
+    	AdObject right = eval(expr.getRight(), env);
+    	AdObject result = evalInfixExpression(expr.getOperator(), left, right);
+    	return result;
+    }
+    
+    private AdObject evalInfixExpression(String operator, AdObject left, AdObject right) {
+    	if (left.getType() == ObjectTypeEnum.INT && right.getType() == ObjectTypeEnum.INT) {
+    		return evalIntegerInfixExpression(operator, left, right);
+    	}
+    	if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.STRING) {
+    		return evalStringInfixExpression(operator, left, right);
+    	}
     	return null;
+    }
+    
+    private AdObject evalIntegerInfixExpression(String operator, AdObject left, AdObject right) {
+    	int left_val = ((AdIntegerObject)left).getValue();
+    	int right_val = ((AdIntegerObject)right).getValue();
+    	switch (operator) {
+    	case "+":
+    		return new AdIntegerObject(left_val + right_val);
+    	case "-":
+    		return new AdIntegerObject(left_val - right_val);
+    	case "*":
+    		return new AdIntegerObject(left_val * right_val);
+    	case "/":
+    		return new AdIntegerObject(left_val / right_val);
+    	case "<":
+    		return new AdBooleanObject(left_val < right_val);
+    	case ">":
+    		return new AdBooleanObject(left_val > right_val);
+    	case "<=":
+    		return new AdBooleanObject(left_val <= right_val);
+    	case ">=":
+    		return new AdBooleanObject(left_val >= right_val);
+    	}
+    	return null;
+    }
+    
+    private AdObject evalStringInfixExpression(String operator, AdObject left, AdObject right) {
+    	return null;
+    }
+    
+    private AdObject newError(String msg) {
+    	return new AdErrorObject(msg);
     }
 }
