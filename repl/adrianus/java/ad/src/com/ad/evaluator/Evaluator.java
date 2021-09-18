@@ -3,6 +3,7 @@ package com.ad.evaluator;
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstIdentifier;
+import com.ad.ast.AstIfExpression;
 import com.ad.ast.AstInfixExpression;
 import com.ad.ast.AstInteger;
 import com.ad.ast.AstLetStatement;
@@ -25,8 +26,7 @@ public class Evaluator {
 		case PROGRAM:
 			return evalProgram((AstProgram)node, env);
 		case BLOCK_STATEMENT:
-			System.out.println("eval BlockStatement");
-			break;
+			return evalBlockStatement(node, env);
 		case BOOLEAN:
 			return evalBoolean(node, env);
 		case CALL_EXPRESSION:
@@ -40,8 +40,7 @@ public class Evaluator {
 		case IDENTIFIER:
 			return evalIdentifier(node, env);
 		case IF_EXPRESSION:
-			System.out.println("eval IfExpression");
-			break;
+			return evalIfExpression(node, env);
 		case INFIX_EXPRESSION:
 			return evalInfixExpression(node, env);
 		case INTEGER_LITERAL:
@@ -169,7 +168,51 @@ public class Evaluator {
     	return null;
     }
     
+    private AdObject evalIfExpression(AstNode node, Environment env) {
+    	AstIfExpression expr = (AstIfExpression)node;
+    	AstNode condition = expr.getCondition();
+    	AstNode consequence = expr.getConsequence();
+    	AstNode alternative = expr.getAlternative();
+    	
+    	AdObject conditionObj = eval(condition, env);
+    	if (isError(conditionObj)) return conditionObj;
+    	
+    	if (isTruthy(conditionObj)) {
+    		return eval(consequence, env);
+    	} else {
+    		if (alternative != null) return eval(alternative, env);
+    	}
+    	return null;
+    }
+    
+    private boolean isTruthy(AdObject obj) {
+    	if (obj == null) return false;
+
+    	switch (obj.getType()) {
+    	case NULL:
+    		return false;
+    	case INT:
+    		if (((AdIntegerObject)obj).getValue() == 0) return false;
+    		return true;
+    	case BOOLEAN:
+    		if (((AdBooleanObject)obj).getValue()) return true;
+    		return false;
+    	default:
+    	break;
+    	}
+    	return false;
+    }
+    
+    private AdObject evalBlockStatement(AstNode node, Environment env) {
+    	// TODO: implement eval block statement
+    	return null;
+    }
+    
     private AdObject newError(String msg) {
     	return new AdErrorObject(msg);
+    }
+    
+    private boolean isError(AdObject obj) {
+    	return obj.getType() == ObjectTypeEnum.ERROR;
     }
 }
