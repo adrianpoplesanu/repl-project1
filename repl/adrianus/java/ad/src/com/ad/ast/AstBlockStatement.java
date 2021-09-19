@@ -9,6 +9,7 @@ public class AstBlockStatement extends AstNode {
 	private ArrayList<AstNode> statements;
 	
 	public AstBlockStatement() {
+		type = AstNodeTypeEnum.BLOCK_STATEMENT;
 		statements = new ArrayList<AstNode>();
 	}
 	

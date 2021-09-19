@@ -5,5 +5,6 @@ public enum ObjectTypeEnum {
     INT,
     STRING,
     BOOLEAN,
-    ERROR
+    ERROR,
+    RETURN_VALUE
 }

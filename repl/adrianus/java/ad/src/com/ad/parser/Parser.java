@@ -190,7 +190,7 @@ public class Parser {
 			return null;
 		}
 		nextToken();
-		expr.setCondition(parseExpression(PrecedenceTypeEnum.PREFIX));
+		expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
 		if (!expectPeek(TokenTypeEnum.RBRACE)) {
 			return null;
 		}

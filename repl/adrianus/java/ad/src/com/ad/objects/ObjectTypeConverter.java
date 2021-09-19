@@ -10,6 +10,7 @@ public class ObjectTypeConverter {
 			put(ObjectTypeEnum.INT, "IntObject");
 			put(ObjectTypeEnum.BOOLEAN, "BooleanObject");
 			put(ObjectTypeEnum.STRING, "StringObject");
+			put(ObjectTypeEnum.RETURN_VALUE, "ReturnValueObject");
 		}
     };
     

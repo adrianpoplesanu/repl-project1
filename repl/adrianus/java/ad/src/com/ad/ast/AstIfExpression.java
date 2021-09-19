@@ -9,6 +9,7 @@ public class AstIfExpression extends AstNode {
     private AstNode alternative;
     
     public AstIfExpression(Token token) {
+    	type = AstNodeTypeEnum.IF_EXPRESSION;
     	this.token = token;
     }
 

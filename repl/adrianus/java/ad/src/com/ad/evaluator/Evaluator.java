@@ -1,5 +1,6 @@
 package com.ad.evaluator;
 
+import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstIdentifier;
@@ -205,6 +206,12 @@ public class Evaluator {
     
     private AdObject evalBlockStatement(AstNode node, Environment env) {
     	// TODO: implement eval block statement
+    	AstBlockStatement blockStatement = (AstBlockStatement)node;
+    	AdObject result;
+    	for (AstNode stmt : blockStatement.getStatements()) {
+    		result = eval(stmt, env);
+    		if (result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
+    	}
     	return null;
     }
     
