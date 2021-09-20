@@ -22,7 +22,7 @@ public class Evaluator {
 	public static AdBooleanObject TrueObject = new AdBooleanObject(true);
 	public static AdBooleanObject FalseObject = new AdBooleanObject(false);
 	
-    public AdObject eval(AstNode node, Environment env) {    	
+    public AdObject eval(AstNode node, Environment env) {
     	switch(node.getType()) {
 		case PROGRAM:
 			return evalProgram((AstProgram)node, env);
@@ -188,7 +188,7 @@ public class Evaluator {
     
     private boolean isTruthy(AdObject obj) {
     	if (obj == null) return false;
-
+    	
     	switch (obj.getType()) {
     	case NULL:
     		return false;
@@ -205,14 +205,14 @@ public class Evaluator {
     }
     
     private AdObject evalBlockStatement(AstNode node, Environment env) {
-    	// TODO: implement eval block statement
     	AstBlockStatement blockStatement = (AstBlockStatement)node;
-    	AdObject result;
+    	AdObject result = null;
     	for (AstNode stmt : blockStatement.getStatements()) {
     		result = eval(stmt, env);
     		if (result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
     	}
-    	return null;
+    	// TODO: return the return value of the return object
+    	return result; // return the last evaluated expression in the block just to print something out
     }
     
     private AdObject newError(String msg) {

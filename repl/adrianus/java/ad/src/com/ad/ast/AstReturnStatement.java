@@ -7,6 +7,7 @@ public class AstReturnStatement extends AstNode {
 	private AstNode value;
 
 	public AstReturnStatement(Token token) {
+		type = AstNodeTypeEnum.RETURN_STATEMENT;
 		this.token = token;
 	}
 	

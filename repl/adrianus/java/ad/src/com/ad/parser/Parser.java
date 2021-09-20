@@ -191,10 +191,10 @@ public class Parser {
 		}
 		nextToken();
 		expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
-		if (!expectPeek(TokenTypeEnum.RBRACE)) {
+		if (!expectPeek(TokenTypeEnum.RPAREN)) {
 			return null;
 		}
-		if (!expectPeek(TokenTypeEnum.LBRACKET)) {
+		if (!expectPeek(TokenTypeEnum.LBRACE)) {
 			return null;
 		}
 		expr.setConsequence(parseBlockStatement());
@@ -210,14 +210,15 @@ public class Parser {
 
 	private AstNode parseBlockStatement() {
 		AstBlockStatement block = new AstBlockStatement(getCurrentToken());
-		while(!currentTokenIs(TokenTypeEnum.RBRACKET) && !currentTokenIs(TokenTypeEnum.EOF)) {
+		nextToken();
+		while(!currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
 			AstNode statement = parseStatement();
 			if (statement != null) {
 				block.addStatement(statement);
 			}
 			nextToken();
 		}
-		return null;
+		return block;
 	}
 	
 	public AstNode parseFunctionLiteral() {

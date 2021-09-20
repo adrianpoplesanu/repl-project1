@@ -4,6 +4,7 @@ public class AdBooleanObject extends AdObject {
 	private boolean value;
 	
     public AdBooleanObject(boolean value) {
+    	this.type = ObjectTypeEnum.BOOLEAN;
     	this.value = value;
     }
 
