@@ -211,21 +211,18 @@ public class Evaluator {
     	AdObject result = null;
     	for (AstNode stmt : blockStatement.getStatements()) {
     		result = eval(stmt, env);
-    		//if (result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
     		if (result.getType() == ObjectTypeEnum.RETURN_VALUE) {
     			AdReturnValueObject returnObject = (AdReturnValueObject)result;
-    			//return result;
     			return returnObject.getReturnValue();
     		}
     	}
-    	// TODO: return the return value of the return object
-    	return result; // return the last evaluated expression in the block just to print something out
+    	return result; // this should return null, leaving it for now for testing purposes
     }
     
     private AdObject evalReturnStatement(AstNode node, Environment env) {
     	AstReturnStatement returnStatement = (AstReturnStatement)node;
     	AdObject result = eval(returnStatement.getValue(), env);
-    	return result;
+    	return new AdReturnValueObject(result);
     }
     
     private AdObject newError(String msg) {
