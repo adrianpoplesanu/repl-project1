@@ -16,13 +16,12 @@ public class AstProgram extends AstNode {
 
 	@Override
 	public String tokenLiteral() {
-		// TODO Auto-generated method stub
+		// ProgramStatement has no token
 		return null;
 	}
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Program";
 	}
 }

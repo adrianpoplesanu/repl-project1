@@ -10,6 +10,7 @@ public class AstFunctionLiteral extends AstNode {
 	private AstNode body;
 	
 	public AstFunctionLiteral(Token token) {
+		type = AstNodeTypeEnum.IF_EXPRESSION;
 		this.token = token;
 	}
 

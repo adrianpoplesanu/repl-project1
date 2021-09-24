@@ -38,8 +38,7 @@ public class Evaluator {
 		case EXPRESSION_STATEMENT:
 			return evalExpressionStatement(node, env);
 		case FUNCTION_LITERAL:
-			System.out.println("eval FunctionLiteral");
-			break;
+			return evalFunctionLiteral(node, env);
 		case IDENTIFIER:
 			return evalIdentifier(node, env);
 		case IF_EXPRESSION:
@@ -78,7 +77,12 @@ public class Evaluator {
     
     private AdObject evalBoolean(AstNode node, Environment env) {
     	AstBoolean booleanLiteral = (AstBoolean)node;
-    	return new AdBooleanObject(booleanLiteral.getValue());
+    	return nativeBoolToBoolean(booleanLiteral.getValue());
+    }
+    
+    private AdObject nativeBoolToBoolean(boolean value) {
+    	if (value) return TrueObject;
+    	return FalseObject;
     }
     
     private AdObject evalExpressionStatement(AstNode node, Environment env) {
@@ -105,7 +109,7 @@ public class Evaluator {
     }
     
     private AdObject evalBangPrefixExpression(AdObject right) {
-    	return new AdBooleanObject(!((AdBooleanObject)right).getValue());
+    	return nativeBoolToBoolean(!((AdBooleanObject)right).getValue());
     }
     
     private AdObject evalMinusPrefixExpression(AdObject right) {
@@ -156,13 +160,13 @@ public class Evaluator {
     	case "/":
     		return new AdIntegerObject(left_val / right_val);
     	case "<":
-    		return new AdBooleanObject(left_val < right_val);
+    		return nativeBoolToBoolean(left_val < right_val);
     	case ">":
-    		return new AdBooleanObject(left_val > right_val);
+    		return nativeBoolToBoolean(left_val > right_val);
     	case "<=":
-    		return new AdBooleanObject(left_val <= right_val);
+    		return nativeBoolToBoolean(left_val <= right_val);
     	case ">=":
-    		return new AdBooleanObject(left_val >= right_val);
+    		return nativeBoolToBoolean(left_val >= right_val);
     	}
     	return null;
     }
@@ -223,6 +227,10 @@ public class Evaluator {
     	AstReturnStatement returnStatement = (AstReturnStatement)node;
     	AdObject result = eval(returnStatement.getValue(), env);
     	return new AdReturnValueObject(result);
+    }
+    
+    private AdObject evalFunctionLiteral(AstNode node, Environment env) {
+    	return null;
     }
     
     private AdObject newError(String msg) {
