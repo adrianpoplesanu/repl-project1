@@ -17,6 +17,7 @@ public:
     Repl();
     ~Repl();
     void Loop();
+    void ExecuteFile(std::ifstream&);
 };
 
 #endif

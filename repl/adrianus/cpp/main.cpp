@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "tests.cpp"
 #include "test_objects.cpp"
 #include "test_parser.cpp"
@@ -16,7 +17,6 @@
 
 
 int main(int argc, char *argv[]) {
-	std::cout << "Ad interpreter [C++]... v1.0\n";
 	if (RUN_TESTS) {
 		run_all_tests();
 		test_simple_generic_object();
@@ -35,6 +35,14 @@ int main(int argc, char *argv[]) {
 		test_list_parsing();
 	}
 	Repl repl;
-	repl.Loop();
+	if (argc == 1) {
+		std::cout << "Ad interpreter [C++]... v1.0\n";
+	    repl.Loop();
+    } else {
+		for (int i = 1; i < argc; i++) {
+			std::ifstream target(argv[i]);
+			repl.ExecuteFile(target);
+		}
+	}
 	return 0;
 }
