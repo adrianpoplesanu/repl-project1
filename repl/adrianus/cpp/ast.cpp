@@ -88,6 +88,9 @@ Ad_AST_AssignStatement::Ad_AST_AssignStatement(Token t) {
 }
 
 Ad_AST_AssignStatement::~Ad_AST_AssignStatement() {
+    if (name) {
+        free_Ad_AST_Node_memory(name);
+    }
     if (value) {
         free_Ad_AST_Node_memory(value);
     }
