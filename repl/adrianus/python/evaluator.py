@@ -81,6 +81,8 @@ class Evaluator(object):
             return self.eval_index_expression(left, index)
         elif node.type == StatementType.HASH_LITERAL:
             return self.eval_hash_literal(node, env)
+        elif node.type == StatementType.DEF_STATEMENT:
+            return self.eval_def_statement(node, env)
         else:
             print 'unknown AST node'
 
@@ -321,7 +323,13 @@ class Evaluator(object):
         index = self.eval(node.name.index, env)
         if self.is_error(index):
             return index
-        idx = index.value
-        obj = self.eval(node.value, env)
-        list_obj.elements[idx] = obj
+        if list_obj.type == ObjectType.LIST:
+            idx = index.value
+            obj = self.eval(node.value, env)
+            list_obj.elements[idx] = obj
+        elif list_obj.type == ObjectType.HASH:
+            print 'todo: add logic for hash simple assign'
         return None
+
+    def eval_def_statement(self, node, env):
+        pass
