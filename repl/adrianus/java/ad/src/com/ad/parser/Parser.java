@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
+import com.ad.ast.AstCallExpression;
 import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstFunctionLiteral;
 import com.ad.ast.AstIdentifier;
@@ -49,7 +50,7 @@ public class Parser {
 		infixParseFns.put(TokenTypeEnum.GT, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.LTE, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.GTE, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.LPAREN, new CallExpressionParser());
+		infixParseFns.put(TokenTypeEnum.LPAREN, new CallExpressionParser(this));
 	}
 
 	public void load(String source) {
@@ -223,7 +224,7 @@ public class Parser {
 	
 	public AstNode parseFunctionLiteral() {
 		AstFunctionLiteral func = new AstFunctionLiteral(getCurrentToken());
-		if (expectPeek(TokenTypeEnum.LPAREN)) {
+		if (!expectPeek(TokenTypeEnum.LPAREN)) {
 			return null;
 		}
 		func.setParameters(parseFunctionParameters());
@@ -253,6 +254,21 @@ public class Parser {
 			return new ArrayList<AstNode>(); // return an empty list
 		}
 		return identifiers;
+	}
+	
+	public AstNode parseCallExpression(AstNode node) {
+		AstCallExpression expr = new AstCallExpression(getCurrentToken(), node);
+		expr.setArguments(parseCallArguments());
+		return expr;
+	}
+	
+	public ArrayList<AstNode> parseCallArguments() {
+		ArrayList<AstNode> args = new ArrayList<AstNode>();
+		if (peekTokenIs(TokenTypeEnum.RPAREN)) {
+			nextToken();
+			return args;
+		}
+		return args;
 	}
 
 	public AstNode parseInfixExpression(AstNode left) {

@@ -19,8 +19,7 @@ public class AdFunctionObject extends AdObject {
 
 	@Override
 	public String inspect() {
-		// TODO Auto-generated method stub
-		return null;
+		return "funtion at memory address: " + Integer.toHexString(this.hashCode());
 	}
 
 	@Override

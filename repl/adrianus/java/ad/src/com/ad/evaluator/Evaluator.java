@@ -58,7 +58,6 @@ public class Evaluator {
 			return evalPrefixExpression(((AstPrefixExpression)node).getOperator(), right);
 		case RETURN_STATEMENT:
 			return evalReturnStatement(node, env);
-			//break;
 		case STRING_LITERAL:
 			System.out.println("eval StringLiteral");
 			break;
