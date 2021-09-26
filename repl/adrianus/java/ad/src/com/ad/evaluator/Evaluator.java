@@ -1,8 +1,11 @@
 package com.ad.evaluator;
 
+import java.util.ArrayList;
+
 import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
 import com.ad.ast.AstExpressionStatement;
+import com.ad.ast.AstFunctionLiteral;
 import com.ad.ast.AstIdentifier;
 import com.ad.ast.AstIfExpression;
 import com.ad.ast.AstInfixExpression;
@@ -15,6 +18,7 @@ import com.ad.ast.AstReturnStatement;
 import com.ad.environment.Environment;
 import com.ad.objects.AdBooleanObject;
 import com.ad.objects.AdErrorObject;
+import com.ad.objects.AdFunctionObject;
 import com.ad.objects.AdIntegerObject;
 import com.ad.objects.AdObject;
 import com.ad.objects.AdReturnValueObject;
@@ -230,7 +234,11 @@ public class Evaluator {
     }
     
     private AdObject evalFunctionLiteral(AstNode node, Environment env) {
-    	return null;
+    	AstFunctionLiteral functionLiteral = (AstFunctionLiteral)node;
+    	AstNode body = functionLiteral.getBody();
+    	ArrayList<AstNode> params = functionLiteral.getParameters();
+    	AdFunctionObject func = new AdFunctionObject(params, body, env);
+    	return func;
     }
     
     private AdObject newError(String msg) {

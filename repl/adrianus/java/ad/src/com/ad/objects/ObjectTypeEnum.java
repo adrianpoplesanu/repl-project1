@@ -6,5 +6,6 @@ public enum ObjectTypeEnum {
     STRING,
     BOOLEAN,
     ERROR,
-    RETURN_VALUE
+    RETURN_VALUE,
+    FUNCTION
 }

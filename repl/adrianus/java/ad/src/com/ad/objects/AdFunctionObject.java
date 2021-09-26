@@ -1,5 +1,55 @@
 package com.ad.objects;
 
-public class AdFunctionObject {
+import java.util.ArrayList;
 
+import com.ad.ast.AstNode;
+import com.ad.environment.Environment;
+
+public class AdFunctionObject extends AdObject {
+    private AstNode block;
+    private ArrayList<AstNode> parameters;
+    private Environment env;
+    
+    public AdFunctionObject(ArrayList<AstNode> p, AstNode b, Environment e) {
+    	type = ObjectTypeEnum.FUNCTION;
+    	parameters = p;
+    	block = b;
+    	env = e;
+    }
+
+	@Override
+	public String inspect() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void print() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public AstNode getBlock() {
+		return block;
+	}
+
+	public void setBlock(AstNode block) {
+		this.block = block;
+	}
+
+	public ArrayList<AstNode> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(ArrayList<AstNode> parameters) {
+		this.parameters = parameters;
+	}
+
+	public Environment getEnv() {
+		return env;
+	}
+
+	public void setEnv(Environment env) {
+		this.env = env;
+	}
 }

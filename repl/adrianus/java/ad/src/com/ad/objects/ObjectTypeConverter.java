@@ -11,6 +11,7 @@ public class ObjectTypeConverter {
 			put(ObjectTypeEnum.BOOLEAN, "BooleanObject");
 			put(ObjectTypeEnum.STRING, "StringObject");
 			put(ObjectTypeEnum.RETURN_VALUE, "ReturnValueObject");
+			put(ObjectTypeEnum.FUNCTION, "FunctionObject");
 		}
     };
     
