@@ -185,7 +185,7 @@ class Parser(object):
         if not self.expect_peek(TokenType.LPAREN):
             # this should return an error object
             return None
-        stmt.params = self.parse_function_parameters()
+        stmt.parameters = self.parse_function_parameters()
         if not self.expect_peek(TokenType.LBRACE):
             return None
         stmt.body = self.parse_block_statement()

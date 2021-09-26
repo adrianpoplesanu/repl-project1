@@ -288,7 +288,10 @@ class ASTBlockStatement(ASTNode):
         return self.token.literal
 
     def __str__(self):
-        return 'TODO: implement __str__ in ASTBlockStatement'
+        out = ""
+        for statement in self.statements:
+            out += str(statement)
+        return out
 
 
 class ASTFunctionLiteral(ASTNode):
@@ -408,7 +411,7 @@ class ASTHashLiteral(ASTNode):
 class ASTDefStatement(ASTNode):
     type = StatementType.DEF_STATEMENT
 
-    def __init__(self, token=None, name=None, params=None, body=None):
+    def __init__(self, token=None, name=None, parameters=None, body=None):
         """
         @param name: AstNode - identifier that will store the function, it needs to be like a let statement in the eval
         @param params: AstNode[] list of funtion arguments
@@ -416,11 +419,11 @@ class ASTDefStatement(ASTNode):
         """
         self.name = name
         self.token = token
-        self.params = params
+        self.parameters = parameters
         self.body = body
 
     def token_literal(self):
         return self.token.literal
 
     def __str__(self):
-        return 'Token: ' + str(self.token) + '<name: ' + str(self.name) + ', params:' + str(self.params) + ', body: ' + str(self.body) + '>'
+        return 'Token: ' + str(self.token) + '<name: ' + str(self.name) + ', params:' + str(self.parameters) + ', body: ' + str(self.body) + '>'

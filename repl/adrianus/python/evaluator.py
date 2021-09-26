@@ -332,4 +332,9 @@ class Evaluator(object):
         return None
 
     def eval_def_statement(self, node, env):
-        pass
+        func_name = node.name.value
+
+        obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
+        env.set(node.name.value, obj)
+
+        return None
