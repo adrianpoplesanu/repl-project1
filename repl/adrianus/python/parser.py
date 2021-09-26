@@ -5,7 +5,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
-                ASTHashLiteral, ASTWhileExpression, ASTAssignStatement
+                ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement
 
 
 class Parser(object):
@@ -25,6 +25,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.FALSE] = self.parse_boolean
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
         self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
+        self.prefix_parse_functions[TokenType.DEF] = self.parse_def_expression
         self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
@@ -175,6 +176,20 @@ class Parser(object):
                 block.statements.append(stmt)
             self.next_token()
         return block
+
+    def parse_def_expression(self):
+        stmt = ASTDefStatement(token=self.current_token)
+        self.next_token()
+        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        stmt.name = name
+        if not self.expect_peek(TokenType.LPAREN):
+            # this should return an error object
+            return None
+        stmt.params = self.parse_function_parameters()
+        if not self.expect_peek(TokenType.LBRACE):
+            return None
+        stmt.body = self.parse_block_statement()
+        return stmt
 
     def parse_function_literal(self):
         func = ASTFunctionLiteral(token=self.current_token)

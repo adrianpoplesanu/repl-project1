@@ -6,6 +6,7 @@ class TokenType(object):
 	RETURN = "RETURN"
 	WHILE = "WHILE"
 	FUNCTION = "FUNCTION"
+	DEF = "DEF"
 	IDENT = "IDENT"
 	INT = "INT"
 	PLUS = "+"

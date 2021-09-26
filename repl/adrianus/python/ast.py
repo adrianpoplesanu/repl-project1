@@ -18,6 +18,7 @@ class StatementType(object):
     INDEX_EXPRESSION = 'INDEX_EXPRESSION'
     HASH_LITERAL = 'HASH_LITERAL'
     ASSIGN_STATEMENT = 'ASSIGN_STATEMENT'
+    DEF_STATEMENT = 'DEF_STATEMENT'
 
 
 statement_type_map = {
@@ -39,7 +40,8 @@ statement_type_map = {
     StatementType.LIST_LITERAL: 'LIST_LITERAL',
     StatementType.INDEX_EXPRESSION: 'INDEX_EXPRESSION',
     StatementType.HASH_LITERAL: 'HASH_LITERAL',
-    StatementType.ASSIGN_STATEMENT: 'ASSIGN_STATEMENT'
+    StatementType.ASSIGN_STATEMENT: 'ASSIGN_STATEMENT',
+    StatementType.DEF_STATEMENT: 'DEF_STATEMENT'
 }
 
 
@@ -401,3 +403,24 @@ class ASTHashLiteral(ASTNode):
 
     def __str__(self):
         return 'TODO: implement __str__ in ASTHashLiteral'
+
+
+class ASTDefStatement(ASTNode):
+    type = StatementType.DEF_STATEMENT
+
+    def __init__(self, token=None, name=None, params=None, body=None):
+        """
+        @param name: AstNode - identifier that will store the function, it needs to be like a let statement in the eval
+        @param params: AstNode[] list of funtion arguments
+        @param body: AstNode block statement that is the body of the function
+        """
+        self.name = name
+        self.token = token
+        self.params = params
+        self.body = body
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token) + '<name: ' + str(self.name) + ', params:' + str(self.params) + ', body: ' + str(self.body) + '>'
