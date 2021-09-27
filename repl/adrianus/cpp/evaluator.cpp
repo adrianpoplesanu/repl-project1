@@ -405,13 +405,19 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &env) {
-    Ad_List_Object* list_obj = (Ad_List_Object*)Eval(((Ad_AST_IndexExpression*)(((Ad_AST_AssignStatement*)node)->name))->left, env);
-    if (IsError(list_obj)) return list_obj;
+    Ad_Object* obj = Eval(((Ad_AST_IndexExpression*)(((Ad_AST_AssignStatement*)node)->name))->left, env);
+    if (IsError(obj)) return obj;
     Ad_Integer_Object* index = (Ad_Integer_Object*)Eval(((Ad_AST_IndexExpression*)(((Ad_AST_AssignStatement*)node)->name))->index, env);
     if (IsError(index)) return index;
-    int idx = index->value;
-    Ad_Object* obj = Eval(((Ad_AST_AssignStatement*)node)->value, env);
-    list_obj->elements[idx] = obj;
+    if (obj->Type() == OBJ_LIST) {
+        int idx = index->value;
+        Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
+        Ad_List_Object* list_obj = (Ad_List_Object*)obj;
+        list_obj->elements[idx] = value;
+    }
+    if (obj->Type() == OBJ_HASH) {
+        std::cout << "TODO: implement simple assign for HashObject\n";
+    }
     return NULL;
 }
 
