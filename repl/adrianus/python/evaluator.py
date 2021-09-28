@@ -317,24 +317,24 @@ class Evaluator(object):
         return None
 
     def eval_index_expression_assign(self, node, env):
-        list_obj = self.eval(node.name.left, env)
-        if self.is_error(list_obj):
-            return list_obj
+        obj = self.eval(node.name.left, env)
+        if self.is_error(obj):
+            return obj
         index = self.eval(node.name.index, env)
         if self.is_error(index):
             return index
-        if list_obj.type == ObjectType.LIST:
+        if obj.type == ObjectType.LIST:
             idx = index.value
-            obj = self.eval(node.value, env)
-            list_obj.elements[idx] = obj
-        elif list_obj.type == ObjectType.HASH:
-            print 'todo: add logic for hash simple assign'
+            value = self.eval(node.value, env)
+            obj.elements[idx] = value
+        elif obj.type == ObjectType.HASH:
+            value = self.eval(node.value, env)
+            hashed = index.hash_key()
+            obj.pairs[hashed.value] = Hash_Pair(key=index, value=value)
+
         return None
 
     def eval_def_statement(self, node, env):
-        func_name = node.name.value
-
         obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
         env.set(node.name.value, obj)
-
         return None
