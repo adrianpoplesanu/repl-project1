@@ -395,33 +395,45 @@ Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index)
 }
 
 Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
-    if (((Ad_AST_AssignStatement*)node)->name->type == ST_INDEX_EXPRESSION) {
+    Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*)node;
+    if (assign_statement->name->type == ST_INDEX_EXPRESSION) {
         return EvalIndexExpressionAssign(node, env);
     } else {
-        Ad_Object* obj = Eval(((Ad_AST_AssignStatement*)node)->value, env);
-        env.Set(((Ad_AST_Identifier*)((Ad_AST_AssignStatement*)node)->name)->value, obj);
+        Ad_Object* obj = Eval(assign_statement->value, env);
+        Ad_AST_Identifier* identifier = (Ad_AST_Identifier*)assign_statement->name;
+        env.Set(identifier->value, obj);
     }
     return NULL;
 }
 
 Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &env) {
-    Ad_Object* obj = Eval(((Ad_AST_IndexExpression*)(((Ad_AST_AssignStatement*)node)->name))->left, env);
+    Ad_AST_AssignStatement *assign_statement = (Ad_AST_AssignStatement*)node;
+    Ad_AST_IndexExpression *index_expression = (Ad_AST_IndexExpression*)assign_statement->name;
+    Ad_Object* obj = Eval(index_expression->left, env);
     if (IsError(obj)) return obj;
-    Ad_Object* index = Eval(((Ad_AST_IndexExpression*)(((Ad_AST_AssignStatement*)node)->name))->index, env);
+    Ad_Object* index = Eval(index_expression->index, env);
     if (IsError(index)) return index;
     if (obj->Type() == OBJ_LIST) {
         int idx = ((Ad_Integer_Object*)index)->value;
         Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
         Ad_List_Object* list_obj = (Ad_List_Object*)obj;
-        list_obj->elements[idx] = value; // this is a potential memory leak
+        list_obj->elements[idx] = value; // TODO: this is a potential memory leak
     }
     if (obj->Type() == OBJ_HASH) {
         std::hash<std::string> hash_string;
         Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
         HashPair hash_pair(index, value);
         Ad_Hash_Object* hash_obj = (Ad_Hash_Object*)obj;
-        // TODO: this only does insert, it should do update if it's the case
-        hash_obj->pairs.insert(std::make_pair(std::to_string(hash_string(index->Hash())), hash_pair)); // this is a potential memory leak
+        std::string hash = std::to_string(hash_string(index->Hash()));
+
+        std::map<std::string, HashPair>::iterator it = hash_obj->pairs.find(hash);
+
+        if (it == hash_obj->pairs.end()) {
+            hash_obj->pairs.insert(std::make_pair(hash, hash_pair));
+        } else {
+            // TODO: this is a potential memory leak
+            it->second = hash_pair;
+        }
     }
     return NULL;
 }
