@@ -36,12 +36,22 @@ Ad_Object* ref_count(std::vector<Ad_Object*> args) {
     return obj;
 }
 
+Ad_Object* type_builtin(std::vector<Ad_Object*> args) {
+    return NULL;
+}
+
+Ad_Object* append_builtin(std::vector<Ad_Object*> args) {
+    return NULL;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
     {"exit", new Ad_Builtin_Object(&exit_builtin)},
     {"print", new Ad_Builtin_Object(&print_builtin)},
-    {"ref_count", new Ad_Builtin_Object(&ref_count)}
+    {"ref_count", new Ad_Builtin_Object(&ref_count)},
+    {"type", new Ad_Builtin_Object(&type_builtin)},
+    {"append", new Ad_Builtin_Object(&append_builtin)}
 };
 
 void free_builtin_arguments(std::vector<Ad_Object*> args) {

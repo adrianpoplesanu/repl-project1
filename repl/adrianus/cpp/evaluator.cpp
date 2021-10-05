@@ -417,7 +417,7 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         int idx = ((Ad_Integer_Object*)index)->value;
         Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
         Ad_List_Object* list_obj = (Ad_List_Object*)obj;
-        list_obj->elements[idx] = value; // TODO: this is a potential memory leak
+        list_obj->elements[idx] = value; // TODO: this is a potential memory leak, i need to free what was already there
     }
     if (obj->Type() == OBJ_HASH) {
         std::hash<std::string> hash_string;
@@ -431,7 +431,7 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         if (it == hash_obj->pairs.end()) {
             hash_obj->pairs.insert(std::make_pair(hash, hash_pair));
         } else {
-            // TODO: this is a potential memory leak
+            // TODO: this is a potential memory leak, i need to free what was already there
             it->second = hash_pair;
         }
     }
