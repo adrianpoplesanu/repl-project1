@@ -37,7 +37,10 @@ Ad_Object* ref_count(std::vector<Ad_Object*> args) {
 }
 
 Ad_Object* type_builtin(std::vector<Ad_Object*> args) {
-    return NULL;
+    Ad_Object* target = args[0];
+    std::string type = object_type_map[target->Type()];
+    Ad_String_Object* obj = new Ad_String_Object(type);
+    return obj; // TODO: check for potential memory leak
 }
 
 Ad_Object* append_builtin(std::vector<Ad_Object*> args) {
