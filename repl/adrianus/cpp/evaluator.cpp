@@ -279,8 +279,8 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
 std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> args, Environment &env) {
     std::vector<Ad_Object*> res;
     for (std::vector<Ad_AST_Node*>::iterator it = args.begin() ; it != args.end(); ++it) {
-        Ad_AST_Node *obj = *it;
-        Ad_Object* evaluated = Eval(obj, env);
+        Ad_AST_Node *node = *it;
+        Ad_Object* evaluated = Eval(node, env);
         if (IsError(evaluated)) {
             std::vector<Ad_Object*> error_res;
             error_res.push_back(evaluated);

@@ -44,6 +44,26 @@ Ad_Object* type_builtin(std::vector<Ad_Object*> args) {
 }
 
 Ad_Object* append_builtin(std::vector<Ad_Object*> args) {
+    Ad_List_Object* target = (Ad_List_Object*)args[0];
+    Ad_Object* obj = args[1];
+    //Ad_INCREF(obj); // in EvalExpressions din List Object evaluator asta nu e apelat, pentru ca atata timp cat nu se dezaloca ListObject nu se apeleaza free_Ad_Object_memory
+    target->elements.push_back(obj);
+    return NULL;
+}
+
+Ad_Object* pop_builtin(std::vector<Ad_Object*> args) {
+    return NULL;
+}
+
+Ad_Object* remove_builtin(std::vector<Ad_Object*> args) {
+    return NULL;
+}
+
+Ad_Object* upper_builtin(std::vector<Ad_Object*> args) {
+    return NULL;
+}
+
+Ad_Object* lower_builtin(std::vector<Ad_Object*> args) {
     return NULL;
 }
 
@@ -54,7 +74,11 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"print", new Ad_Builtin_Object(&print_builtin)},
     {"ref_count", new Ad_Builtin_Object(&ref_count)},
     {"type", new Ad_Builtin_Object(&type_builtin)},
-    {"append", new Ad_Builtin_Object(&append_builtin)}
+    {"append", new Ad_Builtin_Object(&append_builtin)},
+    {"pop", new Ad_Builtin_Object(&pop_builtin)},
+    {"remove", new Ad_Builtin_Object(&remove_builtin)},
+    {"upper", new Ad_Builtin_Object(&upper_builtin)},
+    {"lower", new Ad_Builtin_Object(&lower_builtin)}
 };
 
 void free_builtin_arguments(std::vector<Ad_Object*> args) {
