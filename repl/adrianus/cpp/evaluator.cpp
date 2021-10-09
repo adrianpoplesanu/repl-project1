@@ -417,11 +417,19 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         int idx = ((Ad_Integer_Object*)index)->value;
         Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
         Ad_List_Object* list_obj = (Ad_List_Object*)obj;
-        list_obj->elements[idx] = value; // TODO: this is a potential memory leak, i need to free what was already there
+        Ad_Object* old_obj = list_obj->elements[idx];
+        Ad_INCREF(value);
+        list_obj->elements[idx] = value;
+        free_Ad_Object_memory(index);
+        Ad_DECREF(old_obj);
+        free_Ad_Object_memory(old_obj);
+
     }
     if (obj->Type() == OBJ_HASH) {
         std::hash<std::string> hash_string;
         Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
+        Ad_INCREF(index);
+        Ad_INCREF(value);
         HashPair hash_pair(index, value);
         Ad_Hash_Object* hash_obj = (Ad_Hash_Object*)obj;
         std::string hash = std::to_string(hash_string(index->Hash()));
@@ -431,7 +439,11 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         if (it == hash_obj->pairs.end()) {
             hash_obj->pairs.insert(std::make_pair(hash, hash_pair));
         } else {
-            // TODO: this is a potential memory leak, i need to free what was already there
+            HashPair old_hash_pair = it->second;
+            Ad_DECREF(old_hash_pair.key);
+            Ad_DECREF(old_hash_pair.value);
+            free_Ad_Object_memory(old_hash_pair.key);
+            free_Ad_Object_memory(old_hash_pair.value);
             it->second = hash_pair;
         }
     }
