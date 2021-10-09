@@ -7,5 +7,6 @@ public enum ObjectTypeEnum {
     BOOLEAN,
     ERROR,
     RETURN_VALUE,
-    FUNCTION
+    FUNCTION,
+    BUILTIN
 }

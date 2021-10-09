@@ -23,6 +23,7 @@ import com.ad.objects.AdFunctionObject;
 import com.ad.objects.AdIntegerObject;
 import com.ad.objects.AdObject;
 import com.ad.objects.AdReturnValueObject;
+import com.ad.objects.AdStringObject;
 import com.ad.objects.ObjectTypeEnum;
 
 public class Evaluator {
@@ -203,11 +204,17 @@ public class Evaluator {
     	case NULL:
     		return false;
     	case INT:
-    		if (((AdIntegerObject)obj).getValue() == 0) return false;
+    		AdIntegerObject int_obj = (AdIntegerObject) obj;
+    		if (int_obj.getValue() == 0) return false;
     		return true;
     	case BOOLEAN:
-    		if (((AdBooleanObject)obj).getValue()) return true;
+    		AdBooleanObject bool_obj = (AdBooleanObject) obj;
+    		if (bool_obj.getValue()) return true;
     		return false;
+    	case STRING:
+    		AdStringObject string_obj = (AdStringObject) obj;
+    		if (string_obj.getValue().equals("")) return false;
+    		return true;
     	default:
     	break;
     	}
@@ -262,6 +269,25 @@ public class Evaluator {
     }
     
     private AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments) {
+    	if (function.getType() == ObjectTypeEnum.FUNCTION) {
+    		Environment extendedEnv = extendFunctionEnv(function, arguments);
+    		AdFunctionObject functionObject = (AdFunctionObject) function;
+    		AdObject evaluated = eval(functionObject.getBlock(), extendedEnv);
+    		return unwrapReturnValues(evaluated);
+    	}
+    	if (function.getType() == ObjectTypeEnum.BUILTIN) {
+    		//...
+    	}
+    	return null;
+    }
+    
+    private Environment extendFunctionEnv(AdObject fuction, ArrayList<AdObject> arguments) {
+    	//...
+    	return null;
+    }
+    
+    private AdObject unwrapReturnValues(AdObject evaluated) {
+    	//...
     	return null;
     }
     

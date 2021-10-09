@@ -13,5 +13,4 @@ public class CallExpressionParser implements InfixParseInterface {
 	public AstNode parse(AstNode node) {
 		return parser.parseCallExpression(node);
 	}
-
 }

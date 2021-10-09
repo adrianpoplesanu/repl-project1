@@ -10,10 +10,12 @@ public class AstCallExpression extends AstNode {
 	private AstNode function;
 	
 	public AstCallExpression(Token token) {
+		type = AstNodeTypeEnum.CALL_EXPRESSION;
 		this.token = token;
 	}
 	
 	public AstCallExpression(Token token, AstNode function) {
+		type = AstNodeTypeEnum.CALL_EXPRESSION;
 		this.token = token;
 		this.function = function;
 	}
