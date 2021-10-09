@@ -24,18 +24,17 @@ enum Ad_Object_Type {
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
-	{OBJ_NULL, "NullObject"},
-	{OBJ_INT, "IntObject"},
-	{OBJ_BOOL, "BoolObject"},
-	{OBJ_STRING, "StringObject"},
-	{OBJ_RETURN_VALUE, "ReturnObject"},
-	{OBJ_FUNCTION, "FunctionObject"},
-	{OBJ_STRING, "StringObject"},
-	{OBJ_ERROR, "ErrorObject"},
-	{OBJ_BUILTIN, "BuiltinObject"},
-	{OBJ_SIGNAL, "SignalObject"},
-	{OBJ_LIST, "ListObject"},
-	{OBJ_HASH, "HashObject"}
+	{OBJ_NULL, "NULL"},
+	{OBJ_INT, "INTEGER"},
+	{OBJ_BOOL, "BOOLEAN"},
+	{OBJ_STRING, "STRING"},
+	{OBJ_RETURN_VALUE, "RETURN_VALUE"},
+	{OBJ_FUNCTION, "FUNCTION"},
+	{OBJ_ERROR, "ERROR"},
+	{OBJ_BUILTIN, "BUILTIN"},
+	{OBJ_SIGNAL, "SIGNAL"},
+	{OBJ_LIST, "LIST"},
+	{OBJ_HASH, "HASH"}
 };
 
 class Ad_Object {

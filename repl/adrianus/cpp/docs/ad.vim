@@ -7,14 +7,17 @@ endif
 hi Boolean ctermfg=Red
 hi Let ctermfg=Magenta
 
-syntax keyword adFunction fn len
-syntax keyword adKeyword if else return
-syntax keyword adLet let
-syntax keyword adBoolean true false
+syntax region potionString start=/\v"/ skip=/\v\\./ end=/\v"/
+
+syntax keyword adFunction function len print
+syntax keyword adKeyword if else return while class
+syntax keyword adLet let, def
+syntax keyword adBoolean true false potionString
 
 highlight link adKeyword Keyword
 highlight link adFunction Function
 highlight link adLet Let
 highlight link adBoolean Boolean
+highlight link potionString String
 
 let b:current_syntax = "ad"

@@ -9,6 +9,7 @@ enum TokenType {
     TT_EOF,
     TT_IDENT,
     TT_ASSIGN,
+    TT_DEF,
     TT_LPAREN,
     TT_RPAREN,
     TT_LBRACE,
@@ -45,6 +46,7 @@ enum TokenType {
 
 std::map<TokenType, std::string> token_type_map = {
     {TT_ASSIGN, "ASSIGN"},
+    {TT_DEF, "DEF"},
     {TT_ILLEGAL, "ILLEGAL"},
     {TT_EOF, "EOF"},
     {TT_TRUE, "TRUE"},
@@ -89,6 +91,7 @@ std::map<std::string, TokenType> keywords = {
     {"true", TT_TRUE},
     {"false", TT_FALSE},
     {"fn", TT_FUNCTION},
+    {"def", TT_DEF},
     {"let", TT_LET},
     {"while", TT_WHILE},
     {"and", TT_AND},
