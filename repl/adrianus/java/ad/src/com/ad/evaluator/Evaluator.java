@@ -37,8 +37,7 @@ public class Evaluator {
 		case BOOLEAN:
 			return evalBoolean(node, env);
 		case CALL_EXPRESSION:
-			System.out.println("eval CallExpression");
-			break;
+			return evalCallExpression(node, env);
 		case EXPRESSION_STATEMENT:
 			return evalExpressionStatement(node, env);
 		case FUNCTION_LITERAL:
@@ -54,8 +53,9 @@ public class Evaluator {
 		case LET_STATEMENT:
 			return evalLetStatement(node, env);
 		case PREFIX_EXPRESSION:
-			AdObject right = eval(((AstPrefixExpression)node).getRight(), env);
-			return evalPrefixExpression(((AstPrefixExpression)node).getOperator(), right);
+			AstPrefixExpression prefixExpression = (AstPrefixExpression)node;
+			AdObject right = eval(prefixExpression.getRight(), env);
+			return evalPrefixExpression(prefixExpression.getOperator(), right);
 		case RETURN_STATEMENT:
 			return evalReturnStatement(node, env);
 		case STRING_LITERAL:
@@ -238,6 +238,11 @@ public class Evaluator {
     	ArrayList<AstNode> params = functionLiteral.getParameters();
     	AdFunctionObject func = new AdFunctionObject(params, body, env);
     	return func;
+    }
+    
+    private AdObject evalCallExpression(AstNode node, Environment env) {
+    	// TODO: implement the call expression evaluation
+    	return null;
     }
     
     private AdObject newError(String msg) {

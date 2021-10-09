@@ -268,6 +268,16 @@ public class Parser {
 			nextToken();
 			return args;
 		}
+		nextToken();
+		args.add(parseExpression(PrecedenceTypeEnum.LOWEST));
+		while(peekTokenIs(TokenTypeEnum.COMMA)) {
+			nextToken();
+			nextToken();
+			args.add(parseExpression(PrecedenceTypeEnum.LOWEST));
+		}
+		if (!expectPeek(TokenTypeEnum.RPAREN)) {
+			return new ArrayList<AstNode>();
+		}
 		return args;
 	}
 
