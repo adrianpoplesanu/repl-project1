@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
+import com.ad.ast.AstCallExpression;
 import com.ad.ast.AstExpressionStatement;
 import com.ad.ast.AstFunctionLiteral;
 import com.ad.ast.AstIdentifier;
@@ -241,7 +242,26 @@ public class Evaluator {
     }
     
     private AdObject evalCallExpression(AstNode node, Environment env) {
-    	// TODO: implement the call expression evaluation
+    	AstCallExpression callExpression = (AstCallExpression) node;
+    	AdObject function = eval(callExpression.getFunction(), env);
+    	if (isError(function)) return function;
+    	ArrayList<AdObject> arguments = evalExpressions(callExpression.getArguments(), env);
+    	if (arguments.size() == 1 && isError(arguments.get(0))) {
+    		return arguments.get(0);
+    	}
+    	return applyFunction(function, arguments);
+    }
+    
+    private ArrayList<AdObject> evalExpressions(ArrayList<AstNode> arguments, Environment env) {
+    	ArrayList<AdObject> objects = new ArrayList<AdObject>();
+    	for (AstNode argument : arguments) {
+    		AdObject argumentObject = eval(argument, env);
+    		objects.add(argumentObject);
+    	}
+    	return objects;
+    }
+    
+    private AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments) {
     	return null;
     }
     
