@@ -10,3 +10,5 @@ class ObjectType(object):
     BUILTIN = "BUILTIN"
     LIST = "LIST"
     HASH = "HASH"
+    CLASS = "CLASS"
+    INSTANCE = "INSTANCE"

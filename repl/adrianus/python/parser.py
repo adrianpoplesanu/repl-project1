@@ -5,7 +5,8 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
-                ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement
+                ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
+                ASTClassExpression
 
 
 class Parser(object):
@@ -26,6 +27,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
         self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
         self.prefix_parse_functions[TokenType.DEF] = self.parse_def_expression
+        self.prefix_parse_functions[TokenType.CLASS] = self.parse_class_expression
         self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
@@ -46,6 +48,7 @@ class Parser(object):
         self.infix_parse_functions[TokenType.LPAREN] = self.parse_call_expression
         self.infix_parse_functions[TokenType.ASSIGN] = self.parse_assign_expression
         self.infix_parse_functions[TokenType.LBRACKET] = self.parse_index_expression
+        self.infix_parse_functions[TokenType.DOT] = self.parse_member_access
 
     def reset(self, source):
         self.source = source
@@ -226,6 +229,7 @@ class Parser(object):
         return expr
 
     def parse_call_expression(self, func):
+        # TODO: this call expression might be a class constructor
         expr = ASTCallExpression(self.current_token, func)
         expr.arguments = self.parse_call_arguments()
         return expr
@@ -327,3 +331,34 @@ class Parser(object):
         if self.current_token_is(TokenType.SEMICOLON):
             self.next_token()
         return stmt
+
+    def parse_class_expression(self):
+        expr = ASTClassExpression(token=self.current_token)
+        self.next_token()
+        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        expr.name = name
+        expr.methods = []
+        expr.attributes = []
+        while not self.current_token_is(TokenType.RBRACE):
+            if self.current_token_is(TokenType.DEF):
+                stmt = self.parse_def_expression()
+                expr.methods.append(stmt)
+            elif self.current_token_is(TokenType.IDENT):
+                ident = self.parse_identifier()
+                stmt = self.parse_assign_expression(ident)
+                expr.attributes.append(stmt)
+            elif self.current_token_is(TokenType.SEMICOLON):
+                pass
+            else:
+                print "ERROR: parsing class"
+                # i should return an error object here
+                return None
+            self.next_token()
+        return expr
+
+    def parse_member_access(self, left):
+        # left should be a class instance
+        # right should be a class attribute or method
+        print 'encountered member access'
+        print left
+        return None

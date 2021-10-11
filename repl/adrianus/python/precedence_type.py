@@ -11,6 +11,7 @@ class PrecedenceType(object):
     PREFIX = 8
     CALL = 9
     INDEX = 10
+    MEMBER_ACCESS = 11
 
 precedences = {
     TokenType.ASSIGN: PrecedenceType.ASSIGN,
@@ -27,5 +28,6 @@ precedences = {
     TokenType.SLASH: PrecedenceType.PRODUCT,
     TokenType.ASTERISK: PrecedenceType.PRODUCT,
     TokenType.LPAREN: PrecedenceType.CALL,
-    TokenType.LBRACKET: PrecedenceType.INDEX
+    TokenType.LBRACKET: PrecedenceType.INDEX,
+    TokenType.DOT: PrecedenceType.MEMBER_ACCESS
 }

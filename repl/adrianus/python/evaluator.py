@@ -1,6 +1,7 @@
 from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                     Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
-                    Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Hash_Pair
+                    Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Hash_Pair, \
+                    Ad_Class_Object
 from object_type import ObjectType
 from ast import StatementType
 from environment import new_enclosed_environment
@@ -54,6 +55,7 @@ class Evaluator(object):
             obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
             return obj
         elif node.type == StatementType.CALL_EXPRESSION:
+            # TODO: i need to check if this is a class constructor
             func = self.eval(node.func, env)
             if self.is_error(func):
                 return func
@@ -83,6 +85,8 @@ class Evaluator(object):
             return self.eval_hash_literal(node, env)
         elif node.type == StatementType.DEF_STATEMENT:
             return self.eval_def_statement(node, env)
+        elif node.type == StatementType.CLASS_EXPRESSION:
+            return self.eval_class_expression(node, env)
         else:
             print 'unknown AST node'
 
@@ -336,5 +340,10 @@ class Evaluator(object):
 
     def eval_def_statement(self, node, env):
         obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
+        env.set(node.name.value, obj)
+        return None
+
+    def eval_class_expression(self, node, env):
+        obj = Ad_Class_Object(name=node.name, methods=node.methods, attributes=node.attributes)
         env.set(node.name.value, obj)
         return None

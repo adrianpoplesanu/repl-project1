@@ -82,7 +82,7 @@ class Ad_String_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
-        return self.value
+        return "\"" + self.value + "\""
 
     def hash_key(self):
         return HashKey(type=type, value=hash(self.value))
@@ -146,4 +146,33 @@ class Ad_Hash_Object(Ad_Object):
         out = "{"
         out += ', '.join(['{0}: {1}'.format(pair.key.inspect(), pair.value.inspect()) for pair in self.pairs.values()])
         out += "}"
+        return out
+
+
+class Ad_Class_Object(Ad_Object):
+    type = ObjectType.CLASS
+
+    def __init__(self, name=None, attributes=None, methods=None):
+        self.name = name
+        self.attributes = attributes
+        self.methods = methods
+
+    def inspect(self):
+        out = "class object"
+        return out
+
+
+class Ad_Class_Instance(Ad_Object):
+    type = ObjectType.INSTANCE
+
+    def __init__(self, name=None, class_object=None):
+        """
+        @param: name - AstNode with the AstIdenfitier of the instance name
+        @param: class_object - a clone of the Ad_Class_Object against which the logic will be executed
+        """
+        self.name = name
+        self.class_object = class_object
+
+    def inspect(self):
+        out = "class instance object"
         return out

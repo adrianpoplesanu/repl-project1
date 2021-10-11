@@ -30,7 +30,8 @@ def ref_count_builtin(args):
     print 'ref_count not available in Python implementation'
 
 def type_builtin(args):
-    return Ad_String_Object("type 'aaa'")
+    target = args[0]
+    return Ad_String_Object(target.type)
 
 def append_builtin(args):
     list_obj = args[0]

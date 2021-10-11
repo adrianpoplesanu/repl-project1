@@ -143,7 +143,7 @@ class Lexer(object):
 
     def read_ident(self):
         start = self.position
-        while self.is_letter():
+        while self.is_letter() or self.is_digit():
             self.read_char()
         return self.source[start:self.position]
 

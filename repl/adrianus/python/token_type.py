@@ -41,3 +41,5 @@ class TokenType(object):
 	LBRACKET = "["
 	RBRACKET = "]"
 	COLON = ":"
+	DOT = "."
+	CLASS = "CLASS"

@@ -39,7 +39,9 @@ token_type_map = {
 	TokenType.OR: "OR",
 	TokenType.LBRACKET: 'LBRACKET',
 	TokenType.RBRACKET: 'RBRACKET',
-	TokenType.COLON: "COLON"
+	TokenType.COLON: "COLON",
+	TokenType.DOT: "DOT",
+	TokenType.CLASS: "CLASS"
 }
 
 keywords_map = {
@@ -47,7 +49,7 @@ keywords_map = {
 	"return": TokenType.RETURN,
 	"if": TokenType.IF,
 	"else": TokenType.ELSE,
-	"fn": TokenType.FUNCTION,
+	"function": TokenType.FUNCTION,
 	"def": TokenType.DEF,
 	"while": TokenType.WHILE,
 	"true": TokenType.TRUE,
@@ -55,7 +57,8 @@ keywords_map = {
 	# context
 	# "context": TokenType.ILLEGAL, context ar trebui sa fie un builtin
 	"and": TokenType.AND,
-	"or": TokenType.OR
+	"or": TokenType.OR,
+	"class": TokenType.CLASS
 }
 
 
