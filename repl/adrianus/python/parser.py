@@ -6,7 +6,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
-                ASTClassExpression
+                ASTClassStatement, ASTMemberAccess
 
 
 class Parser(object):
@@ -27,7 +27,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
         self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
         self.prefix_parse_functions[TokenType.DEF] = self.parse_def_expression
-        self.prefix_parse_functions[TokenType.CLASS] = self.parse_class_expression
+        self.prefix_parse_functions[TokenType.CLASS] = self.parse_class_statement
         self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
@@ -332,8 +332,8 @@ class Parser(object):
             self.next_token()
         return stmt
 
-    def parse_class_expression(self):
-        expr = ASTClassExpression(token=self.current_token)
+    def parse_class_statement(self):
+        expr = ASTClassStatement(token=self.current_token)
         self.next_token()
         name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
         expr.name = name
@@ -357,8 +357,11 @@ class Parser(object):
         return expr
 
     def parse_member_access(self, left):
-        # left should be a class instance
-        # right should be a class attribute or method
-        print 'encountered member access'
-        print left
-        return None
+        member_access = ASTMemberAccess(token=self.current_token)
+        self.next_token()
+        right = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        args = self.parse_call_arguments()
+        member_access.owner = left
+        member_access.member = right
+        member_access.arguments = args
+        return member_access

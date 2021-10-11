@@ -165,13 +165,14 @@ class Ad_Class_Object(Ad_Object):
 class Ad_Class_Instance(Ad_Object):
     type = ObjectType.INSTANCE
 
-    def __init__(self, name=None, class_object=None):
+    def __init__(self, name=None, class_object=None, instance_environment=None):
         """
         @param: name - AstNode with the AstIdenfitier of the instance name
         @param: class_object - a clone of the Ad_Class_Object against which the logic will be executed
         """
         self.name = name
         self.class_object = class_object
+        self.instance_environment = instance_environment
 
     def inspect(self):
         out = "class instance object"

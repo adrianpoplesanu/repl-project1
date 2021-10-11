@@ -63,6 +63,14 @@ def print_ast_nodes(node, level):
         print '->IndexExpression ' + str(node.token)
         print_ast_nodes(node.left, level + 2)
         print_ast_nodes(node.index, level + 2)
+    elif node.type == StatementType.HASH_LITERAL:
+        print '->HashLiteral ' + str(node.token)
+    elif node.type == StatementType.ASSIGN_STATEMENT:
+        print '->AssignStatement ' + str(node.token)
+    elif node.type == StatementType.DEF_STATEMENT:
+        print '->DefStatement ' + str(node.token)
+    elif node.type == StatementType.CLASS_STATEMENT:
+        print '->ClassStatement ' + str(node.token)
     else:
         print 'ERROR: print ast node unknow type'
 

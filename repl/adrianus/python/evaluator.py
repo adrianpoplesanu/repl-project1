@@ -85,8 +85,10 @@ class Evaluator(object):
             return self.eval_hash_literal(node, env)
         elif node.type == StatementType.DEF_STATEMENT:
             return self.eval_def_statement(node, env)
-        elif node.type == StatementType.CLASS_EXPRESSION:
-            return self.eval_class_expression(node, env)
+        elif node.type == StatementType.CLASS_STATEMENT:
+            return self.eval_class_statement(node, env)
+        elif node.type == StatementType.MEMBER_ACCESS:
+            return self.eval_member_access(node, env)
         else:
             print 'unknown AST node'
 
@@ -343,7 +345,12 @@ class Evaluator(object):
         env.set(node.name.value, obj)
         return None
 
-    def eval_class_expression(self, node, env):
+    def eval_class_statement(self, node, env):
         obj = Ad_Class_Object(name=node.name, methods=node.methods, attributes=node.attributes)
         env.set(node.name.value, obj)
+        return None
+
+    def eval_member_access(self, node, env):
+        # TODO: implement this
+        print 'evaluating a member access, either attribute or member'
         return None

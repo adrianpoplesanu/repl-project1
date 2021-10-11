@@ -41,7 +41,8 @@ token_type_map = {
 	TokenType.RBRACKET: 'RBRACKET',
 	TokenType.COLON: "COLON",
 	TokenType.DOT: "DOT",
-	TokenType.CLASS: "CLASS"
+	TokenType.CLASS: "CLASS",
+	TokenType.THIS: "THIS"
 }
 
 keywords_map = {
@@ -58,7 +59,8 @@ keywords_map = {
 	# "context": TokenType.ILLEGAL, context ar trebui sa fie un builtin
 	"and": TokenType.AND,
 	"or": TokenType.OR,
-	"class": TokenType.CLASS
+	"class": TokenType.CLASS,
+	"this": TokenType.THIS
 }
 
 

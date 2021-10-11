@@ -19,7 +19,8 @@ class StatementType(object):
     HASH_LITERAL = 'HASH_LITERAL'
     ASSIGN_STATEMENT = 'ASSIGN_STATEMENT'
     DEF_STATEMENT = 'DEF_STATEMENT'
-    CLASS_EXPRESSION = 'CLASS_EXPRESSION'
+    CLASS_STATEMENT = 'CLASS_STATEMENT'
+    MEMBER_ACCESS = 'MEMBER_ACCESS'
 
 
 statement_type_map = {
@@ -43,7 +44,8 @@ statement_type_map = {
     StatementType.HASH_LITERAL: 'HASH_LITERAL',
     StatementType.ASSIGN_STATEMENT: 'ASSIGN_STATEMENT',
     StatementType.DEF_STATEMENT: 'DEF_STATEMENT',
-    StatementType.CLASS_EXPRESSION: 'CLASS_EXPRESSION'
+    StatementType.CLASS_STATEMENT: 'CLASS_STATEMENT',
+    StatementType.MEMBER_ACCESS: 'MEMBER_ACCESS'
 }
 
 
@@ -431,14 +433,27 @@ class ASTDefStatement(ASTNode):
         return 'Token: ' + str(self.token) + '<name: ' + str(self.name) + ', params:' + str(self.parameters) + ', body: ' + str(self.body) + '>'
 
 
-class ASTClassExpression(ASTNode):
-    type = StatementType.CLASS_EXPRESSION
+class ASTClassStatement(ASTNode):
+    type = StatementType.CLASS_STATEMENT
 
     def __init__(self, token=None, name=None, methods=None, attributes=None):
         self.token = token
         self.name = name
         self.methods = methods
         self.attributes = attributes
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)
+
+
+class ASTMemberAccess(ASTNode):
+    type = StatementType.MEMBER_ACCESS
+
+    def __init__(self, token=None, attributes=None, owner=None, member=None):
+        self.token = token
 
     def token_literal(self):
         return self.token.literal

@@ -43,3 +43,4 @@ class TokenType(object):
 	COLON = ":"
 	DOT = "."
 	CLASS = "CLASS"
+	THIS = "THIS"
