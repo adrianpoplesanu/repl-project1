@@ -1,6 +1,7 @@
 package com.ad.evaluator;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
@@ -273,7 +274,7 @@ public class Evaluator {
     		Environment extendedEnv = extendFunctionEnv(function, arguments);
     		AdFunctionObject functionObject = (AdFunctionObject) function;
     		AdObject evaluated = eval(functionObject.getBlock(), extendedEnv);
-    		return unwrapReturnValues(evaluated);
+    		return unwrapReturnValue(evaluated);
     	}
     	if (function.getType() == ObjectTypeEnum.BUILTIN) {
     		//...
@@ -281,14 +282,22 @@ public class Evaluator {
     	return null;
     }
     
-    private Environment extendFunctionEnv(AdObject fuction, ArrayList<AdObject> arguments) {
-    	//...
-    	return null;
+    private Environment extendFunctionEnv(AdObject func, ArrayList<AdObject> arguments) {
+    	AdFunctionObject functionObject = (AdFunctionObject) func;
+     	Environment extended = Environment.newEnclosedEnvironment(functionObject.getEnv());
+     	int i = 0;
+     	for (AstNode param : functionObject.getParameters()) {
+     		extended.set(param.tokenLiteral(), arguments.get(i++));
+     	}
+    	return extended;
     }
     
-    private AdObject unwrapReturnValues(AdObject evaluated) {
-    	//...
-    	return null;
+    private AdObject unwrapReturnValue(AdObject evaluated) {
+    	if (evaluated.getType() == ObjectTypeEnum.RETURN_VALUE) {
+    		AdReturnValueObject returnValue = (AdReturnValueObject) evaluated;
+    		return returnValue.getReturnValue();
+    	}
+    	return evaluated;
     }
     
     private AdObject newError(String msg) {

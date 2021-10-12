@@ -24,8 +24,7 @@ public class AdFunctionObject extends AdObject {
 
 	@Override
 	public void print() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Function object");
 	}
 
 	public AstNode getBlock() {
