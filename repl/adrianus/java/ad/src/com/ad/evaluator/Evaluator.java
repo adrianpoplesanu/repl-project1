@@ -1,7 +1,6 @@
 package com.ad.evaluator;
 
 import java.util.ArrayList;
-import java.util.function.Function;
 
 import com.ad.ast.AstBlockStatement;
 import com.ad.ast.AstBoolean;
@@ -17,8 +16,10 @@ import com.ad.ast.AstNode;
 import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
 import com.ad.ast.AstReturnStatement;
+import com.ad.builtin.BuiltinLookup;
 import com.ad.environment.Environment;
 import com.ad.objects.AdBooleanObject;
+import com.ad.objects.AdBuiltinObject;
 import com.ad.objects.AdErrorObject;
 import com.ad.objects.AdFunctionObject;
 import com.ad.objects.AdIntegerObject;
@@ -131,7 +132,12 @@ public class Evaluator {
     
     private AdObject evalIdentifier(AstNode node, Environment env) {
     	AstIdentifier ident = (AstIdentifier)node;
-    	AdObject obj = env.get(ident.getValue());
+    	AdObject obj = null;
+    	if (env.check(ident.getValue())) {
+    		obj = env.get(ident.getValue());
+    	} else if (BuiltinLookup.builtinMap.containsKey(ident.getValue())) {
+    		obj = BuiltinLookup.builtinMap.get(ident.getValue());
+    	}
     	return obj;
     }
     
@@ -277,7 +283,8 @@ public class Evaluator {
     		return unwrapReturnValue(evaluated);
     	}
     	if (function.getType() == ObjectTypeEnum.BUILTIN) {
-    		//...
+    		AdBuiltinObject builtin = (AdBuiltinObject) function;
+    		return builtin.getBuiltinFunction().call(arguments, null); // env = null for now because env is not yet passed in applyFunction
     	}
     	return null;
     }

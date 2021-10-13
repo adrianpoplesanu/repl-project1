@@ -18,8 +18,7 @@ public class AdStringObject extends AdObject {
 
 	@Override
 	public String inspect() {
-		// TODO Auto-generated method stub
-		return null;
+		return value;
 	}
 
 	@Override
