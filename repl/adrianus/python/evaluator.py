@@ -1,10 +1,10 @@
 from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                     Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
                     Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Hash_Pair, \
-                    Ad_Class_Object
+                    Ad_Class_Object, Ad_Class_Instance
 from object_type import ObjectType
 from ast import StatementType
-from environment import new_enclosed_environment
+from environment import new_environment, new_enclosed_environment
 from builtins import builtins_map
 from utils import print_ast_nodes
 
@@ -62,7 +62,7 @@ class Evaluator(object):
             args_objs = self.eval_expressions(node.arguments, env)
             if len(args_objs) == 1 and self.is_error(args_objs[0]):
                 return args_objs[0]
-            return self.apply_function(func, args_objs)
+            return self.apply_function(func, args_objs, env)
         elif node.type == StatementType.WHILE_EXPRESSION:
             return self.eval_while_expression(node, env)
         elif node.type == StatementType.STRING_LITERAL:
@@ -240,14 +240,23 @@ class Evaluator(object):
             res.append(evaluated)
         return res
 
-    def apply_function(self, func, args_objs):
+    def apply_function(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:
             extended_env = self.extend_function_env(func, args_objs)
             evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
         if func.type == ObjectType.BUILTIN:
-            return func.builtin_function(args_objs) # asta ar putea fi si func.builtin_function(*args_objs)
+            return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
             # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
+        if func.type == ObjectType.CLASS:
+            #print 'instantiate a class object'
+            #print 'call the class constructor'
+            instance_environment = new_environment()
+            klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
+            for attribute in func.attributes:
+                print "+++" + str(attribute)
+                #klass_instance.instance_environment.set()
+            return klass_instance
         return None
 
     def unwrap_return_value(self, obj):

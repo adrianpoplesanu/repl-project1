@@ -3,13 +3,16 @@ print("start test")
 
 class Elev {
     varsta = 12
+    aaa = "abc"
+    bbb = "cde"
+    ccc = 1 + 56
 
     def construct(offset) {
         this.offset = offset
     }
 
     def print_varsta(offset2) {
-        offset2 + offset + varsta
+        offset2 + this.offset + varsta
     }
 }
 
@@ -17,4 +20,8 @@ print("end class declaration")
 
 e = Elev(12)
 e.print_varsta(34)
+
+globals()
+
+print(e)
 print("end class test")

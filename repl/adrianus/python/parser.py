@@ -335,11 +335,13 @@ class Parser(object):
     def parse_class_statement(self):
         expr = ASTClassStatement(token=self.current_token)
         self.next_token()
-        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        name = self.parse_identifier()
         expr.name = name
-        expr.methods = []
+        self.next_token()
         expr.attributes = []
+        expr.methods = []
         while not self.current_token_is(TokenType.RBRACE):
+            print self.current_token
             if self.current_token_is(TokenType.DEF):
                 stmt = self.parse_def_expression()
                 expr.methods.append(stmt)
@@ -347,10 +349,33 @@ class Parser(object):
                 ident = self.parse_identifier()
                 stmt = self.parse_assign_expression(ident)
                 expr.attributes.append(stmt)
+            self.next_token()
+        return expr
+
+    def parse_class_statement_old(self):
+        expr = ASTClassStatement(token=self.current_token)
+        self.next_token()
+        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        expr.name = name
+        expr.methods = []
+        expr.attributes = []
+        while not self.current_token_is(TokenType.RBRACE):
+            print self.current_token
+            if self.current_token_is(TokenType.DEF):
+                #print 'aaa'
+                stmt = self.parse_def_expression()
+                expr.methods.append(stmt)
+            elif self.current_token_is(TokenType.IDENT):
+                #print 'bbb'
+                ident = self.parse_identifier()
+                stmt = self.parse_assign_expression(ident)
+                expr.attributes.append(stmt)
             elif self.current_token_is(TokenType.SEMICOLON):
+                #print 'ccc'
                 pass
             else:
                 print "ERROR: parsing class"
+                #print self.current_token
                 # i should return an error object here
                 return None
             self.next_token()

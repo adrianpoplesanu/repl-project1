@@ -104,11 +104,12 @@ class Ad_Error_Object(Ad_Object):
 class Ad_Builtin_Object(Ad_Object):
     type = ObjectType.BUILTIN
 
-    def __init__(self, builtin_function=None):
+    def __init__(self, builtin_function=None, env=None):
         """
         @param builtin_function: reference to a function
         """
         self.builtin_function = builtin_function
+        self.env = env
 
     def inspect(self):
         return str(self.builtin_function)
@@ -175,5 +176,7 @@ class Ad_Class_Instance(Ad_Object):
         self.instance_environment = instance_environment
 
     def inspect(self):
-        out = "class instance object"
+        out = "ClassInstance " + str(self.name) + " "
+        out += "attributes: " + str(self.class_object.attributes) + " "
+        out += "methods: " + str(self.class_object.methods)
         return out
