@@ -16,6 +16,7 @@ import com.ad.ast.AstNode;
 import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
 import com.ad.ast.AstReturnStatement;
+import com.ad.ast.AstStringLiteral;
 import com.ad.builtin.BuiltinLookup;
 import com.ad.environment.Environment;
 import com.ad.objects.AdBooleanObject;
@@ -63,8 +64,7 @@ public class Evaluator {
 		case RETURN_STATEMENT:
 			return evalReturnStatement(node, env);
 		case STRING_LITERAL:
-			System.out.println("eval StringLiteral");
-			break;
+			return evalStringLiteral(node, env);
 		case WHILE_EXPRESSION:
 			System.out.println("eval WhileExpression");
 			break;
@@ -305,6 +305,11 @@ public class Evaluator {
     		return returnValue.getReturnValue();
     	}
     	return evaluated;
+    }
+    
+    private AdObject evalStringLiteral(AstNode node, Environment env) {
+    	AstStringLiteral stringLiteral = (AstStringLiteral)node;
+    	return new AdStringObject(stringLiteral.getValue());
     }
     
     private AdObject newError(String msg) {

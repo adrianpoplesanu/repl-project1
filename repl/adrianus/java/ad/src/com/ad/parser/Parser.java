@@ -17,6 +17,7 @@ import com.ad.ast.AstNode;
 import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
 import com.ad.ast.AstReturnStatement;
+import com.ad.ast.AstStringLiteral;
 import com.ad.lexer.Lexer;
 import com.ad.token.Token;
 import com.ad.token.TokenTypeEnum;
@@ -42,6 +43,7 @@ public class Parser {
 	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this));
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
+	    prefixParseFns.put(TokenTypeEnum.STRING, new StringLiteralParser(this));
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.ASTERISK, new InfixExpressionParser(this));
@@ -302,6 +304,12 @@ public class Parser {
 			left_expression = infixParser.parse(left_expression);
 		}
 		return left_expression;
+	}
+	
+	public AstNode parseStringLiteral() {
+		AstStringLiteral node = new AstStringLiteral(getCurrentToken());
+		node.setValue(getCurrentToken().getLiteral());
+		return node;
 	}
 
 	public Lexer getLexer() {

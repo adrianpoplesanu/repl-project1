@@ -82,6 +82,10 @@ public class Lexer {
 			token.setType(TokenTypeEnum.RBRACE);
 			token.setLiteral("}");
 		break;
+		case '"':
+			token.setType(TokenTypeEnum.STRING);
+			token.setLiteral(readString());
+			break;
 		case '<':
 			if (peekChar() == '=') {
 				token.setType(TokenTypeEnum.LTE);
@@ -168,6 +172,15 @@ public class Lexer {
 	private String readNumber() {
 		int start = position;
 		while(isDigit()) {
+			readChar();
+		}
+		return source.substring(start, position);
+	}
+	
+	private String readString() {
+		readChar();
+		int start = position;
+		while(currentChar != '"') {
 			readChar();
 		}
 		return source.substring(start, position);

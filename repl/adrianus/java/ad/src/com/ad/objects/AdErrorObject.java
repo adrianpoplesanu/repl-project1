@@ -4,6 +4,7 @@ public class AdErrorObject extends AdObject {
 	private String msg;
 	
 	public AdErrorObject(String msg) {
+		type = ObjectTypeEnum.ERROR;
 		this.msg = msg;
 	}
 
