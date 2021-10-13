@@ -18,6 +18,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_STRING, &Parser::ParseStringLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseListLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACE, &Parser::ParseHashLiteral));
+    prefixParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefExpression));
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -428,6 +429,25 @@ Ad_AST_Node* Parser::ParseAssignExpression(Ad_AST_Node* left) {
     if (CurrentTokenIs(TT_SEMICOLON)) {
         NextToken();
     }
+    return stmt;
+}
+
+Ad_AST_Node* Parser::ParseDefExpression() {
+    Ad_AST_Def_Statement* stmt = new Ad_AST_Def_Statement(current_token);
+    NextToken();
+    Ad_AST_Identifier* name = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
+    stmt->name = name;
+    if (!ExpectPeek(TT_LPAREN)) {
+        // free Ad_AST_Def_Statement
+        return NULL; // this should potentially return an error AST node
+    }
+    std::vector<Ad_AST_Node*> parameters = ParseFunctionParameters();
+    stmt->parameters = parameters;
+    if (!ExpectPeek(TT_LBRACE)) {
+        return NULL;
+    }
+    Ad_AST_Node* body = ParseBlockStatement();
+    stmt->body = body;
     return stmt;
 }
 

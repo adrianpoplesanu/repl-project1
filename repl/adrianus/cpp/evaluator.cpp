@@ -423,7 +423,6 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         free_Ad_Object_memory(index);
         Ad_DECREF(old_obj);
         free_Ad_Object_memory(old_obj);
-
     }
     if (obj->Type() == OBJ_HASH) {
         std::hash<std::string> hash_string;

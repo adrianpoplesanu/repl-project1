@@ -575,6 +575,29 @@ std::string Ad_AST_HashLiteral::ToString() {
     return "todo: implement Ad_AST_HashLiteral ToString()";
 }
 
+Ad_AST_Def_Statement::Ad_AST_Def_Statement() {
+    type = ST_DEF_STATEMENT;
+    ref_count = 0;
+}
+
+Ad_AST_Def_Statement::Ad_AST_Def_Statement(Token t) {
+    type = ST_DEF_STATEMENT;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_Def_Statement::~Ad_AST_Def_Statement() {
+    // TODO: implement destructor for AST_Def_Statement
+}
+
+std::string Ad_AST_Def_Statement::TokenLiteral() {
+    return "todo: implement Ad_AST_Def_Statement TokenLiteral()";
+}
+
+std::string Ad_AST_Def_Statement::ToString() {
+    return "todo: implement Ad_AST_Def_Statement ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;
