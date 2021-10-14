@@ -110,6 +110,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalHashLiteral(node, env);
         }
         break;
+        case ST_DEF_STATEMENT: {
+            return EvalDefStatement(node, env);
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -447,6 +451,17 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         }
     }
     return NULL;
+}
+
+Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
+    Ad_Function_Object* func = new Ad_Function_Object();
+    Ad_AST_Def_Statement* def_statement = (Ad_AST_Def_Statement*) node;
+    func->params = def_statement->parameters;
+    func->body = def_statement->body;
+    func->env = &env;
+    Ad_AST_Identifier* ident = (Ad_AST_Identifier*) def_statement->name;
+    env.Set(ident->value, func);
+    return func;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

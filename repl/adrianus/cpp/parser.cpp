@@ -444,7 +444,8 @@ Ad_AST_Node* Parser::ParseDefExpression() {
     std::vector<Ad_AST_Node*> parameters = ParseFunctionParameters();
     stmt->parameters = parameters;
     if (!ExpectPeek(TT_LBRACE)) {
-        return NULL;
+        // free As_AST_Def_Statement
+        return NULL; // this hsould potentially return an error AST node
     }
     Ad_AST_Node* body = ParseBlockStatement();
     stmt->body = body;

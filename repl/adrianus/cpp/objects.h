@@ -110,7 +110,7 @@ class Ad_Function_Object : public Ad_Object {
 public:
 	std::vector<Ad_AST_Node*> params; // i don't really like using AST nodes here
 	Ad_AST_Node* body; // i don't really like using AST nodes here
-	Environment *env; // this works only with forward declaration
+	Environment* env; // this works only with forward declaration
 
 	Ad_Function_Object();
 	Ad_Function_Object(std::vector<Ad_AST_Node*>, Ad_AST_Node*, Environment*);
@@ -133,12 +133,6 @@ public:
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
 };
-
-void Ad_INCREF(Ad_Object*);
-void Ad_DECREF(Ad_Object*);
-
-void free_Ad_Object_memory(Ad_Object*);
-void print_Ad_Object(Ad_Object*);
 
 class Ad_Builtin_Object : public Ad_Object {
 public:
@@ -193,5 +187,11 @@ public:
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
 };
+
+void Ad_INCREF(Ad_Object*);
+void Ad_DECREF(Ad_Object*);
+
+void free_Ad_Object_memory(Ad_Object*);
+void print_Ad_Object(Ad_Object*);
 
 #endif
