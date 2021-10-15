@@ -249,13 +249,15 @@ class Evaluator(object):
             return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
             # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
         if func.type == ObjectType.CLASS:
-            #print 'instantiate a class object'
-            #print 'call the class constructor'
             instance_environment = new_environment()
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
             for attribute in func.attributes:
-                print "+++" + str(attribute)
-                #klass_instance.instance_environment.set()
+                if attribute.type == StatementType.ASSIGN_STATEMENT:
+                    print attribute.name
+                    print attribute.value
+                    #evaluated = self.eval(attribute.value, klass_instance.instance_environment)
+                    #key = attribute.name.value
+                    #klass_instance.instance_environment.set(key, evaluated)
             return klass_instance
         return None
 

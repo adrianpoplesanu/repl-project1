@@ -346,8 +346,7 @@ class Parser(object):
                 stmt = self.parse_def_expression()
                 expr.methods.append(stmt)
             elif self.current_token_is(TokenType.IDENT):
-                ident = self.parse_identifier()
-                stmt = self.parse_assign_expression(ident)
+                stmt = self.parse_expression_statement()
                 expr.attributes.append(stmt)
             self.next_token()
         return expr
