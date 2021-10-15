@@ -18,8 +18,11 @@ public class TypeBuiltin implements BuiltinInterface {
 		case BOOLEAN:
 			type.setValue("BOOLEAN");
 			break;
+		case STRING:
+			type.setValue("STRING");
+			break;
 		default:
-			type.setValue("UNKNOWN TYPE");
+			type.setValue("UNKNOWN_TYPE");
 			break;
 		}
 		return type;

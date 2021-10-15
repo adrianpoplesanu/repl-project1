@@ -42,7 +42,7 @@ public class Parser {
 		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this));
-	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser());
+	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.STRING, new StringLiteralParser(this));
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser(this));
@@ -310,6 +310,11 @@ public class Parser {
 		AstStringLiteral node = new AstStringLiteral(getCurrentToken());
 		node.setValue(getCurrentToken().getLiteral());
 		return node;
+	}
+	
+	public AstNode evalWhileExpression() {
+		// TODO: implement this
+		return null;
 	}
 
 	public Lexer getLexer() {
