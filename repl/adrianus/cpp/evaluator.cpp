@@ -454,14 +454,15 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
 }
 
 Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
-    Ad_Function_Object* func = new Ad_Function_Object();
     Ad_AST_Def_Statement* def_statement = (Ad_AST_Def_Statement*) node;
-    func->params = def_statement->parameters;
-    func->body = def_statement->body;
-    func->env = &env;
+
+    std::vector<Ad_AST_Node*> parameters = def_statement->parameters;
+    Ad_AST_Node* body = def_statement->body;
+
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) def_statement->name;
+    Ad_Function_Object* func = new Ad_Function_Object(parameters, body, &env);
     env.Set(ident->value, func);
-    return func;
+    return NULL; // this is correct, i don't want to print the function memory address on its definition statement
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

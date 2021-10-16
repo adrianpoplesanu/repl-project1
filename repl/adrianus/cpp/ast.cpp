@@ -587,7 +587,19 @@ Ad_AST_Def_Statement::Ad_AST_Def_Statement(Token t) {
 }
 
 Ad_AST_Def_Statement::~Ad_AST_Def_Statement() {
-    // TODO: implement destructor for AST_Def_Statement
+    if (name) {
+        Ad_DECREF(name);
+        free_Ad_AST_Node_memory(name);
+    }
+    if (body) {
+        Ad_DECREF(body); // asta merge si e super cool
+        free_Ad_AST_Node_memory(body);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = parameters.begin() ; it != parameters.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
 }
 
 std::string Ad_AST_Def_Statement::TokenLiteral() {
@@ -669,6 +681,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_HASH_LITERAL:
             delete (Ad_AST_HashLiteral*)node;
+        break;
+        case ST_DEF_STATEMENT:
+            delete (Ad_AST_Def_Statement*)node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";

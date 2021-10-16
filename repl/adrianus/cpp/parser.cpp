@@ -449,6 +449,7 @@ Ad_AST_Node* Parser::ParseDefExpression() {
     }
     Ad_AST_Node* body = ParseBlockStatement();
     stmt->body = body;
+    Ad_INCREF(stmt->body);
     return stmt;
 }
 
