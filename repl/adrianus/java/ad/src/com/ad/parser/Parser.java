@@ -18,6 +18,7 @@ import com.ad.ast.AstPrefixExpression;
 import com.ad.ast.AstProgram;
 import com.ad.ast.AstReturnStatement;
 import com.ad.ast.AstStringLiteral;
+import com.ad.ast.AstWhileExpression;
 import com.ad.lexer.Lexer;
 import com.ad.token.Token;
 import com.ad.token.TokenTypeEnum;
@@ -312,9 +313,23 @@ public class Parser {
 		return node;
 	}
 	
-	public AstNode evalWhileExpression() {
-		// TODO: implement this
-		return null;
+	public AstNode parseWhileExpression() {
+		System.out.println("parseWhileExpression invokation");
+		AstWhileExpression expr = new AstWhileExpression(getCurrentToken());
+		if (!expectPeek(TokenTypeEnum.LPAREN)) {
+			return null; // this should all return error ast nodes that evaluate in error objects
+		}
+		nextToken();
+		expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
+		if (!expectPeek(TokenTypeEnum.RPAREN)) {
+			return null; // see previous comment
+		}
+		if (!expectPeek(TokenTypeEnum.LBRACE)) {
+			return null; // see previous comment
+		}
+		expr.setBody(parseBlockStatement());
+		System.out.println(expr);
+		return expr;
 	}
 
 	public Lexer getLexer() {
