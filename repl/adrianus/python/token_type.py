@@ -44,3 +44,5 @@ class TokenType(object):
 	DOT = "."
 	CLASS = "CLASS"
 	THIS = "THIS"
+	START_COMMENT = "/*"
+	END_COMMENT = "*/"

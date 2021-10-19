@@ -89,8 +89,11 @@ class Evaluator(object):
             return self.eval_class_statement(node, env)
         elif node.type == StatementType.MEMBER_ACCESS:
             return self.eval_member_access(node, env)
+        elif node.type == StatementType.COMMENT:
+            # this is just a comment, do nothing
+            return None
         else:
-            print 'unknown AST node'
+            print 'unknown AST node: ' + node.type
 
     def eval_program(self, node, env):
         for statement in node.statements:

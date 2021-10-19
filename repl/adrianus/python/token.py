@@ -42,7 +42,9 @@ token_type_map = {
 	TokenType.COLON: "COLON",
 	TokenType.DOT: "DOT",
 	TokenType.CLASS: "CLASS",
-	TokenType.THIS: "THIS"
+	TokenType.THIS: "THIS",
+	TokenType.START_COMMENT: "STRAT_COMMENT",
+	TokenType.END_COMMENT: "END_COMMENT"
 }
 
 keywords_map = {

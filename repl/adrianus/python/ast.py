@@ -21,6 +21,7 @@ class StatementType(object):
     DEF_STATEMENT = 'DEF_STATEMENT'
     CLASS_STATEMENT = 'CLASS_STATEMENT'
     MEMBER_ACCESS = 'MEMBER_ACCESS'
+    COMMENT = 'COMMENT'
 
 
 statement_type_map = {
@@ -45,7 +46,8 @@ statement_type_map = {
     StatementType.ASSIGN_STATEMENT: 'ASSIGN_STATEMENT',
     StatementType.DEF_STATEMENT: 'DEF_STATEMENT',
     StatementType.CLASS_STATEMENT: 'CLASS_STATEMENT',
-    StatementType.MEMBER_ACCESS: 'MEMBER_ACCESS'
+    StatementType.MEMBER_ACCESS: 'MEMBER_ACCESS',
+    StatementType.COMMENT: 'COMMENT'
 }
 
 
@@ -431,6 +433,19 @@ class ASTDefStatement(ASTNode):
 
     def __str__(self):
         return 'Token: ' + str(self.token) + '<name: ' + str(self.name) + ', params:' + str(self.parameters) + ', body: ' + str(self.body) + '>'
+
+
+class ASTComment(ASTNode):
+    type = StatementType.COMMENT
+
+    def __init__(self, token=None):
+        self.token = token
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'ASTComment'
 
 
 class ASTClassStatement(ASTNode):

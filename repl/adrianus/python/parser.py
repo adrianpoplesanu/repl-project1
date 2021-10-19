@@ -6,7 +6,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
-                ASTClassStatement, ASTMemberAccess
+                ASTClassStatement, ASTMemberAccess, ASTComment
 
 
 class Parser(object):
@@ -97,6 +97,8 @@ class Parser(object):
             return self.parse_let_statement()
         elif self.current_token.type == TokenType.RETURN:
             return self.parse_return_statement()
+        elif self.current_token.type == TokenType.START_COMMENT:
+            return self.parse_comment()
         return self.parse_expression_statement()
 
     def parse_let_statement(self):
@@ -332,6 +334,13 @@ class Parser(object):
             self.next_token()
         return stmt
 
+    def parse_comment(self):
+        comment = ASTComment(token=self.current_token)
+        while not self.current_token_is(TokenType.EOF) and not self.current_token_is(TokenType.END_COMMENT):
+            self.next_token()
+        self.next_token()
+        return comment
+
     def parse_class_statement(self):
         expr = ASTClassStatement(token=self.current_token)
         self.next_token()
@@ -341,7 +350,6 @@ class Parser(object):
         expr.attributes = []
         expr.methods = []
         while not self.current_token_is(TokenType.RBRACE):
-            print self.current_token
             if self.current_token_is(TokenType.DEF):
                 stmt = self.parse_def_expression()
                 expr.methods.append(stmt)
@@ -359,7 +367,7 @@ class Parser(object):
         expr.methods = []
         expr.attributes = []
         while not self.current_token_is(TokenType.RBRACE):
-            print self.current_token
+            #print self.current_token
             if self.current_token_is(TokenType.DEF):
                 #print 'aaa'
                 stmt = self.parse_def_expression()

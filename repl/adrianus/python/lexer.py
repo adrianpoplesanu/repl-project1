@@ -28,11 +28,21 @@ class Lexer(object):
             token.type = TokenType.MINUS
             token.literal = self.ch
         elif self.ch == '/':
-            token.type = TokenType.SLASH
-            token.literal = self.ch
+            if self.peek_char() == '*':
+                self.read_char()
+                token.type = TokenType.START_COMMENT
+                token.literal = '/*'
+            else:
+                token.type = TokenType.SLASH
+                token.literal = self.ch
         elif self.ch == '*':
-            token.type = TokenType.ASTERISK
-            token.literal = self.ch
+            if self.peek_char() == '/':
+                self.read_char()
+                token.type = TokenType.END_COMMENT
+                token.literal = '*/'
+            else:
+                token.type = TokenType.ASTERISK
+                token.literal = self.ch
         elif self.ch == '>':
             if self.peek_char() == '=':
                 self.read_char()
