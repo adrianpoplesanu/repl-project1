@@ -1,0 +1,10 @@
+print("start");
+
+class Server {
+    port = 8080
+}
+
+server = Server()
+server.port
+
+print("stop")
