@@ -256,11 +256,17 @@ class Evaluator(object):
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
             for attribute in func.attributes:
                 if attribute.type == StatementType.ASSIGN_STATEMENT:
-                    print attribute.name
-                    print attribute.value
-                    #evaluated = self.eval(attribute.value, klass_instance.instance_environment)
-                    #key = attribute.name.value
-                    #klass_instance.instance_environment.set(key, evaluated)
+                    instance_environment.outer = env
+                    evaluated = self.eval(attribute.value, klass_instance.instance_environment)
+                    key = attribute.name.value
+                    klass_instance.instance_environment.set(key, evaluated)
+                if attribute.type == StatementType.EXPRESSION_STATEMENT:
+                    if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
+                        instance_environment.outer = env
+                        evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
+                        key = attribute.expression.name.value
+                        klass_instance.instance_environment.set(key, evaluated)
+            # i also need to call the class constructor, if one is present
             return klass_instance
         return None
 
@@ -351,7 +357,6 @@ class Evaluator(object):
             value = self.eval(node.value, env)
             hashed = index.hash_key()
             obj.pairs[hashed.value] = Hash_Pair(key=index, value=value)
-
         return None
 
     def eval_def_statement(self, node, env):
@@ -360,11 +365,12 @@ class Evaluator(object):
         return None
 
     def eval_class_statement(self, node, env):
-        obj = Ad_Class_Object(name=node.name, methods=node.methods, attributes=node.attributes)
+        obj = Ad_Class_Object(name=node.name, attributes=node.attributes, methods=node.methods)
         env.set(node.name.value, obj)
         return None
 
     def eval_member_access(self, node, env):
-        # TODO: implement this
-        print 'evaluating a member access, either attribute or member'
-        return None
+        klass_instance = env.get(node.owner.value)
+        klass_environment = klass_instance.instance_environment
+        evaluated = self.eval(node.member, klass_environment)
+        return evaluated

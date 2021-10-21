@@ -18,6 +18,9 @@ class Environment(object):
     def set(self, key, value):
         self.store[key] = value
 
+    def __str__(self):
+        return "[Env] store: " + str(self.store) + " outer: " + str(self.outer)
+
 
 def new_environment():
     env = Environment()

@@ -338,7 +338,6 @@ class Parser(object):
         comment = ASTComment(token=self.current_token)
         while not self.current_token_is(TokenType.EOF) and not self.current_token_is(TokenType.END_COMMENT):
             self.next_token()
-        self.next_token()
         return comment
 
     def parse_class_statement(self):
@@ -392,8 +391,14 @@ class Parser(object):
         member_access = ASTMemberAccess(token=self.current_token)
         self.next_token()
         right = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
-        args = self.parse_call_arguments()
         member_access.owner = left
         member_access.member = right
-        member_access.arguments = args
+
+        if self.peek_token_is(TokenType.LPAREN):
+            #member_access.arguments = self.parse_call_arguments()
+            member_access.arguments = []
+            member_access.is_method = True
+        else:
+            member_access.arguments = []
+            member_access.is_method = False
         return member_access

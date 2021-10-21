@@ -1,4 +1,6 @@
-print("start");
+/* print("start"); */
+
+a = 12
 
 class Server {
     port = 8080
@@ -7,4 +9,6 @@ class Server {
 server = Server()
 server.port
 
-print("stop")
+globals()
+
+/* print("stop") */
