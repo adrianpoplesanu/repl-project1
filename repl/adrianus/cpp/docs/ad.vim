@@ -6,7 +6,10 @@ endif
 
 hi Boolean ctermfg=Red
 hi Let ctermfg=Magenta
+hi Comment ctermfg=DarkGray
 
+syntax match adComment "\v\/\*.*\*\/$"
+highlight link adComment Comment
 syntax region potionString start=/\v"/ skip=/\v\\./ end=/\v"/
 
 syntax keyword adFunction function len print
