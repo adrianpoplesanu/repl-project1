@@ -467,8 +467,12 @@ class ASTClassStatement(ASTNode):
 class ASTMemberAccess(ASTNode):
     type = StatementType.MEMBER_ACCESS
 
-    def __init__(self, token=None, attributes=None, owner=None, member=None):
+    def __init__(self, token=None, attributes=None, owner=None, member=None, is_method=False):
         self.token = token
+        self.attributes = attributes
+        self.owner = owner
+        self.member = member
+        self.is_method = is_method
 
     def token_literal(self):
         return self.token.literal
