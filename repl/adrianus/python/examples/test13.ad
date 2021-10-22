@@ -3,8 +3,11 @@ class Dexiciul {
 
     def init(n) {
         b = 23
-        print(n)
+        /*print(n)*/
         num = n
+        /*print(num)*/
+        /*print(b)*/
+        /*globals()*/ /* this works, it's just not persisted after the method finishes execution */
     }
 
     def ham_ham() {

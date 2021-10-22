@@ -256,13 +256,46 @@ class Evaluator(object):
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
             for attribute in func.attributes:
                 if attribute.type == StatementType.ASSIGN_STATEMENT:
-                    instance_environment.outer = env
+                    instance_environment.outer = env.store
                     evaluated = self.eval(attribute.value, klass_instance.instance_environment)
                     key = attribute.name.value
                     klass_instance.instance_environment.set(key, evaluated)
                 if attribute.type == StatementType.EXPRESSION_STATEMENT:
                     if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
-                        instance_environment.outer = env
+                        instance_environment.outer = env.store
+                        evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
+                        key = attribute.expression.name.value
+                        klass_instance.instance_environment.set(key, evaluated)
+            for method in func.methods:
+                func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
+                klass_instance.instance_environment.set(method.name.value, func_obj)
+            # i also need to call the class constructor, if one is present
+            return klass_instance
+        return None
+
+    def apply_method(self, func, args_objs, env):
+        if func.type == ObjectType.FUNCTION:
+            self.extend_method_env(func, args_objs, env)
+            #print env.store
+            #print env.outer
+            #print type(func.body)
+            evaluated = self.eval(func.body, env)
+            return self.unwrap_return_value(evaluated)
+        if func.type == ObjectType.BUILTIN:
+            return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
+            # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
+        if func.type == ObjectType.CLASS:
+            instance_environment = new_environment()
+            klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
+            for attribute in func.attributes:
+                if attribute.type == StatementType.ASSIGN_STATEMENT:
+                    instance_environment.outer = env.store
+                    evaluated = self.eval(attribute.value, klass_instance.instance_environment)
+                    key = attribute.name.value
+                    klass_instance.instance_environment.set(key, evaluated)
+                if attribute.type == StatementType.EXPRESSION_STATEMENT:
+                    if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
+                        instance_environment.outer = env.store
                         evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
                         key = attribute.expression.name.value
                         klass_instance.instance_environment.set(key, evaluated)
@@ -283,6 +316,10 @@ class Evaluator(object):
         for i, param in enumerate(func.parameters):
             extended.set(param.token_literal(), args_objs[i])
         return extended
+
+    def extend_method_env(self, func, args_objs, env):
+        for i, param in enumerate(func.parameters):
+            env.set(param.token_literal(), args_objs[i])
 
     def eval_boolean_infix_expression(self, operator, left, right):
         left_val = left.value
@@ -375,21 +412,12 @@ class Evaluator(object):
     def eval_member_access(self, node, env):
         evaluated = None
         if node.is_method:
-            #print node
-            #print node.owner
-            #sprint node.member.value
-            #print node.is_method
-            #print node.arguments
             klass_instance = env.get(node.owner.value)
-            #print klass_instance
-            #print klass_instance.class_object.methods
-            #print klass_instance.instance_environment
             klass_method = klass_instance.instance_environment.get(node.member.value)
-            #print type(klass_method)
             args_objs = self.eval_expressions(node.arguments, env)
             if len(args_objs) == 1 and self.is_error(args_objs[0]):
                 return args_objs[0]
-            return self.apply_function(klass_method, args_objs, klass_instance.instance_environment)
+            return self.apply_method(klass_method, args_objs, klass_instance.instance_environment)
         else:
             klass_instance = env.get(node.owner.value)
             klass_environment = klass_instance.instance_environment
