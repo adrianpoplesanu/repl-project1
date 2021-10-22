@@ -266,6 +266,9 @@ class Evaluator(object):
                         evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
                         key = attribute.expression.name.value
                         klass_instance.instance_environment.set(key, evaluated)
+            for method in func.methods:
+                func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
+                klass_instance.instance_environment.set(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
             return klass_instance
         return None
@@ -370,7 +373,19 @@ class Evaluator(object):
         return None
 
     def eval_member_access(self, node, env):
-        klass_instance = env.get(node.owner.value)
-        klass_environment = klass_instance.instance_environment
-        evaluated = self.eval(node.member, klass_environment)
+        evaluated = None
+        if node.is_method:
+            print node
+            print node.owner
+            print node.member
+            print node.is_method
+            print node.arguments
+            klass_instance = env.get(node.owner.value)
+            print klass_instance
+            print klass_instance.class_object.methods
+            print klass_instance.instance_environment
+        else:
+            klass_instance = env.get(node.owner.value)
+            klass_environment = klass_instance.instance_environment
+            evaluated = self.eval(node.member, klass_environment)
         return evaluated

@@ -1,0 +1,26 @@
+print("start");
+
+a = 12
+
+class Server {
+    port = 8080
+
+    def test(number) {
+        print(number + 111)
+    }
+}
+
+server = Server()
+server.port
+server.test(123)
+
+https_port = server.port + 1
+nginx_port = server.port + 2
+
+ports = [server.port, https_port, nginx_port]
+
+print(ports)
+
+/*globals()*/
+
+print("stop")

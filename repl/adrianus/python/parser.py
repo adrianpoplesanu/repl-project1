@@ -395,8 +395,8 @@ class Parser(object):
         member_access.member = right
 
         if self.peek_token_is(TokenType.LPAREN):
-            #member_access.arguments = self.parse_call_arguments()
-            member_access.arguments = []
+            self.next_token()
+            member_access.arguments = self.parse_call_arguments()
             member_access.is_method = True
         else:
             member_access.arguments = []
