@@ -1,0 +1,27 @@
+class Dexiciul {
+    num = 10
+
+    def init(n) {
+        b = 23
+        print(n)
+        num = n
+    }
+
+    def ham_ham() {
+        i = 0
+        while (i < num) {
+            print("ham ham ham")
+            i = i + 1
+        }
+    }
+}
+
+dex = Dexiciul()
+
+dex.init(4)
+
+print(dex.b)
+print(dex.num)
+/* globals() */
+
+dex.ham_ham()

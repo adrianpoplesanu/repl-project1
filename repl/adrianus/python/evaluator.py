@@ -375,15 +375,21 @@ class Evaluator(object):
     def eval_member_access(self, node, env):
         evaluated = None
         if node.is_method:
-            print node
-            print node.owner
-            print node.member
-            print node.is_method
-            print node.arguments
+            #print node
+            #print node.owner
+            #sprint node.member.value
+            #print node.is_method
+            #print node.arguments
             klass_instance = env.get(node.owner.value)
-            print klass_instance
-            print klass_instance.class_object.methods
-            print klass_instance.instance_environment
+            #print klass_instance
+            #print klass_instance.class_object.methods
+            #print klass_instance.instance_environment
+            klass_method = klass_instance.instance_environment.get(node.member.value)
+            #print type(klass_method)
+            args_objs = self.eval_expressions(node.arguments, env)
+            if len(args_objs) == 1 and self.is_error(args_objs[0]):
+                return args_objs[0]
+            return self.apply_function(klass_method, args_objs, klass_instance.instance_environment)
         else:
             klass_instance = env.get(node.owner.value)
             klass_environment = klass_instance.instance_environment
