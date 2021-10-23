@@ -114,6 +114,11 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalDefStatement(node, env);
         }
         break;
+        case ST_COMMENT: {
+            // this is just a comment, do nothing in the evaluator
+            return NULL;
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;

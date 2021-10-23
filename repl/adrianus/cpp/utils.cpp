@@ -126,5 +126,21 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             std::cout << "->HashLiteral " << "\n";
             // TODO: parse all hashpairs and print hashpair.key + ": " + hashpair.value
         break;
+        case ST_DEF_STATEMENT:
+            print_level(level);
+            std::cout << "->DefStatement " << "\n";
+        break;
+        case ST_COMMENT:
+            print_level(level);
+            std::cout << "->Comment " << "\n";
+        break;
+        case ST_CLASS_STATEMENT:
+            print_level(level);
+            std::cout << "->ClassStatement " << "\n";
+        break;
+        case ST_MEMBER_ACCESS:
+            print_level(level);
+            std::cout << "->MemberAccess " << "\n";
+        break;
     }
 }

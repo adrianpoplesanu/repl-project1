@@ -121,6 +121,8 @@ Ad_AST_Node* Parser::ParseStatement() {
         return ParseLetStatement();
     if (current_token.type == TT_RETURN)
         return ParseReturnStatement();
+    if (current_token.type == TT_STARTCOMMENT)
+        return ParseComment();
     return ParseExpressionStatement();
 }
 
@@ -451,6 +453,14 @@ Ad_AST_Node* Parser::ParseDefExpression() {
     stmt->body = body;
     Ad_INCREF(stmt->body);
     return stmt;
+}
+
+Ad_AST_Node* Parser::ParseComment() {
+    Ad_AST_Comment *comm = new Ad_AST_Comment(current_token);
+    while (!CurrentTokenIs(TT_EOF) && !(CurrentTokenIs(TT_ENDCOMMENT))) {
+        NextToken();
+    }
+    return comm;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {

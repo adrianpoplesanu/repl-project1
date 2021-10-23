@@ -90,6 +90,7 @@ public:
     Ad_AST_Node* ParseIndexExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseAssignExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseDefExpression();
+    Ad_AST_Node* ParseComment();
 };
 
 #endif

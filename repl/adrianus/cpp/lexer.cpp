@@ -99,12 +99,24 @@ Token Lexer::NextToken() {
             token.literal = current_char;
         break;
         case '*':
-            token.type = TT_ASTERISK;
-            token.literal = current_char;
+            if (PeekChar() == '/') {
+                ReadChar();
+                token.type = TT_ENDCOMMENT;
+                token.literal = "*/";
+            } else {
+                token.type = TT_ASTERISK;
+                token.literal = current_char;
+            }
         break;
         case '/':
-            token.type = TT_SLASH;
-            token.literal = current_char;
+            if (PeekChar() == '*') {
+                ReadChar();
+                token.type = TT_STARTCOMMENT;
+                token.literal = "/*";
+            } else {
+                token.type = TT_SLASH;
+                token.literal = current_char;
+            }
         break;
         case '<':
             if (PeekChar() == '=') {

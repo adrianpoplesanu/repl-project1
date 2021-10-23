@@ -610,6 +610,29 @@ std::string Ad_AST_Def_Statement::ToString() {
     return "todo: implement Ad_AST_Def_Statement ToString()";
 }
 
+Ad_AST_Comment::Ad_AST_Comment() {
+    type = ST_COMMENT;
+    ref_count = 0;
+}
+
+Ad_AST_Comment::Ad_AST_Comment(Token t) {
+    type = ST_COMMENT;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_Comment::~Ad_AST_Comment() {
+
+}
+
+std::string Ad_AST_Comment::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_Comment::ToString() {
+    return "todo: implement Ad_AST_Comment ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;
@@ -684,6 +707,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_DEF_STATEMENT:
             delete (Ad_AST_Def_Statement*)node;
+        break;
+        case ST_COMMENT:
+            delete (Ad_AST_Comment*)node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";

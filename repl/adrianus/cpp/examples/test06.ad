@@ -1,0 +1,10 @@
+port = 8080
+offset = 1
+
+def listen(x) {
+    return port + offset + x
+}
+
+nginx_port = listen(1)
+
+print(nginx_port)

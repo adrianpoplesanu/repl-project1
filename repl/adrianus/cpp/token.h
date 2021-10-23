@@ -41,7 +41,12 @@ enum TokenType {
     TT_STRING,
     TT_AND,
     TT_OR,
-    TT_COLON
+    TT_COLON,
+    TT_DOT,
+    TT_CLASS,
+    TT_THIS,
+    TT_STARTCOMMENT,
+    TT_ENDCOMMENT
 };
 
 std::map<TokenType, std::string> token_type_map = {
@@ -81,7 +86,12 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_STRING, "STRING"},
     {TT_AND, "AND"},
     {TT_OR, "OR"},
-    {TT_COLON, "COLON"}
+    {TT_COLON, "COLON"},
+    {TT_DOT, "DOT"},
+    {TT_CLASS, "CLASS"},
+    {TT_THIS, "THIS"},
+    {TT_STARTCOMMENT, "STARTCOMMENT"},
+    {TT_ENDCOMMENT, "ENDCOMMENT"}
 };
 
 std::map<std::string, TokenType> keywords = {
