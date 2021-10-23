@@ -155,6 +155,9 @@ Ad_AST_Node* Parser::ParseReturnStatement() {
     Ad_AST_ReturnStatement* stmt = new Ad_AST_ReturnStatement(current_token);
     NextToken();
     stmt->value = ParseExpression(PT_LOWEST);
+    if (PeekTokenIs(TT_RBRACE) || PeekTokenIs(TT_SEMICOLON) || PeekTokenIs(TT_EOF)) {
+        return stmt;
+    }
     while (!CurrentTokenIs(TT_SEMICOLON) && !CurrentTokenIs(TT_EOF)) {
         NextToken();
     }
