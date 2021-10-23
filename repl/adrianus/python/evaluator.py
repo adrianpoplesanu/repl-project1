@@ -276,9 +276,6 @@ class Evaluator(object):
     def apply_method(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:
             self.extend_method_env(func, args_objs, env)
-            #print env.store
-            #print env.outer
-            #print type(func.body)
             evaluated = self.eval(func.body, env)
             return self.unwrap_return_value(evaluated)
         if func.type == ObjectType.BUILTIN:
@@ -377,6 +374,12 @@ class Evaluator(object):
     def eval_assign_statement(self, node, env):
         if node.name.type == StatementType.INDEX_EXPRESSION:
             self.eval_index_expression_assign(node, env)
+        elif node.name.type == StatementType.MEMBER_ACCESS:
+            klass_instance = env.get(node.name.owner.value)
+            klass_member = node.name.member
+            klass_environment = klass_instance.instance_environment
+            obj = self.eval(node.value, env)
+            klass_environment.set(klass_member.value, obj)
         else:
             obj = self.eval(node.value, env)
             env.set(node.name.value, obj)
