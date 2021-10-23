@@ -118,7 +118,9 @@ class Parser(object):
         stmt = ASTReturnStatement(token=self.current_token)
         self.next_token()
         stmt.value = self.parse_expression(PrecedenceType.LOWEST)
-        while not self.current_token_is(TokenType.SEMICOLON) and not self.current_token_is(TokenType.EOF):
+        if self.peek_token_is(TokenType.SEMICOLON) or self.peek_token_is(TokenType.RBRACE) or self.peek_token_is(TokenType.EOF):
+            return stmt
+        while not self.current_token_is(TokenType.SEMICOLON) and not self.current_token_is(TokenType.RBRACE) and not self.current_token_is(TokenType.EOF):
             self.next_token()
         return stmt
 
