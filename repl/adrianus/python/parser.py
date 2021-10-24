@@ -266,19 +266,6 @@ class Parser(object):
         expr.block = self.parse_block_statement()
         return expr
 
-    def parse_expression(self, precedence):
-        if self.current_token.type not in self.prefix_parse_functions:
-            return None
-        prefix = self.prefix_parse_functions[self.current_token.type]
-        left_exp = prefix()
-        while (not self.peek_token_is(TokenType.SEMICOLON)) and precedence < self.peek_precedence():
-            if self.peek_token.type not in self.infix_parse_functions:
-                return left_exp
-            infix = self.infix_parse_functions[self.peek_token.type]
-            self.next_token()
-            left_exp = infix(left_exp)
-        return left_exp
-
     def parse_string_literal(self):
         return ASTStringLiteral(token=self.current_token, value=str(self.current_token.literal))
 
@@ -360,35 +347,6 @@ class Parser(object):
             self.next_token()
         return expr
 
-    def parse_class_statement_old(self):
-        expr = ASTClassStatement(token=self.current_token)
-        self.next_token()
-        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
-        expr.name = name
-        expr.methods = []
-        expr.attributes = []
-        while not self.current_token_is(TokenType.RBRACE):
-            #print self.current_token
-            if self.current_token_is(TokenType.DEF):
-                #print 'aaa'
-                stmt = self.parse_def_expression()
-                expr.methods.append(stmt)
-            elif self.current_token_is(TokenType.IDENT):
-                #print 'bbb'
-                ident = self.parse_identifier()
-                stmt = self.parse_assign_expression(ident)
-                expr.attributes.append(stmt)
-            elif self.current_token_is(TokenType.SEMICOLON):
-                #print 'ccc'
-                pass
-            else:
-                print "ERROR: parsing class"
-                #print self.current_token
-                # i should return an error object here
-                return None
-            self.next_token()
-        return expr
-
     def parse_member_access(self, left):
         member_access = ASTMemberAccess(token=self.current_token)
         self.next_token()
@@ -404,3 +362,16 @@ class Parser(object):
             member_access.arguments = []
             member_access.is_method = False
         return member_access
+
+    def parse_expression(self, precedence):
+        if self.current_token.type not in self.prefix_parse_functions:
+            return None
+        prefix = self.prefix_parse_functions[self.current_token.type]
+        left_exp = prefix()
+        while (not self.peek_token_is(TokenType.SEMICOLON)) and precedence < self.peek_precedence():
+            if self.peek_token.type not in self.infix_parse_functions:
+                return left_exp
+            infix = self.infix_parse_functions[self.peek_token.type]
+            self.next_token()
+            left_exp = infix(left_exp)
+        return left_exp
