@@ -184,6 +184,12 @@ public class Evaluator {
     }
     
     private AdObject evalStringInfixExpression(String operator, AdObject left, AdObject right) {
+    	String left_val = ((AdStringObject)left).getValue();
+    	String right_val = ((AdStringObject)right).getValue();
+    	switch(operator) {
+    	case "+":
+    		return new AdStringObject(left_val + right_val);
+    	}
     	return null;
     }
     
