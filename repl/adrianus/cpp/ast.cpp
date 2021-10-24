@@ -633,6 +633,29 @@ std::string Ad_AST_Comment::ToString() {
     return "todo: implement Ad_AST_Comment ToString()";
 }
 
+Ad_AST_Class::Ad_AST_Class() {
+    type = ST_CLASS_STATEMENT;
+    ref_count = 0;
+}
+
+Ad_AST_Class::Ad_AST_Class(Token t) {
+    type = ST_CLASS_STATEMENT;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_Class::~Ad_AST_Class() {
+
+}
+
+std::string Ad_AST_Class::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_Class::ToString() {
+    return "todo: implement Ad_AST_Class ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;

@@ -100,12 +100,14 @@ std::map<std::string, TokenType> keywords = {
     {"return", TT_RETURN},
     {"true", TT_TRUE},
     {"false", TT_FALSE},
-    {"fn", TT_FUNCTION},
+    {"function", TT_FUNCTION},
     {"def", TT_DEF},
     {"let", TT_LET},
     {"while", TT_WHILE},
     {"and", TT_AND},
-    {"or", TT_OR}
+    {"or", TT_OR},
+    {"class", TT_CLASS},
+    {"this", TT_THIS}
 };
 
 class Token {

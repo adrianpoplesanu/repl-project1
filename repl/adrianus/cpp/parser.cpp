@@ -19,6 +19,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseListLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACE, &Parser::ParseHashLiteral));
     prefixParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefExpression));
+    prefixParseFns.insert(std::make_pair(TT_CLASS, &Parser::ParseClassStatement));
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -464,6 +465,10 @@ Ad_AST_Node* Parser::ParseComment() {
         NextToken();
     }
     return comm;
+}
+
+Ad_AST_Node* Parser::ParseClassStatement() {
+    return NULL;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {
