@@ -21,6 +21,9 @@ public class TypeBuiltin implements BuiltinInterface {
 		case STRING:
 			type.setValue("STRING");
 			break;
+		case FUNCTION:
+			type.setValue("FUNCTION");
+			break;
 		default:
 			type.setValue("UNKNOWN_TYPE");
 			break;

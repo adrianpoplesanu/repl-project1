@@ -314,7 +314,6 @@ public class Parser {
 	}
 	
 	public AstNode parseWhileExpression() {
-		System.out.println("parseWhileExpression invokation");
 		AstWhileExpression expr = new AstWhileExpression(getCurrentToken());
 		if (!expectPeek(TokenTypeEnum.LPAREN)) {
 			return null; // this should all return error ast nodes that evaluate in error objects
@@ -328,7 +327,6 @@ public class Parser {
 			return null; // see previous comment
 		}
 		expr.setBody(parseBlockStatement());
-		System.out.println(expr);
 		return expr;
 	}
 

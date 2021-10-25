@@ -66,9 +66,9 @@ public class Evaluator {
 		case STRING_LITERAL:
 			return evalStringLiteral(node, env);
 		case WHILE_EXPRESSION:
-			System.out.println("eval WhileExpression");
-			break;
+			return evalWhileExpression(node, env);
 		default:
+			System.out.println("Unknown evaluation for AST node");
 			break;
     	}
     	return null;
@@ -317,6 +317,10 @@ public class Evaluator {
     	AstStringLiteral stringLiteral = (AstStringLiteral)node;
     	return new AdStringObject(stringLiteral.getValue());
     }
+
+    private AdObject evalWhileExpression(AstNode node, Environment env) {
+    	return null;
+	}
     
     private AdObject newError(String msg) {
     	return new AdErrorObject(msg);

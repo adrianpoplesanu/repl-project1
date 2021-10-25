@@ -9,6 +9,7 @@ public class BuiltinLookup {
 		private static final long serialVersionUID = 1L;
 		{
 			put("type", new AdBuiltinObject(new TypeBuiltin()));
+			put("print", new AdBuiltinObject(new PrintBuiltin()));
 		}
 	};
 }
