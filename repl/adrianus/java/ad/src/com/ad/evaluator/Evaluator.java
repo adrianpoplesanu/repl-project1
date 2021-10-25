@@ -2,21 +2,7 @@ package com.ad.evaluator;
 
 import java.util.ArrayList;
 
-import com.ad.ast.AstBlockStatement;
-import com.ad.ast.AstBoolean;
-import com.ad.ast.AstCallExpression;
-import com.ad.ast.AstExpressionStatement;
-import com.ad.ast.AstFunctionLiteral;
-import com.ad.ast.AstIdentifier;
-import com.ad.ast.AstIfExpression;
-import com.ad.ast.AstInfixExpression;
-import com.ad.ast.AstInteger;
-import com.ad.ast.AstLetStatement;
-import com.ad.ast.AstNode;
-import com.ad.ast.AstPrefixExpression;
-import com.ad.ast.AstProgram;
-import com.ad.ast.AstReturnStatement;
-import com.ad.ast.AstStringLiteral;
+import com.ad.ast.*;
 import com.ad.builtin.BuiltinLookup;
 import com.ad.environment.Environment;
 import com.ad.objects.AdBooleanObject;
@@ -239,7 +225,7 @@ public class Evaluator {
     	AdObject result = null;
     	for (AstNode stmt : blockStatement.getStatements()) {
     		result = eval(stmt, env);
-    		if (result.getType() == ObjectTypeEnum.RETURN_VALUE) {
+    		if (result != null && result.getType() == ObjectTypeEnum.RETURN_VALUE) {
     			AdReturnValueObject returnObject = (AdReturnValueObject)result;
     			return returnObject.getReturnValue();
     		}
@@ -319,6 +305,15 @@ public class Evaluator {
     }
 
     private AdObject evalWhileExpression(AstNode node, Environment env) {
+		AstWhileExpression expr = (AstWhileExpression) node;
+    	AdObject condition = eval(expr.getCondition(), env);
+    	if (isError(condition)) {
+    		// TODO: treat the error, posibily return an AdError object
+		}
+    	while (isTruthy(condition)) {
+    		eval(expr.getBody(), env);
+    		condition = eval(expr.getCondition(), env);
+		}
     	return null;
 	}
     
