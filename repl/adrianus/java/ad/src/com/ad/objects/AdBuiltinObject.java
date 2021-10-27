@@ -22,8 +22,7 @@ public class AdBuiltinObject extends AdObject {
 
 	@Override
 	public void print() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("TODO: implement print() in AdBuiltinObject");
 	}
 
 	public BuiltinInterface getBuiltinFunction() {

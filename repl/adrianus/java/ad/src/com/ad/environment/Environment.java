@@ -1,6 +1,7 @@
 package com.ad.environment;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.ad.objects.AdObject;
 
@@ -31,6 +32,15 @@ public class Environment {
 	
 	public void set(String key, AdObject value) {
 		store.put(key, value);
+	}
+
+	public String toString() {
+		String out = "{";
+		for (Map.Entry<String, AdObject> entry : store.entrySet()) {
+			out += entry.getKey() + ": " + entry.getValue();
+		}
+		out += "}";
+		return out;
 	}
 	
 	public static Environment newEnvironment() {

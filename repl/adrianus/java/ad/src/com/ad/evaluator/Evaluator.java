@@ -18,7 +18,7 @@ import com.ad.objects.ObjectTypeEnum;
 public class Evaluator {
 	public static AdBooleanObject TrueObject = new AdBooleanObject(true);
 	public static AdBooleanObject FalseObject = new AdBooleanObject(false);
-	
+
     public AdObject eval(AstNode node, Environment env) {
     	switch(node.getType()) {
 		case PROGRAM:
@@ -59,7 +59,7 @@ public class Evaluator {
     	}
     	return null;
     }
-    
+
     private AdObject evalProgram(AstProgram program, Environment env) {
     	for (AstNode stmt : program.statements) {
     		AdObject result = eval(stmt, env);
@@ -67,17 +67,17 @@ public class Evaluator {
     	}
     	return null;
     }
-    
+
     private AdObject evalBoolean(AstNode node, Environment env) {
     	AstBoolean booleanLiteral = (AstBoolean)node;
     	return nativeBoolToBoolean(booleanLiteral.getValue());
     }
-    
+
     private AdObject nativeBoolToBoolean(boolean value) {
     	if (value) return TrueObject;
     	return FalseObject;
     }
-    
+
     private AdObject evalExpressionStatement(AstNode node, Environment env) {
     	AstExpressionStatement stmt = (AstExpressionStatement)node;
     	if (stmt.getExpression() != null) {
@@ -85,12 +85,12 @@ public class Evaluator {
     	}
     	return null;
     }
-    
+
     private AdObject evalInteger(AstNode node, Environment env) {
     	AstInteger integerLiteral = (AstInteger)node;
     	return new AdIntegerObject(integerLiteral.getValue());
     }
-    
+
     private AdObject evalPrefixExpression(String operator, AdObject right) {
     	if (operator == "!") {
     		return evalBangPrefixExpression(right);
@@ -100,22 +100,22 @@ public class Evaluator {
     	}
     	return newError("unknown prefix operator");
     }
-    
+
     private AdObject evalBangPrefixExpression(AdObject right) {
     	return nativeBoolToBoolean(!((AdBooleanObject)right).getValue());
     }
-    
+
     private AdObject evalMinusPrefixExpression(AdObject right) {
     	return new AdIntegerObject(-((AdIntegerObject)right).getValue());
     }
-    
+
     private AdObject evalLetStatement(AstNode node, Environment env) {
 		AstLetStatement letStatement = (AstLetStatement)node;
 		AdObject obj = eval(letStatement.getValue(), env);
 		env.set(letStatement.getName().getValue(), obj);
     	return null;
     }
-    
+
     private AdObject evalIdentifier(AstNode node, Environment env) {
     	AstIdentifier ident = (AstIdentifier)node;
     	AdObject obj = null;
@@ -126,7 +126,7 @@ public class Evaluator {
     	}
     	return obj;
     }
-    
+
     private AdObject evalInfixExpression(AstNode node, Environment env) {
     	AstInfixExpression expr = (AstInfixExpression)node;
     	AdObject left = eval(expr.getLeft(), env);
@@ -134,7 +134,7 @@ public class Evaluator {
     	AdObject result = evalInfixExpression(expr.getOperator(), left, right);
     	return result;
     }
-    
+
     private AdObject evalInfixExpression(String operator, AdObject left, AdObject right) {
     	if (left.getType() == ObjectTypeEnum.INT && right.getType() == ObjectTypeEnum.INT) {
     		return evalIntegerInfixExpression(operator, left, right);
@@ -144,7 +144,7 @@ public class Evaluator {
     	}
     	return null;
     }
-    
+
     private AdObject evalIntegerInfixExpression(String operator, AdObject left, AdObject right) {
     	int left_val = ((AdIntegerObject)left).getValue();
     	int right_val = ((AdIntegerObject)right).getValue();
@@ -168,7 +168,7 @@ public class Evaluator {
     	}
     	return null;
     }
-    
+
     private AdObject evalStringInfixExpression(String operator, AdObject left, AdObject right) {
     	String left_val = ((AdStringObject)left).getValue();
     	String right_val = ((AdStringObject)right).getValue();
@@ -178,16 +178,16 @@ public class Evaluator {
     	}
     	return null;
     }
-    
+
     private AdObject evalIfExpression(AstNode node, Environment env) {
     	AstIfExpression expr = (AstIfExpression)node;
     	AstNode condition = expr.getCondition();
     	AstNode consequence = expr.getConsequence();
     	AstNode alternative = expr.getAlternative();
-    	
+
     	AdObject conditionObj = eval(condition, env);
     	if (isError(conditionObj)) return conditionObj;
-    	
+
     	if (isTruthy(conditionObj)) {
     		return eval(consequence, env);
     	} else {
@@ -195,10 +195,10 @@ public class Evaluator {
     	}
     	return null;
     }
-    
+
     private boolean isTruthy(AdObject obj) {
     	if (obj == null) return false;
-    	
+
     	switch (obj.getType()) {
     	case NULL:
     		return false;
@@ -219,7 +219,7 @@ public class Evaluator {
     	}
     	return false;
     }
-    
+
     private AdObject evalBlockStatement(AstNode node, Environment env) {
     	AstBlockStatement blockStatement = (AstBlockStatement)node;
     	AdObject result = null;
@@ -230,15 +230,15 @@ public class Evaluator {
     			return returnObject.getReturnValue();
     		}
     	}
-    	return result; // this should return null, leaving it for now for testing purposes
+    	return null; // this should return null, leaving it for now for testing purposes
     }
-    
+
     private AdObject evalReturnStatement(AstNode node, Environment env) {
     	AstReturnStatement returnStatement = (AstReturnStatement)node;
     	AdObject result = eval(returnStatement.getValue(), env);
     	return new AdReturnValueObject(result);
     }
-    
+
     private AdObject evalFunctionLiteral(AstNode node, Environment env) {
     	AstFunctionLiteral functionLiteral = (AstFunctionLiteral)node;
     	AstNode body = functionLiteral.getBody();
@@ -246,7 +246,7 @@ public class Evaluator {
     	AdFunctionObject func = new AdFunctionObject(params, body, env);
     	return func;
     }
-    
+
     private AdObject evalCallExpression(AstNode node, Environment env) {
     	AstCallExpression callExpression = (AstCallExpression) node;
     	AdObject function = eval(callExpression.getFunction(), env);
@@ -255,9 +255,9 @@ public class Evaluator {
     	if (arguments.size() == 1 && isError(arguments.get(0))) {
     		return arguments.get(0);
     	}
-    	return applyFunction(function, arguments);
+    	return applyFunction(function, arguments, env);
     }
-    
+
     private ArrayList<AdObject> evalExpressions(ArrayList<AstNode> arguments, Environment env) {
     	ArrayList<AdObject> objects = new ArrayList<AdObject>();
     	for (AstNode argument : arguments) {
@@ -266,8 +266,8 @@ public class Evaluator {
     	}
     	return objects;
     }
-    
-    private AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments) {
+
+    private AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments, Environment env) {
     	if (function.getType() == ObjectTypeEnum.FUNCTION) {
     		Environment extendedEnv = extendFunctionEnv(function, arguments);
     		AdFunctionObject functionObject = (AdFunctionObject) function;
@@ -276,11 +276,11 @@ public class Evaluator {
     	}
     	if (function.getType() == ObjectTypeEnum.BUILTIN) {
     		AdBuiltinObject builtin = (AdBuiltinObject) function;
-    		return builtin.getBuiltinFunction().call(arguments, null); // env = null for now because env is not yet passed in applyFunction
+    		return builtin.getBuiltinFunction().call(arguments, env);
     	}
     	return null;
     }
-    
+
     private Environment extendFunctionEnv(AdObject func, ArrayList<AdObject> arguments) {
     	AdFunctionObject functionObject = (AdFunctionObject) func;
      	Environment extended = Environment.newEnclosedEnvironment(functionObject.getEnv());
@@ -290,7 +290,7 @@ public class Evaluator {
      	}
     	return extended;
     }
-    
+
     private AdObject unwrapReturnValue(AdObject evaluated) {
     	if (evaluated.getType() == ObjectTypeEnum.RETURN_VALUE) {
     		AdReturnValueObject returnValue = (AdReturnValueObject) evaluated;
@@ -298,7 +298,7 @@ public class Evaluator {
     	}
     	return evaluated;
     }
-    
+
     private AdObject evalStringLiteral(AstNode node, Environment env) {
     	AstStringLiteral stringLiteral = (AstStringLiteral)node;
     	return new AdStringObject(stringLiteral.getValue());
@@ -308,7 +308,7 @@ public class Evaluator {
 		AstWhileExpression expr = (AstWhileExpression) node;
     	AdObject condition = eval(expr.getCondition(), env);
     	if (isError(condition)) {
-    		// TODO: treat the error, posibily return an AdError object
+    		// TODO: treat the error, possibly return an AdError object
 		}
     	while (isTruthy(condition)) {
     		eval(expr.getBody(), env);
@@ -316,12 +316,12 @@ public class Evaluator {
 		}
     	return null;
 	}
-    
+
     private AdObject newError(String msg) {
-    	return new AdErrorObject(msg);
+        return new AdErrorObject(msg);
     }
-    
+
     private boolean isError(AdObject obj) {
-    	return obj.getType() == ObjectTypeEnum.ERROR;
+        return obj.getType() == ObjectTypeEnum.ERROR;
     }
 }
