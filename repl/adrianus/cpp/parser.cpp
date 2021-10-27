@@ -468,7 +468,25 @@ Ad_AST_Node* Parser::ParseComment() {
 }
 
 Ad_AST_Node* Parser::ParseClassStatement() {
-    return NULL;
+    Ad_AST_Class* expr = new Ad_AST_Class(current_token);
+    NextToken();
+    Ad_AST_Node* name = ParseIdentifier();
+    expr->name = name;
+    NextToken();
+    while(!CurrentTokenIs(TT_RBRACE)) {
+        if (CurrentTokenIs(TT_DEF)) {
+            Ad_AST_Node* stmt = ParseDefExpression();
+            Ad_INCREF(stmt); // is this really needed?
+            expr->methods.push_back(stmt);
+        }
+        if (CurrentTokenIs(TT_IDENT)) {
+            Ad_AST_Node* stmt = ParseExpressionStatement();
+            Ad_INCREF(stmt); // is this really needed?
+            expr->attributes.push_back(stmt);
+        }
+        NextToken();
+    }
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {

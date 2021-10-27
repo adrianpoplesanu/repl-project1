@@ -323,6 +323,9 @@ public:
 class Ad_AST_Class : public Ad_AST_Node {
 public:
     Token token;
+    Ad_AST_Node* name;
+    std::vector<Ad_AST_Node*> methods;
+    std::vector<Ad_AST_Node*> attributes;
 
     Ad_AST_Class();
     Ad_AST_Class(Token);
