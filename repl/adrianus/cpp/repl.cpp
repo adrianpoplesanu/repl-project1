@@ -44,6 +44,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
         }
     }
     target.close();
+    free_builtin_map();
 }
 
 bool Repl::ParseLine(std::string line) {
