@@ -645,7 +645,20 @@ Ad_AST_Class::Ad_AST_Class(Token t) {
 }
 
 Ad_AST_Class::~Ad_AST_Class() {
-
+    if (name) {
+        Ad_DECREF(name);
+        free_Ad_AST_Node_memory(name);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin() ; it != attributes.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
 }
 
 std::string Ad_AST_Class::TokenLiteral() {
@@ -733,6 +746,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_COMMENT:
             delete (Ad_AST_Comment*)node;
+        break;
+        case ST_CLASS_STATEMENT:
+            delete (Ad_AST_Class*)node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";

@@ -20,7 +20,8 @@ enum Ad_Object_Type {
 	OBJ_BUILTIN,
 	OBJ_SIGNAL,
 	OBJ_LIST,
-	OBJ_HASH
+	OBJ_HASH,
+	OBJ_CLASS
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
@@ -34,7 +35,8 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_BUILTIN, "BUILTIN"},
 	{OBJ_SIGNAL, "SIGNAL"},
 	{OBJ_LIST, "LIST"},
-	{OBJ_HASH, "HASH"}
+	{OBJ_HASH, "HASH"},
+	{OBJ_CLASS, "CLASS"}
 };
 
 class Ad_Object {
@@ -182,6 +184,20 @@ public:
 	Ad_Hash_Object();
 	Ad_Hash_Object(std::map<std::string, HashPair>);
 	~Ad_Hash_Object();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
+};
+
+class Ad_Class_Object : public Ad_Object {
+public:
+	std::vector<Ad_AST_Node*> methods;
+	std::vector<Ad_AST_Node*> attributes;
+
+	Ad_Class_Object();
+	Ad_Class_Object(std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>);
+	~Ad_Class_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();

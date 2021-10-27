@@ -375,6 +375,55 @@ std::string Ad_Hash_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Class_Object::Ad_Class_Object() {
+    type = OBJ_CLASS;
+    ref_count = 0;
+}
+
+Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
+    type = OBJ_CLASS;
+    ref_count = 0;
+    methods = m;
+    for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_INCREF(node);
+    }
+    attributes = a;
+    for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin() ; it != attributes.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_INCREF(node);
+    }
+}
+
+Ad_Class_Object::~Ad_Class_Object() {
+    for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin() ; it != attributes.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
+}
+
+std::string Ad_Class_Object::Inspect() {
+    return "todo: implement this for Ad_Class_Object";
+}
+
+void Ad_Class_Object::Print() {
+    std::cout << "ClassObject\n";
+}
+
+Ad_Object_Type Ad_Class_Object::Type() {
+    return type;
+}
+
+std::string Ad_Class_Object::Hash() {
+    return object_type_map[type] + Inspect();
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
