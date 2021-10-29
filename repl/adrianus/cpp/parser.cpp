@@ -476,12 +476,12 @@ Ad_AST_Node* Parser::ParseClassStatement() {
     while(!CurrentTokenIs(TT_RBRACE)) {
         if (CurrentTokenIs(TT_DEF)) {
             Ad_AST_Node* stmt = ParseDefExpression();
-            Ad_INCREF(stmt); // is this really needed?
+            Ad_INCREF(stmt);
             expr->methods.push_back(stmt);
         }
         if (CurrentTokenIs(TT_IDENT)) {
             Ad_AST_Node* stmt = ParseExpressionStatement();
-            Ad_INCREF(stmt); // is this really needed?
+            Ad_INCREF(stmt);
             expr->attributes.push_back(stmt);
         }
         NextToken();

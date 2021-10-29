@@ -36,6 +36,7 @@ public:
     Ad_Object* EvalAssignStatement(Ad_AST_Node*, Environment&);
     Ad_Object* EvalIndexExpressionAssign(Ad_AST_Node*, Environment&);
     Ad_Object* EvalDefStatement(Ad_AST_Node*, Environment&);
+    Ad_Object* EvalClassStatement(Ad_AST_Node*, Environment&);
 };
 
 #endif

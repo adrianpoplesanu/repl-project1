@@ -119,6 +119,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return NULL;
         }
         break;
+        case ST_CLASS_STATEMENT: {
+            return EvalClassStatement(node, env);
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -468,6 +472,15 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
     Ad_Function_Object* func = new Ad_Function_Object(parameters, body, &env);
     env.Set(ident->value, func);
     return NULL; // this is correct, i don't want to print the function memory address on its definition statement
+}
+
+Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
+    Ad_AST_Class* class_node = (Ad_AST_Class*) node;
+    Ad_Class_Object* klass_object = new Ad_Class_Object(class_node->methods, class_node->attributes);
+    Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*)(class_node->name);
+    std::string klass_name = klass_ident->value;
+    env.Set(klass_name, klass_object);
+    return NULL;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {
