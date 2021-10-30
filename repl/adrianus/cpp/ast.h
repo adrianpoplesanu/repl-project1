@@ -334,6 +334,22 @@ public:
     virtual std::string ToString();
 };
 
+class Ad_AST_MemberAccess : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* owner;
+    Ad_AST_Node* member;
+    std::vector<Ad_AST_Node*> attributes;
+    bool is_method;
+
+    Ad_AST_MemberAccess();
+    Ad_AST_MemberAccess(Token);
+    Ad_AST_MemberAccess(Token, Ad_AST_Node*, Ad_AST_Node*, std::vector<Ad_AST_Node*>);
+    ~Ad_AST_MemberAccess();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
 bool StatementIs(Ad_AST_Node *stmt, StatementType st) {
     return stmt->type == st;
 }

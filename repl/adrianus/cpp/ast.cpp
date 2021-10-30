@@ -669,6 +669,38 @@ std::string Ad_AST_Class::ToString() {
     return "todo: implement Ad_AST_Class ToString()";
 }
 
+Ad_AST_MemberAccess::Ad_AST_MemberAccess() {
+    type = ST_MEMBER_ACCESS;
+    ref_count = 0;
+}
+
+Ad_AST_MemberAccess::Ad_AST_MemberAccess(Token t) {
+    type = ST_MEMBER_ACCESS;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_MemberAccess::Ad_AST_MemberAccess(Token t, Ad_AST_Node* o, Ad_AST_Node* m, std::vector<Ad_AST_Node*> a) {
+    type = ST_MEMBER_ACCESS;
+    ref_count = 0;
+    token = t;
+    owner = o;
+    member = m;
+    attributes = a;
+}
+
+Ad_AST_MemberAccess::~Ad_AST_MemberAccess() {
+    // TODO: deallocate owner, member and attributes
+}
+
+std::string Ad_AST_MemberAccess::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_MemberAccess::ToString() {
+    return "todo: implement Ad_AST_MemberAccess ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;
