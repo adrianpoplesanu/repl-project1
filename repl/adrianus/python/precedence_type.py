@@ -8,10 +8,11 @@ class PrecedenceType(object):
     LESSGREATER = 5
     SUM = 6
     PRODUCT = 7
-    PREFIX = 8
-    CALL = 9
-    INDEX = 10
-    MEMBER_ACCESS = 11
+    PLUSPLUS = 8
+    PREFIX = 9
+    CALL = 10
+    INDEX = 11
+    MEMBER_ACCESS = 12
 
 precedences = {
     TokenType.ASSIGN: PrecedenceType.ASSIGN,
@@ -29,5 +30,6 @@ precedences = {
     TokenType.ASTERISK: PrecedenceType.PRODUCT,
     TokenType.LPAREN: PrecedenceType.CALL,
     TokenType.LBRACKET: PrecedenceType.INDEX,
-    TokenType.DOT: PrecedenceType.MEMBER_ACCESS
+    TokenType.DOT: PrecedenceType.MEMBER_ACCESS,
+    TokenType.PLUSPLUS: PrecedenceType.PLUSPLUS
 }

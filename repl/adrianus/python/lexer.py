@@ -22,8 +22,13 @@ class Lexer(object):
         self.skip_whitespaces()
         skip_read_char = False
         if self.ch == '+':
-            token.type = TokenType.PLUS
-            token.literal = self.ch
+            if self.peek_char() == '+':
+                self.read_char()
+                token.type = TokenType.PLUSPLUS
+                token.literal = '++'
+            else:
+                token.type = TokenType.PLUS
+                token.literal = self.ch
         elif self.ch == '-':
             token.type = TokenType.MINUS
             token.literal = self.ch

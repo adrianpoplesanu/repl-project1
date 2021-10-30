@@ -33,6 +33,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
         self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
+        self.prefix_parse_functions[TokenType.PLUSPLUS] = self.parse_prefix_plus_plus
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
@@ -49,6 +50,7 @@ class Parser(object):
         self.infix_parse_functions[TokenType.ASSIGN] = self.parse_assign_expression
         self.infix_parse_functions[TokenType.LBRACKET] = self.parse_index_expression
         self.infix_parse_functions[TokenType.DOT] = self.parse_member_access
+        self.infix_parse_functions[TokenType.PLUSPLUS] = self.parse_infix_plus_plus
 
     def reset(self, source):
         self.source = source
@@ -362,6 +364,14 @@ class Parser(object):
             member_access.arguments = []
             member_access.is_method = False
         return member_access
+
+    def parse_prefix_plus_plus(self):
+        print 'a ++ prefix expression was detected'
+        return None
+
+    def parse_infix_plus_plus(self, left):
+        print 'a ++ postfix expression was detected'
+        return None
 
     def parse_expression(self, precedence):
         if self.current_token.type not in self.prefix_parse_functions:
