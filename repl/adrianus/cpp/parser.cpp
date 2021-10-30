@@ -489,6 +489,10 @@ Ad_AST_Node* Parser::ParseClassStatement() {
     return expr;
 }
 
+Ad_AST_Node* Parser::ParseMemberAccess() {
+    return NULL;
+}
+
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {
     if (prefixParseFns.find(current_token.type) == prefixParseFns.end()) {
         return NULL;

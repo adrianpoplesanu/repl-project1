@@ -424,6 +424,38 @@ std::string Ad_Class_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Class_Instance::Ad_Class_Instance() {
+    type = OBJ_INSTANCE;
+    ref_count = 0;
+}
+
+Ad_Class_Instance::Ad_Class_Instance(Ad_Object* ko, Environment* env) {
+    type = OBJ_INSTANCE;
+    ref_count = 0;
+    klass_object = ko;
+    instance_environment = env;
+}
+
+Ad_Class_Instance::~Ad_Class_Instance() {
+    // TODO: implement this
+}
+
+std::string Ad_Class_Instance::Inspect() {
+    return "todo: implement Inspect() in Ad_Class_Instance";
+}
+
+void Ad_Class_Instance::Print() {
+    std::cout << "todo: implement Print() in Ad_Class_Instance\n";
+}
+
+Ad_Object_Type Ad_Class_Instance::Type() {
+    return type;
+}
+
+std::string Ad_Class_Instance::Hash() {
+    return object_type_map[type] + Inspect();
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;

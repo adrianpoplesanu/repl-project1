@@ -92,6 +92,7 @@ public:
     Ad_AST_Node* ParseDefExpression();
     Ad_AST_Node* ParseComment();
     Ad_AST_Node* ParseClassStatement();
+    Ad_AST_Node* ParseMemberAccess();
 };
 
 #endif
