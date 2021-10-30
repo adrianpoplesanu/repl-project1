@@ -1,0 +1,9 @@
+port = 8080
+offset = 1
+
+let a = function(x) {
+    return port + offset + x
+}
+
+b = a(6)
+print(b)
