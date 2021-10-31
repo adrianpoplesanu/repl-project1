@@ -22,6 +22,8 @@ class StatementType(object):
     CLASS_STATEMENT = 'CLASS_STATEMENT'
     MEMBER_ACCESS = 'MEMBER_ACCESS'
     COMMENT = 'COMMENT'
+    PREFIX_INCREMENT = 'PREFIX_INCREMENT'
+    POSTFIX_INCREMENT = 'POSTFIX_INCREMENT'
 
 
 statement_type_map = {
@@ -47,7 +49,9 @@ statement_type_map = {
     StatementType.DEF_STATEMENT: 'DEF_STATEMENT',
     StatementType.CLASS_STATEMENT: 'CLASS_STATEMENT',
     StatementType.MEMBER_ACCESS: 'MEMBER_ACCESS',
-    StatementType.COMMENT: 'COMMENT'
+    StatementType.COMMENT: 'COMMENT',
+    StatementType.PREFIX_INCREMENT: 'PREFIX_INCREMENT',
+    StatementType.POSTFIX_INCREMENT: 'POSTFIX_INCREMENT'
 }
 
 
@@ -439,6 +443,10 @@ class ASTComment(ASTNode):
     type = StatementType.COMMENT
 
     def __init__(self, token=None):
+        """
+        @param token: the node's token
+        no need for other params, this just has to be ingnored by the evaluator
+        """
         self.token = token
 
     def token_literal(self):
@@ -452,6 +460,12 @@ class ASTClassStatement(ASTNode):
     type = StatementType.CLASS_STATEMENT
 
     def __init__(self, token=None, name=None, methods=None, attributes=None):
+        """
+        @param token: the node's token
+        @param name: ASTIdentifier, name of the class
+        @param methods: list of ASTDefStatement
+        @param attributes: list of ASTAssignStatement
+        """
         self.token = token
         self.name = name
         self.methods = methods
@@ -468,6 +482,13 @@ class ASTMemberAccess(ASTNode):
     type = StatementType.MEMBER_ACCESS
 
     def __init__(self, token=None, arguments=None, owner=None, member=None, is_method=False):
+        """
+        @param token: the node's token
+        @param arguments:
+        @param owner:
+        @param member:
+        @param is_method: boolean, indicates is this member access is a method call or an attribute access
+        """
         self.token = token
         self.arguments = arguments
         self.owner = owner
@@ -479,3 +500,23 @@ class ASTMemberAccess(ASTNode):
 
     def __str__(self):
         return 'Token: ' + str(self.token)
+
+
+class ASTPrefixIncrement(ASTNode):
+    type = StatementType.PREFIX_INCREMENT
+
+    def __init__(self, token=None):
+        """
+        @param token: the node's token
+        """
+        self.token = token
+
+
+class ASTPostfixIncrement(ASTNode):
+    type = StatementType.POSTFIX_INCREMENT
+
+    def __init__(self, token=None):
+        """
+        @param token: the node's token
+        """
+        self.token = token
