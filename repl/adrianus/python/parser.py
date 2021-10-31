@@ -6,7 +6,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
-                ASTClassStatement, ASTMemberAccess, ASTComment
+                ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement
 
 
 class Parser(object):
@@ -366,8 +366,12 @@ class Parser(object):
         return member_access
 
     def parse_prefix_plus_plus(self):
-        print 'a ++ prefix expression was detected'
-        return None
+        # TODO: investigate if this can be a regular parse_prefix_expression call
+        stmt = ASTPrefixIncrement(token=self.current_token)
+        self.next_token()
+        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        stmt.name = name
+        return stmt
 
     def parse_infix_plus_plus(self, left):
         print 'a ++ postfix expression was detected'

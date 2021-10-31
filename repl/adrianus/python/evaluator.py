@@ -92,6 +92,8 @@ class Evaluator(object):
         elif node.type == StatementType.COMMENT:
             # this is just a comment, do nothing
             return None
+        elif node.type == StatementType.PREFIX_INCREMENT:
+            return self.eval_prefix_increment(node, env)
         else:
             print 'unknown AST node: ' + node.type
 
@@ -426,3 +428,10 @@ class Evaluator(object):
             klass_environment = klass_instance.instance_environment
             evaluated = self.eval(node.member, klass_environment)
         return evaluated
+
+    def eval_prefix_increment(self, node, env):
+        obj = env.get(node.name.value)
+        if obj.type == ObjectType.INTEGER:
+            obj.value += 1
+        env.set(node.name.value, obj)
+        return obj

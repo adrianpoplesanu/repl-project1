@@ -505,11 +505,13 @@ class ASTMemberAccess(ASTNode):
 class ASTPrefixIncrement(ASTNode):
     type = StatementType.PREFIX_INCREMENT
 
-    def __init__(self, token=None):
+    def __init__(self, token=None, name=None):
         """
         @param token: the node's token
+        @param name: AstNode, Identifier that is the target of the ++ operation
         """
         self.token = token
+        self.name = name
 
 
 class ASTPostfixIncrement(ASTNode):
