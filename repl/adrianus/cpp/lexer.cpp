@@ -177,6 +177,10 @@ Token Lexer::NextToken() {
             token.type = TT_RBRACKET;
             token.literal = current_char;
         break;
+        case '.':
+            token.type = TT_DOT;
+            token.literal = current_char;
+        break;
         case '=':
             if (PeekChar() == '=') {
                 ReadChar();

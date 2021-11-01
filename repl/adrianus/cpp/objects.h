@@ -141,10 +141,10 @@ public:
 class Ad_Builtin_Object : public Ad_Object {
 public:
 	//...
-	Ad_Object* (*builtin_function)(std::vector<Ad_Object*>);
+	Ad_Object* (*builtin_function)(std::vector<Ad_Object*>, Environment*);
 
 	Ad_Builtin_Object();
-	Ad_Builtin_Object(Ad_Object* (*)(std::vector<Ad_Object*>));
+	Ad_Builtin_Object(Ad_Object* (*)(std::vector<Ad_Object*>, Environment*));
 	~Ad_Builtin_Object();
 	virtual std::string Inspect();
 	virtual void Print();

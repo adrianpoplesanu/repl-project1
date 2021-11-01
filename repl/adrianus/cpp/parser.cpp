@@ -33,6 +33,7 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseCallExpression));
     infixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseIndexExpression));
     infixParseFns.insert(std::make_pair(TT_ASSIGN, &Parser::ParseAssignExpression));
+    infixParseFns.insert(std::make_pair(TT_DOT, &Parser::ParseMemberAccess));
 }
 
 Parser::~Parser() {
@@ -489,7 +490,9 @@ Ad_AST_Node* Parser::ParseClassStatement() {
     return expr;
 }
 
-Ad_AST_Node* Parser::ParseMemberAccess() {
+Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
+    //Ad_AST_MemberAccess* stmt = new Ad_AST_MemberAccess();
+    //return stmt;
     return NULL;
 }
 

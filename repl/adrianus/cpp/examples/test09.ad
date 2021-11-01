@@ -1,0 +1,6 @@
+class Server {
+    port = 8080
+}
+
+server = Server()
+globals()

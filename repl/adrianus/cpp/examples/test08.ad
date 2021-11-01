@@ -1,0 +1,20 @@
+/* class object and member access test script */
+
+class Server {
+    port = 8080
+
+    def constructor(o) {
+        offset = o
+    }
+
+    def print_port() {
+        print(port + offset)
+    }
+}
+
+server = Server()
+
+globals()
+/* server.port */
+
+print("end script")

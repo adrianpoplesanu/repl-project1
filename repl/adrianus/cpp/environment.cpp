@@ -49,11 +49,13 @@ void Environment::FreeObjectForKey(std::string key) {
 }
 
 void Environment::PrintStore() {
-    std::cout << "store:\n";
+    std::cout << "store: {";
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        std::cout << it->first << "\n";
+        std::cout << it->first << ": ";
         print_Ad_Object(it->second);
+        std::cout << ", "; // hmmm, this needs to be fixed
     }
+    std::cout << "}\n";
 }
 
 Environment NewEnvoronment() {

@@ -17,7 +17,8 @@ enum ParseType {
     PT_PRODUCT,
     PT_PREFIX,
     PT_CALL,
-    PT_INDEX
+    PT_INDEX,
+    PT_MEMBERACCESS
 };
 
 std::map<TokenType, ParseType> precedences = {
@@ -35,7 +36,8 @@ std::map<TokenType, ParseType> precedences = {
     {TT_SLASH, PT_PRODUCT},
     {TT_ASTERISK, PT_PRODUCT},
     {TT_LPAREN, PT_CALL},
-    {TT_LBRACKET, PT_INDEX}
+    {TT_LBRACKET, PT_INDEX},
+    {TT_DOT, PT_MEMBERACCESS}
 };
 
 class Parser {
@@ -92,7 +94,7 @@ public:
     Ad_AST_Node* ParseDefExpression();
     Ad_AST_Node* ParseComment();
     Ad_AST_Node* ParseClassStatement();
-    Ad_AST_Node* ParseMemberAccess();
+    Ad_AST_Node* ParseMemberAccess(Ad_AST_Node*);
 };
 
 #endif

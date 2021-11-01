@@ -236,7 +236,7 @@ Ad_Builtin_Object::Ad_Builtin_Object() {
     ref_count = 0;
 }
 
-Ad_Builtin_Object::Ad_Builtin_Object(Ad_Object* (*bf)(std::vector<Ad_Object*>)) {
+Ad_Builtin_Object::Ad_Builtin_Object(Ad_Object* (*bf)(std::vector<Ad_Object*>, Environment*)) {
     type = OBJ_BUILTIN;
     ref_count = 0;
     builtin_function = bf;
@@ -517,6 +517,10 @@ void free_Ad_Object_memory(Ad_Object* obj) {
 }
 
 void print_Ad_Object(Ad_Object* obj) {
+    if (obj == NULL) {
+        std::cout << "oops... something went wrong";
+        return;
+    }
     switch(obj->type) {
         case OBJ_NULL:
             std::cout << "null\n";
@@ -544,6 +548,12 @@ void print_Ad_Object(Ad_Object* obj) {
         break;
         case OBJ_SIGNAL:
             std::cout << "signal object\n";
+        break;
+        case OBJ_CLASS:
+            std::cout << "class object";
+        break;
+        case OBJ_INSTANCE:
+            std::cout << "class instance";
         break;
         default:
             std::cout << "no print implmentation for this object type";

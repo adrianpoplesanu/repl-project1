@@ -81,7 +81,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
                 return args_objs[0];
             }
-            return ApplyFunction(func, args_objs);
+            return ApplyFunction(func, args_objs, env);
         }
         break;
         case ST_WHILE_EXPRESSION: {
@@ -304,14 +304,20 @@ std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> arg
     return res;
 }
 
-Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args) {
+Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
         Environment extendedEnv = ExtendFunctionEnv(func, args);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
-        return ((Ad_Builtin_Object*)func)->builtin_function(args);
+        return ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
+    }
+    if (func->type == OBJ_CLASS) {
+        // TODO: complete this Ad_Class_Instance object instantiation
+        Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
+        Ad_Class_Instance* klass_instance = new Ad_Class_Instance();
+        return klass_instance;
     }
     return NULL;
 }
