@@ -94,6 +94,8 @@ class Evaluator(object):
             return None
         elif node.type == StatementType.PREFIX_INCREMENT:
             return self.eval_prefix_increment(node, env)
+        elif node.type == StatementType.POSTFIX_INCREMENT:
+            return self.eval_postfix_increment(node, env)
         else:
             print 'unknown AST node: ' + node.type
 
@@ -435,3 +437,11 @@ class Evaluator(object):
             obj.value += 1
         env.set(node.name.value, obj)
         return obj
+
+    def eval_postfix_increment(self, node, env):
+        obj = env.get(node.name.value)
+        old_value = obj.value
+        if obj.type == ObjectType.INTEGER:
+            obj.value += 1
+        env.set(node.name.value, obj)
+        return Ad_Integer_Object(value=old_value)
