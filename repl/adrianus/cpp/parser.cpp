@@ -491,9 +491,20 @@ Ad_AST_Node* Parser::ParseClassStatement() {
 }
 
 Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
-    //Ad_AST_MemberAccess* stmt = new Ad_AST_MemberAccess();
-    //return stmt;
-    return NULL;
+    Ad_AST_MemberAccess* stmt = new Ad_AST_MemberAccess(current_token);
+    NextToken();
+    Ad_AST_Identifier* right = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
+    stmt->owner = left;
+    stmt->member = right;
+    if (PeekTokenIs(TT_LPAREN)) {
+        NextToken();
+        stmt->attributes = ParseCallArguments();
+        stmt->is_method = true;
+    } else {
+        stmt->attributes.clear();
+        stmt->is_method = false;
+    }
+    return stmt;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {
