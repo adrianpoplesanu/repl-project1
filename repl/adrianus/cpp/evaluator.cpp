@@ -315,8 +315,21 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
     }
     if (func->type == OBJ_CLASS) {
         // TODO: complete this Ad_Class_Instance object instantiation
+        std::cout << "ApplyFunction called with a klass object\n";
         Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
         Ad_Class_Instance* klass_instance = new Ad_Class_Instance();
+        std::vector<Ad_AST_Node*> attributes = ((Ad_Class_Object*) func)->attributes;
+        for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
+            //std::cout << "parsing a function attribute while calling a Class construct\n";
+            Ad_AST_Node *node = *it;
+            std::cout << node->type << '\n';
+            if (node->type == ST_ASSIGN_STATEMENT) {
+                std::cout << "am intalnit un assign statement in body-ul clasei\n";
+            }
+            if (node->type == ST_EXPRESSION_STATEMENT) {
+                std::cout << "am intalnit un expression statement in body-ul clasei\n";
+            }
+        }
         return klass_instance;
     }
     return NULL;
