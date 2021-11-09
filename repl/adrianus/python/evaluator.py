@@ -206,7 +206,7 @@ class Evaluator(object):
             result = self.eval(statement, env)
             if result and result.type == ObjectType.RETURN_VALUE:
                 return result
-        return result
+        return None
 
     def eval_while_expression(self, node, env):
         condition = self.eval(node.condition, env)
