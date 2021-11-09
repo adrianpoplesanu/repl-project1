@@ -26,6 +26,7 @@ public class Repl {
     public void loop() {
     	Environment env = Environment.newEnvironment();
     	while(true) {
+    		System.out.print(">> ");
     		String source = getNextLine();
     		if (source.equals("exit()")) break;
     		parser.load(source);

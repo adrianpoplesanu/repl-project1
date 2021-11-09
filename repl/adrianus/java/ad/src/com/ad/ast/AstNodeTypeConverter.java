@@ -20,6 +20,7 @@ public class AstNodeTypeConverter {
 			put(AstNodeTypeEnum.FUNCTION_LITERAL, "FunctionLiteral");
 			put(AstNodeTypeEnum.CALL_EXPRESSION, "CallExpression");
 			put(AstNodeTypeEnum.WHILE_EXPRESSION, "WhileExpression");
+			put(AstNodeTypeEnum.ASSIGN_STATEMENT, "AssignStatement");
 		}
 	};
 	

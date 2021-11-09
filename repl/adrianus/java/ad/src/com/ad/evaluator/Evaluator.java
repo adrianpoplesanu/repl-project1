@@ -226,8 +226,9 @@ public class Evaluator {
     	for (AstNode stmt : blockStatement.getStatements()) {
     		result = eval(stmt, env);
     		if (result != null && result.getType() == ObjectTypeEnum.RETURN_VALUE) {
-    			AdReturnValueObject returnObject = (AdReturnValueObject)result;
-    			return returnObject.getReturnValue();
+    			//AdReturnValueObject returnObject = (AdReturnValueObject)result;
+    			//return returnObject.getReturnValue();
+				return result;
     		}
     	}
     	return null; // this should return null, leaving it for now for testing purposes

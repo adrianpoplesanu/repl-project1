@@ -27,6 +27,19 @@ public class AstNodeUtils {
     	        	PrintASTNode(((AstExpressionStatement)node).getExpression(), level + 2);
     	        }
     		break;
+			case IF_EXPRESSION:
+				AstIfExpression expr = (AstIfExpression) node;
+				System.out.println("->IfExpression " + expr.getToken());
+				if (expr.getCondition() != null) {
+					PrintASTNode(expr.getCondition(), level + 2);
+				}
+				if (expr.getConsequence() != null) {
+					PrintASTNode(expr.getConsequence(), level + 2);
+				}
+				if (expr.getAlternative() != null) {
+					PrintASTNode(expr.getAlternative(), level + 2);
+				}
+				break;
     		default:
     			System.out.println("not recognized node type for printing: " + AstNodeTypeConverter.convertToString(node.getType()));
     		break;
