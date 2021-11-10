@@ -30,6 +30,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.DEF] = self.parse_def_expression
         self.prefix_parse_functions[TokenType.CLASS] = self.parse_class_statement
         self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
+        self.prefix_parse_functions[TokenType.FOR] = self.parse_for_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
@@ -378,6 +379,10 @@ class Parser(object):
         stmt = ASTPostfixIncrement(token=self.current_token)
         stmt.name = left
         return stmt
+
+    def parse_for_expression(self):
+        stmt = ASTForExpression(token=self.corrent_token)
+        print self.current_token
 
     def parse_expression(self, precedence):
         if self.current_token.type not in self.prefix_parse_functions:

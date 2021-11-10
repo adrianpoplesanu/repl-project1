@@ -24,6 +24,7 @@ class StatementType(object):
     COMMENT = 'COMMENT'
     PREFIX_INCREMENT = 'PREFIX_INCREMENT'
     POSTFIX_INCREMENT = 'POSTFIX_INCREMENT'
+    FOR_EXPRESSION = 'FOR_EXPRESSION'
 
 
 statement_type_map = {
@@ -51,7 +52,8 @@ statement_type_map = {
     StatementType.MEMBER_ACCESS: 'MEMBER_ACCESS',
     StatementType.COMMENT: 'COMMENT',
     StatementType.PREFIX_INCREMENT: 'PREFIX_INCREMENT',
-    StatementType.POSTFIX_INCREMENT: 'POSTFIX_INCREMENT'
+    StatementType.POSTFIX_INCREMENT: 'POSTFIX_INCREMENT',
+    StatementType.FOR_EXPRESSION: 'FOR_EXPRESSION'
 }
 
 
@@ -513,12 +515,39 @@ class ASTPrefixIncrement(ASTNode):
         self.token = token
         self.name = name
 
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)
+
 
 class ASTPostfixIncrement(ASTNode):
     type = StatementType.POSTFIX_INCREMENT
+
+    def __init__(self, token=None, name=None):
+        """
+        @param token: the node's token
+        """
+        self.token = token
+        self.name = name
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)
+
+
+class ASTForExpression(ASTNode):
+    type = StatementType.FOR_EXPRESSION
 
     def __init__(self, token=None):
         """
         @param token: the node's token
         """
         self.token = token
+        self.initialization = initialization
+        self.condition = condition
+        self.step = step
+        self.body = body

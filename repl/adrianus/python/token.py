@@ -57,6 +57,7 @@ keywords_map = {
 	"while": TokenType.WHILE,
 	"true": TokenType.TRUE,
 	"false": TokenType.FALSE,
+	"for": TokenType.FOR,
 	# context
 	# "context": TokenType.ILLEGAL, context ar trebui sa fie un builtin
 	"and": TokenType.AND,
