@@ -542,7 +542,7 @@ class ASTPostfixIncrement(ASTNode):
 class ASTForExpression(ASTNode):
     type = StatementType.FOR_EXPRESSION
 
-    def __init__(self, token=None):
+    def __init__(self, token=None, initialization=None, condition=None, step=None, body=None):
         """
         @param token: the node's token
         """
@@ -551,3 +551,9 @@ class ASTForExpression(ASTNode):
         self.condition = condition
         self.step = step
         self.body = body
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)

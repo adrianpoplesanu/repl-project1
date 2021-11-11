@@ -44,7 +44,8 @@ token_type_map = {
 	TokenType.CLASS: "CLASS",
 	TokenType.THIS: "THIS",
 	TokenType.START_COMMENT: "STRAT_COMMENT",
-	TokenType.END_COMMENT: "END_COMMENT"
+	TokenType.END_COMMENT: "END_COMMENT",
+	TokenType.PLUSPLUS: 'PREFIX_INCREMENT'
 }
 
 keywords_map = {

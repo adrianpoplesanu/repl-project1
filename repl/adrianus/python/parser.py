@@ -7,7 +7,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
                 ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
-                ASTPostfixIncrement
+                ASTPostfixIncrement, ASTForExpression
 
 
 class Parser(object):
@@ -381,8 +381,41 @@ class Parser(object):
         return stmt
 
     def parse_for_expression(self):
-        stmt = ASTForExpression(token=self.corrent_token)
-        print self.current_token
+        stmt = ASTForExpression(token=self.current_token)
+        #print self.current_token
+        self.next_token()
+        #print self.current_token
+        if not self.current_token_is(TokenType.LPAREN):
+            print 'error parsing for expression: LPRAEN expected'
+            return None
+        self.next_token()
+        stmt.initialization = self.parse_expression(PrecedenceType.LOWEST)
+        print stmt.initialization
+        if not self.expect_peek(TokenType.SEMICOLON):
+            print 'error parsing for expression: SEMICOLON expected'
+            return None
+        self.next_token()
+        stmt.condition = self.parse_expression(PrecedenceType.LOWEST)
+        print stmt.condition
+        if not self.expect_peek(TokenType.SEMICOLON):
+            print 'error parsing for expression: second SEMICOLON expected'
+            return None
+        self.next_token()
+        stmt.step = self.parse_expression(PrecedenceType.LOWEST)
+        print stmt.step
+        #print self.current_token
+        if not self.expect_peek(TokenType.RPAREN):
+            print 'error parsing for expression: RPRAREN not found'
+            return None
+        self.next_token()
+        if not self.current_token_is(TokenType.LBRACE):
+            print 'error parsing for block statement'
+            return None
+        stmt.body =  self.parse_block_statement()
+        print stmt.body
+        #print self.current_token
+        #self.next_token()
+        return stmt
 
     def parse_expression(self, precedence):
         if self.current_token.type not in self.prefix_parse_functions:

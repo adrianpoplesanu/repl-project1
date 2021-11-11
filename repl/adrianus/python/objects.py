@@ -133,6 +133,9 @@ class Ad_List_Object(Ad_Object):
 
 class Hash_Pair(object):
     def __init__(self, key=None, value=None):
+        """
+        todo: write this
+        """
         self.key = key
         self.value = value
 
@@ -141,6 +144,9 @@ class Ad_Hash_Object(Ad_Object):
     type = ObjectType.HASH
 
     def __init__(self, pairs=None):
+        """
+        todo: write this
+        """
         self.pairs = pairs
 
     def inspect(self):
@@ -154,6 +160,9 @@ class Ad_Class_Object(Ad_Object):
     type = ObjectType.CLASS
 
     def __init__(self, name=None, attributes=None, methods=None):
+        """
+        todo: write this
+        """
         self.name = name
         self.attributes = attributes
         self.methods = methods

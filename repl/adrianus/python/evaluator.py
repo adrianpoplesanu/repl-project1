@@ -96,6 +96,11 @@ class Evaluator(object):
             return self.eval_prefix_increment(node, env)
         elif node.type == StatementType.POSTFIX_INCREMENT:
             return self.eval_postfix_increment(node, env)
+        elif node.type == StatementType.FOR_EXPRESSION:
+            print node.initialization
+            print node.condition
+            print node.step
+            print node.body
         else:
             print 'unknown AST node: ' + node.type
 
