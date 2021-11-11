@@ -19,7 +19,7 @@ public:
     void PrintStore();
 };
 
-Environment NewEnvoronment();
+Environment NewEnvironment();
 Environment NewEnclosedEnvironment(Environment*);
 
 #endif

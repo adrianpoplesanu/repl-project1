@@ -314,20 +314,26 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         return ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
     }
     if (func->type == OBJ_CLASS) {
-        // TODO: complete this Ad_Class_Instance object instantiation
-        std::cout << "ApplyFunction called with a klass object\n";
+        Environment* instance_environment = new Environment();
         Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
-        Ad_Class_Instance* klass_instance = new Ad_Class_Instance();
+        Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*) klass_object->name;
+        Ad_Class_Instance* klass_instance = new Ad_Class_Instance(klass_ident->value, klass_object, instance_environment);
         std::vector<Ad_AST_Node*> attributes = ((Ad_Class_Object*) func)->attributes;
         for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
-            //std::cout << "parsing a function attribute while calling a Class construct\n";
             Ad_AST_Node *node = *it;
-            std::cout << node->type << '\n';
             if (node->type == ST_ASSIGN_STATEMENT) {
-                std::cout << "am intalnit un assign statement in body-ul clasei\n";
+                Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) node;
+                instance_environment->outer = &env;
+                Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
+                Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
+                std::string key = assign_ident->value;
+                klass_instance->instance_environment->Set(key, evaluated);
             }
             if (node->type == ST_EXPRESSION_STATEMENT) {
-                std::cout << "am intalnit un expression statement in body-ul clasei\n";
+                Ad_AST_ExpressionStatement * expression_statement = (Ad_AST_ExpressionStatement*) node;
+                if (expression_statement->expression->type == ST_ASSIGN_STATEMENT) {
+                    Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) expression_statement->expression;
+                }
             }
         }
         return klass_instance;
@@ -495,7 +501,7 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_Class* class_node = (Ad_AST_Class*) node;
-    Ad_Class_Object* klass_object = new Ad_Class_Object(class_node->methods, class_node->attributes);
+    Ad_Class_Object* klass_object = new Ad_Class_Object(class_node->name, class_node->methods, class_node->attributes);
     Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*)(class_node->name);
     std::string klass_name = klass_ident->value;
     env.Set(klass_name, klass_object);

@@ -395,6 +395,23 @@ Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST
     }
 }
 
+Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
+    type = OBJ_CLASS;
+    ref_count = 0;
+    name = n;
+    Ad_INCREF(name);
+    methods = m;
+    for (std::vector<Ad_AST_Node*>::iterator it = methods.begin(); it != methods.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_INCREF(node);
+    }
+    attributes = a;
+    for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_INCREF(node);
+    }
+}
+
 Ad_Class_Object::~Ad_Class_Object() {
     for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
         Ad_AST_Node *node = *it;
@@ -432,6 +449,14 @@ Ad_Class_Instance::Ad_Class_Instance() {
 Ad_Class_Instance::Ad_Class_Instance(Ad_Object* ko, Environment* env) {
     type = OBJ_INSTANCE;
     ref_count = 0;
+    klass_object = ko;
+    instance_environment = env;
+}
+
+Ad_Class_Instance::Ad_Class_Instance(std::string n, Ad_Object* ko, Environment* env) {
+    type = OBJ_INSTANCE;
+    ref_count = 0;
+    name = n;
     klass_object = ko;
     instance_environment = env;
 }

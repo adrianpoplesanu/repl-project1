@@ -31,8 +31,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
         std::string line;
         std::string text;
         while (getline(target ,line)) {
-            //std::cout << line << "\n";
-            text += line;
+            text += line + "\n";
         }
         parser.Load(text);
         Ad_AST_Program program;
