@@ -97,10 +97,7 @@ class Evaluator(object):
         elif node.type == StatementType.POSTFIX_INCREMENT:
             return self.eval_postfix_increment(node, env)
         elif node.type == StatementType.FOR_EXPRESSION:
-            print node.initialization
-            print node.condition
-            print node.step
-            print node.body
+            return self.eval_for_expression(node, env)
         else:
             print 'unknown AST node: ' + node.type
 
@@ -450,3 +447,7 @@ class Evaluator(object):
             obj.value += 1
         env.set(node.name.value, obj)
         return Ad_Integer_Object(value=old_value)
+
+    def eval_for_expression(self, node, env):
+        print "evaluating for expression"
+        return None
