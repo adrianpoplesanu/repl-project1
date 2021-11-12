@@ -496,17 +496,14 @@ Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
     Ad_AST_Identifier* right = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
     stmt->owner = left;
     stmt->member = right;
-    /*if (PeekTokenIs(TT_LPAREN)) {
+    if (PeekTokenIs(TT_LPAREN)) {
         NextToken();
         stmt->attributes = ParseCallArguments();
         stmt->is_method = true;
     } else {
         stmt->attributes.clear();
         stmt->is_method = false;
-    }*/
-    std::cout << "===\n";
-    std::cout << current_token.ToString();
-    std::cout << "===\n";
+    }
     return stmt;
 }
 

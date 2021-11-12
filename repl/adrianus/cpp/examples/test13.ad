@@ -1,0 +1,19 @@
+a = 5
+
+globals()
+
+class Server {
+    port = 8080
+
+    def listen() {
+        print ("listening...")
+    }
+}
+
+server = Server()
+server.port
+server.listen()
+
+print("aaa")
+print("bbb")
+globals()

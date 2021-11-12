@@ -1,2 +1,8 @@
 a = 8
 globals()
+
+def test() {
+    print("sunt in test()")
+}
+
+globals()

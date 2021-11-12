@@ -123,6 +123,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalClassStatement(node, env);
         }
         break;
+        case ST_MEMBER_ACCESS: {
+            return EvalMemberAccess(node, env);
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -318,7 +322,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
         Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*) klass_object->name;
         Ad_Class_Instance* klass_instance = new Ad_Class_Instance(klass_ident->value, klass_object, instance_environment);
-        std::vector<Ad_AST_Node*> attributes = ((Ad_Class_Object*) func)->attributes;
+        std::vector<Ad_AST_Node*> attributes = klass_object->attributes;
         for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
             Ad_AST_Node *node = *it;
             if (node->type == ST_ASSIGN_STATEMENT) {
@@ -333,8 +337,20 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
                 Ad_AST_ExpressionStatement * expression_statement = (Ad_AST_ExpressionStatement*) node;
                 if (expression_statement->expression->type == ST_ASSIGN_STATEMENT) {
                     Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) expression_statement->expression;
+                    instance_environment->outer = &env;
+                    Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
+                    Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
+                    std::string key = assign_ident->value;
+                    klass_instance->instance_environment->Set(key, evaluated);
                 }
             }
+        }
+        std::vector<Ad_AST_Node*> methods = klass_object->methods;
+        for (std::vector<Ad_AST_Node*>::iterator it = methods.begin(); it != methods.end(); ++it) {
+            Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
+            Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, klass_instance->instance_environment);
+            Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
+            klass_instance->instance_environment->Set(def_ident->value, method_obj);
         }
         return klass_instance;
     }
@@ -505,6 +521,16 @@ Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*)(class_node->name);
     std::string klass_name = klass_ident->value;
     env.Set(klass_name, klass_object);
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
+    Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
+    if (member_access->is_method) {
+
+    } else {
+
+    }
     return NULL;
 }
 

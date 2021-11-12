@@ -426,7 +426,9 @@ Ad_Class_Object::~Ad_Class_Object() {
 }
 
 std::string Ad_Class_Object::Inspect() {
-    return "todo: implement this for Ad_Class_Object";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "class object at memory address " + ss.str();
 }
 
 void Ad_Class_Object::Print() {
@@ -466,7 +468,9 @@ Ad_Class_Instance::~Ad_Class_Instance() {
 }
 
 std::string Ad_Class_Instance::Inspect() {
-    return "todo: implement Inspect() in Ad_Class_Instance";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "class instance at memory address " + ss.str();
 }
 
 void Ad_Class_Instance::Print() {
