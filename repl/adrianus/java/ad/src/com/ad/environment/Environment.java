@@ -7,18 +7,21 @@ import com.ad.objects.AdObject;
 
 public class Environment {
 	private Environment outer;
-	public static HashMap<String, AdObject> store;
+	public HashMap<String, AdObject> store;
 	
 	public Environment() {
 		store = new HashMap<String, AdObject>();
+		outer = null;
 	}
 	
 	public Environment(Environment outer) {
+		this();
 		this.outer = outer;
 	}
 	
 	public boolean check(String key) {
 		if (store.containsKey(key)) return true;
+		if (outer != null && outer.check(key)) return true;
 		return false;
 	}
 	
@@ -26,30 +29,24 @@ public class Environment {
 		if (store.containsKey(key)) {
 			return store.get(key);
 		}
-		if (outer.check(key)) return outer.get(key);
+		if (outer != null && outer.check(key)) return outer.get(key);
 		return null;
 	}
 	
 	public void set(String key, AdObject value) {
-		store.put(key, value);
+		if (outer != null && outer.check(key)) {
+			outer.set(key, value);
+		} else {
+			store.put(key, value);
+		}
 	}
 
 	public String toString() {
 		String out = "{";
 		for (Map.Entry<String, AdObject> entry : store.entrySet()) {
-			out += entry.getKey() + ": " + entry.getValue();
+			out += entry.getKey() + ": " + entry.getValue() + ", ";
 		}
 		out += "}";
 		return out;
-	}
-	
-	public static Environment newEnvironment() {
-		Environment env = new Environment();
-		return env;
-	}
-	
-	public static Environment newEnclosedEnvironment(Environment outer) {
-		Environment env = new Environment(outer);
-		return env;
 	}
 }

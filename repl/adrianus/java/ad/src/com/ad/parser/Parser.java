@@ -49,6 +49,8 @@ public class Parser {
 		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.ASTERISK, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.SLASH, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.EQ, new InfixExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.NOT_EQ, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.LT, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.GT, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.LTE, new InfixExpressionParser(this));
@@ -140,7 +142,10 @@ public class Parser {
 		AstReturnStatement stmt = new AstReturnStatement(currentToken);
 		nextToken();
 		stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
-		while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.EOF)) {
+		if (peekTokenIs(TokenTypeEnum.SEMICOLON) || peekTokenIs(TokenTypeEnum.RBRACE) || peekTokenIs(TokenTypeEnum.EOF)) {
+			return stmt;
+		}
+		while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
 			nextToken();
 		}
 		return stmt;

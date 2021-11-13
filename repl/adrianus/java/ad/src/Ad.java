@@ -13,15 +13,21 @@ public class Ad {
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			String filename = args[0];
-			String text;
+			String source;
 			try {
-				text = new String(Files.readAllBytes(Paths.get(filename)));
+				source = new String(Files.readAllBytes(Paths.get(filename)));
 			} catch (IOException e) {
-				text = "";
+				source = "";
 			}
-			System.out.println(text);
+			//System.out.println(source);
+			Parser parser = new Parser();
+			AstProgram program = new AstProgram();
+			Evaluator evaluator = new Evaluator();
+
+			Repl repl = new Repl(parser, program, evaluator);
+			repl.executeSource(source);
 		} else {
-			System.out.println("Ad intepreter [JAVA]... v1.0");
+			System.out.println("Ad interpreter [JAVA]... v1.0");
 			
 	        ParserTest.testParser();
 	

@@ -2,8 +2,10 @@ package com.ad.repl;
 
 import java.util.Scanner;
 
+import com.ad.ast.AstNodeUtils;
 import com.ad.ast.AstProgram;
 import com.ad.environment.Environment;
+import com.ad.environment.EnvironmentUtils;
 import com.ad.evaluator.Evaluator;
 import com.ad.parser.Parser;
 
@@ -24,7 +26,7 @@ public class Repl {
     }
     
     public void loop() {
-    	Environment env = Environment.newEnvironment();
+    	Environment env = EnvironmentUtils.newEnvironment();
     	while(true) {
     		System.out.print(">> ");
     		String source = getNextLine();
@@ -32,7 +34,16 @@ public class Repl {
     		parser.load(source);
     		program.reset();
     		parser.buildProgramStatements(program);
-    		this.evaluator.eval(program, env);
+    		evaluator.eval(program, env);
     	}
     }
+
+    public void executeSource(String source) {
+		Environment env = EnvironmentUtils.newEnvironment();
+		parser.load(source);
+		program.reset();
+		parser.buildProgramStatements(program);
+		//AstNodeUtils.PrintASTNode(program, 0);
+		evaluator.eval(program, env);
+	}
 }

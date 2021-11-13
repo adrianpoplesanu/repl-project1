@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.ad.ast.*;
 import com.ad.builtin.BuiltinLookup;
 import com.ad.environment.Environment;
+import com.ad.environment.EnvironmentUtils;
 import com.ad.objects.AdBooleanObject;
 import com.ad.objects.AdBuiltinObject;
 import com.ad.objects.AdErrorObject;
@@ -128,7 +129,7 @@ public class Evaluator {
     }
 
     private AdObject evalInfixExpression(AstNode node, Environment env) {
-    	AstInfixExpression expr = (AstInfixExpression)node;
+    	AstInfixExpression expr = (AstInfixExpression) node;
     	AdObject left = eval(expr.getLeft(), env);
     	AdObject right = eval(expr.getRight(), env);
     	AdObject result = evalInfixExpression(expr.getOperator(), left, right);
@@ -149,22 +150,26 @@ public class Evaluator {
     	int left_val = ((AdIntegerObject)left).getValue();
     	int right_val = ((AdIntegerObject)right).getValue();
     	switch (operator) {
-    	case "+":
-    		return new AdIntegerObject(left_val + right_val);
-    	case "-":
-    		return new AdIntegerObject(left_val - right_val);
-    	case "*":
-    		return new AdIntegerObject(left_val * right_val);
-    	case "/":
-    		return new AdIntegerObject(left_val / right_val);
-    	case "<":
-    		return nativeBoolToBoolean(left_val < right_val);
-    	case ">":
-    		return nativeBoolToBoolean(left_val > right_val);
-    	case "<=":
-    		return nativeBoolToBoolean(left_val <= right_val);
-    	case ">=":
-    		return nativeBoolToBoolean(left_val >= right_val);
+    		case "+":
+    			return new AdIntegerObject(left_val + right_val);
+			case "-":
+				return new AdIntegerObject(left_val - right_val);
+			case "*":
+				return new AdIntegerObject(left_val * right_val);
+			case "/":
+				return new AdIntegerObject(left_val / right_val);
+			case "<":
+				return nativeBoolToBoolean(left_val < right_val);
+			case ">":
+				return nativeBoolToBoolean(left_val > right_val);
+			case "<=":
+				return nativeBoolToBoolean(left_val <= right_val);
+			case ">=":
+				return nativeBoolToBoolean(left_val >= right_val);
+			case "==":
+				return nativeBoolToBoolean(left_val == right_val);
+			case "!=":
+				return nativeBoolToBoolean(left_val != right_val);
     	}
     	return null;
     }
@@ -284,7 +289,7 @@ public class Evaluator {
 
     private Environment extendFunctionEnv(AdObject func, ArrayList<AdObject> arguments) {
     	AdFunctionObject functionObject = (AdFunctionObject) func;
-     	Environment extended = Environment.newEnclosedEnvironment(functionObject.getEnv());
+     	Environment extended = EnvironmentUtils.newEnclosedEnvironment(functionObject.getEnv());
      	int i = 0;
      	for (AstNode param : functionObject.getParameters()) {
      		extended.set(param.tokenLiteral(), arguments.get(i++));
@@ -293,6 +298,7 @@ public class Evaluator {
     }
 
     private AdObject unwrapReturnValue(AdObject evaluated) {
+    	if (evaluated == null) return null;
     	if (evaluated.getType() == ObjectTypeEnum.RETURN_VALUE) {
     		AdReturnValueObject returnValue = (AdReturnValueObject) evaluated;
     		return returnValue.getReturnValue();
