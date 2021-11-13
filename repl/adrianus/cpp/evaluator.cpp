@@ -358,6 +358,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
 }
 
 Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj) {
+    if (obj == NULL) return obj; // found when doing the Java implementation
     if (obj->Type() == OBJ_RETURN_VALUE) {
         Ad_Object* returned_obj = ((Ad_ReturnValue_Object*)obj)->value;
         free_Ad_Object_memory(obj);
