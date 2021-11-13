@@ -68,7 +68,7 @@ Ad_Object* lower_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return NULL;
 }
 
-Ad_Object* globals_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env) {
     env->PrintStore();
     return NULL;
 }
@@ -85,7 +85,7 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"remove", new Ad_Builtin_Object(&remove_builtin)},
     {"upper", new Ad_Builtin_Object(&upper_builtin)},
     {"lower", new Ad_Builtin_Object(&lower_builtin)},
-    {"globals", new Ad_Builtin_Object(&globals_builtin)}
+    {"context", new Ad_Builtin_Object(&context_builtin)}
 };
 
 void free_builtin_arguments(std::vector<Ad_Object*> args) {

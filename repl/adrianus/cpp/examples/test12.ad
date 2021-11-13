@@ -1,8 +1,8 @@
 a = 8
-globals()
+context()
 
 def test() {
     print("sunt in test()")
 }
 
-globals()
+context()

@@ -528,9 +528,9 @@ Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
 Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
     if (member_access->is_method) {
-
+        // ...
     } else {
-
+        // ...
     }
     return NULL;
 }

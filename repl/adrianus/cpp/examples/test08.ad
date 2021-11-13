@@ -14,7 +14,7 @@ class Server {
 
 server = Server()
 
-globals()
+context()
 /* server.port */
 
 print("end script")
