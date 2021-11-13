@@ -1,0 +1,9 @@
+let a = 2
+
+let b = function() {
+    let a = 5
+}
+
+b()
+
+a

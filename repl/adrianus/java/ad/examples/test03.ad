@@ -1,0 +1,5 @@
+let a = function(x) {
+    return x+1
+}
+
+a(5)
