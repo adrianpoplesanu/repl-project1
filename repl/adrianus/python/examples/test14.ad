@@ -8,7 +8,7 @@ class Server {
 
     def print_port(a) {
         /*port = Port()*/
-        /*globals()*/
+        /*context()*/
         print(8080 + a)
     }
 }

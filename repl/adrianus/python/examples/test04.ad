@@ -21,7 +21,7 @@ print("end class declaration")
 e = Elev(12)
 e.print_varsta(34)
 
-globals()
+context()
 
 print(e)
 print("end class test")

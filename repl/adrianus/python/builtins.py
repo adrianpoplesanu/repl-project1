@@ -39,7 +39,7 @@ def append_builtin(args, env):
     if list_obj.type == ObjectType.LIST:
         list_obj.elements.append(obj)
 
-def globals_builtin(args, env):
+def context_builtin(args, env):
     print env.store
 
 builtins_map = {
@@ -50,5 +50,5 @@ builtins_map = {
     "ref_count": Ad_Builtin_Object(ref_count_builtin),
     "type": Ad_Builtin_Object(type_builtin),
     "append": Ad_Builtin_Object(append_builtin),
-    "globals": Ad_Builtin_Object(globals_builtin)
+    "context": Ad_Builtin_Object(context_builtin)
 }

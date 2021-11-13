@@ -9,6 +9,6 @@ class Server {
 server = Server()
 server.port
 
-globals()
+context()
 
 /* print("stop") */

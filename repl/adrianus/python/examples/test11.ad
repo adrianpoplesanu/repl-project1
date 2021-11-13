@@ -21,6 +21,6 @@ ports = [server.port, https_port, nginx_port]
 
 print(ports)
 
-/*globals()*/
+/*context()*/
 
 print("stop")
