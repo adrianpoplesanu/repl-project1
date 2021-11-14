@@ -28,6 +28,8 @@ token_type_map = {
 	TokenType.RBRACE: "RBRACE",
 	TokenType.LT: "LT",
 	TokenType.GT: "GT",
+	TokenType.LTE: "LTE",
+	TokenType.GTE: "GTE",
 	TokenType.EQ: "EQ",
 	TokenType.NOT_EQ: "NOT_EQ",
 	TokenType.IF: "IF",
@@ -45,26 +47,26 @@ token_type_map = {
 	TokenType.THIS: "THIS",
 	TokenType.START_COMMENT: "STRAT_COMMENT",
 	TokenType.END_COMMENT: "END_COMMENT",
-	TokenType.PLUSPLUS: 'PREFIX_INCREMENT'
+	TokenType.PLUSPLUS: 'INCREMENT_OPERATOR'
 }
 
 keywords_map = {
 	"let": TokenType.LET,
 	"return": TokenType.RETURN,
-	"if": TokenType.IF,
-	"else": TokenType.ELSE,
+	"break": TokenType.BREAK,
+	"continue": TokenType.CONTINUE,
+	"while": TokenType.WHILE,
+	"for": TokenType.FOR,
 	"function": TokenType.FUNCTION,
 	"def": TokenType.DEF,
-	"while": TokenType.WHILE,
+	"if": TokenType.IF,
+	"else": TokenType.ELSE,
 	"true": TokenType.TRUE,
 	"false": TokenType.FALSE,
-	"for": TokenType.FOR,
-	# context
-	# "context": TokenType.ILLEGAL, context ar trebui sa fie un builtin
 	"and": TokenType.AND,
 	"or": TokenType.OR,
 	"class": TokenType.CLASS,
-	"this": TokenType.THIS
+	"this": TokenType.THIS,
 }
 
 

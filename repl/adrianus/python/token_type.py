@@ -34,7 +34,6 @@ class TokenType(object):
 	ELSE = "ELSE"
 	TRUE = "TRUE"
 	FALSE = "FALSE"
-	WHILE = "WHILE"
 	STRING = "STRING"
 	AND = "AND"
 	OR = "OR"

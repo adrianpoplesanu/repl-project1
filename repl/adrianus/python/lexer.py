@@ -58,7 +58,7 @@ class Lexer(object):
                 token.literal = self.ch
         elif self.ch == '<':
             if self.peek_char() == '=':
-                token.type = TokenType.GTE
+                token.type = TokenType.LTE
                 token.literal = "<="
             else:
                 token.type = TokenType.LT
