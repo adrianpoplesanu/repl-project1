@@ -6,7 +6,7 @@ import com.ad.objects.AdStringObject;
 
 import java.util.ArrayList;
 
-public class GlobalsBuiltin implements BuiltinInterface {
+public class ContextBuiltin implements BuiltinInterface {
 
     @Override
     public AdObject call(ArrayList<AdObject> args, Environment env) {

@@ -1,5 +1,5 @@
 let b = function(x) {
-    print("cacate")
+    print("buna dimineata")
 }
 
 b(7)

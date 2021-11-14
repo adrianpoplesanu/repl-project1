@@ -1,0 +1,18 @@
+let a = 1
+let b = function(x) {
+    if (x > 10) {
+        let a = 2
+        print("aaa")
+    } else {
+        let a = 3
+        print("bbb")
+    }
+}
+
+print(a)
+b(20)
+print(a)
+b(4)
+print(a)
+
+context()

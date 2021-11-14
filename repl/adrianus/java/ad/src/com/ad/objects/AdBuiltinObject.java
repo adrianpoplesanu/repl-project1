@@ -10,14 +10,13 @@ public class AdBuiltinObject extends AdObject {
 	}
 
 	public AdBuiltinObject(BuiltinInterface builtinFunction) {
-		this.type = ObjectTypeEnum.BUILTIN;
+		this();
 		this.builtinFunction = builtinFunction;
 	}
 	
 	@Override
 	public String inspect() {
-		// TODO Auto-generated method stub
-		return null;
+		return "<funtion at memory address: " + Integer.toHexString(this.hashCode()) + ">";
 	}
 
 	@Override

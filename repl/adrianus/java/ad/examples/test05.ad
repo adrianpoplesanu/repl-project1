@@ -4,6 +4,6 @@ let b = function() {
     return a + 2
 }
 
-globals()
+context()
 
 b()

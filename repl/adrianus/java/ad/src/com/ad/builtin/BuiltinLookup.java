@@ -10,7 +10,7 @@ public class BuiltinLookup {
 		{
 			put("type", new AdBuiltinObject(new TypeBuiltin()));
 			put("print", new AdBuiltinObject(new PrintBuiltin()));
-			put("globals", new AdBuiltinObject(new GlobalsBuiltin()));
+			put("context", new AdBuiltinObject(new ContextBuiltin()));
 		}
 	};
 }

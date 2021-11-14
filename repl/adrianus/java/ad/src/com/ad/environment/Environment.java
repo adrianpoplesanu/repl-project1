@@ -43,8 +43,12 @@ public class Environment {
 
 	public String toString() {
 		String out = "{";
+		int total = store.size();
+		int i = 0;
 		for (Map.Entry<String, AdObject> entry : store.entrySet()) {
-			out += entry.getKey() + ": " + entry.getValue() + ", ";
+			out += entry.getKey() + ": " + entry.getValue().inspect();
+			i++;
+			if (i < total) out += ", ";
 		}
 		out += "}";
 		return out;
