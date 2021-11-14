@@ -5,7 +5,7 @@ class Environment(object):
         self.outer = None
 
     def check(self, key):
-        return key in self.store or key in self.outer
+        return key in self.store or (self.outer and key in self.outer.store)
 
     def get(self, key):
         if key in self.store:

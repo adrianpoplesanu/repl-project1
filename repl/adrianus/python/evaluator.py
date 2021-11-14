@@ -215,7 +215,9 @@ class Evaluator(object):
         if self.is_error(condition):
             return None
         while self.is_truthy(condition):
-            self.eval(node.block, env)
+            result = self.eval(node.block, env)
+            if result and result.type == ObjectType.RETURN_VALUE:
+                return result
             condition = self.eval(node.condition, env)
 
     def is_truthy(self, obj):
@@ -449,5 +451,14 @@ class Evaluator(object):
         return Ad_Integer_Object(value=old_value)
 
     def eval_for_expression(self, node, env):
-        # ...
+        initialization = self.eval(node.initialization, env)
+        condition = self.eval(node.condition, env)
+        if self.is_error(condition):
+            return None
+        while self.is_truthy(condition):
+            result = self.eval(node.body, env)
+            if result and result.type == ObjectType.RETURN_VALUE:
+                return result
+            step = self.eval(node.step, env)
+            condition = self.eval(node.condition, env)
         return None
