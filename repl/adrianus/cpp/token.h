@@ -46,7 +46,10 @@ enum TokenType {
     TT_CLASS,
     TT_THIS,
     TT_STARTCOMMENT,
-    TT_ENDCOMMENT
+    TT_ENDCOMMENT,
+    TT_PLUSPLUS,
+    TT_CONTINUE,
+    TT_BREAK
 };
 
 std::map<TokenType, std::string> token_type_map = {
@@ -91,7 +94,10 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_CLASS, "CLASS"},
     {TT_THIS, "THIS"},
     {TT_STARTCOMMENT, "STARTCOMMENT"},
-    {TT_ENDCOMMENT, "ENDCOMMENT"}
+    {TT_ENDCOMMENT, "ENDCOMMENT"},
+    {TT_PLUSPLUS, "INCREMENT_OPERATOR"},
+    {TT_CONTINUE, "CONTINUE"},
+    {TT_BREAK, "BREAK"}
 };
 
 std::map<std::string, TokenType> keywords = {
@@ -107,7 +113,9 @@ std::map<std::string, TokenType> keywords = {
     {"and", TT_AND},
     {"or", TT_OR},
     {"class", TT_CLASS},
-    {"this", TT_THIS}
+    {"this", TT_THIS},
+    {"continue", TT_CONTINUE},
+    {"break", TT_BREAK}
 };
 
 class Token {

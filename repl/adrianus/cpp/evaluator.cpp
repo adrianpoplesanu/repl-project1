@@ -390,6 +390,7 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
         Ad_Object* result;
         result = Eval(((Ad_AST_WhileExpression*)node)->consequence, env);
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
+        if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result; // if a return is encountered in the block statement then that's the object the eval block must return
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
     return NULL;
@@ -528,11 +529,20 @@ Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
 Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
     if (member_access->is_method) {
+        Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
+        Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
+        Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
+        Ad_Object* klass_methods = klass_instance->instance_environment->Get(member->value);
         // ...
+        return NULL;
     } else {
-        // ...
+        Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
+        Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
+        Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
+        Environment* klass_environment = klass_instance->instance_environment;
+        Ad_Object* result = Eval(member, *klass_environment);
+        return result;
     }
-    return NULL;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

@@ -1,0 +1,7 @@
+class Server {
+    port = 8080
+}
+
+server = Server()
+server.port
+context()
