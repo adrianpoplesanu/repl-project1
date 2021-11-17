@@ -363,7 +363,7 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, env);
         return UnwrapReturnValue(evaluated);
     }
-    if (func->type == OBJ_BUILTIN) {
+    /*if (func->type == OBJ_BUILTIN) {
         return ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
     }
     if (func->type == OBJ_CLASS) {
@@ -402,7 +402,7 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
             klass_instance->instance_environment->Set(def_ident->value, method_obj);
         }
         return klass_instance;
-    }
+    }*/
     return NULL;
 }
 

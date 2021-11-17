@@ -28,7 +28,8 @@ enum StatementType {
     ST_DEF_STATEMENT,
     ST_CLASS_STATEMENT,
     ST_MEMBER_ACCESS,
-    ST_COMMENT
+    ST_COMMENT,
+    ST_NULL_EXPRESSION
 };
 
 std::map<StatementType, std::string> statement_type_map = {
@@ -54,7 +55,8 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_DEF_STATEMENT, "DefStatement"},
     {ST_CLASS_STATEMENT, "ClassStatement"},
     {ST_MEMBER_ACCESS, "MemberAccess"},
-    {ST_COMMENT, "Comment"}
+    {ST_COMMENT, "Comment"},
+    {ST_NULL_EXPRESSION, "NullExpression"}
 };
 
 class Ad_AST_Node {
@@ -348,6 +350,14 @@ public:
     ~Ad_AST_MemberAccess();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
+};
+
+class Ad_AST_Null_Expression : public Ad_AST_Node {
+public:
+    Token token;
+
+    Ad_AST_Null_Expression();
+    ~Ad_AST_Null_Expression();
 };
 
 bool StatementIs(Ad_AST_Node *stmt, StatementType st) {

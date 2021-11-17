@@ -55,6 +55,7 @@ public:
 class Ad_Null_Object : public Ad_Object {
 public:
 	Ad_Null_Object();
+	~Ad_Null_Object();
 };
 
 class Ad_Integer_Object : public Ad_Object {

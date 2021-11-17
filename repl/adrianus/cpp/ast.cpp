@@ -701,6 +701,15 @@ std::string Ad_AST_MemberAccess::ToString() {
     return "todo: implement Ad_AST_MemberAccess ToString()";
 }
 
+Ad_AST_Null_Expression::Ad_AST_Null_Expression() {
+    type = ST_NULL_EXPRESSION;
+    ref_count = 0;
+}
+
+Ad_AST_Null_Expression::~Ad_AST_Null_Expression() {
+    // nothing to do here, type and ref_count are deallocated automatically(because they are not pointers)
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;

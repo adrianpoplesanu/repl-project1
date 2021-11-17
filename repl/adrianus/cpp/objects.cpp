@@ -25,7 +25,11 @@ std::string Ad_Object::Hash() {
 
 Ad_Null_Object::Ad_Null_Object() {
     type = OBJ_NULL;
-    ref_count = 0; // maybe this should be 1 and decreased along the way?
+    ref_count = 0;
+}
+
+Ad_Null_Object::~Ad_Null_Object() {
+    // nothind to do here, type and ref_count are automatically deallocated (because they are not pointers)
 }
 
 Ad_Integer_Object::Ad_Integer_Object() {
