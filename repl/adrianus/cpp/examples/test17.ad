@@ -1,0 +1,12 @@
+class Server {
+    port = 8080
+
+    def test() {
+        print("running test() in Server");
+    }
+}
+
+server = Server()
+server.port
+/* server.test() */
+context()
