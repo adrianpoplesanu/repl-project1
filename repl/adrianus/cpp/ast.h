@@ -339,7 +339,7 @@ public:
     Token token;
     Ad_AST_Node* owner;
     Ad_AST_Node* member;
-    std::vector<Ad_AST_Node*> attributes;
+    std::vector<Ad_AST_Node*> arguments;
     bool is_method;
 
     Ad_AST_MemberAccess();

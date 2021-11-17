@@ -359,7 +359,6 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
 
 Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
-        std::cout << "pacia\n";
         ExtendMethodEnv(func, args, env);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, env);
         return UnwrapReturnValue(evaluated);
@@ -589,11 +588,10 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
         Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
         Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
         Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
-        std::vector<Ad_Object*> args_objs = EvalExpressions(((Ad_AST_CallExpression*)node)->arguments, env);
+        std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
         if (args_objs.size() == 1 && IsError(args_objs[0])) {
             return args_objs[0];
         }
-        //return NULL;
         return ApplyMethod(klass_method, args_objs, env);
     } else {
         Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;

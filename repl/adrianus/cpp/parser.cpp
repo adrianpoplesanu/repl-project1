@@ -498,10 +498,10 @@ Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
     stmt->member = right;
     if (PeekTokenIs(TT_LPAREN)) {
         NextToken();
-        stmt->attributes = ParseCallArguments();
+        stmt->arguments = ParseCallArguments();
         stmt->is_method = true;
     } else {
-        stmt->attributes.clear();
+        stmt->arguments.clear();
         stmt->is_method = false;
     }
     return stmt;

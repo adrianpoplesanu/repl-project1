@@ -686,11 +686,11 @@ Ad_AST_MemberAccess::Ad_AST_MemberAccess(Token t, Ad_AST_Node* o, Ad_AST_Node* m
     token = t;
     owner = o;
     member = m;
-    attributes = a;
+    arguments = a;
 }
 
 Ad_AST_MemberAccess::~Ad_AST_MemberAccess() {
-    // TODO: deallocate owner, member and attributes
+    // TODO: deallocate owner, member and arguments
 }
 
 std::string Ad_AST_MemberAccess::TokenLiteral() {
