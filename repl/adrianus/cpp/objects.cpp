@@ -1,4 +1,5 @@
 #include "objects.h"
+#include "environment.h"
 #include "listobject.h"
 #include "listobject.cpp"
 #include <sstream>
@@ -417,6 +418,7 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
 }
 
 Ad_Class_Object::~Ad_Class_Object() {
+    std::cout << "aaa\n";
     for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
         Ad_AST_Node *node = *it;
         Ad_DECREF(node); // asta merge si e super cool
@@ -468,7 +470,9 @@ Ad_Class_Instance::Ad_Class_Instance(std::string n, Ad_Object* ko, Environment* 
 }
 
 Ad_Class_Instance::~Ad_Class_Instance() {
-    // TODO: implement this
+    if (instance_environment) {
+        delete instance_environment;
+    }
 }
 
 std::string Ad_Class_Instance::Inspect() {
@@ -541,6 +545,12 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_HASH:
                 delete ((Ad_Hash_Object*)obj);
+            break;
+            case OBJ_CLASS:
+                delete (Ad_Class_Object*) obj;
+            break;
+            case OBJ_INSTANCE:
+                delete (Ad_Class_Instance*) obj;
             break;
             default:
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";

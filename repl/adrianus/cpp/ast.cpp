@@ -690,7 +690,19 @@ Ad_AST_MemberAccess::Ad_AST_MemberAccess(Token t, Ad_AST_Node* o, Ad_AST_Node* m
 }
 
 Ad_AST_MemberAccess::~Ad_AST_MemberAccess() {
-    // TODO: deallocate owner, member and arguments
+    if (owner) {
+        Ad_DECREF(owner);
+        free_Ad_AST_Node_memory(owner);
+    }
+    if (member) {
+        Ad_DECREF(member);
+        free_Ad_AST_Node_memory(member);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
 }
 
 std::string Ad_AST_MemberAccess::TokenLiteral() {
@@ -790,6 +802,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_CLASS_STATEMENT:
             delete (Ad_AST_Class*)node;
+        break;
+        case ST_MEMBER_ACCESS:
+            delete (Ad_AST_MemberAccess*) node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";
