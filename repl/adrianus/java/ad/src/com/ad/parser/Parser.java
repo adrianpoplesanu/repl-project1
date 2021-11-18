@@ -44,6 +44,8 @@ public class Parser {
 	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this));
 	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this));
 	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser(this));
+	    prefixParseFns.put(TokenTypeEnum.LBRACKET, new ListLiteralParser(this));
+		prefixParseFns.put(TokenTypeEnum.LBRACE, new HashLiteralParser(this));
 	    prefixParseFns.put(TokenTypeEnum.STRING, new StringLiteralParser(this));
 		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser(this));
@@ -295,6 +297,14 @@ public class Parser {
 		nextToken();
 		expr.setRight(parseExpression(precedence));
 		return expr;
+	}
+
+	public AstNode parseListLiteral() {
+		return null;
+	}
+
+	public AstNode parseHashLiteral() {
+		return null;
 	}
 
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {
