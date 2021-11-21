@@ -3,3 +3,6 @@ lib/
 __pycache__/
 pyvenv.cfg
 .env
+.Python
+/include
+pip-selfcheck.json
