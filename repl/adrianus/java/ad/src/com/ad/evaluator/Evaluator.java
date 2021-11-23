@@ -125,7 +125,12 @@ public class Evaluator {
     	} else if (BuiltinLookup.builtinMap.containsKey(ident.getValue())) {
     		obj = BuiltinLookup.builtinMap.get(ident.getValue());
     	}
-    	return obj;
+    	if (obj != null) {
+			return obj;
+		} else {
+			AdErrorObject error = new AdErrorObject(((AstIdentifier) node).getToken().getLiteral() + " used before definition.");
+			return error;
+		}
     }
 
     private AdObject evalInfixExpression(AstNode node, Environment env) {

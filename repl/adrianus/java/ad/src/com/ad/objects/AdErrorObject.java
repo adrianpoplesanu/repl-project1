@@ -10,12 +10,12 @@ public class AdErrorObject extends AdObject {
 
 	@Override
 	public String inspect() {
-		return "Error: " + msg;
+		return "ERROR: " + msg;
 	}
 
 	@Override
 	public void print() {
-		System.out.println("Error: " + msg);
+		System.out.println("ERROR: " + msg);
 	}
 
 	public String getMsg() {
