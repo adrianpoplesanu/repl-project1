@@ -153,6 +153,9 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    if (left == NULL || right == NULL) {
+        return NULL;
+    }
     if (left->Type() == OBJ_INT && right->Type() == OBJ_INT) {
         return EvalIntegerInfixExpression(_operator, left, right);
     }
