@@ -15,11 +15,13 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
     prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionLiteral));
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
+    prefixParseFns.insert(std::make_pair(TT_FOR, &Parser::ParseForExpression));
     prefixParseFns.insert(std::make_pair(TT_STRING, &Parser::ParseStringLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseListLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACE, &Parser::ParseHashLiteral));
     prefixParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefExpression));
     prefixParseFns.insert(std::make_pair(TT_CLASS, &Parser::ParseClassStatement));
+    prefixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePrefixPlusPlus));
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -34,6 +36,7 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseIndexExpression));
     infixParseFns.insert(std::make_pair(TT_ASSIGN, &Parser::ParseAssignExpression));
     infixParseFns.insert(std::make_pair(TT_DOT, &Parser::ParseMemberAccess));
+    infixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePostfixPlusPlus));
 }
 
 Parser::~Parser() {
@@ -505,6 +508,21 @@ Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
         stmt->is_method = false;
     }
     return stmt;
+}
+
+Ad_AST_Node* Parser::ParsePrefixPlusPlus() {
+    std::cout << "parsing prefix plus plus\n";
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParsePostfixPlusPlus(Ad_AST_Node* left) {
+    std::cout << "parsisng postfix plus plus\n";
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseForExpression() {
+    std::cout << "parsing for expression\n";
+    return NULL;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {

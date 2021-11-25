@@ -91,8 +91,14 @@ Token Lexer::NextToken() {
             token.literal = "";
         break;
         case '+':
-            token.type = TT_PLUS;
-            token.literal = current_char;
+            if (PeekChar() == '+') {
+                ReadChar();
+                token.type = TT_PLUSPLUS;
+                token.literal = "++";
+            } else {
+                token.type = TT_PLUS;
+                token.literal = current_char;
+            }
         break;
         case '-':
             token.type = TT_MINUS;

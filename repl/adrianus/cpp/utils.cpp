@@ -146,5 +146,17 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->NullObject " << "\n";
         break;
+        case ST_PREFIX_INCREMENT:
+            print_level(level);
+            std::cout << "->PrefixIncrement " << "\n";
+        break;
+        case ST_POSTFIX_INCREMENT:
+            print_level(level);
+            std::cout << "->PostfixIncrement" << "\n";
+        break;
+        case ST_FOR_EXPRESSION:
+            print_level(level);
+            std::cout << "->ForExpression" << "\n";
+        break;
     }
 }

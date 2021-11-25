@@ -29,6 +29,9 @@ enum StatementType {
     ST_CLASS_STATEMENT,
     ST_MEMBER_ACCESS,
     ST_COMMENT,
+    ST_PREFIX_INCREMENT,
+    ST_POSTFIX_INCREMENT,
+    ST_FOR_EXPRESSION,
     ST_NULL_EXPRESSION
 };
 
@@ -56,6 +59,9 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_CLASS_STATEMENT, "ClassStatement"},
     {ST_MEMBER_ACCESS, "MemberAccess"},
     {ST_COMMENT, "Comment"},
+    {ST_PREFIX_INCREMENT, "PrefixIncrement"},
+    {ST_POSTFIX_INCREMENT, "PostfixIncrement"},
+    {ST_FOR_EXPRESSION, "ForExpression"},
     {ST_NULL_EXPRESSION, "NullExpression"}
 };
 
@@ -348,6 +354,48 @@ public:
     Ad_AST_MemberAccess(Token);
     Ad_AST_MemberAccess(Token, Ad_AST_Node*, Ad_AST_Node*, std::vector<Ad_AST_Node*>);
     ~Ad_AST_MemberAccess();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_PrefixIncrement : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* name;
+
+    Ad_AST_PrefixIncrement();
+    Ad_AST_PrefixIncrement(Token);
+    Ad_AST_PrefixIncrement(Token, Ad_AST_Node*);
+    ~Ad_AST_PrefixIncrement();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_PostfixIncrement : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* name;
+
+    Ad_AST_PostfixIncrement();
+    Ad_AST_PostfixIncrement(Token);
+    Ad_AST_PostfixIncrement(Token, Ad_AST_Node*);
+    ~Ad_AST_PostfixIncrement();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_ForExprssion : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* initialization;
+    Ad_AST_Node* condition;
+    Ad_AST_Node* step;
+    Ad_AST_Node* body;
+
+    Ad_AST_ForExprssion();
+    Ad_AST_ForExprssion(Token);
+    Ad_AST_ForExprssion(Token, Ad_AST_Node*, Ad_AST_Node*, Ad_AST_Node*, Ad_AST_Node*);
+    ~Ad_AST_ForExprssion();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
 };
