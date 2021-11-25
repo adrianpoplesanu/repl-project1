@@ -135,6 +135,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
+    Init();
     Ad_Object* result;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_Program*)node)->statements.begin() ; it != ((Ad_AST_Program*)node)->statements.end(); ++it) {
         result = NULL;
@@ -152,9 +153,27 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
     return NULL;
 }
 
+void Evaluator::Init() {
+    NULLOBJECT.permanent = true;
+    TRUE.permanent = true;
+    FALSE.permanent = true;
+}
+
 Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
     if (left == NULL || right == NULL) {
         return NULL;
+    }
+    if (left->Type() == OBJ_ERROR) {
+        Ad_Error_Object* error_obj = (Ad_Error_Object*) left;
+        return new Ad_Error_Object(error_obj->message);
+    }
+    if (right->Type() == OBJ_ERROR) {
+        Ad_Error_Object* error_obj = (Ad_Error_Object*) right;
+        return new Ad_Error_Object(error_obj->message);
+    }
+    if (left->Type() == OBJ_NULL || right->Type() == OBJ_NULL) {
+        //return new Ad_Null_Object();
+        return &NULLOBJECT;
     }
     if (left->Type() == OBJ_INT && right->Type() == OBJ_INT) {
         return EvalIntegerInfixExpression(_operator, left, right);
@@ -259,10 +278,14 @@ Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
     obj = NULL;
     if (env.Check(((Ad_AST_Identifier*)node)->token.literal)) {
         obj = env.Get(((Ad_AST_Identifier*)node)->token.literal);
+        return obj;
     }
     if (builtins_map.find(((Ad_AST_Identifier*)node)->token.literal) != builtins_map.end()) {
         return builtins_map[((Ad_AST_Identifier*)node)->token.literal];
     }
+    //obj = new Ad_Error_Object("ERROR: Identifier " + ((Ad_AST_Identifier*)node)->token.literal + " used before being declared.");
+    obj = &NULLOBJECT;
+    //obj = new Ad_Null_Object();
     return obj;
 }
 

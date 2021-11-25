@@ -54,8 +54,14 @@ public:
 
 class Ad_Null_Object : public Ad_Object {
 public:
+    bool permanent;
+
 	Ad_Null_Object();
 	~Ad_Null_Object();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Ad_Integer_Object : public Ad_Object {
@@ -74,6 +80,7 @@ public:
 class Ad_Boolean_Object : public Ad_Object {
 public:
 	bool value;
+	bool permanent;
 
 	Ad_Boolean_Object();
 	Ad_Boolean_Object(bool);

@@ -142,5 +142,9 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->MemberAccess " << "\n";
         break;
+        case ST_NULL_EXPRESSION:
+            print_level(level);
+            std::cout << "->NullObject " << "\n";
+        break;
     }
 }

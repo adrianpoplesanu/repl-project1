@@ -33,6 +33,22 @@ Ad_Null_Object::~Ad_Null_Object() {
     // nothind to do here, type and ref_count are automatically deallocated (because they are not pointers)
 }
 
+std::string Ad_Null_Object::Inspect() {
+    return "null";
+}
+
+void Ad_Null_Object::Print() {
+    std::cout << "NullObject";
+}
+
+Ad_Object_Type Ad_Null_Object::Type() {
+   return type;
+}
+
+std::string Ad_Null_Object::Hash() {
+    return object_type_map[type] + Inspect();
+}
+
 Ad_Integer_Object::Ad_Integer_Object() {
     type = OBJ_INT;
     ref_count = 0;
@@ -514,13 +530,17 @@ void free_Ad_Object_memory(Ad_Object* obj) {
     if (obj) {
         switch(obj->type) {
             case OBJ_NULL:
-                delete ((Ad_Null_Object*)obj);
+                if (!((Ad_Null_Object*)obj)->permanent) {
+                    delete ((Ad_Null_Object*)obj);
+                }
             break;
             case OBJ_INT:
                 delete ((Ad_Integer_Object*)obj);
             break;
             case OBJ_BOOL:
-                delete ((Ad_Boolean_Object*)obj);
+                if (!((Ad_Boolean_Object*)obj)->permanent) {
+                    delete ((Ad_Boolean_Object*)obj);
+                }
             break;
             case OBJ_STRING:
                 delete ((Ad_String_Object*)obj);

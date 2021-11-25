@@ -40,6 +40,7 @@ public:
     Ad_Object* EvalMemberAccess(Ad_AST_Node*, Environment&);
     Ad_Object* ApplyMethod(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
+    void Init();
 };
 
 #endif

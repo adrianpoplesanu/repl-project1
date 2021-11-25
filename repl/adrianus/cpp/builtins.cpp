@@ -8,9 +8,16 @@ Ad_Object* len_builtin(std::vector<Ad_Object*> args, Environment* env) {
     // toate builtinurile cred ca ar trebui sa primeasca o lista de argumente, ca sa fie unitate in antet
     Ad_Object* obj = args[0];
     if (obj->Type() == OBJ_STRING) {
-        int length = ((Ad_String_Object*)obj)->value.length();
+        Ad_String_Object* error_obj = (Ad_String_Object*) obj;
+        int length = error_obj->value.length();
         free_builtin_arguments(args);
         return new Ad_Integer_Object(length);
+    }
+    if (obj->Type() == OBJ_LIST) {
+        return new Ad_Integer_Object(0);
+    }
+    if (obj->Type() == OBJ_HASH) {
+        return new Ad_Integer_Object(0);
     }
     free_builtin_arguments(args);
     return new Ad_Integer_Object(0);
