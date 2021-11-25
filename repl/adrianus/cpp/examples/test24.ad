@@ -1,0 +1,29 @@
+a = 12
+print("start test")
+
+class Elev {
+    varsta = 12
+    aaa = "abc"
+    bbb = "cde"
+    ccc = 1 + 56
+
+    def construct(offset) {
+        /*this.offset = offset*/
+        print(offset)
+    }
+
+    def print_varsta(offset2) {
+        /*offset2 + this.offset + varsta*/
+        print(offset2)
+    }
+}
+
+print("end class declaration")
+
+/*e = Elev()
+e.print_varsta(34)*/
+
+context()
+
+/*print(e)*/
+print("end class test")

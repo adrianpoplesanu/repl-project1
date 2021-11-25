@@ -1,0 +1,25 @@
+class Elev {
+    varsta = 12
+    aaa = "abc"
+    bbb = "cde"
+    ccc = 1 + 56
+
+    /*def aaa(txt) {
+        print(txt)
+    }
+
+    def bbb(qwe) {
+        print (qwe)
+    }
+
+    def test_test(qwe) {
+        print(qwe)
+    }*/
+}
+
+/*e = Elev()
+e.print_varsta(34)*/
+
+context()
+
+/*print(e)*/

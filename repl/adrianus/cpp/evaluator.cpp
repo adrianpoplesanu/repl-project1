@@ -314,7 +314,7 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
         if (result && result->type == OBJ_RETURN_VALUE) {
             return result;
         }
-        free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
+        //free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
     }
     return result;
 }
@@ -455,7 +455,8 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
     Environment extended = NewEnclosedEnvironment(&(*((Ad_Function_Object*)func)->env));
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_Function_Object*)func)->params.begin() ; it != ((Ad_Function_Object*)func)->params.end(); ++it) {
-        extended.Set((*it)->TokenLiteral(), args[i]);
+        //extended.Set((*it)->TokenLiteral(), args[i]);
+        extended.SetCallArgument((*it)->TokenLiteral(), args[i]);
         ++i;
     }
     return extended;

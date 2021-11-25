@@ -44,6 +44,15 @@ void Environment::Set(std::string key, Ad_Object* obj) {
     Ad_INCREF(obj);
 }
 
+void Environment::SetCallArgument(std::string key, Ad_Object* obj) {
+    if (store.find(key) != store.end()) {
+        // sterge obiectul vechi daca e o suprascriere de element
+        FreeObjectForKey(key);
+    }
+    store[key] = obj;
+    Ad_INCREF(obj);
+}
+
 void Environment::SetOuterEnvironment(Environment* o) {
     outer = o;
 }
@@ -62,6 +71,17 @@ void Environment::PrintStore() {
         std::cout << it->second->Inspect();
         total++;
         if (total < size) std::cout << ", "; // hmmm, this needs to be fixed
+    }
+    std::cout << "}\n";
+    std::cout << "outer: {";
+    if (outer) {
+        size = outer->store.size();
+        for(std::map<std::string, Ad_Object* >::const_iterator it = outer->store.begin(); it != outer->store.end(); ++it) {
+            std::cout << it->first << ": ";
+            std::cout << it->second->Inspect();
+            total++;
+            if (total < size) std::cout << ", "; // hmmm, this needs to be fixed
+        }
     }
     std::cout << "}\n";
 }

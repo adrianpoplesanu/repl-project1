@@ -1,0 +1,18 @@
+class Elev {
+    varsta = 12
+    aaa = "abc"
+    bbb = "cde"
+    ccc = 1 + 56
+
+    def construct(offset) {
+        print(offset)
+    }
+
+    def print_varsta(offset2) {
+        print(offset2)
+    }
+}
+
+context()
+e = Elev()
+e.print_varsta(58)

@@ -1,0 +1,12 @@
+x = 11
+
+def a(y) {
+    context()
+    if (3 > 1) { y + 1001; } else { y + 1002; }
+}
+
+context()
+a(100)
+x
+
+context()

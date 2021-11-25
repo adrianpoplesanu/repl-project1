@@ -434,7 +434,6 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
 }
 
 Ad_Class_Object::~Ad_Class_Object() {
-    std::cout << "aaa\n";
     for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
         Ad_AST_Node *node = *it;
         Ad_DECREF(node); // asta merge si e super cool

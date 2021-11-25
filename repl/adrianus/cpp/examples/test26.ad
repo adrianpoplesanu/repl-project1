@@ -1,0 +1,14 @@
+class Student {
+    varsta = 56
+    clasa = 2
+
+    def print_aaa(mesaj) {
+        print(mesaj)
+    }
+}
+
+s = Student()
+s.varsta
+s.print_aaa("buna dimineata!!!")
+
+context()

@@ -43,7 +43,7 @@ bool Lexer::IsDigit() {
 
 std::string Lexer::ReadIdentifier() {
     int start = position;
-    while(IsLetter()) {
+    while(IsLetter() || IsDigit()) {
         ReadChar();
     }
     return source.substr(start, position - start);
