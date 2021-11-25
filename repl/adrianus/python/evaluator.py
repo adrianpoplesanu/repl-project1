@@ -8,6 +8,7 @@ from environment import new_environment, new_enclosed_environment
 from builtins import builtins_map
 from utils import print_ast_nodes
 
+NULLOBJECT = Ad_Null_Object()
 TRUE = Ad_Boolean_Object(value=True)
 FALSE = Ad_Boolean_Object(value=False)
 
@@ -112,7 +113,7 @@ class Evaluator(object):
             return env.get(node.token.literal)
         if node.token.literal in builtins_map:
             return builtins_map[node.value]
-        return None
+        return NULLOBJECT
 
     def eval_integer(self, node, env):
         obj = Ad_Integer_Object(value=node.value)
@@ -127,12 +128,20 @@ class Evaluator(object):
         return obj
 
     def eval_infix_expression(self, operator, left, right):
+        if not left or not right:
+            return NULLOBJECT
+        if self.is_error(left):
+            return left
+        if self.is_error(right):
+            return right
         if left.type == ObjectType.INTEGER and right.type == ObjectType.INTEGER:
             return self.eval_integer_infix_expression(operator, left, right)
         if left.type == ObjectType.STRING and right.type == ObjectType.STRING:
             return self.eval_string_infix_expression(operator, left, right)
         if left.type == ObjectType.BOOLEAN and right.type == ObjectType.BOOLEAN:
             return self.eval_boolean_infix_expression(operator, left, right)
+        if left.type == ObjectType.NULL or right.type == ObjectType.NULL:
+            return NULLOBJECT
         #if operator == '==':
         #    return self.native_bool_to_boolean_object(left == right)
         #if operator == '!=':

@@ -9,6 +9,18 @@ class Ad_Object(object):
 class Ad_Null_Object(Ad_Object):
     type = ObjectType.NULL
 
+    def __init__(self):
+        """
+        nothing to do here
+        """
+        pass
+
+    def inspect(self):
+        return "null"
+
+    def hash_key(self):
+        return HashKey(type=type, value=Hash(self.value))
+
 
 class Ad_Integer_Object(Ad_Object):
     type = ObjectType.INTEGER
