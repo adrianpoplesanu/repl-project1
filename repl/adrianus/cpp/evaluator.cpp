@@ -539,6 +539,14 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
     Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*)node;
     if (assign_statement->name->type == ST_INDEX_EXPRESSION) {
         return EvalIndexExpressionAssign(node, env);
+    } else if (assign_statement->name->type == ST_MEMBER_ACCESS) {
+        Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
+        Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
+        Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
+        Ad_AST_Node* klass_member = member_access->member;
+        Environment* klass_environment = klass_instance->instance_environment;
+        Ad_Object* obj = Eval(assign_statement->value, *klass_environment);
+        klass_environment->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
     } else {
         Ad_Object* obj = Eval(assign_statement->value, env);
         Ad_AST_Identifier* identifier = (Ad_AST_Identifier*)assign_statement->name;
