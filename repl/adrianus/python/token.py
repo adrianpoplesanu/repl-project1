@@ -47,7 +47,8 @@ token_type_map = {
 	TokenType.THIS: "THIS",
 	TokenType.START_COMMENT: "STRAT_COMMENT",
 	TokenType.END_COMMENT: "END_COMMENT",
-	TokenType.PLUSPLUS: 'INCREMENT_OPERATOR'
+	TokenType.PLUSPLUS: 'INCREMENT_OPERATOR',
+	TokenType.NULL: 'NULL'
 }
 
 keywords_map = {
@@ -67,6 +68,7 @@ keywords_map = {
 	"or": TokenType.OR,
 	"class": TokenType.CLASS,
 	"this": TokenType.THIS,
+	"null": TokenType.NULL
 }
 
 

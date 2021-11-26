@@ -12,16 +12,19 @@ class Elev {
     }
 
     def print_varsta(offset2) {
-        offset2 + this.offset + varsta
+        /*offset2 + this.offset + varsta*/
+        context()
+        print(offset2 + varsta)
     }
 }
 
 print("end class declaration")
 
-e = Elev(12)
+/*e = Elev(12)*/
+e = Elev()
 e.print_varsta(34)
 
-context()
+/*context()
 
 print(e)
-print("end class test")
+print("end class test")*/

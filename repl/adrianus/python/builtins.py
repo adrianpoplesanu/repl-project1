@@ -40,7 +40,7 @@ def append_builtin(args, env):
         list_obj.elements.append(obj)
 
 def context_builtin(args, env):
-    print env.store
+    print env
 
 builtins_map = {
     "len": Ad_Builtin_Object(len_builtin),

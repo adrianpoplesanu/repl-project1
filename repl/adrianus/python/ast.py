@@ -25,6 +25,7 @@ class StatementType(object):
     PREFIX_INCREMENT = 'PREFIX_INCREMENT'
     POSTFIX_INCREMENT = 'POSTFIX_INCREMENT'
     FOR_EXPRESSION = 'FOR_EXPRESSION'
+    NULL_EXPRESSION = 'NULL_EXPRESSION'
 
 
 statement_type_map = {
@@ -53,7 +54,8 @@ statement_type_map = {
     StatementType.COMMENT: 'COMMENT',
     StatementType.PREFIX_INCREMENT: 'PREFIX_INCREMENT',
     StatementType.POSTFIX_INCREMENT: 'POSTFIX_INCREMENT',
-    StatementType.FOR_EXPRESSION: 'FOR_EXPRESSION'
+    StatementType.FOR_EXPRESSION: 'FOR_EXPRESSION',
+    StatementType.NULL_EXPRESSION: 'NULL_EXPRESSION'
 }
 
 
@@ -551,6 +553,22 @@ class ASTForExpression(ASTNode):
         self.condition = condition
         self.step = step
         self.body = body
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)
+
+
+class ASTNullExpression(ASTNode):
+    type = StatementType.NULL_EXPRESSION
+
+    def __init__(self, token=None):
+        """
+        @param token: the node's token
+        """
+        self.token = token
 
     def token_literal(self):
         return self.token.literal

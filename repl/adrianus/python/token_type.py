@@ -46,3 +46,4 @@ class TokenType(object):
 	START_COMMENT = "/*"
 	END_COMMENT = "*/"
 	PLUSPLUS = "++"
+        NULL = "NULL"

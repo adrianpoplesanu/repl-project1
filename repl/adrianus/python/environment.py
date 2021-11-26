@@ -22,7 +22,10 @@ class Environment(object):
         self.store[key] = value
 
     def __str__(self):
-        return "[Env] store: " + str(self.store) + " outer: " + str(self.outer)
+        out = "[Env] store: " + str(self.store) + "\n"
+        if self.outer:
+            out += " outer: " + str(self.outer.store) + "\n"
+        return out
 
 
 def new_environment():

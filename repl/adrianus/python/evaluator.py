@@ -273,18 +273,22 @@ class Evaluator(object):
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
             for attribute in func.attributes:
                 if attribute.type == StatementType.ASSIGN_STATEMENT:
-                    instance_environment.outer = env.store
+                    #instance_environment.outer = env.store
+                    instance_environment.outer = store
                     evaluated = self.eval(attribute.value, klass_instance.instance_environment)
                     key = attribute.name.value
                     klass_instance.instance_environment.set(key, evaluated)
                 if attribute.type == StatementType.EXPRESSION_STATEMENT:
                     if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
-                        instance_environment.outer = env.store
+                        #instance_environment.outer = env.store
+                        instance_environment.outer = env
                         evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
                         key = attribute.expression.name.value
+                        print key
                         klass_instance.instance_environment.set(key, evaluated)
             for method in func.methods:
                 func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
+                print method.name.value
                 klass_instance.instance_environment.set(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
             return klass_instance
@@ -295,29 +299,31 @@ class Evaluator(object):
             self.extend_method_env(func, args_objs, env)
             evaluated = self.eval(func.body, env)
             return self.unwrap_return_value(evaluated)
-        if func.type == ObjectType.BUILTIN:
-            return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
-            # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
-        if func.type == ObjectType.CLASS:
-            instance_environment = new_environment()
-            klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
-            for attribute in func.attributes:
-                if attribute.type == StatementType.ASSIGN_STATEMENT:
-                    instance_environment.outer = env.store
-                    evaluated = self.eval(attribute.value, klass_instance.instance_environment)
-                    key = attribute.name.value
-                    klass_instance.instance_environment.set(key, evaluated)
-                if attribute.type == StatementType.EXPRESSION_STATEMENT:
-                    if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
-                        instance_environment.outer = env.store
-                        evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
-                        key = attribute.expression.name.value
-                        klass_instance.instance_environment.set(key, evaluated)
-            for method in func.methods:
-                func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
-                klass_instance.instance_environment.set(method.name.value, func_obj)
-            # i also need to call the class constructor, if one is present
-            return klass_instance
+#        if func.type == ObjectType.BUILTIN:
+#            return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
+#            # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
+#        if func.type == ObjectType.CLASS:
+#            instance_environment = new_environment()
+#            klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
+#            for attribute in func.attributes:
+#                if attribute.type == StatementType.ASSIGN_STATEMENT:
+#                    #instance_environment.outer = env.store
+#                    instance_environment.outer = env
+#                    evaluated = self.eval(attribute.value, klass_instance.instance_environment)
+#                    key = attribute.name.value
+#                    klass_instance.instance_environment.set(key, evaluated)
+#                if attribute.type == StatementType.EXPRESSION_STATEMENT:
+#                    if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
+#                        #instance_environment.outer = env.store
+#                        instance_environment.outer = env
+#                        evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
+#                        key = attribute.expression.name.value
+#                        klass_instance.instance_environment.set(key, evaluated)
+#            for method in func.methods:
+#                func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
+#                klass_instance.instance_environment.set(method.name.value, func_obj)
+#            # i also need to call the class constructor, if one is present
+#            return klass_instance
         return None
 
     def unwrap_return_value(self, obj):

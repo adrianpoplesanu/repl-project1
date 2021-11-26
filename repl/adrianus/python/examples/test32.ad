@@ -1,0 +1,16 @@
+class Server {
+    security_offset = 2
+
+    def init() {
+        port = 8080
+    }
+
+    def print_port() {
+        context()
+        print(port + security_offset)
+    }
+}
+
+server = Server()
+server.init()
+server.print_port()
