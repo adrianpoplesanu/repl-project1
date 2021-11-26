@@ -353,7 +353,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             Ad_AST_Node *node = *it;
             if (node->type == ST_ASSIGN_STATEMENT) {
                 Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) node;
-                instance_environment->outer = &env;
+                klass_instance->instance_environment->outer = &env;
                 Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
                 Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
                 std::string key = assign_ident->value;
@@ -363,10 +363,11 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
                 Ad_AST_ExpressionStatement * expression_statement = (Ad_AST_ExpressionStatement*) node;
                 if (expression_statement->expression->type == ST_ASSIGN_STATEMENT) {
                     Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) expression_statement->expression;
-                    instance_environment->outer = &env;
+                    klass_instance->instance_environment->outer = &env;
                     Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
                     Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
                     std::string key = assign_ident->value;
+                    //std::cout << key << "\n";
                     klass_instance->instance_environment->Set(key, evaluated);
                 }
             }
@@ -376,7 +377,9 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
             Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, klass_instance->instance_environment);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
+            //std::cout << def_ident->value << "\n";
             klass_instance->instance_environment->Set(def_ident->value, method_obj);
+            klass_instance->instance_environment->PrintStore();
         }
         return klass_instance;
     }
@@ -619,7 +622,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
         if (args_objs.size() == 1 && IsError(args_objs[0])) {
             return args_objs[0];
         }
-        return ApplyMethod(klass_method, args_objs, env);
+        return ApplyMethod(klass_method, args_objs, *(klass_instance->instance_environment));
     } else {
         Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
         Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
