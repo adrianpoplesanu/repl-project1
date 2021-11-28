@@ -11,6 +11,7 @@ public class BuiltinLookup {
 			put("type", new AdBuiltinObject(new TypeBuiltin()));
 			put("print", new AdBuiltinObject(new PrintBuiltin()));
 			put("context", new AdBuiltinObject(new ContextBuiltin()));
+			put("len", new AdBuiltinObject(new LenBuiltin()));
 		}
 	};
 }
