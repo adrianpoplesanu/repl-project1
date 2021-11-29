@@ -755,6 +755,39 @@ std::string Ad_AST_PrefixIncrement::ToString() {
     return "todo: implement ToString() in Ad_ast_PrefixIncrement";
 }
 
+Ad_AST_PostfixIncrement::Ad_AST_PostfixIncrement() {
+    type = ST_POSTFIX_INCREMENT;
+    ref_count = 0;
+}
+
+Ad_AST_PostfixIncrement::Ad_AST_PostfixIncrement(Token t) {
+    type = ST_POSTFIX_INCREMENT;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_PostfixIncrement::Ad_AST_PostfixIncrement(Token t, Ad_AST_Node* n) {
+    type = ST_POSTFIX_INCREMENT;
+    ref_count = 0;
+    token = t;
+    name = n;
+}
+
+Ad_AST_PostfixIncrement::~Ad_AST_PostfixIncrement() {
+    if (name) {
+        Ad_DECREF(name);
+        free_Ad_AST_Node_memory(name);
+    }
+}
+
+std::string Ad_AST_PostfixIncrement::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_PostfixIncrement::ToString() {
+    return "todo: implement ToString() in Ad_AST_PostfixIncrement";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;
