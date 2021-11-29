@@ -511,13 +511,17 @@ Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
 }
 
 Ad_AST_Node* Parser::ParsePrefixPlusPlus() {
-    std::cout << "parsing prefix plus plus\n";
-    return NULL;
+    Ad_AST_PrefixIncrement* expr = new Ad_AST_PrefixIncrement(current_token);
+    NextToken();
+    Ad_AST_Identifier* name = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
+    expr->name = name;
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParsePostfixPlusPlus(Ad_AST_Node* left) {
-    std::cout << "parsisng postfix plus plus\n";
-    return NULL;
+    Ad_AST_PostfixIncrement* expr = new Ad_AST_PostfixIncrement(current_token);
+    expr->name = left;
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseForExpression() {
