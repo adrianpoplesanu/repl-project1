@@ -60,6 +60,8 @@ public class Parser {
 		infixParseFns.put(TokenTypeEnum.LTE, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.GTE, new InfixExpressionParser(this));
 		infixParseFns.put(TokenTypeEnum.LPAREN, new CallExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.LBRACKET, new IndexExpressionParser(this));
+		infixParseFns.put(TokenTypeEnum.ASSIGN, new AssignExpressionParser(this));
 	}
 
 	public void load(String source) {
@@ -309,6 +311,14 @@ public class Parser {
 		return null;
 	}
 
+	public AstNode parseIndexExpression(AstNode node) {
+		return null;
+	}
+
+	public AstNode parseAssignExpression(AstNode node) {
+		return null;
+	}
+
 	public AstNode parseExpression(PrecedenceTypeEnum pte) {
 		if (!prefixParseFns.containsKey(currentToken.getType())) {
 			return null;
@@ -348,10 +358,12 @@ public class Parser {
 	}
 
 	public AstNode parseForExpression() {
+		// TODO: implement this
 		return null;
 	}
 
 	public AstNode parseDefStatement() {
+		// TODO: implement this
 		return null;
 	}
 
