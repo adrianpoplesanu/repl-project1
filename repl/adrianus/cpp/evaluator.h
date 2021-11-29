@@ -39,6 +39,8 @@ public:
     Ad_Object* EvalClassStatement(Ad_AST_Node*, Environment&);
     Ad_Object* EvalMemberAccess(Ad_AST_Node*, Environment&);
     Ad_Object* ApplyMethod(Ad_Object*, std::vector<Ad_Object*>, Environment&);
+    Ad_Object* EvalPrefixExpression(Ad_AST_Node*, Environment&);
+    Ad_Object* EvalPostfixExpression(Ad_AST_Node*, Environment&);
     void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void Init();
 };
