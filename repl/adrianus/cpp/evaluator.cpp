@@ -650,27 +650,29 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
 Ad_Object* Evaluator::EvalPrefixExpression(Ad_AST_Node* node, Environment& env) {
     Ad_AST_PrefixIncrement* prefix_increment = (Ad_AST_PrefixIncrement*) node;
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) prefix_increment->name;
-    Ad_Object* obj = env.Get(ident->value);
-    int value = ((Ad_Integer_Object*) obj)->value + 1;
-    if (obj->Type() == OBJ_INT) {
-        ((Ad_Integer_Object*) obj)->value = value;
+    Ad_Object* old_obj = env.Get(ident->value);
+    if (old_obj->Type() == OBJ_INT) {
+        int value = ((Ad_Integer_Object*) old_obj)->value + 1;
+        Ad_Integer_Object* new_obj = new Ad_Integer_Object(value);
+        env.Set(ident->value, new_obj);
+        Ad_Integer_Object* result = new Ad_Integer_Object(value);
+        return result;
     }
-    env.Set(ident->value, obj);
-    Ad_Integer_Object* result = new Ad_Integer_Object(value);
-    return result;
+    return new Ad_Null_Object();
 }
 
 Ad_Object* Evaluator::EvalPostfixExpression(Ad_AST_Node* node, Environment& env) {
     Ad_AST_PostfixIncrement* postfix_increment = (Ad_AST_PostfixIncrement*) node;
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) postfix_increment->name;
-    Ad_Object* obj = env.Get(ident->value);
-    int value = ((Ad_Integer_Object*) obj)->value;
-    if (obj->Type() == OBJ_INT) {
-        ((Ad_Integer_Object*) obj)->value = value + 1;
+    Ad_Object* old_obj = env.Get(ident->value);
+    if (old_obj->Type() == OBJ_INT) {
+        int value = ((Ad_Integer_Object*) old_obj)->value;
+        Ad_Integer_Object* new_obj = new Ad_Integer_Object(value + 1);
+        env.Set(ident->value, new_obj);
+        Ad_Integer_Object* result = new Ad_Integer_Object(value);
+        return result;
     }
-    env.Set(ident->value, obj);
-    Ad_Integer_Object* result = new Ad_Integer_Object(value);
-    return result;
+    return new Ad_Null_Object();
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

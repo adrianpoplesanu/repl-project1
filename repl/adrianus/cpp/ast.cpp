@@ -872,6 +872,12 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         case ST_MEMBER_ACCESS:
             delete (Ad_AST_MemberAccess*) node;
         break;
+        case ST_PREFIX_INCREMENT:
+            delete (Ad_AST_PrefixIncrement*) node;
+        break;
+        case ST_POSTFIX_INCREMENT:
+            delete (Ad_AST_PostfixIncrement*) node;
+        break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";
         break;
