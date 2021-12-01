@@ -525,8 +525,9 @@ Ad_AST_Node* Parser::ParsePostfixPlusPlus(Ad_AST_Node* left) {
 }
 
 Ad_AST_Node* Parser::ParseForExpression() {
+    Ad_AST_ForExprssion* expr = new Ad_AST_ForExprssion(current_token);
     std::cout << "parsing for expression\n";
-    return NULL;
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {

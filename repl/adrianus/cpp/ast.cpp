@@ -788,6 +788,39 @@ std::string Ad_AST_PostfixIncrement::ToString() {
     return "todo: implement ToString() in Ad_AST_PostfixIncrement";
 }
 
+Ad_AST_ForExprssion::Ad_AST_ForExprssion() {
+    type = ST_FOR_EXPRESSION;
+    ref_count = 0;
+}
+
+Ad_AST_ForExprssion::Ad_AST_ForExprssion(Token t) {
+    type = ST_FOR_EXPRESSION;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_ForExprssion::Ad_AST_ForExprssion(Token t, Ad_AST_Node* i, Ad_AST_Node* c, Ad_AST_Node* s, Ad_AST_Node* b) {
+    type = ST_FOR_EXPRESSION;
+    ref_count = 0;
+    token = t;
+    initialization = i;
+    condition = c;
+    step = s;
+    body = b;
+}
+
+Ad_AST_ForExprssion::~Ad_AST_ForExprssion() {
+    //... TODO
+}
+
+std::string Ad_AST_ForExprssion::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_ForExprssion::ToString() {
+    return "todo: implemnt ToString() in Ad_AST_ForExprssion";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;
