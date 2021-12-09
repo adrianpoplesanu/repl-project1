@@ -4,6 +4,8 @@ import com.ad.token.Token;
 
 public class AstAssignStatement extends AstNode {
     private Token token;
+    private AstNode value;
+    private AstIdentifier name;
 
     public AstAssignStatement() {
         type = AstNodeTypeEnum.ASSIGN_STATEMENT;
@@ -22,5 +24,29 @@ public class AstAssignStatement extends AstNode {
     @Override
     public String toString() {
         return "TODO: implement this in AstAssignStatement";
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public void setToken(Token token) {
+        this.token = token;
+    }
+
+    public AstNode getValue() {
+        return value;
+    }
+
+    public void setValue(AstNode value) {
+        this.value = value;
+    }
+
+    public AstIdentifier getName() {
+        return name;
+    }
+
+    public void setName(AstIdentifier name) {
+        this.name = name;
     }
 }
