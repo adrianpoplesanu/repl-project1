@@ -3,14 +3,14 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class PrefixExpressionParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 
-	public PrefixExpressionParser(Parser parser) {
-		this.parser = parser;
+	public PrefixExpressionParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse() {
-		return parser.parsePrefixExpression();
+		return parserOLD.parsePrefixExpression();
 	}
 }

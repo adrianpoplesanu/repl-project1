@@ -3,14 +3,14 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class IntegerLiteralParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 
-	public IntegerLiteralParser(Parser parser) {
-		this.parser = parser;
+	public IntegerLiteralParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse() {
-		return parser.parseInteger();
+		return parserOLD.parseInteger();
 	}
 }

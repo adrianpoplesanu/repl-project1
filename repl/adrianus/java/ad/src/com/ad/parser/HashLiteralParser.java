@@ -3,14 +3,14 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class HashLiteralParser implements PrefixParseInterface {
-    private Parser parser;
+    private ParserOLD parserOLD;
 
-    public HashLiteralParser(Parser parser) {
-        this.parser = parser;
+    public HashLiteralParser(ParserOLD parserOLD) {
+        this.parserOLD = parserOLD;
     }
 
     @Override
     public AstNode parse() {
-        return parser.parseHashLiteral();
+        return parserOLD.parseHashLiteral();
     }
 }

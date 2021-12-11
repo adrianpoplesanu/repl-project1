@@ -3,15 +3,15 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class GroupExpressionParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 
-	public GroupExpressionParser(Parser parser) {
-		this.parser = parser;
+	public GroupExpressionParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse() {
-		return parser.parseGroupedExpression();
+		return parserOLD.parseGroupedExpression();
 	}
 
 }

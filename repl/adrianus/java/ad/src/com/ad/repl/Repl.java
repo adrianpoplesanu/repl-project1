@@ -2,7 +2,6 @@ package com.ad.repl;
 
 import java.util.Scanner;
 
-import com.ad.ast.AstNodeUtils;
 import com.ad.ast.AstProgram;
 import com.ad.environment.Environment;
 import com.ad.environment.EnvironmentUtils;
@@ -11,6 +10,7 @@ import com.ad.parser.Parser;
 
 public class Repl {
 	private Scanner scanner = new Scanner(System.in);
+	//private Parser parser;
 	private Parser parser;
 	private AstProgram program;
 	private Evaluator evaluator;

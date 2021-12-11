@@ -3,15 +3,15 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class WhileExpressionParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 	
-	public WhileExpressionParser(Parser parser) {
-		this.parser = parser;
+	public WhileExpressionParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse() {
-		return parser.parseWhileExpression();
+		return parserOLD.parseWhileExpression();
 	}
 
 }

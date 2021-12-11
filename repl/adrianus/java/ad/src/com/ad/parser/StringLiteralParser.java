@@ -3,15 +3,15 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class StringLiteralParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 
-	public StringLiteralParser(Parser parser) {
-		this.parser = parser;
+	public StringLiteralParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 	
 	@Override
 	public AstNode parse() {
-		return parser.parseStringLiteral();
+		return parserOLD.parseStringLiteral();
 	}
 
 }

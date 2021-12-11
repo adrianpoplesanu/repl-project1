@@ -3,14 +3,14 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class CallExpressionParser implements InfixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 	
-	public CallExpressionParser(Parser parser) {
-		this.parser = parser;
+	public CallExpressionParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse(AstNode node) {
-		return parser.parseCallExpression(node);
+		return parserOLD.parseCallExpression(node);
 	}
 }

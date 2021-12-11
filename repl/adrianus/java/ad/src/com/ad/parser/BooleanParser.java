@@ -3,14 +3,14 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class BooleanParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 
-	public BooleanParser(Parser parser) {
-		this.parser = parser;
+	public BooleanParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse() {
-		return parser.parseBoolean();
+		return parserOLD.parseBoolean();
 	}
 }

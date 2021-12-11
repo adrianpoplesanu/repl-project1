@@ -1,417 +1,404 @@
 package com.ad.parser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.ad.ast.AstBlockStatement;
-import com.ad.ast.AstBoolean;
-import com.ad.ast.AstCallExpression;
-import com.ad.ast.AstExpressionStatement;
-import com.ad.ast.AstFunctionLiteral;
-import com.ad.ast.AstIdentifier;
-import com.ad.ast.AstIfExpression;
-import com.ad.ast.AstInfixExpression;
-import com.ad.ast.AstInteger;
-import com.ad.ast.AstLetStatement;
-import com.ad.ast.AstNode;
-import com.ad.ast.AstPrefixExpression;
-import com.ad.ast.AstProgram;
-import com.ad.ast.AstReturnStatement;
-import com.ad.ast.AstStringLiteral;
-import com.ad.ast.AstWhileExpression;
+import com.ad.ast.*;
 import com.ad.lexer.Lexer;
 import com.ad.token.Token;
 import com.ad.token.TokenTypeEnum;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 public class Parser {
-	private Lexer lexer;
-	private String source;
-	private Token currentToken;
-	private Token peekToken;
-	private HashMap<TokenTypeEnum, PrefixParseInterface> prefixParseFns = new HashMap<TokenTypeEnum, PrefixParseInterface>();
-	private HashMap<TokenTypeEnum, InfixParseInterface> infixParseFns = new HashMap<TokenTypeEnum, InfixParseInterface>();
-	
-	public Parser() {
-		//... i should instantiate the callback maps here for prefix and infix
-		lexer = new Lexer();
-		prefixParseFns.put(TokenTypeEnum.IDENT, new IdentifierParser(this));
-		prefixParseFns.put(TokenTypeEnum.INT, new IntegerLiteralParser(this));
-		prefixParseFns.put(TokenTypeEnum.BANG, new PrefixExpressionParser(this));
-		prefixParseFns.put(TokenTypeEnum.MINUS, new PrefixExpressionParser(this));
-		prefixParseFns.put(TokenTypeEnum.TRUE, new BooleanParser(this));
-		prefixParseFns.put(TokenTypeEnum.FALSE, new BooleanParser(this));
-		prefixParseFns.put(TokenTypeEnum.LPAREN, new GroupExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.IF, new IfExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.FUNCTION, new FunctionLiteralParser(this));
-	    prefixParseFns.put(TokenTypeEnum.WHILE, new WhileExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.FOR, new ForExpressionParser(this));
-	    prefixParseFns.put(TokenTypeEnum.DEF, new DefStatementParser(this));
-	    prefixParseFns.put(TokenTypeEnum.LBRACKET, new ListLiteralParser(this));
-		prefixParseFns.put(TokenTypeEnum.LBRACE, new HashLiteralParser(this));
-	    prefixParseFns.put(TokenTypeEnum.STRING, new StringLiteralParser(this));
-		infixParseFns.put(TokenTypeEnum.PLUS, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.MINUS, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.ASTERISK, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.SLASH, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.EQ, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.NOT_EQ, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.LT, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.GT, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.LTE, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.GTE, new InfixExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.LPAREN, new CallExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.LBRACKET, new IndexExpressionParser(this));
-		infixParseFns.put(TokenTypeEnum.ASSIGN, new AssignExpressionParser(this));
-	}
+    private Lexer lexer;
+    private String source;
+    private Token currentToken;
+    private Token peekToken;
+    private HashMap<TokenTypeEnum, Supplier<AstNode>> prefixParseFns = new HashMap<>();
+    private HashMap<TokenTypeEnum, Function<AstNode, AstNode>> infixParseFns = new HashMap<>();
 
-	public void load(String source) {
-		this.source = source;
-		lexer.load(this.source);
-		nextToken();
-		nextToken();
-	}
-	
-	public void buildProgramStatements(AstProgram program) {
-		while (currentToken.getType() != TokenTypeEnum.EOF) {
-			AstNode node = parseStatement();
-			if (node != null) {
-				program.statements.add(node);
-			}
-			nextToken();
-		}
-	}
-	
-	public void nextToken() {
-		currentToken = peekToken;
-		peekToken = lexer.nextToken();
-	}
-	
-	public boolean currentTokenIs(TokenTypeEnum tte) {
-		return currentToken.getType() == tte;
-	}
+    public Parser() {
+        System.out.println("using Parser v2, this prompt will display for a few iterations");
+        lexer = new Lexer();
+        prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier);
+        prefixParseFns.put(TokenTypeEnum.INT, this::parseIntegerLiteral);
+        prefixParseFns.put(TokenTypeEnum.BANG, this::parsePrefixExpression);
+        prefixParseFns.put(TokenTypeEnum.MINUS, this::parsePrefixExpression);
+        prefixParseFns.put(TokenTypeEnum.TRUE, this::parseBoolean);
+        prefixParseFns.put(TokenTypeEnum.FALSE, this::parseBoolean);
+        prefixParseFns.put(TokenTypeEnum.LPAREN, this::parseGroupedExpression);
+        prefixParseFns.put(TokenTypeEnum.IF, this::parseIfExpression);
+        prefixParseFns.put(TokenTypeEnum.FUNCTION, this::parseFunctionLiteral);
+        prefixParseFns.put(TokenTypeEnum.WHILE, this::parseWhileExpression);
+        prefixParseFns.put(TokenTypeEnum.FOR, this::parseForExpression);
+        prefixParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
+        prefixParseFns.put(TokenTypeEnum.LBRACKET, this::parseListLiteral);
+        prefixParseFns.put(TokenTypeEnum.LBRACE, this::parseHashLiteral);
+        prefixParseFns.put(TokenTypeEnum.STRING, this::parseStringLiteral);
+        infixParseFns.put(TokenTypeEnum.PLUS, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.MINUS, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.ASTERISK, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.SLASH, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.EQ, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.NOT_EQ, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.LT, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.GT, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.LTE, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.GTE, this::parseInfixExpression);
+        infixParseFns.put(TokenTypeEnum.LPAREN, this::parseCallExpression);
+        infixParseFns.put(TokenTypeEnum.LBRACKET, this::parseIndexExpression);
+        infixParseFns.put(TokenTypeEnum.ASSIGN, this::parseAssignExpression);
+    }
 
-	public boolean peekTokenIs(TokenTypeEnum tte) {
-		return peekToken.getType() == tte;
-	}
+    public void load(String s) {
+        source = s;
+        lexer.load(source);
+        nextToken();
+        nextToken();
+    }
 
-	public boolean expectPeek(TokenTypeEnum tte) {
-		if (peekTokenIs(tte)) {
-			nextToken();
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	private PrecedenceTypeEnum currentPrecedence() {
-		if (TokenPrecedenceConverter.precedenceMap.containsKey(currentToken.getType())) {
-			return TokenPrecedenceConverter.precedenceMap.get(currentToken.getType());
-		}
-		return PrecedenceTypeEnum.LOWEST;
-	}
+    public void buildProgramStatements(AstProgram program) {
+        while (currentToken.getType() != TokenTypeEnum.EOF) {
+            AstNode node = parseStatement();
+            if (node != null) {
+                program.statements.add(node);
+            }
+            nextToken();
+        }
+    }
 
-	private PrecedenceTypeEnum peekPrecedence() {
-		if (TokenPrecedenceConverter.precedenceMap.containsKey(peekToken.getType())) {
-			return TokenPrecedenceConverter.precedenceMap.get(peekToken.getType());
-		}
-		return PrecedenceTypeEnum.LOWEST;
-	}
+    private void nextToken() {
+        currentToken = peekToken;
+        peekToken = lexer.nextToken();
+    }
 
-	public AstNode parseStatement() {
-		if (currentToken.getType() == TokenTypeEnum.LET) {
-			return parseLetStatement();
-		} else if (currentToken.getType() == TokenTypeEnum.RETURN) {
-			return parseReturnStatement();
-		} else {
-			return parseExpressionStatement();
-		}
-	}
+    private boolean currentTokenIs(TokenTypeEnum tte) {
+        return currentToken.getType() == tte;
+    }
 
-	public AstNode parseLetStatement() {
-		AstLetStatement stmt = new AstLetStatement(currentToken);
-		if (!expectPeek(TokenTypeEnum.IDENT)) {
-			return null;
-		}
-		stmt.setName(new AstIdentifier(currentToken, currentToken.getLiteral()));
-		if (!expectPeek(TokenTypeEnum.ASSIGN)) {
-			return null;
-		}
-		nextToken();
-		stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
-		if (currentTokenIs(TokenTypeEnum.SEMICOLON)) {
-			nextToken();
-		}
-		return stmt;
-	}
+    private boolean peekTokenIs(TokenTypeEnum tte) {
+        return peekToken.getType() == tte;
+    }
 
-	public AstNode parseReturnStatement() {
-		AstReturnStatement stmt = new AstReturnStatement(currentToken);
-		nextToken();
-		stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
-		if (peekTokenIs(TokenTypeEnum.SEMICOLON) || peekTokenIs(TokenTypeEnum.RBRACE) || peekTokenIs(TokenTypeEnum.EOF)) {
-			return stmt;
-		}
-		while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
-			nextToken();
-		}
-		return stmt;
-	}
+    private boolean expectPeek(TokenTypeEnum tte) {
+        if (peekTokenIs(tte)) {
+            nextToken();
+            return true;
+        }
+        return false;
+    }
 
-	public AstNode parseExpressionStatement() {
-		AstExpressionStatement stmt = new AstExpressionStatement(currentToken);
-		stmt.setExpression(parseExpression(PrecedenceTypeEnum.LOWEST));
-		if (peekTokenIs(TokenTypeEnum.SEMICOLON)) {
-			nextToken();
-		}
-		return stmt;
-	}
+    private PrecedenceTypeEnum currentPrecedence() {
+        if (TokenPrecedenceConverter.precedenceMap.containsKey(currentToken.getType())) {
+            return TokenPrecedenceConverter.getPrecedence(currentToken.getType());
+        }
+        return PrecedenceTypeEnum.LOWEST;
+    }
 
-    // TODO: PrefixParseInterface and InfixParseInterface should call specific public methods from within the parser
-    // it makes more sense to have the logic that is responsible with parsing here and not in the interfaces
+    private PrecedenceTypeEnum peekPrecedence() {
+        if (TokenPrecedenceConverter.precedenceMap.containsKey(peekToken.getType())) {
+            return TokenPrecedenceConverter.getPrecedence(peekToken.getType());
+        }
+        return PrecedenceTypeEnum.LOWEST;
+    }
 
-	public AstNode parseIdentifier() {
-		return new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
-	}
+    private AstNode parseStatement() {
+        if (currentToken.getType() == TokenTypeEnum.LET) {
+            return parseLetStatement();
+        } else if (currentToken.getType() == TokenTypeEnum.RETURN) {
+            return parseReturnStatement();
+        } else {
+            return parseExpressionStatement();
+        }
+    }
 
-	public AstNode parseInteger() {
-		String value = getCurrentToken().getLiteral();
-		return new AstInteger(getCurrentToken(), Integer.parseInt(value));
-	}
+    private AstNode parseLetStatement() {
+        AstLetStatement stmt = new AstLetStatement(currentToken);
+        if (!expectPeek(TokenTypeEnum.IDENT)) {
+            return null;
+        }
+        stmt.setName(new AstIdentifier(currentToken, currentToken.getLiteral()));
+        if (!expectPeek(TokenTypeEnum.ASSIGN)) {
+            return null;
+        }
+        nextToken();
+        stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
+        if (currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+            nextToken();
+        }
+        return stmt;
+    }
 
-	public AstNode parsePrefixExpression() {
-		AstPrefixExpression expr = new AstPrefixExpression(getCurrentToken(),
-				getCurrentToken().getLiteral());
-		nextToken();
-		expr.setRight(parseExpression(PrecedenceTypeEnum.PREFIX));
-		return expr;
-	}
+    private AstNode parseReturnStatement() {
+        AstReturnStatement stmt = new AstReturnStatement(currentToken);
+        nextToken();
+        stmt.setValue(parseExpression(PrecedenceTypeEnum.LOWEST));
+        if (peekTokenIs(TokenTypeEnum.SEMICOLON) || peekTokenIs(TokenTypeEnum.RBRACE) || peekTokenIs(TokenTypeEnum.EOF)) {
+            return stmt;
+        }
+        while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
+            nextToken();
+        }
+        return stmt;
+    }
 
-	public AstNode parseBoolean() {
-		return new AstBoolean(getCurrentToken(), currentTokenIs(TokenTypeEnum.TRUE));
-	}
+    private AstNode parseExpressionStatement() {
+        AstExpressionStatement stmt = new AstExpressionStatement(currentToken);
+        stmt.setExpression(parseExpression(PrecedenceTypeEnum.LOWEST));
+        if (peekTokenIs(TokenTypeEnum.SEMICOLON)) {
+            nextToken();
+        }
+        return stmt;
+    }
 
-	public AstNode parseGroupedExpression() {
-		nextToken();
-		AstNode expr = parseExpression(PrecedenceTypeEnum.LOWEST);
-		if (!expectPeek(TokenTypeEnum.RPAREN)) {
-			return null;
-		}
-		return expr;
-	}
+    private AstNode parseIdentifier() {
+        return new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
+    }
 
-	public AstNode parseIfExpression() {
-		AstIfExpression expr = new AstIfExpression(getCurrentToken());
-		if (!expectPeek(TokenTypeEnum.LPAREN)) {
-			return null;
-		}
-		nextToken();
-		expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
-		if (!expectPeek(TokenTypeEnum.RPAREN)) {
-			return null;
-		}
-		if (!expectPeek(TokenTypeEnum.LBRACE)) {
-			return null;
-		}
-		expr.setConsequence(parseBlockStatement());
-		if (peekTokenIs(TokenTypeEnum.ELSE)) {
-			nextToken();
-			if (!expectPeek(TokenTypeEnum.LBRACE)) {
-				return null;
-			}
-			expr.setAlternative(parseBlockStatement());
-		}
-		return expr;
-	}
+    private AstNode parseBoolean() {
+        return new AstBoolean(getCurrentToken(), currentTokenIs(TokenTypeEnum.TRUE));
+    }
 
-	private AstNode parseBlockStatement() {
-		AstBlockStatement block = new AstBlockStatement(getCurrentToken());
-		nextToken();
-		while(!currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
-			AstNode statement = parseStatement();
-			if (statement != null) {
-				block.addStatement(statement);
-			}
-			nextToken();
-		}
-		return block;
-	}
-	
-	public AstNode parseFunctionLiteral() {
-		AstFunctionLiteral func = new AstFunctionLiteral(getCurrentToken());
-		if (!expectPeek(TokenTypeEnum.LPAREN)) {
-			return null;
-		}
-		func.setParameters(parseFunctionParameters());
-		if (!expectPeek(TokenTypeEnum.LBRACE)) {
-			return null;
-		}
-		func.setBody(parseBlockStatement());
-		return func;
-	}
-	
-	public ArrayList<AstNode> parseFunctionParameters() {
-		ArrayList<AstNode> identifiers = new ArrayList<AstNode>();
-		if (peekTokenIs(TokenTypeEnum.RPAREN)) {
-			nextToken();
-			return identifiers;
-		}
-		nextToken();
-		AstIdentifier ident = new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
-		identifiers.add(ident);
-		while(peekTokenIs(TokenTypeEnum.COMMA)) {
-			nextToken();
-			nextToken();
-			ident = new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
-			identifiers.add(ident);
-		}
-		if (!expectPeek(TokenTypeEnum.RPAREN)) {
-			return new ArrayList<AstNode>(); // return an empty list
-		}
-		return identifiers;
-	}
-	
-	public AstNode parseCallExpression(AstNode node) {
-		AstCallExpression expr = new AstCallExpression(getCurrentToken(), node);
-		expr.setArguments(parseCallArguments());
-		return expr;
-	}
-	
-	public ArrayList<AstNode> parseCallArguments() {
-		ArrayList<AstNode> args = new ArrayList<AstNode>();
-		if (peekTokenIs(TokenTypeEnum.RPAREN)) {
-			nextToken();
-			return args;
-		}
-		nextToken();
-		args.add(parseExpression(PrecedenceTypeEnum.LOWEST));
-		while(peekTokenIs(TokenTypeEnum.COMMA)) {
-			nextToken();
-			nextToken();
-			args.add(parseExpression(PrecedenceTypeEnum.LOWEST));
-		}
-		if (!expectPeek(TokenTypeEnum.RPAREN)) {
-			return new ArrayList<AstNode>();
-		}
-		return args;
-	}
+    private AstNode parseIntegerLiteral() {
+        String value = getCurrentToken().getLiteral();
+        return new AstInteger(getCurrentToken(), Integer.parseInt(value));
+    }
 
-	public AstNode parseInfixExpression(AstNode left) {
-		AstInfixExpression expr = new AstInfixExpression(getCurrentToken(), getCurrentToken().getLiteral(), left);
-		PrecedenceTypeEnum precedence = currentPrecedence();
-		nextToken();
-		expr.setRight(parseExpression(precedence));
-		return expr;
-	}
+    private AstNode parseIfExpression() {
+        AstIfExpression expr = new AstIfExpression(getCurrentToken());
+        if (!expectPeek(TokenTypeEnum.LPAREN)) {
+            return null;
+        }
+        nextToken();
+        expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
+        if (!expectPeek(TokenTypeEnum.RPAREN)) {
+            return null;
+        }
+        if (!expectPeek(TokenTypeEnum.LBRACE)) {
+            return null;
+        }
+        expr.setConsequence(parseBlockStatement());
+        if (peekTokenIs(TokenTypeEnum.ELSE)) {
+            nextToken();
+            if (!expectPeek(TokenTypeEnum.LBRACE)) {
+                return null;
+            }
+            expr.setAlternative(parseBlockStatement());
+        }
+        return expr;
+    }
 
-	public AstNode parseListLiteral() {
-		return null;
-	}
+    private AstNode parseBlockStatement() {
+        AstBlockStatement block = new AstBlockStatement(getCurrentToken());
+        nextToken();
+        while(!currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
+            AstNode statement = parseStatement();
+            if (statement != null) {
+                block.addStatement(statement);
+            }
+            nextToken();
+        }
+        return block;
+    }
 
-	public AstNode parseHashLiteral() {
-		return null;
-	}
+    private AstNode parseGroupedExpression() {
+        nextToken();
+        AstNode expr = parseExpression(PrecedenceTypeEnum.LOWEST);
+        if (!expectPeek(TokenTypeEnum.RPAREN)) {
+            return null;
+        }
+        return expr;
+    }
 
-	public AstNode parseIndexExpression(AstNode node) {
-		return null;
-	}
+    private AstNode parseFunctionLiteral() {
+        AstFunctionLiteral func = new AstFunctionLiteral(getCurrentToken());
+        if (!expectPeek(TokenTypeEnum.LPAREN)) {
+            return null;
+        }
+        func.setParameters(parseFunctionParameters());
+        if (!expectPeek(TokenTypeEnum.LBRACE)) {
+            return null;
+        }
+        func.setBody(parseBlockStatement());
+        return func;
+    }
 
-	public AstNode parseAssignExpression(AstNode node) {
-		return null;
-	}
+    private ArrayList<AstNode> parseFunctionParameters() {
+        ArrayList<AstNode> identifiers = new ArrayList<AstNode>();
+        if (peekTokenIs(TokenTypeEnum.RPAREN)) {
+            nextToken();
+            return identifiers;
+        }
+        nextToken();
+        AstIdentifier ident = new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
+        identifiers.add(ident);
+        while(peekTokenIs(TokenTypeEnum.COMMA)) {
+            nextToken();
+            nextToken();
+            ident = new AstIdentifier(getCurrentToken(), getCurrentToken().getLiteral());
+            identifiers.add(ident);
+        }
+        if (!expectPeek(TokenTypeEnum.RPAREN)) {
+            return new ArrayList<AstNode>(); // return an empty list
+        }
+        return identifiers;
+    }
 
-	public AstNode parseExpression(PrecedenceTypeEnum pte) {
-		if (!prefixParseFns.containsKey(currentToken.getType())) {
-			return null;
-		}
-		PrefixParseInterface prefixParser = prefixParseFns.get(currentToken.getType());
-		AstNode left_expression = prefixParser.parse();
-		while(!peekTokenIs(TokenTypeEnum.SEMICOLON) && (pte.ordinal() < peekPrecedence().ordinal())) {
-			if (!infixParseFns.containsKey(peekToken.getType())) return left_expression;
-			InfixParseInterface infixParser = infixParseFns.get(peekToken.getType());
-			nextToken();
-			left_expression = infixParser.parse(left_expression);
-		}
-		return left_expression;
-	}
-	
-	public AstNode parseStringLiteral() {
-		AstStringLiteral node = new AstStringLiteral(getCurrentToken());
-		node.setValue(getCurrentToken().getLiteral());
-		return node;
-	}
-	
-	public AstNode parseWhileExpression() {
-		AstWhileExpression expr = new AstWhileExpression(getCurrentToken());
-		if (!expectPeek(TokenTypeEnum.LPAREN)) {
-			return null; // this should all return error ast nodes that evaluate in error objects
-		}
-		nextToken();
-		expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
-		if (!expectPeek(TokenTypeEnum.RPAREN)) {
-			return null; // see previous comment
-		}
-		if (!expectPeek(TokenTypeEnum.LBRACE)) {
-			return null; // see previous comment
-		}
-		expr.setBody(parseBlockStatement());
-		return expr;
-	}
+    private AstNode parseWhileExpression() {
+        AstWhileExpression expr = new AstWhileExpression(getCurrentToken());
+        if (!expectPeek(TokenTypeEnum.LPAREN)) {
+            return null; // this should all return error ast nodes that evaluate in error objects
+        }
+        nextToken();
+        expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
+        if (!expectPeek(TokenTypeEnum.RPAREN)) {
+            return null; // see previous comment
+        }
+        if (!expectPeek(TokenTypeEnum.LBRACE)) {
+            return null; // see previous comment
+        }
+        expr.setBody(parseBlockStatement());
+        return expr;
+    }
 
-	public AstNode parseForExpression() {
-		// TODO: implement this
-		return null;
-	}
+    private AstNode parseForExpression() {
+        // TODO: implement this
+        return null;
+    }
 
-	public AstNode parseDefStatement() {
-		// TODO: implement this
-		return null;
-	}
+    private AstNode parseDefStatement() {
+        // TODO: implement this
+        return null;
+    }
 
-	public Lexer getLexer() {
-		return lexer;
-	}
+    private AstNode parseListLiteral() {
+        // TODO: implement this
+        return null;
+    }
 
-	public void setLexer(Lexer lexer) {
-		this.lexer = lexer;
-	}
+    private AstNode parseHashLiteral() {
+        // TODO: implement this
+        return null;
+    }
 
-	public String getSource() {
-		return source;
-	}
+    private AstNode parseStringLiteral() {
+        AstStringLiteral node = new AstStringLiteral(getCurrentToken());
+        node.setValue(getCurrentToken().getLiteral());
+        return node;
+    }
 
-	public void setSource(String source) {
-		this.source = source;
-	}
+    private AstNode parsePrefixExpression() {
+        AstPrefixExpression expr = new AstPrefixExpression(getCurrentToken(),
+                getCurrentToken().getLiteral());
+        nextToken();
+        expr.setRight(parseExpression(PrecedenceTypeEnum.PREFIX));
+        return expr;
+    }
 
-	public Token getCurrentToken() {
-		return currentToken;
-	}
+    private AstNode parseInfixExpression(AstNode left) {
+        AstInfixExpression expr = new AstInfixExpression(getCurrentToken(), getCurrentToken().getLiteral(), left);
+        PrecedenceTypeEnum precedence = currentPrecedence();
+        nextToken();
+        expr.setRight(parseExpression(precedence));
+        return expr;
+    }
 
-	public void setCurrentToken(Token currentToken) {
-		this.currentToken = currentToken;
-	}
+    private AstNode parseCallExpression(AstNode node) {
+        AstCallExpression expr = new AstCallExpression(getCurrentToken(), node);
+        expr.setArguments(parseCallArguments());
+        return expr;
+    }
 
-	public Token getPeekToken() {
-		return peekToken;
-	}
+    private ArrayList<AstNode> parseCallArguments() {
+        ArrayList<AstNode> args = new ArrayList<AstNode>();
+        if (peekTokenIs(TokenTypeEnum.RPAREN)) {
+            nextToken();
+            return args;
+        }
+        nextToken();
+        args.add(parseExpression(PrecedenceTypeEnum.LOWEST));
+        while(peekTokenIs(TokenTypeEnum.COMMA)) {
+            nextToken();
+            nextToken();
+            args.add(parseExpression(PrecedenceTypeEnum.LOWEST));
+        }
+        if (!expectPeek(TokenTypeEnum.RPAREN)) {
+            return new ArrayList<AstNode>();
+        }
+        return args;
+    }
 
-	public void setPeekToken(Token peekToken) {
-		this.peekToken = peekToken;
-	}
+    private AstNode parseIndexExpression(AstNode left) {
+        // TODO: implement this
+        return null;
+    }
 
-	public HashMap<TokenTypeEnum, PrefixParseInterface> getPrefixParseFns() {
-		return prefixParseFns;
-	}
+    private AstNode parseAssignExpression(AstNode left) {
+        AstAssignStatement stmt = new AstAssignStatement(currentToken);
+        return null;
+    }
 
-	public void setPrefixParseFns(HashMap<TokenTypeEnum, PrefixParseInterface> prefixParseFns) {
-		this.prefixParseFns = prefixParseFns;
-	}
+    private AstNode parseExpression(PrecedenceTypeEnum pte) {
+        if (!prefixParseFns.containsKey(currentToken.getType())) {
+            return null;
+        }
+        Supplier<AstNode> prefix = prefixParseFns.get(currentToken.getType());
+        AstNode leftExpression = prefix.get();
+        while (!peekTokenIs(TokenTypeEnum.SEMICOLON) && pte.ordinal() < peekPrecedence().ordinal()) {
+            if (!infixParseFns.containsKey(peekToken.getType())) return leftExpression;
+            Function<AstNode, AstNode> infix = infixParseFns.get(peekToken.getType());
+            nextToken();
+            leftExpression = infix.apply(leftExpression);
+        }
+        return leftExpression;
+    }
 
-	public HashMap<TokenTypeEnum, InfixParseInterface> getInfixParseFns() {
-		return infixParseFns;
-	}
+    public Lexer getLexer() {
+        return lexer;
+    }
 
-	public void setInfixParseFns(HashMap<TokenTypeEnum, InfixParseInterface> infixParseFns) {
-		this.infixParseFns = infixParseFns;
-	}
+    public void setLexer(Lexer lexer) {
+        this.lexer = lexer;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public Token getCurrentToken() {
+        return currentToken;
+    }
+
+    public void setCurrentToken(Token currentToken) {
+        this.currentToken = currentToken;
+    }
+
+    public Token getPeekToken() {
+        return peekToken;
+    }
+
+    public void setPeekToken(Token peekToken) {
+        this.peekToken = peekToken;
+    }
+
+    public HashMap<TokenTypeEnum, Supplier<AstNode>> getPrefixParseFns() {
+        return prefixParseFns;
+    }
+
+    public void setPrefixParseFns(HashMap<TokenTypeEnum, Supplier<AstNode>> prefixParseFns) {
+        this.prefixParseFns = prefixParseFns;
+    }
+
+    public HashMap<TokenTypeEnum, Function<AstNode, AstNode>> getInfixParseFns() {
+        return infixParseFns;
+    }
+
+    public void setInfixParseFns(HashMap<TokenTypeEnum, Function<AstNode, AstNode>> infixParseFns) {
+        this.infixParseFns = infixParseFns;
+    }
 }

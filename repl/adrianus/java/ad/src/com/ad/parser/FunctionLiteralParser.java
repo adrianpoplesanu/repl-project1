@@ -3,14 +3,14 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class FunctionLiteralParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 	
-	public FunctionLiteralParser(Parser parser) {
-		this.parser = parser;
+	public FunctionLiteralParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse() {
-		return parser.parseFunctionLiteral();
+		return parserOLD.parseFunctionLiteral();
 	}
 }

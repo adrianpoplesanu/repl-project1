@@ -3,10 +3,10 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class AssignStatementParser implements InfixParseInterface {
-    private Parser parser;
+    private ParserOLD parserOLD;
 
-    public AssignStatementParser(Parser parser) {
-        this.parser = parser;
+    public AssignStatementParser(ParserOLD parserOLD) {
+        this.parserOLD = parserOLD;
     }
 
     @Override

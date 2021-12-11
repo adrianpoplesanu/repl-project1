@@ -3,15 +3,15 @@ package com.ad.parser;
 import com.ad.ast.AstNode;
 
 public class IfExpressionParser implements PrefixParseInterface {
-	private Parser parser;
+	private ParserOLD parserOLD;
 
-	public IfExpressionParser(Parser parser) {
-		this.parser = parser;
+	public IfExpressionParser(ParserOLD parserOLD) {
+		this.parserOLD = parserOLD;
 	}
 
 	@Override
 	public AstNode parse() {
-		return parser.parseIfExpression();
+		return parserOLD.parseIfExpression();
 	}
 
 }
