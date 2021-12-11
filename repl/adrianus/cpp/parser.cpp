@@ -525,37 +525,37 @@ Ad_AST_Node* Parser::ParsePostfixPlusPlus(Ad_AST_Node* left) {
 }
 
 Ad_AST_Node* Parser::ParseForExpression() {
-    // TODO: finish this implementation
     Ad_AST_ForExprssion* expr = new Ad_AST_ForExprssion(current_token);
     NextToken();
-    if (!ExpectPeek(TT_LPAREN)) {
+    if (!CurrentTokenIs(TT_LPAREN)) {
+        std::cout << "error parsing for expression: LPAREN expected\n";
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     expr->initialization = ParseExpression(PT_LOWEST);
-    if (!CurrentTokenIs(TT_SEMICOLON)) {
-        std::cout << "error parsing initialization for expression: SEMICOLON expected";
+    if (!ExpectPeek(TT_SEMICOLON)) {
+        std::cout << "error parsing initialization for expression: SEMICOLON expected\n";
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     expr->condition = ParseExpression(PT_LOWEST);
-    if (!CurrentTokenIs(TT_SEMICOLON)) {
-        std::cout << "error parsing condition for expression: SEMICOLON expected";
+    if (!ExpectPeek(TT_SEMICOLON)) {
+        std::cout << "error parsing condition for expression: second SEMICOLON expected\n";
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     expr->step = ParseExpression(PT_LOWEST);
-    if (!CurrentTokenIs(TT_RPAREN)) {
-        std::cout << "error parsing step for expression: RPAREN expected";
+    if (!ExpectPeek(TT_RPAREN)) {
+        std::cout << "error parsing step for expression: RPAREN expected\n";
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     if (!CurrentTokenIs(TT_LBRACE)) {
-        std::cout << "error parsing body for expression: LBRACE expectd";
+        std::cout << "error parsing body for expression: LBRACE expectd\n";
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }

@@ -133,6 +133,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_POSTFIX_INCREMENT:
             return EvalPostfixExpression(node, env);
         break;
+        case ST_FOR_EXPRESSION:
+            std::cout << "evaluating a For expression\n";
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
