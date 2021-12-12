@@ -134,7 +134,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalPostfixExpression(node, env);
         break;
         case ST_FOR_EXPRESSION:
-            std::cout << "evaluating a For expression\n";
+            return EvalForExpression(node, env);
         break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
@@ -676,6 +676,20 @@ Ad_Object* Evaluator::EvalPostfixExpression(Ad_AST_Node* node, Environment& env)
         return result;
     }
     return new Ad_Null_Object();
+}
+
+Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
+    Ad_AST_ForExprssion* expr = (Ad_AST_ForExprssion*) node;
+    Ad_Object* initialization = Eval(expr->initialization, env);
+    Ad_Object* condition = Eval(expr->condition, env);
+    while (IsTruthy(condition)) {
+        Ad_Object* result = Eval(expr->body, env);
+        if (result != NULL && result->Type() == OBJ_SIGNAL) return result;
+        if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result;
+        Ad_Object* step = Eval(expr->step, env);
+        condition = Eval(expr->condition, env);
+    }
+    return NULL;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

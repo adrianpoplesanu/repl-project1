@@ -14,7 +14,8 @@ Ad_Object* len_builtin(std::vector<Ad_Object*> args, Environment* env) {
         return new Ad_Integer_Object(length);
     }
     if (obj->Type() == OBJ_LIST) {
-        return new Ad_Integer_Object(0);
+        Ad_List_Object* list_obj = (Ad_List_Object*) obj;
+        return new Ad_Integer_Object(list_obj->elements.size());
     }
     if (obj->Type() == OBJ_HASH) {
         return new Ad_Integer_Object(0);
@@ -80,6 +81,18 @@ Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return NULL;
 }
 
+Ad_Object* file_builtin(std::vector<Ad_Object*> args, Environment* env) {
+    return NULL;
+}
+
+Ad_Object* system_builtin(std::vector<Ad_Object*> args, Environment* env) {
+    return NULL;
+}
+
+Ad_Object* socket_builtin(std::vector<Ad_Object*> args, Environment* env) {
+    return NULL;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -92,7 +105,13 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"remove", new Ad_Builtin_Object(&remove_builtin)},
     {"upper", new Ad_Builtin_Object(&upper_builtin)},
     {"lower", new Ad_Builtin_Object(&lower_builtin)},
-    {"context", new Ad_Builtin_Object(&context_builtin)}
+    {"context", new Ad_Builtin_Object(&context_builtin)},
+    {"file", new Ad_Builtin_Object(&file_builtin)},
+    {"system", new Ad_Builtin_Object(&system_builtin)},
+    {"socket", new Ad_Builtin_Object(&socket_builtin)}
+    // eval
+    // first
+    // input
 };
 
 void free_builtin_arguments(std::vector<Ad_Object*> args) {
