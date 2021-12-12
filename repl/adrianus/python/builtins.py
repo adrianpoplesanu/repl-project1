@@ -42,13 +42,52 @@ def append_builtin(args, env):
 def context_builtin(args, env):
     print env
 
+def pop_builtin(args, env):
+    pass
+
+def remove_builtin(args, env):
+    pass
+
+def lower_builtin(args, env):
+    pass
+
+def upper_builtin(args, env):
+    pass
+
+def file_builtin(args, env):
+    pass
+
+def system_builtin(args, env):
+    pass
+
+def socket_builtin(args, env):
+    pass
+
+def eval_builtin(args, env):
+    pass
+
+def first_builtin(args, env):
+    pass
+
+def input_builtin(args, env):
+    pass
+
 builtins_map = {
     "len": Ad_Builtin_Object(len_builtin),
-    "first": Ad_Builtin_Object(first_builtin),
-    "print": Ad_Builtin_Object(print_builtin),
     "exit": Ad_Builtin_Object(exit_builtin),
+    "print": Ad_Builtin_Object(print_builtin),
     "ref_count": Ad_Builtin_Object(ref_count_builtin),
     "type": Ad_Builtin_Object(type_builtin),
     "append": Ad_Builtin_Object(append_builtin),
-    "context": Ad_Builtin_Object(context_builtin)
+    "pop": Ad_Builtin_Object(pop_builtin),
+    "remove": Ad_Builtin_Object(remove_builtin),
+    "lower": Ad_Builtin_Object(lower_builtin),
+    "upper": Ad_Builtin_Object(upper_builtin),
+    "context": Ad_Builtin_Object(context_builtin),
+    "file": Ad_Builtin_Object(file_builtin),
+    "system": Ad_Builtin_Object(system_builtin),
+    "socket": Ad_Builtin_Object(socket_builtin),
+    "eval": Ad_Builtin_Object(eval_builtin),
+    "first": Ad_Builtin_Object(first_builtin),
+    "input": Ad_Builtin_Object(input_builtin)
 }
