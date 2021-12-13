@@ -435,10 +435,13 @@ class Evaluator(object):
             args_objs = self.eval_expressions(node.arguments, env)
             if len(args_objs) == 1 and self.is_error(args_objs[0]):
                 return args_objs[0]
-            return self.apply_method(klass_method, args_objs, klass_instance.instance_environment)
+            klass_environment = klass_instance.instance_environment
+            klass_environment.outer = env
+            return self.apply_method(klass_method, args_objs, klass_environment)
         else:
             klass_instance = env.get(node.owner.value)
             klass_environment = klass_instance.instance_environment
+            klass_environment.outer = env
             evaluated = self.eval(node.member, klass_environment)
         return evaluated
 

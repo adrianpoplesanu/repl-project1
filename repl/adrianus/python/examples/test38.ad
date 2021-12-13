@@ -1,0 +1,25 @@
+a = 747
+
+class Test {
+    def display() {
+        print ("buna dimineata!")
+    }
+}
+
+class TestService() {
+
+    def display_service() {
+        print ("display_service")
+        /*test1 = a*/
+        /*print(test1)*/
+        test1 = Test()
+        test1.display()
+        /*context()*/
+    }
+}
+
+test = Test()
+test.display()
+
+test_service = TestService()
+test_service.display_service()
