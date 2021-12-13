@@ -639,12 +639,15 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
         if (args_objs.size() == 1 && IsError(args_objs[0])) {
             return args_objs[0];
         }
-        return ApplyMethod(klass_method, args_objs, *(klass_instance->instance_environment));
+        Environment* klass_environment = klass_instance->instance_environment;
+        klass_environment->outer = &env;
+        return ApplyMethod(klass_method, args_objs, *klass_environment);
     } else {
         Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
         Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
         Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
         Environment* klass_environment = klass_instance->instance_environment;
+        klass_environment->outer = &env;
         Ad_Object* result = Eval(member, *klass_environment);
         return result;
     }
