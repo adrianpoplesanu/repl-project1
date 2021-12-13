@@ -1,0 +1,8 @@
+class File {
+    /* test */
+    def read() {
+        /* aaa */
+    }
+}
+
+a = File()

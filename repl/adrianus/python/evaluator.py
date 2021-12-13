@@ -7,6 +7,7 @@ from ast import StatementType
 from environment import new_environment, new_enclosed_environment
 from builtins import builtins_map
 from utils import print_ast_nodes
+from handlers.file import read_file_content
 
 NULLOBJECT = Ad_Null_Object()
 TRUE = Ad_Boolean_Object(value=True)
@@ -18,6 +19,8 @@ class Evaluator(object):
         pass
 
     def eval(self, node, env):
+        if not node:
+            return None
         if node.type == StatementType.PROGRAM:
             return self.eval_program(node, env)
         elif node.type == StatementType.LET_STATEMENT:
@@ -99,6 +102,8 @@ class Evaluator(object):
             return self.eval_postfix_increment(node, env)
         elif node.type == StatementType.FOR_EXPRESSION:
             return self.eval_for_expression(node, env)
+        elif node.type == StatementType.NULL_EXPRESSION:
+            return self.eval_null_expression(node, env)
         else:
             print 'unknown AST node: ' + node.type
 
@@ -273,22 +278,18 @@ class Evaluator(object):
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
             for attribute in func.attributes:
                 if attribute.type == StatementType.ASSIGN_STATEMENT:
-                    #instance_environment.outer = env.store
                     instance_environment.outer = store
                     evaluated = self.eval(attribute.value, klass_instance.instance_environment)
                     key = attribute.name.value
                     klass_instance.instance_environment.set(key, evaluated)
                 if attribute.type == StatementType.EXPRESSION_STATEMENT:
                     if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
-                        #instance_environment.outer = env.store
                         instance_environment.outer = env
                         evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
                         key = attribute.expression.name.value
-                        print key
                         klass_instance.instance_environment.set(key, evaluated)
             for method in func.methods:
                 func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
-                print method.name.value
                 klass_instance.instance_environment.set(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
             return klass_instance
@@ -299,31 +300,6 @@ class Evaluator(object):
             self.extend_method_env(func, args_objs, env)
             evaluated = self.eval(func.body, env)
             return self.unwrap_return_value(evaluated)
-#        if func.type == ObjectType.BUILTIN:
-#            return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
-#            # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
-#        if func.type == ObjectType.CLASS:
-#            instance_environment = new_environment()
-#            klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
-#            for attribute in func.attributes:
-#                if attribute.type == StatementType.ASSIGN_STATEMENT:
-#                    #instance_environment.outer = env.store
-#                    instance_environment.outer = env
-#                    evaluated = self.eval(attribute.value, klass_instance.instance_environment)
-#                    key = attribute.name.value
-#                    klass_instance.instance_environment.set(key, evaluated)
-#                if attribute.type == StatementType.EXPRESSION_STATEMENT:
-#                    if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
-#                        #instance_environment.outer = env.store
-#                        instance_environment.outer = env
-#                        evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
-#                        key = attribute.expression.name.value
-#                        klass_instance.instance_environment.set(key, evaluated)
-#            for method in func.methods:
-#                func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
-#                klass_instance.instance_environment.set(method.name.value, func_obj)
-#            # i also need to call the class constructor, if one is present
-#            return klass_instance
         return None
 
     def unwrap_return_value(self, obj):
@@ -353,6 +329,9 @@ class Evaluator(object):
         if operator == "+":
             val = left.value + right.value
             return Ad_String_Object(value=val)
+        if operator == "==":
+            val = left.value == right.value
+            return self.native_bool_to_boolean_object(val)
 
     def new_error(self, msg):
         return Ad_Error_Object(message=msg)
@@ -436,7 +415,20 @@ class Evaluator(object):
         return None
 
     def eval_member_access(self, node, env):
+        # aici ar trebui un switch, daca obiectul peste care se face member acces e
+        # - string: atunci indexOf, find, reverse pot fi metode asociate
+        # - list: atunci reverse, sort pot fi metode asociate
+        # - file: read, write pot fi metode asociate
+        #if self.eval_file_object_method(node, env):
+        #    # nu sunt 100% sigur de abordarea asta
+        #    #self.eval_file_object_method(node, env)
+        #    return None
         evaluated = None
+        evaluated = self.eval_file_object_method(node, env)
+        if evaluated:
+            # this needs re-written, looks crappy
+            return evaluated
+
         if node.is_method:
             klass_instance = env.get(node.owner.value)
             klass_method = klass_instance.instance_environment.get(node.member.value)
@@ -449,6 +441,18 @@ class Evaluator(object):
             klass_environment = klass_instance.instance_environment
             evaluated = self.eval(node.member, klass_environment)
         return evaluated
+
+    def eval_file_object_method(self, node, env):
+        owner = env.get(node.owner.value)
+        if owner.type == ObjectType.FILE:
+            method = node.member.value
+            if method == 'read':
+                if 'r' in owner.operator:
+                    return read_file_content(owner.filename)
+            if method == 'write':
+                print 'util function for writing file content'
+        else:
+            return None
 
     def eval_prefix_increment(self, node, env):
         obj = env.get(node.name.value)
@@ -477,3 +481,6 @@ class Evaluator(object):
             step = self.eval(node.step, env)
             condition = self.eval(node.condition, env)
         return None
+
+    def eval_null_expression(self, node, env):
+        return NULLOBJECT

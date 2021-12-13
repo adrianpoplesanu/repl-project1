@@ -7,7 +7,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
                 ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
-                ASTPostfixIncrement, ASTForExpression
+                ASTPostfixIncrement, ASTForExpression, ASTNullExpression
 
 
 class Parser(object):
@@ -36,6 +36,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
         self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
         self.prefix_parse_functions[TokenType.PLUSPLUS] = self.parse_prefix_plus_plus
+        self.prefix_parse_functions[TokenType.NULL] = self.parse_null_expression
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
@@ -407,6 +408,10 @@ class Parser(object):
             return None
         stmt.body =  self.parse_block_statement()
         return stmt
+
+    def parse_null_expression(self):
+        expr = ASTNullExpression(self.current_token)
+        return expr
 
     def parse_expression(self, precedence):
         if self.current_token.type not in self.prefix_parse_functions:

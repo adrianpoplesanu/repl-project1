@@ -1,6 +1,6 @@
 import sys
 
-from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object
+from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object
 from object_type import ObjectType
 
 def len_builtin(args, env):
@@ -54,13 +54,16 @@ def lower_builtin(args, env):
 def upper_builtin(args, env):
     pass
 
-def file_builtin(args, env):
+def iofile_builtin(args, env):
+    filename = args[0]
+    operator = args[1]
+    file_obj = Ad_File_Object(filename=filename.value, operator=operator.value)
+    return file_obj
+
+def syssystem_builtin(args, env):
     pass
 
-def system_builtin(args, env):
-    pass
-
-def socket_builtin(args, env):
+def iosocket_builtin(args, env):
     pass
 
 def eval_builtin(args, env):
@@ -84,10 +87,12 @@ builtins_map = {
     "lower": Ad_Builtin_Object(lower_builtin),
     "upper": Ad_Builtin_Object(upper_builtin),
     "context": Ad_Builtin_Object(context_builtin),
-    "file": Ad_Builtin_Object(file_builtin),
-    "system": Ad_Builtin_Object(system_builtin),
-    "socket": Ad_Builtin_Object(socket_builtin),
+    "__iofile": Ad_Builtin_Object(iofile_builtin),
+    "__syssystem": Ad_Builtin_Object(syssystem_builtin),
+    "__iosocket": Ad_Builtin_Object(iosocket_builtin),
     "eval": Ad_Builtin_Object(eval_builtin),
     "first": Ad_Builtin_Object(first_builtin),
     "input": Ad_Builtin_Object(input_builtin)
+    # https://www.w3schools.com/python/python_ref_keywords.asp
+	# https://www.w3schools.com/python/python_ref_functions.asp
 }

@@ -12,3 +12,5 @@ class ObjectType(object):
     HASH = "HASH"
     CLASS = "CLASS"
     INSTANCE = "INSTANCE"
+    FILE = "FILE"
+    SOCKET = "SOCKET"

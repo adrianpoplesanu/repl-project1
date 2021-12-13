@@ -201,3 +201,19 @@ class Ad_Class_Instance(Ad_Object):
         out += "attributes: " + str(self.class_object.attributes) + " "
         out += "methods: " + str(self.class_object.methods)
         return out
+
+
+class Ad_File_Object(Ad_Object):
+    type = ObjectType.FILE
+
+    def __init__(self, filename=None, operator=None):
+        """
+        @param: name - string, the file_path
+        @param: operator - string, 'r', 'w'
+        """
+        self.filename = filename
+        self.operator = operator
+        self.file_descriptor = open(self.filename, self.operator)
+
+    def inspect(self):
+        out = "File [" + self.filename + ", " + self.operator + "]"
