@@ -6,19 +6,12 @@ import com.ad.ast.*;
 import com.ad.builtin.BuiltinLookup;
 import com.ad.environment.Environment;
 import com.ad.environment.EnvironmentUtils;
-import com.ad.objects.AdBooleanObject;
-import com.ad.objects.AdBuiltinObject;
-import com.ad.objects.AdErrorObject;
-import com.ad.objects.AdFunctionObject;
-import com.ad.objects.AdIntegerObject;
-import com.ad.objects.AdObject;
-import com.ad.objects.AdReturnValueObject;
-import com.ad.objects.AdStringObject;
-import com.ad.objects.ObjectTypeEnum;
+import com.ad.objects.*;
 
 public class Evaluator {
 	public static AdBooleanObject TrueObject = new AdBooleanObject(true);
 	public static AdBooleanObject FalseObject = new AdBooleanObject(false);
+	public static AdNullObject NULLOBJECT = new AdNullObject();
 
     public AdObject eval(AstNode node, Environment env) {
     	switch(node.getType()) {
@@ -128,8 +121,10 @@ public class Evaluator {
     	if (obj != null) {
 			return obj;
 		} else {
-			AdErrorObject error = new AdErrorObject(((AstIdentifier) node).getToken().getLiteral() + " used before definition.");
-			return error;
+    		// maybe this should return NULLOBJECT for consistency with cpp and python implementation
+			/*AdErrorObject error = new AdErrorObject(((AstIdentifier) node).getToken().getLiteral() + " used before definition.");
+			return error;*/
+			return NULLOBJECT;
 		}
     }
 
