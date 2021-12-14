@@ -405,6 +405,7 @@ public:
     Token token;
 
     Ad_AST_Null_Expression();
+    Ad_AST_Null_Expression(Token);
     ~Ad_AST_Null_Expression();
 };
 

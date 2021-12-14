@@ -100,6 +100,7 @@ public:
     Ad_AST_Node* ParsePrefixPlusPlus();
     Ad_AST_Node* ParsePostfixPlusPlus(Ad_AST_Node*);
     Ad_AST_Node* ParseForExpression();
+    Ad_AST_Node* ParseNullExpression();
 };
 
 #endif

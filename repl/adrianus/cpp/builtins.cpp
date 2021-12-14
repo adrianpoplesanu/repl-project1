@@ -112,6 +112,8 @@ std::map<std::string, Ad_Object*> builtins_map = {
     // eval
     // first
     // input
+    // https://www.w3schools.com/python/python_ref_keywords.asp
+	// https://www.w3schools.com/python/python_ref_functions.asp
 };
 
 void free_builtin_arguments(std::vector<Ad_Object*> args) {

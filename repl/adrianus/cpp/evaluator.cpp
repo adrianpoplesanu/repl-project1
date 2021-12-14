@@ -136,6 +136,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_FOR_EXPRESSION:
             return EvalForExpression(node, env);
         break;
+        case ST_NULL_EXPRESSION:
+            return EvalNullExpression(node, env);
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -388,7 +391,6 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             //std::cout << def_ident->value << "\n";
             klass_instance->instance_environment->Set(def_ident->value, method_obj);
-            klass_instance->instance_environment->PrintStore();
         }
         return klass_instance;
     }
@@ -693,6 +695,10 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
         condition = Eval(expr->condition, env);
     }
     return NULL;
+}
+
+Ad_Object* Evaluator::EvalNullExpression(Ad_AST_Node* node, Environment& env) {
+    return new Ad_Null_Object();
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {
