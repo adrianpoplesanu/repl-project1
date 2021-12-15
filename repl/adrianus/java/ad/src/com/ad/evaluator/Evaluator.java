@@ -47,6 +47,8 @@ public class Evaluator {
 			return evalStringLiteral(node, env);
 		case WHILE_EXPRESSION:
 			return evalWhileExpression(node, env);
+		case ASSIGN_STATEMENT:
+			return evalAssignStatement(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node");
 			break;
@@ -321,6 +323,13 @@ public class Evaluator {
     		eval(expr.getBody(), env);
     		condition = eval(expr.getCondition(), env);
 		}
+    	return null;
+	}
+
+	private AdObject evalAssignStatement(AstNode node, Environment env) {
+    	AstAssignStatement stmt = (AstAssignStatement) node;
+    	AdObject obj = eval(stmt.getValue(), env);
+    	env.set(stmt.getName().getValue(), obj);
     	return null;
 	}
 

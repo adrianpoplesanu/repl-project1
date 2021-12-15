@@ -336,7 +336,18 @@ public class Parser {
 
     private AstNode parseAssignExpression(AstNode left) {
         AstAssignStatement stmt = new AstAssignStatement(currentToken);
-        return null;
+        if (left.getType() == AstNodeTypeEnum.IDENTIFIER) {
+            stmt.setName((AstIdentifier) left);
+        } else {
+            return null;
+        }
+        nextToken();
+        AstNode right = parseExpression(PrecedenceTypeEnum.LOWEST);
+        stmt.setValue(right);
+        if (currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+            nextToken();
+        }
+        return stmt;
     }
 
     private AstNode parseExpression(PrecedenceTypeEnum pte) {

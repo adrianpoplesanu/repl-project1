@@ -21,6 +21,7 @@ public class TokenPrecedenceConverter {
 			put(TokenTypeEnum.ASTERISK, PrecedenceTypeEnum.PRODUCT);
 			put(TokenTypeEnum.SLASH, PrecedenceTypeEnum.PRODUCT);
 			put(TokenTypeEnum.LPAREN, PrecedenceTypeEnum.CALL);
+			put(TokenTypeEnum.ASSIGN, PrecedenceTypeEnum.ASSIGN);
 		}
 	};
 	
