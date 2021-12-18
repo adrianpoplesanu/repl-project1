@@ -14,6 +14,7 @@ public class TokenKeywordConverter {
 		    put("true", TokenTypeEnum.TRUE);
 		    put("false", TokenTypeEnum.FALSE);
 		    put("while", TokenTypeEnum.WHILE);
+		    put("def", TokenTypeEnum.DEF);
 	    }
 	};
 	

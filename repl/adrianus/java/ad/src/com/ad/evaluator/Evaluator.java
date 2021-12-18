@@ -49,6 +49,8 @@ public class Evaluator {
 			return evalWhileExpression(node, env);
 		case ASSIGN_STATEMENT:
 			return evalAssignStatement(node, env);
+		case DEF_STATEMENT:
+			return evalDefStatement(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node");
 			break;

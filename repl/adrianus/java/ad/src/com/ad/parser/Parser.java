@@ -268,8 +268,23 @@ public class Parser {
     }
 
     private AstNode parseDefStatement() {
-        // TODO: implement this
-        return null;
+        AstDefStatement stmt = new AstDefStatement(currentToken);
+        nextToken();
+        AstNode name = new AstIdentifier(currentToken, currentToken.getLiteral());
+        stmt.setName(name);
+        if (!expectPeek(TokenTypeEnum.LPAREN)) {
+            // TODO: return an Error AST node
+            return null;
+        }
+        ArrayList<AstNode> parameters = parseFunctionParameters();
+        stmt.setParameters(parameters);
+        if (!expectPeek(TokenTypeEnum.LBRACE)) {
+            // TODO: return an Error AST node
+            return null;
+        }
+        AstNode body = parseBlockStatement();
+        stmt.setBody(body);
+        return stmt;
     }
 
     private AstNode parseListLiteral() {
