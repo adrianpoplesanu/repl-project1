@@ -335,6 +335,11 @@ public class Evaluator {
     	return null;
 	}
 
+	private AdObject evalDefStatement(AstNode node, Environment env) {
+    	AstDefStatement stmt = (AstDefStatement) node;
+    	return null;
+	}
+
     private AdObject newError(String msg) {
         return new AdErrorObject(msg);
     }
