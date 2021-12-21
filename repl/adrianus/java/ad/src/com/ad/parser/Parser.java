@@ -289,7 +289,8 @@ public class Parser {
 
     private AstNode parseListLiteral() {
         // TODO: implement this
-        return null;
+        AstListExpression expr = new AstListExpression(currentToken);
+        return expr;
     }
 
     private AstNode parseHashLiteral() {

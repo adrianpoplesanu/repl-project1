@@ -337,6 +337,11 @@ public class Evaluator {
 
 	private AdObject evalDefStatement(AstNode node, Environment env) {
     	AstDefStatement stmt = (AstDefStatement) node;
+    	ArrayList<AstNode> parameters = stmt.getParameters();
+    	AstNode body = stmt.getBody();
+    	AstIdentifier identifier = (AstIdentifier) stmt.getName();
+    	AdFunctionObject function = new AdFunctionObject(parameters, body, env);
+    	env.set(identifier.getValue(), function);
     	return null;
 	}
 
