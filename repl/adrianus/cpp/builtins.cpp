@@ -1,6 +1,7 @@
 #include "objects.h"
 #include "signal.h"
 #include "environment.h"
+#include <stdio.h>
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
@@ -81,15 +82,53 @@ Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return NULL;
 }
 
-Ad_Object* file_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* __iofile_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return NULL;
 }
 
 Ad_Object* system_builtin(std::vector<Ad_Object*> args, Environment* env) {
+    Ad_String_Object* command_argument = (Ad_String_Object*) args[0];
+    system(command_argument->value.c_str());
+    Ad_String_Object* obj = new Ad_String_Object("bla bla bli");
+    return obj;
+}
+
+Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    Ad_String_Object* command_argument = (Ad_String_Object*) args[0];
+    std::string result = "";
+
+    FILE *fpipe;
+    char *command = (char*) command_argument->value.c_str();
+    char c = 0;
+
+    if (0 == (fpipe = (FILE*)popen(command, "r"))) {
+        perror("popen() failed.");
+        exit(EXIT_FAILURE);
+    }
+
+    while (fread(&c, sizeof c, 1, fpipe)) {
+        //printf("%c", c);
+        result += c;
+    }
+
+    pclose(fpipe);
+    Ad_String_Object* obj = new Ad_String_Object(result);
+    return obj;
+}
+
+Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return NULL;
 }
 
-Ad_Object* socket_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* eval_builtin(std::vector<Ad_Object*> args, Environment* env) {
+    return NULL;
+}
+
+Ad_Object* first_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
+Ad_Object* input_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return NULL;
 }
 
@@ -106,9 +145,12 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"upper", new Ad_Builtin_Object(&upper_builtin)},
     {"lower", new Ad_Builtin_Object(&lower_builtin)},
     {"context", new Ad_Builtin_Object(&context_builtin)},
-    {"file", new Ad_Builtin_Object(&file_builtin)},
-    {"system", new Ad_Builtin_Object(&system_builtin)},
-    {"socket", new Ad_Builtin_Object(&socket_builtin)}
+    {"__iofile", new Ad_Builtin_Object(&__iofile_builtin)},
+    {"__syssystem", new Ad_Builtin_Object(&__syssystem_builtin)},
+    {"__iosocket", new Ad_Builtin_Object(&__iosocket_builtin)},
+    {"eval", new Ad_Builtin_Object(&eval_builtin)},
+    {"first", new Ad_Builtin_Object(&first_builtin)},
+    {"input", new Ad_Builtin_Object(&input_builtin)}
     // eval
     // first
     // input
