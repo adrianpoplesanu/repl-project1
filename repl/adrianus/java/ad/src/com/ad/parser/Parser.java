@@ -7,6 +7,7 @@ import com.ad.token.TokenTypeEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -288,9 +289,30 @@ public class Parser {
     }
 
     private AstNode parseListLiteral() {
-        // TODO: implement this
         AstListExpression expr = new AstListExpression(currentToken);
+        expr.setElements(parseListExpressions());
         return expr;
+    }
+
+    private List<AstNode> parseListExpressions() {
+        ArrayList<AstNode> elements = new ArrayList<>();
+        if (peekTokenIs(TokenTypeEnum.RBRACKET)) {
+            nextToken();
+            return elements;
+        }
+        nextToken();
+        AstNode element = parseExpression(PrecedenceTypeEnum.LOWEST);
+        elements.add(element);
+        while (peekTokenIs(TokenTypeEnum.COMMA)) {
+            nextToken();
+            nextToken();
+            element = parseExpression(PrecedenceTypeEnum.LOWEST);
+            elements.add(element);
+        }
+        if (!expectPeek(TokenTypeEnum.RBRACKET)) {
+            return new ArrayList<>();
+        }
+        return elements;
     }
 
     private AstNode parseHashLiteral() {

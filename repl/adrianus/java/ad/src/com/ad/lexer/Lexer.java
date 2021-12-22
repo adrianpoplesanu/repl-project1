@@ -82,6 +82,14 @@ public class Lexer {
 			token.setType(TokenTypeEnum.RBRACE);
 			token.setLiteral("}");
 		break;
+		case '[':
+			token.setType(TokenTypeEnum.LBRACKET);
+			token.setLiteral("[");
+		break;
+		case ']':
+			token.setType(TokenTypeEnum.RBRACKET);
+			token.setLiteral("]");
+		break;
 		case '"':
 			token.setType(TokenTypeEnum.STRING);
 			token.setLiteral(readString());
