@@ -377,11 +377,15 @@ class Evaluator(object):
         if node.name.type == StatementType.INDEX_EXPRESSION:
             self.eval_index_expression_assign(node, env)
         elif node.name.type == StatementType.MEMBER_ACCESS:
-            klass_instance = env.get(node.name.owner.value)
-            klass_member = node.name.member
-            klass_environment = klass_instance.instance_environment
-            obj = self.eval(node.value, env)
-            klass_environment.set(klass_member.value, obj)
+            if node.name.owner.type == StatementType.THIS_EXPRESSION:
+                print node.name.owner.type
+                print 'do specific this stuff'
+            else:
+                klass_instance = env.get(node.name.owner.value)
+                klass_member = node.name.member
+                klass_environment = klass_instance.instance_environment
+                obj = self.eval(node.value, env)
+                klass_environment.set(klass_member.value, obj)
         else:
             obj = self.eval(node.value, env)
             env.set(node.name.value, obj)
@@ -429,6 +433,10 @@ class Evaluator(object):
             # this needs re-written, looks crappy
             return evaluated
 
+        if node.owner.type == StatementType.THIS_EXPRESSION:
+            print 'do specific THIS stuff #2'
+            return None
+
         if node.is_method:
             klass_instance = env.get(node.owner.value)
             klass_method = klass_instance.instance_environment.get(node.member.value)
@@ -453,7 +461,7 @@ class Evaluator(object):
                 if 'r' in owner.operator:
                     return read_file_content(owner.filename)
             if method == 'write':
-                print 'util function for writing file content'
+                print 'TODO: util function for writing file content'
         else:
             return None
 
