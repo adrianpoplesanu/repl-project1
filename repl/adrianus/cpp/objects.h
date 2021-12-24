@@ -2,6 +2,7 @@
 #define __OBJECTS_H
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <map>
 #include <vector>
@@ -22,7 +23,9 @@ enum Ad_Object_Type {
 	OBJ_LIST,
 	OBJ_HASH,
 	OBJ_CLASS,
-	OBJ_INSTANCE
+	OBJ_INSTANCE,
+	OBJ_FILE,
+	OBJ_SOCKET
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
@@ -38,7 +41,9 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_LIST, "LIST"},
 	{OBJ_HASH, "HASH"},
 	{OBJ_CLASS, "CLASS"},
-	{OBJ_INSTANCE, "INSTANCE"}
+	{OBJ_INSTANCE, "INSTANCE"},
+	{OBJ_FILE, "FILE"},
+	{OBJ_SOCKET, "SOCKET"}
 };
 
 class Ad_Object {
@@ -226,6 +231,19 @@ public:
 	Ad_Class_Instance(Ad_Object*, Environment*);
 	Ad_Class_Instance(std::string, Ad_Object*, Environment*);
 	~Ad_Class_Instance();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
+};
+
+class Ad_File_Object : public Ad_Object {
+public:
+	std::string filename;
+	std::string _operator;
+	std::ifstream input_descriptor;
+	std::ofstream output_descriptor;
+
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
