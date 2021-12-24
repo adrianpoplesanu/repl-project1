@@ -1,0 +1,14 @@
+class Test {
+    a = 6
+
+    def b() {
+        print(a)
+    }
+
+    def c() {
+        this.b()
+    }
+}
+
+t = Test()
+t.c()
