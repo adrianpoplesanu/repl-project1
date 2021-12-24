@@ -32,7 +32,8 @@ enum StatementType {
     ST_PREFIX_INCREMENT,
     ST_POSTFIX_INCREMENT,
     ST_FOR_EXPRESSION,
-    ST_NULL_EXPRESSION
+    ST_NULL_EXPRESSION,
+    ST_THIS_EXPRESSION
 };
 
 std::map<StatementType, std::string> statement_type_map = {
@@ -62,7 +63,8 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_PREFIX_INCREMENT, "PrefixIncrement"},
     {ST_POSTFIX_INCREMENT, "PostfixIncrement"},
     {ST_FOR_EXPRESSION, "ForExpression"},
-    {ST_NULL_EXPRESSION, "NullExpression"}
+    {ST_NULL_EXPRESSION, "NullExpression"},
+    {ST_THIS_EXPRESSION, "ThisExpression"}
 };
 
 class Ad_AST_Node {
@@ -407,6 +409,15 @@ public:
     Ad_AST_Null_Expression();
     Ad_AST_Null_Expression(Token);
     ~Ad_AST_Null_Expression();
+};
+
+class Ad_AST_This_Expression : public Ad_AST_Node {
+public:
+    Token token;
+
+    Ad_AST_This_Expression();
+    Ad_AST_This_Expression(Token);
+    ~Ad_AST_This_Expression();
 };
 
 bool StatementIs(Ad_AST_Node *stmt, StatementType st) {

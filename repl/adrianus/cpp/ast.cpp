@@ -728,6 +728,21 @@ Ad_AST_Null_Expression::~Ad_AST_Null_Expression() {
     // nothing to do here, type and ref_count are deallocated automatically(because they are not pointers)
 }
 
+Ad_AST_This_Expression::Ad_AST_This_Expression() {
+    type = ST_THIS_EXPRESSION;
+    ref_count = 0;
+}
+
+Ad_AST_This_Expression::Ad_AST_This_Expression(Token t) {
+    type = ST_THIS_EXPRESSION;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_This_Expression::~Ad_AST_This_Expression() {
+    // nothing to do here, type and ref_count are deallocated automatically(because they are not pointers)
+}
+
 Ad_AST_PrefixIncrement::Ad_AST_PrefixIncrement() {
     type = ST_PREFIX_INCREMENT;
     ref_count = 0;
