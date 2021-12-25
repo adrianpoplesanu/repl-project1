@@ -683,6 +683,28 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) {
     // TODO: implement this
+    std::cout << "aaa\n";
+    Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
+    if (member_access->owner->type != ST_IDENTIFIER) {
+        return NULL;
+    }
+    Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
+    std::cout << owner_ident->value << "\n";
+    Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
+    std::cout << "bbb\n";
+    std::cout << object_type_map[owner_obj_raw->type] << "\n";
+    if (owner_obj_raw->type == OBJ_FILE) {
+        Ad_File_Object* owner = (Ad_File_Object*) owner_obj_raw;
+        std::string method_name = ((Ad_AST_Identifier*) member_access->member)->value;
+        std::cout << method_name << "\n";
+        if (method_name == "read") {
+            if (owner->_operator == "r") {
+                Ad_String_Object* result = new Ad_String_Object("file content here");
+                return result;
+            }
+        }
+    }
+    std::cout << "ccc\n";
     return NULL;
 }
 

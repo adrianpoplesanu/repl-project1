@@ -83,7 +83,10 @@ Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env) {
 }
 
 Ad_Object* __iofile_builtin(std::vector<Ad_Object*> args, Environment* env) {
-    return NULL;
+    Ad_String_Object* filename1 = (Ad_String_Object*) args[0];
+    Ad_String_Object* _operator1 = (Ad_String_Object*) args[1];
+    Ad_File_Object* obj = new Ad_File_Object(filename1->value, _operator1->value);
+    return obj;
 }
 
 Ad_Object* system_builtin(std::vector<Ad_Object*> args, Environment* env) {

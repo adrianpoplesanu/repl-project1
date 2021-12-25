@@ -508,6 +508,38 @@ std::string Ad_Class_Instance::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_File_Object::Ad_File_Object() {
+    type = OBJ_FILE;
+}
+
+Ad_File_Object::Ad_File_Object(std::string f, std::string o) {
+    type = OBJ_FILE;
+    filename = f;
+    _operator = o;
+}
+
+Ad_File_Object::~Ad_File_Object() {
+
+}
+
+std::string Ad_File_Object::Inspect() {
+    std::string out;
+    out = "File [" + filename + ", " + _operator + "]";
+    return out;
+}
+
+void Ad_File_Object::Print() {
+    std::cout << "todo: implement Print() in Ad_File_Object\n";
+}
+
+Ad_Object_Type Ad_File_Object::Type() {
+    return type;
+}
+
+std::string Ad_File_Object::Hash() {
+    return object_type_map[type] + Inspect();
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;

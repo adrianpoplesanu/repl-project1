@@ -244,6 +244,10 @@ public:
 	std::ifstream input_descriptor;
 	std::ofstream output_descriptor;
 
+
+	Ad_File_Object();
+	Ad_File_Object(std::string, std::string);
+	~Ad_File_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
