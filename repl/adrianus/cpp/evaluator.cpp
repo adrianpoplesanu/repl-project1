@@ -552,14 +552,17 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
         return EvalIndexExpressionAssign(node, env);
     } else if (assign_statement->name->type == ST_MEMBER_ACCESS) {
         if (((Ad_AST_MemberAccess*)(assign_statement->name))->owner->type == ST_THIS_EXPRESSION) {
-            std::cout << "this keyword encountered, do stuff\n";
+            Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
+            Ad_AST_Node* klass_member = member_access->member;
+            Ad_Object* obj = Eval(assign_statement->value, env);
+            env.Set(((Ad_AST_Identifier*)klass_member)->value, obj);
         } else {
             Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
             Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
             Ad_AST_Node* klass_member = member_access->member;
             Environment* klass_environment = klass_instance->instance_environment;
-            Ad_Object* obj = Eval(assign_statement->value, *klass_environment);
+            Ad_Object* obj = Eval(assign_statement->value, env);
             klass_environment->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
         }
     } else {
@@ -642,8 +645,17 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
     if (evaluated != NULL) return evaluated;
 
     if (member_access->owner->type == ST_THIS_EXPRESSION) {
-        std::cout << "this keyword encountered, do stuff #2\n";
-        return NULL;
+        if (member_access->is_method) {
+            Ad_Object* klass_method = env.Get(((Ad_AST_Identifier*)member_access->member)->value);
+            std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
+            if (args_objs.size() == 1 && IsError(args_objs[0])) {
+                return args_objs[0];
+            }
+            return ApplyMethod(klass_method, args_objs, env);
+        } else {
+            evaluated = Eval(member_access->member, env);
+        }
+        return evaluated;
     } else {
         if (member_access->is_method) {
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
