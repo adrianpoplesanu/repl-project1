@@ -510,10 +510,12 @@ std::string Ad_Class_Instance::Hash() {
 
 Ad_File_Object::Ad_File_Object() {
     type = OBJ_FILE;
+    ref_count = 0;
 }
 
 Ad_File_Object::Ad_File_Object(std::string f, std::string o) {
     type = OBJ_FILE;
+    ref_count = 0;
     filename = f;
     _operator = o;
 }

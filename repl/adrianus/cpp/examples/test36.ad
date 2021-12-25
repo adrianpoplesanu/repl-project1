@@ -1,0 +1,8 @@
+class Test {
+    def read() {
+        print("pisat")
+    }
+}
+
+t = Test()
+t.read()

@@ -250,6 +250,9 @@ Ad_Object* Evaluator::EvalStringInfixExpression(std::string _operator, Ad_Object
         Ad_String_Object* obj = new Ad_String_Object(left_val + right_val);
         return obj;
     }
+    if (_operator == "==") {
+        return NativeBoolToBooleanObject(left_val == right_val);
+    }
     return NULL;
 }
 
@@ -683,20 +686,15 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) {
     // TODO: implement this
-    std::cout << "aaa\n";
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
     if (member_access->owner->type != ST_IDENTIFIER) {
         return NULL;
     }
     Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
-    std::cout << owner_ident->value << "\n";
     Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
-    std::cout << "bbb\n";
-    std::cout << object_type_map[owner_obj_raw->type] << "\n";
     if (owner_obj_raw->type == OBJ_FILE) {
         Ad_File_Object* owner = (Ad_File_Object*) owner_obj_raw;
         std::string method_name = ((Ad_AST_Identifier*) member_access->member)->value;
-        std::cout << method_name << "\n";
         if (method_name == "read") {
             if (owner->_operator == "r") {
                 Ad_String_Object* result = new Ad_String_Object("file content here");
@@ -704,7 +702,6 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) 
             }
         }
     }
-    std::cout << "ccc\n";
     return NULL;
 }
 
@@ -719,7 +716,7 @@ Ad_Object* Evaluator::EvalPrefixExpression(Ad_AST_Node* node, Environment& env) 
         Ad_Integer_Object* result = new Ad_Integer_Object(value + 1);
         return result;
     }
-    return new Ad_Null_Object();
+    return &NULLOBJECT;
 }
 
 Ad_Object* Evaluator::EvalPostfixExpression(Ad_AST_Node* node, Environment& env) {
@@ -733,7 +730,7 @@ Ad_Object* Evaluator::EvalPostfixExpression(Ad_AST_Node* node, Environment& env)
         Ad_Integer_Object* result = new Ad_Integer_Object(value);
         return result;
     }
-    return new Ad_Null_Object();
+    return &NULLOBJECT;
 }
 
 Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
@@ -751,7 +748,7 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
 }
 
 Ad_Object* Evaluator::EvalNullExpression(Ad_AST_Node* node, Environment& env) {
-    return new Ad_Null_Object();
+    return &NULLOBJECT;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

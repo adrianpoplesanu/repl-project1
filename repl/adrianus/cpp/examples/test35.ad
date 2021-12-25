@@ -1,0 +1,14 @@
+class Test {
+    def test(x) {
+        if (x > 5) {
+            print("aaa");
+        } else {
+            print("bbb");
+        }
+    }
+}
+
+t = Test()
+t.test(8)
+t.test(2)
+t.test(6)
