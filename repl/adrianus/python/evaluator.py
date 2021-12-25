@@ -465,7 +465,7 @@ class Evaluator(object):
         return evaluated
 
     def eval_file_object_method(self, node, env):
-        if node.owner.type != ObjectType.FILE:
+        if node.owner.type != StatementType.IDENTIFIER:
             return None
         owner = env.get(node.owner.value)
         if owner.type == ObjectType.FILE:
