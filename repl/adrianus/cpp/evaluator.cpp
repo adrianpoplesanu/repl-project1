@@ -2,6 +2,7 @@
 #include "hashpair.cpp" // nu-mi place importul asta, as fi preferat sa import doar headerul
 #include "builtins.cpp"
 
+
 Ad_Null_Object NULLOBJECT;
 Ad_Boolean_Object TRUE(true);
 Ad_Boolean_Object FALSE(false);
@@ -697,7 +698,18 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) 
         std::string method_name = ((Ad_AST_Identifier*) member_access->member)->value;
         if (method_name == "read") {
             if (owner->_operator == "r") {
-                Ad_String_Object* result = new Ad_String_Object("file content here");
+                // TODO: this needs to be put in a utils file
+                std::ifstream in;
+                in.open(owner->filename);
+                std::string line, data = "";
+                bool first = true;
+                while(getline(in, line)) {
+                    if (!first) data += "\n";
+                    data += line;
+                    first = false;
+                }
+                in.close();
+                Ad_String_Object* result = new Ad_String_Object(data);
                 return result;
             }
         }
