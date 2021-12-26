@@ -2,6 +2,7 @@ import signal
 import sys
 
 from environment import new_environment
+from bootstrap import load_bootstrap
 
 def signal_ctrl_c_handler(sig, frame):
 	sys.exit(0)
@@ -17,6 +18,7 @@ class Repl(object):
 		signal.signal(signal.SIGINT, signal_ctrl_c_handler)
 		print ("Ad interpreter [Python]... v1.1")
 		env = new_environment()
+		load_bootstrap(self.program, self.parser, self.evaluator, env)
 		while True:
 			line = raw_input('>> ')
 			self.parser.reset(source=line)
@@ -27,10 +29,11 @@ class Repl(object):
 
 	def execute_file(self, source):
 		#print (source)
+		env = new_environment()
+		load_bootstrap(self.program, self.parser, self.evaluator, env)
 		self.parser.reset(source=source)
 		self.program.reset()
 		self.parser.build_program_statements(self.program)
-		env = new_environment()
 		self.evaluator.eval(self.program, env)
 		#self.program.debug()
 

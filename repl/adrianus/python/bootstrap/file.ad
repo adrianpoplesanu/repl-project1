@@ -19,7 +19,3 @@ class File {
         return file_object.write(text)
     }
 }
-
-file = File()
-file.init("README.md", "r")
-file.read()
