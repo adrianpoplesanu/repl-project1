@@ -4,6 +4,7 @@
 #include "parser.cpp"
 #include "evaluator.cpp"
 #include "environment.cpp"
+#include "bootstrap.cpp"
 
 Repl::Repl() {
 
@@ -14,6 +15,7 @@ Repl::~Repl() {
 }
 
 void Repl::Loop() {
+    //load_bootstrap();
     while (1) {
         std::string line;
         std::cout << ">> ";
@@ -34,7 +36,8 @@ void Repl::ExecuteFile(std::ifstream &target) {
             text += line + "\n";
         }
         parser.Load(text);
-        Ad_AST_Program program;
+        //Ad_AST_Program program;
+        program.reset();
         parser.ParseProgram(program);
         Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env); // TODO: asta cicleaza in momentul executiei fisierului la while
         // in python nu cicleaza pentru ca fac .read() care ia tot continutul fisierului o data, poate la fel ar trebui sa fac si aici
@@ -48,7 +51,8 @@ void Repl::ExecuteFile(std::ifstream &target) {
 
 bool Repl::ParseLine(std::string line) {
     parser.Load(line);
-    Ad_AST_Program program;
+    //Ad_AST_Program program;
+    program.reset();
     parser.ParseProgram(program);
 
     Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);

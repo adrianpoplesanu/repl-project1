@@ -13,6 +13,7 @@ public:
     Parser parser;
     Evaluator evaluator;
     Environment env;
+    Ad_AST_Program program;
 
     Repl();
     ~Repl();

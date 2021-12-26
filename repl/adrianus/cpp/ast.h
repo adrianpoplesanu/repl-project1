@@ -83,6 +83,7 @@ public:
     ~Ad_AST_Program();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
+    void reset();
 };
 
 class Ad_AST_Identifier : public Ad_AST_Node {

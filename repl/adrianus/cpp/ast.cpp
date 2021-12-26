@@ -36,6 +36,10 @@ std::string Ad_AST_Program::ToString() {
     return out;
 }
 
+void Ad_AST_Program::reset() {
+    statements.clear();
+}
+
 Ad_AST_LetStatement::Ad_AST_LetStatement() {
     type = ST_LET_STATEMENT;
     ref_count = 0;
