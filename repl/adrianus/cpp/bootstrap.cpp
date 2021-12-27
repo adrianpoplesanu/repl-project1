@@ -9,7 +9,13 @@ std::vector<std::string> bootstrap_files {
 };
 
 void add_bootstrap_code(Ad_AST_Program program, Parser parser, Evaluator evaluator, Environment& env, std::string source) {
-
+    parser.Load(source);
+    program.reset();
+    parser.ParseProgram(program);
+    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);
+    if (res && res->Type() == OBJ_SIGNAL) {
+        free_Ad_Object_memory(res);
+    }
 }
 
 void load_bootstrap(Ad_AST_Program program, Parser parser, Evaluator evaluator, Environment& env) {
