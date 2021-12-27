@@ -15,7 +15,7 @@ Repl::~Repl() {
 }
 
 void Repl::Loop() {
-    //load_bootstrap();
+    load_bootstrap(program, parser, evaluator, env);
     while (1) {
         std::string line;
         std::cout << ">> ";
@@ -29,6 +29,7 @@ void Repl::Loop() {
 }
 
 void Repl::ExecuteFile(std::ifstream &target) {
+    load_bootstrap(program, parser, evaluator, env);
     if (target.is_open()) {
         std::string line;
         std::string text;
@@ -36,7 +37,6 @@ void Repl::ExecuteFile(std::ifstream &target) {
             text += line + "\n";
         }
         parser.Load(text);
-        //Ad_AST_Program program;
         program.reset();
         parser.ParseProgram(program);
         Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env); // TODO: asta cicleaza in momentul executiei fisierului la while
@@ -51,7 +51,6 @@ void Repl::ExecuteFile(std::ifstream &target) {
 
 bool Repl::ParseLine(std::string line) {
     parser.Load(line);
-    //Ad_AST_Program program;
     program.reset();
     parser.ParseProgram(program);
 

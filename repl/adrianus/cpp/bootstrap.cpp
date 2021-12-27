@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 #include "bootstrap.h"
@@ -7,6 +8,21 @@ std::vector<std::string> bootstrap_files {
     "bootstrap/file.ad"
 };
 
+void add_bootstrap_code(Ad_AST_Program program, Parser parser, Evaluator evaluator, Environment& env, std::string source) {
+
+}
+
 void load_bootstrap(Ad_AST_Program program, Parser parser, Evaluator evaluator, Environment& env) {
-    //...
+    for (std::vector<std::string>::iterator it = bootstrap_files.begin() ; it != bootstrap_files.end(); ++it) {
+        std::ifstream in;
+        in.open(*it);
+        std::string content = "", line;
+        bool first = true;
+        while(getline(in, line)) {
+            if (!first) content += "\n";
+            content += line;
+            first = false;
+        }
+        add_bootstrap_code(program, parser, evaluator, env, content);
+    }
 }
