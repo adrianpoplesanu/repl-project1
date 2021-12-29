@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 
-enum ParseType {
+enum PrecedenceType {
     PT_LOWEST,
     PT_ASSIGN,
     PT_EQUALS,
@@ -22,7 +22,7 @@ enum ParseType {
     PT_MEMBERACCESS
 };
 
-std::map<TokenType, ParseType> precedences = {
+std::map<TokenType, PrecedenceType> precedences = {
     {TT_ASSIGN, PT_ASSIGN},
     {TT_EQ, PT_EQUALS},
     {TT_NOT_EQ, PT_EQUALS},
@@ -66,8 +66,8 @@ public:
     bool PeekTokenIs(TokenType);
     bool ExpectPeek(TokenType);
     void PeekError(std::string);
-    ParseType PeekPrecedence();
-    ParseType CurPrecedence();
+    PrecedenceType PeekPrecedence();
+    PrecedenceType CurPrecedence();
     Ad_AST_Node* ParseStatement();
     Ad_AST_Node* ParseLetStatement();
     Ad_AST_Node* ParseReturnStatement();
@@ -81,7 +81,7 @@ public:
     Ad_AST_Node* ParseIfExpression();
     Ad_AST_Node* ParseBlockStatement();
     Ad_AST_Node* ParseFunctionLiteral();
-    Ad_AST_Node* ParseExpression(ParseType);
+    Ad_AST_Node* ParseExpression(PrecedenceType);
     Ad_AST_Node* ParseInfixExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseCallExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseWhileExpression();

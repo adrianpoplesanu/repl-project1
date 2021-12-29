@@ -105,14 +105,14 @@ bool Parser::ExpectPeek(TokenType tt) {
     }
 }
 
-ParseType Parser::PeekPrecedence() {
+PrecedenceType Parser::PeekPrecedence() {
     if (precedences.find(peek_token.type) != precedences.end()) {
         return precedences[peek_token.type];
     }
     return PT_LOWEST;
 }
 
-ParseType Parser::CurPrecedence() {
+PrecedenceType Parser::CurPrecedence() {
     if (precedences.find(current_token.type) != precedences.end()) {
         return precedences[current_token.type];
     }
@@ -190,7 +190,7 @@ Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* left) {
     expr->token = current_token;
     expr->_operator = current_token.literal;
     expr->left = left;
-    ParseType preced = CurPrecedence();
+    PrecedenceType preced = CurPrecedence();
     NextToken();
     expr->right = ParseExpression(preced);
     return expr;
@@ -575,7 +575,7 @@ Ad_AST_Node* Parser::ParseThisExpression() {
     return expr;
 }
 
-Ad_AST_Node* Parser::ParseExpression(ParseType precedence) {
+Ad_AST_Node* Parser::ParseExpression(PrecedenceType precedence) {
     if (prefixParseFns.find(current_token.type) == prefixParseFns.end()) {
         return NULL;
     }
