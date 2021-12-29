@@ -47,5 +47,6 @@ public enum TokenTypeEnum {
 	THIS,
 	START_COMMENT,
 	END_COMMENT,
-	PLUSPLUS
+	PLUSPLUS,
+	NULL
 }

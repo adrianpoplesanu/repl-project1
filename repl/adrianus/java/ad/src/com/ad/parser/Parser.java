@@ -37,6 +37,10 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.LBRACKET, this::parseListLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACE, this::parseHashLiteral);
         prefixParseFns.put(TokenTypeEnum.STRING, this::parseStringLiteral);
+        prefixParseFns.put(TokenTypeEnum.CLASS, this::parseClassStatement);
+        prefixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePrefixPlusPlus);
+        prefixParseFns.put(TokenTypeEnum.NULL, this::parseNullExpression);
+        prefixParseFns.put(TokenTypeEnum.THIS, this::parseThisExpression);
         infixParseFns.put(TokenTypeEnum.PLUS, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.MINUS, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.ASTERISK, this::parseInfixExpression);
@@ -50,6 +54,8 @@ public class Parser {
         infixParseFns.put(TokenTypeEnum.LPAREN, this::parseCallExpression);
         infixParseFns.put(TokenTypeEnum.LBRACKET, this::parseIndexExpression);
         infixParseFns.put(TokenTypeEnum.ASSIGN, this::parseAssignExpression);
+        infixParseFns.put(TokenTypeEnum.DOT, this::parseMemberAccess);
+        infixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePostfixPlusPlus);
     }
 
     public void load(String s) {
@@ -386,6 +392,36 @@ public class Parser {
             nextToken();
         }
         return stmt;
+    }
+
+    private AstNode parseClassStatement() {
+        // TODO: implement this
+        return null;
+    }
+
+    private AstNode parsePrefixPlusPlus() {
+        // TODO: implement this
+        return null;
+    }
+
+    private AstNode parseNullExpression() {
+        // TODO: implement this
+        return null;
+    }
+
+    private AstNode parseThisExpression() {
+        // TODO: implement this
+        return null;
+    }
+
+    private AstNode parseMemberAccess(AstNode left) {
+        // TODO: implement this
+        return null;
+    }
+
+    private AstNode parsePostfixPlusPlus(AstNode left) {
+        // TODO: implement this
+        return null;
     }
 
     private AstNode parseExpression(PrecedenceTypeEnum pte) {

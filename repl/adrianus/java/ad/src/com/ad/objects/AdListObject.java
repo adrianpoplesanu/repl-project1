@@ -16,7 +16,15 @@ public class AdListObject extends AdObject {
 
     @Override
     public String inspect() {
-        return "[" + "]";
+        String out = "[";
+        boolean first = true;
+        for (AdObject obj : elements) {
+            if (!first) out += ", ";
+            out += obj.inspect();
+            first = false;
+        }
+        out += "]";
+        return out;
     }
 
     @Override
