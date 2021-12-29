@@ -374,8 +374,14 @@ public class Parser {
     }
 
     private AstNode parseIndexExpression(AstNode left) {
-        // TODO: implement this
-        return null;
+        AstIndexExpression expr = new AstIndexExpression(currentToken, left);
+        nextToken();
+        AstNode index = parseExpression(PrecedenceTypeEnum.LOWEST);
+        expr.setIndex(index);
+        if (!expectPeek(TokenTypeEnum.RBRACKET)) {
+            return null;
+        }
+        return expr;
     }
 
     private AstNode parseAssignExpression(AstNode left) {
