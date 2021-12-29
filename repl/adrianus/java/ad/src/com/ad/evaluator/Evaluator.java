@@ -51,6 +51,8 @@ public class Evaluator {
 			return evalAssignStatement(node, env);
 		case DEF_STATEMENT:
 			return evalDefStatement(node, env);
+		case LIST_EXPRESSION:
+			return evalListExpression(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node");
 			break;
@@ -342,6 +344,10 @@ public class Evaluator {
     	AstIdentifier identifier = (AstIdentifier) stmt.getName();
     	AdFunctionObject function = new AdFunctionObject(parameters, body, env);
     	env.set(identifier.getValue(), function);
+    	return null;
+	}
+
+	private AdObject evalListExpression(AstNode ndoe, Environment env) {
     	return null;
 	}
 
