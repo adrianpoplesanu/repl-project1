@@ -1,6 +1,7 @@
 package com.ad.evaluator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ad.ast.*;
 import com.ad.builtin.BuiltinLookup;
@@ -184,9 +185,13 @@ public class Evaluator {
     	String left_val = ((AdStringObject)left).getValue();
     	String right_val = ((AdStringObject)right).getValue();
     	switch(operator) {
-    	case "+":
-    		return new AdStringObject(left_val + right_val);
-    	}
+			case "+":
+				return new AdStringObject(left_val + right_val);
+			case "==":
+				return new AdBooleanObject(left_val.equals(right_val));
+			case "!=":
+				return new AdBooleanObject(!left_val.equals(right_val));
+		}
     	return null;
     }
 
@@ -270,11 +275,15 @@ public class Evaluator {
     	return applyFunction(function, arguments, env);
     }
 
-    private ArrayList<AdObject> evalExpressions(ArrayList<AstNode> arguments, Environment env) {
+    private ArrayList<AdObject> evalExpressions(List<AstNode> params, Environment env) {
     	ArrayList<AdObject> objects = new ArrayList<AdObject>();
-    	for (AstNode argument : arguments) {
-    		AdObject argumentObject = eval(argument, env);
-    		objects.add(argumentObject);
+    	for (AstNode param : params) {
+    		AdObject evaluated = eval(param, env);
+    		if (isError(evaluated)) {
+				ArrayList<AdObject> errorResponse = new ArrayList<>();
+				return errorResponse;
+			}
+    		objects.add(evaluated);
     	}
     	return objects;
     }
@@ -347,8 +356,12 @@ public class Evaluator {
     	return null;
 	}
 
-	private AdObject evalListExpression(AstNode ndoe, Environment env) {
-    	return null;
+	private AdObject evalListExpression(AstNode node, Environment env) {
+    	AstListExpression expr = (AstListExpression) node;
+    	List<AstNode> listElements = expr.getElements();
+    	AdListObject listObject = new AdListObject();
+    	listObject.setElements(evalExpressions(listElements, env));
+    	return listObject;
 	}
 
     private AdObject newError(String msg) {
