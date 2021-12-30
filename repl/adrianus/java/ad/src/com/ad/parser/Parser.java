@@ -322,8 +322,24 @@ public class Parser {
     }
 
     private AstNode parseHashLiteral() {
-        // TODO: implement this
-        return null;
+        AstHashExpression hash = new AstHashExpression(currentToken);
+        while(!peekTokenIs(TokenTypeEnum.RBRACE)) {
+            nextToken();
+            AstNode key = parseExpression(PrecedenceTypeEnum.LOWEST);
+            if (!expectPeek(TokenTypeEnum.COLON)) {
+                return null;
+            }
+            nextToken();
+            AstNode value = parseExpression(PrecedenceTypeEnum.LOWEST);
+            hash.AddPair(key, value);
+            if (!peekTokenIs(TokenTypeEnum.RBRACE) && !(expectPeek(TokenTypeEnum.COMMA))) {
+                return null;
+            }
+        }
+        if (!expectPeek(TokenTypeEnum.RBRACE)) {
+            return null;
+        }
+        return hash;
     }
 
     private AstNode parseStringLiteral() {

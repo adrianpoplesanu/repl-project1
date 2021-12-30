@@ -58,6 +58,8 @@ public class Evaluator {
 			return evalListExpression(node, env);
 		case INDEX_EXPRESSION:
 			return evalIndexExpression(node, env);
+		case HASH_EXPRESSION:
+			return evalHashExpression(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
@@ -422,6 +424,10 @@ public class Evaluator {
 		} else if (indexedObject.getType() == ObjectTypeEnum.HASH) {
 			// TODO: implement this
 		}
+    	return null;
+	}
+
+	private AdObject evalHashExpression(AstNode node, Environment env) {
     	return null;
 	}
 
