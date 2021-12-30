@@ -9,6 +9,8 @@ import com.ad.environment.Environment;
 import com.ad.environment.EnvironmentUtils;
 import com.ad.objects.*;
 
+import static com.ad.ast.AstNodeTypeConverter.astNodeTypeMap;
+
 public class Evaluator {
 	public static AdBooleanObject TrueObject = new AdBooleanObject(true);
 	public static AdBooleanObject FalseObject = new AdBooleanObject(false);
@@ -54,8 +56,10 @@ public class Evaluator {
 			return evalDefStatement(node, env);
 		case LIST_EXPRESSION:
 			return evalListExpression(node, env);
+		case INDEX_EXPRESSION:
+			return evalIndexExpression(node, env);
 		default:
-			System.out.println("Unknown evaluation for AST node");
+			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
     	}
     	return null;
@@ -362,6 +366,11 @@ public class Evaluator {
     	AdListObject listObject = new AdListObject();
     	listObject.setElements(evalExpressions(listElements, env));
     	return listObject;
+	}
+
+	private AdObject evalIndexExpression(AstNode node, Environment env) {
+    	// TODO: implement this
+    	return null;
 	}
 
     private AdObject newError(String msg) {

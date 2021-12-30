@@ -22,6 +22,7 @@ public class AstNodeTypeConverter {
 			put(AstNodeTypeEnum.WHILE_EXPRESSION, "WhileExpression");
 			put(AstNodeTypeEnum.ASSIGN_STATEMENT, "AssignStatement");
 			put(AstNodeTypeEnum.DEF_STATEMENT, "DefStatement");
+			put(AstNodeTypeEnum.INDEX_EXPRESSION, "IndexExpression");
 		}
 	};
 	
