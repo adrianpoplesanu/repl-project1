@@ -1,5 +1,26 @@
 package com.ad.objects;
 
-public class AdHashObject {
+import java.util.HashMap;
 
+public class AdHashObject extends AdObject {
+    private HashMap<String, AdObject> elements;
+
+    public AdHashObject() {
+        type = ObjectTypeEnum.HASH;
+    }
+
+    public AdHashObject(HashMap<String, AdObject> e) {
+        this();
+        elements = e;
+    }
+
+    @Override
+    public String inspect() {
+        return null;
+    }
+
+    @Override
+    public void print() {
+
+    }
 }
