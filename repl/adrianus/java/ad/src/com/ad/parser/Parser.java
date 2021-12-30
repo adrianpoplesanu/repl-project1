@@ -386,11 +386,7 @@ public class Parser {
 
     private AstNode parseAssignExpression(AstNode left) {
         AstAssignStatement stmt = new AstAssignStatement(currentToken);
-        if (left.getType() == AstNodeTypeEnum.IDENTIFIER) {
-            stmt.setName((AstIdentifier) left);
-        } else {
-            return null;
-        }
+        stmt.setName(left);
         nextToken();
         AstNode right = parseExpression(PrecedenceTypeEnum.LOWEST);
         stmt.setValue(right);

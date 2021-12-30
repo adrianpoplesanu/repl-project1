@@ -345,9 +345,41 @@ public class Evaluator {
 
 	private AdObject evalAssignStatement(AstNode node, Environment env) {
     	AstAssignStatement stmt = (AstAssignStatement) node;
-    	AdObject obj = eval(stmt.getValue(), env);
-    	env.set(stmt.getName().getValue(), obj);
+    	if (stmt.getName().getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
+			return evalIndexExpressionAssign(node, env);
+		} else if (stmt.getName().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+			evalMemberAccessIndexAssignment(node, env);
+		} else {
+			AdObject obj = eval(stmt.getValue(), env);
+			AstIdentifier ident = (AstIdentifier) stmt.getName();
+			env.set(ident.getValue(), obj);
+		}
     	return null;
+	}
+
+	private AdObject evalIndexExpressionAssign(AstNode node, Environment env) {
+    	AstAssignStatement stmt = (AstAssignStatement) node;
+    	AstIndexExpression indexExpr = (AstIndexExpression) stmt.getName();
+    	AstNode left = indexExpr.getLeft();
+    	AstNode index = indexExpr.getIndex();
+    	AdObject leftObj = eval(left, env);
+    	AdObject indexObj = eval(index, env);
+    	if (leftObj.getType() == ObjectTypeEnum.LIST) {
+    		if (indexObj.getType() == ObjectTypeEnum.INT) {
+    			int i = ((AdIntegerObject) indexObj).getValue();
+    			AdListObject target = (AdListObject) leftObj;
+    			AdObject newValue = eval(stmt.getValue(), env);
+    			target.getElements().set(i, newValue);
+			}
+		}
+    	if (leftObj.getType() == ObjectTypeEnum.HASH) {
+    		//...
+		}
+        return null;
+	}
+
+	private void evalMemberAccessIndexAssignment(AstNode node, Environment env) {
+
 	}
 
 	private AdObject evalDefStatement(AstNode node, Environment env) {
