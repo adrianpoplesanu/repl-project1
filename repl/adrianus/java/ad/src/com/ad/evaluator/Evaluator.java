@@ -369,7 +369,27 @@ public class Evaluator {
 	}
 
 	private AdObject evalIndexExpression(AstNode node, Environment env) {
-    	// TODO: implement this
+		AstIndexExpression expr = (AstIndexExpression) node;
+		AstIdentifier ident = (AstIdentifier) expr.getLeft();
+		AdObject indexedObject = env.get(ident.getValue());
+		if (indexedObject.getType() == ObjectTypeEnum.LIST) {
+			AdObject indexValue = eval(expr.getIndex(), env);
+			if (indexValue.getType() == ObjectTypeEnum.INT) {
+				List<AdObject> elements = ((AdListObject) indexedObject).getElements();
+				int i = ((AdIntegerObject) indexValue).getValue();
+				if (i < 0 || i >= elements.size()) {
+					// this should be an Error object
+					return NULLOBJECT;
+				}
+				return elements.get(i);
+			} else {
+				// this is a syntax error, only INTs can be indexes for LISTs
+				// this should be an Error object
+				return NULLOBJECT;
+			}
+		} else if (indexedObject.getType() == ObjectTypeEnum.HASH) {
+			// TODO: implement this
+		}
     	return null;
 	}
 

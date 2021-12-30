@@ -9,5 +9,6 @@ public enum ObjectTypeEnum {
     RETURN_VALUE,
     FUNCTION,
     BUILTIN,
-    LIST
+    LIST,
+    HASH
 }
