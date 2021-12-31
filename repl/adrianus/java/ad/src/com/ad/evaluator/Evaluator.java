@@ -433,7 +433,14 @@ public class Evaluator {
     	AstHashExpression expr = (AstHashExpression) node;
     	HashMap<String, HashPair<AdObject>> pairs = new HashMap<>();
 
-    	return null;
+    	expr.getPairs().entrySet().stream().forEach(e -> {
+    		AdObject key = eval(e.getKey(), env);
+    		AdObject value = eval(e.getValue(), env);
+    		pairs.put(key.hash(), new HashPair<>(key, value));
+		});
+
+    	AdHashObject obj = new AdHashObject(pairs);
+    	return obj;
 	}
 
     private AdObject newError(String msg) {

@@ -18,7 +18,7 @@ public class AdStringObject extends AdObject {
 
 	@Override
 	public String inspect() {
-		return value;
+		return "\"" + value + "\"";
 	}
 
 	@Override
