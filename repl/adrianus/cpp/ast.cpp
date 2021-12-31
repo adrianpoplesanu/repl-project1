@@ -37,6 +37,10 @@ std::string Ad_AST_Program::ToString() {
 }
 
 void Ad_AST_Program::reset() {
+    for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        free_Ad_AST_Node_memory(node);
+    }
     statements.clear();
 }
 
@@ -935,6 +939,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_POSTFIX_INCREMENT:
             delete (Ad_AST_PostfixIncrement*) node;
+        break;
+        case ST_NULL_EXPRESSION:
+            delete (Ad_AST_Null_Expression*) node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";
