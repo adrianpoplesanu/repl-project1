@@ -27,6 +27,11 @@ public class AdStringObject extends AdObject {
 		
 	}
 
+	@Override
+	public String hash() {
+		return ObjectTypeConverter.convertToString(type) + inspect();
+	}
+
 	public Token getToken() {
 		return token;
 	}

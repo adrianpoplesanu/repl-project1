@@ -24,6 +24,11 @@ public class AdBuiltinObject extends AdObject {
 		System.out.println("TODO: implement print() in AdBuiltinObject");
 	}
 
+	@Override
+	public String hash() {
+		return ObjectTypeConverter.convertToString(type) + inspect();
+	}
+
 	public BuiltinInterface getBuiltinFunction() {
 		return builtinFunction;
 	}

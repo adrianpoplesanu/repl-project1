@@ -1,12 +1,14 @@
 package com.ad.evaluator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.ad.ast.*;
 import com.ad.builtin.BuiltinLookup;
 import com.ad.environment.Environment;
 import com.ad.environment.EnvironmentUtils;
+import com.ad.hash.HashPair;
 import com.ad.objects.*;
 
 import static com.ad.ast.AstNodeTypeConverter.astNodeTypeMap;
@@ -428,6 +430,9 @@ public class Evaluator {
 	}
 
 	private AdObject evalHashExpression(AstNode node, Environment env) {
+    	AstHashExpression expr = (AstHashExpression) node;
+    	HashMap<String, HashPair<AdObject>> pairs = new HashMap<>();
+
     	return null;
 	}
 

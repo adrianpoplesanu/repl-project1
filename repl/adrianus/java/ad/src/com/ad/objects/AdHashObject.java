@@ -23,4 +23,9 @@ public class AdHashObject extends AdObject {
     public void print() {
 
     }
+
+    @Override
+    public String hash() {
+        return ObjectTypeConverter.convertToString(type) + inspect();
+    }
 }

@@ -22,6 +22,11 @@ public class AdIntegerObject extends AdObject {
 		System.out.println(value);
 	}
 
+	@Override
+	public String hash() {
+		return ObjectTypeConverter.convertToString(type) + inspect();
+	}
+
 	public int getValue() {
 		return value;
 	}
