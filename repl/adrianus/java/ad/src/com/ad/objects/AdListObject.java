@@ -32,6 +32,11 @@ public class AdListObject extends AdObject {
         System.out.println("TODO: implement print() in AdListObject");
     }
 
+    @Override
+    public String hash() {
+        return ObjectTypeConverter.convertToString(type) + inspect();
+    }
+
     public List<AdObject> getElements() {
         return elements;
     }

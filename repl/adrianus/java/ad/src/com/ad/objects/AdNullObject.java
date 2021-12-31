@@ -15,4 +15,9 @@ public class AdNullObject extends AdObject {
     public void print() {
         System.out.println("NullObject");
     }
+
+    @Override
+    public String hash() {
+        return ObjectTypeConverter.convertToString(type) + inspect();
+    }
 }

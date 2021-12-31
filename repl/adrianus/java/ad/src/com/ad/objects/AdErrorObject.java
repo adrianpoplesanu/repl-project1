@@ -18,6 +18,11 @@ public class AdErrorObject extends AdObject {
 		System.out.println("ERROR: " + msg);
 	}
 
+	@Override
+	public String hash() {
+		return ObjectTypeConverter.convertToString(type) + inspect();
+	}
+
 	public String getMsg() {
 		return msg;
 	}

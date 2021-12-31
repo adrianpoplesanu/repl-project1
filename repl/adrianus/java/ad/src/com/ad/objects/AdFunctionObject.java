@@ -27,6 +27,11 @@ public class AdFunctionObject extends AdObject {
 		System.out.println("Function object");
 	}
 
+	@Override
+	public String hash() {
+		return ObjectTypeConverter.convertToString(type) + inspect();
+	}
+
 	public AstNode getBlock() {
 		return block;
 	}

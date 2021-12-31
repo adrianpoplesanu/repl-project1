@@ -5,6 +5,7 @@ public abstract class AdObject {
 	
 	public abstract String inspect();
 	public abstract void print();
+	public abstract String hash();
 	
 	public ObjectTypeEnum getType() {
 		return type;

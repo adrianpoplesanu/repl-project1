@@ -18,6 +18,11 @@ public class AdBooleanObject extends AdObject {
 		System.out.println(value);
 	}
 
+	@Override
+	public String hash() {
+		return ObjectTypeConverter.convertToString(type) + inspect();
+	}
+
 	public boolean getValue() {
 		return value;
 	}

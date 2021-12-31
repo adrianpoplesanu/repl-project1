@@ -24,6 +24,12 @@ public class AdReturnValueObject extends AdObject {
 		
 	}
 
+	@Override
+	public String hash() {
+		// return object, among other i might say, should not be hashable
+		return null;
+	}
+
 	public AdObject getReturnValue() {
 		return returnValue;
 	}
