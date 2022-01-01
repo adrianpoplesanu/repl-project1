@@ -39,4 +39,12 @@ public class AdHashObject extends AdObject {
     public String hash() {
         return ObjectTypeConverter.convertToString(type) + inspect();
     }
+
+    public HashMap<String, HashPair<AdObject>> getElements() {
+        return elements;
+    }
+
+    public void setElements(HashMap<String, HashPair<AdObject>> elements) {
+        this.elements = elements;
+    }
 }

@@ -420,11 +420,13 @@ public class Evaluator {
 				return elements.get(i);
 			} else {
 				// this is a syntax error, only INTs can be indexes for LISTs
-				// this should be an Error object
+				// maybe this should be an Error object
 				return NULLOBJECT;
 			}
 		} else if (indexedObject.getType() == ObjectTypeEnum.HASH) {
-			// TODO: implement this
+			AdObject indexValue = eval(expr.getIndex(), env);
+			AdObject result = ((AdHashObject)indexedObject).getElements().get(indexValue.hash()).getValue();
+			return result;
 		}
     	return null;
 	}
