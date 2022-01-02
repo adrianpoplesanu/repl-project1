@@ -377,7 +377,8 @@ public class Evaluator {
 			}
 		}
     	if (leftObj.getType() == ObjectTypeEnum.HASH) {
-    		//...
+			AdObject newValue = eval(stmt.getValue(), env);
+			((AdHashObject) leftObj).getElements().put(indexObj.hash(), new HashPair(indexObj, newValue));
 		}
         return null;
 	}
