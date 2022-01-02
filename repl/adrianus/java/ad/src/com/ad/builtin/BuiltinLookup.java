@@ -19,9 +19,9 @@ public class BuiltinLookup {
 			put("lower", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
 			put("upper", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
 			put("context", new AdBuiltinObject(new ContextBuiltin()));
-			put("file", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
-			put("system", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
-			put("socket", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("__iofile", new AdBuiltinObject(new IOFileBuiltin())); // TODO: update this
+			put("__syssystem", new AdBuiltinObject(new SysSystemBuiltin())); // TODO: update this
+			put("__iosocket", new AdBuiltinObject(new IOSocketBuiltin())); // TODO: update this
 			put("eval", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("first", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("input", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
