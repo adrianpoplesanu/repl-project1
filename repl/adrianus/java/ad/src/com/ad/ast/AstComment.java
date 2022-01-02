@@ -1,13 +1,29 @@
 package com.ad.ast;
 
+import com.ad.token.Token;
+
 public class AstComment extends AstNode {
+    private Token token;
+
+    public AstComment() {
+        type = AstNodeTypeEnum.COMMENT;
+    }
+
     @Override
     public String tokenLiteral() {
-        return null;
+        return token.getLiteral();
     }
 
     @Override
     public String toString() {
-        return null;
+        return "AstComment";
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public void setToken(Token token) {
+        this.token = token;
     }
 }
