@@ -423,8 +423,8 @@ public class Parser {
     }
 
     private AstNode parseNullExpression() {
-        // TODO: implement this
-        return null;
+        AstNullExpression expr = new AstNullExpression(currentToken);
+        return expr;
     }
 
     private AstNode parseThisExpression() {

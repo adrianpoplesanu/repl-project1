@@ -62,6 +62,8 @@ public class Evaluator {
 			return evalIndexExpression(node, env);
 		case HASH_EXPRESSION:
 			return evalHashExpression(node, env);
+		case NULL_EXPRESSION:
+			return evalNullExpression(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
@@ -444,6 +446,10 @@ public class Evaluator {
 
     	AdHashObject obj = new AdHashObject(pairs);
     	return obj;
+	}
+
+	private AdObject evalNullExpression(AstNode node, Environment env) {
+    	return NULLOBJECT;
 	}
 
     private AdObject newError(String msg) {

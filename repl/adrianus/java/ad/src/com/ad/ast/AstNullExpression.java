@@ -9,6 +9,11 @@ public class AstNullExpression extends AstNode {
         type = AstNodeTypeEnum.NULL_EXPRESSION;
     }
 
+    public AstNullExpression(Token t) {
+        this();
+        token = t;
+    }
+
     @Override
     public String tokenLiteral() {
         return token.getLiteral();
