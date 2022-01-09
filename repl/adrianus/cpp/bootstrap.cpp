@@ -8,7 +8,7 @@ std::vector<std::string> bootstrap_files {
     "bootstrap/file.ad"
 };
 
-void add_bootstrap_code(Ad_AST_Program program, Parser parser, Evaluator evaluator, Environment& env, std::string source) {
+void add_bootstrap_code(Ad_AST_Program &program, Parser parser, Evaluator evaluator, Environment& env, std::string source) {
     parser.Load(source);
     program.reset();
     parser.ParseProgram(program);
@@ -18,7 +18,7 @@ void add_bootstrap_code(Ad_AST_Program program, Parser parser, Evaluator evaluat
     }
 }
 
-void load_bootstrap(Ad_AST_Program program, Parser parser, Evaluator evaluator, Environment& env) {
+void load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator evaluator, Environment& env) {
     for (std::vector<std::string>::iterator it = bootstrap_files.begin() ; it != bootstrap_files.end(); ++it) {
         std::ifstream in;
         in.open(*it);

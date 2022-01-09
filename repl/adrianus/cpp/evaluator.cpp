@@ -634,7 +634,7 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_Class* class_node = (Ad_AST_Class*) node;
-    Ad_Class_Object* klass_object = new Ad_Class_Object(class_node->name, class_node->methods, class_node->attributes);
+    Ad_Class_Object* klass_object = new Ad_Class_Object(class_node->name, class_node->methods, class_node->attributes, class_node);
     Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*)(class_node->name);
     std::string klass_name = klass_ident->value;
     env.Set(klass_name, klass_object);

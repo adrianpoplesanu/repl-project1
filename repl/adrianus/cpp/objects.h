@@ -207,6 +207,7 @@ public:
 
 class Ad_Class_Object : public Ad_Object {
 public:
+	Ad_AST_Node* class_ast_node;
 	Ad_AST_Node* name;
 	std::vector<Ad_AST_Node*> methods;
 	std::vector<Ad_AST_Node*> attributes;
@@ -214,6 +215,7 @@ public:
 	Ad_Class_Object();
 	Ad_Class_Object(std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>);
 	Ad_Class_Object(Ad_AST_Node*, std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>);
+	Ad_Class_Object(Ad_AST_Node*, std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>, Ad_AST_Node*);
 	~Ad_Class_Object();
 	virtual std::string Inspect();
 	virtual void Print();

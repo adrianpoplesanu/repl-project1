@@ -433,7 +433,31 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
     }
 }
 
+Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*>a, Ad_AST_Node* c) {
+    type = OBJ_CLASS;
+    ref_count = 0;
+    class_ast_node = c;
+    Ad_INCREF(class_ast_node);
+
+    name = n;
+    Ad_INCREF(name);
+    methods = m;
+    for (std::vector<Ad_AST_Node*>::iterator it = methods.begin(); it != methods.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_INCREF(node);
+    }
+    attributes = a;
+    for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_INCREF(node);
+    }
+}
+
 Ad_Class_Object::~Ad_Class_Object() {
+    Ad_DECREF(class_ast_node);
+    free_Ad_AST_Node_memory(class_ast_node);
+
+    // if i deallocate the ast node that references all the methods and attributes ast, do i really need to try and manually free them again?
     for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
         Ad_AST_Node *node = *it;
         Ad_DECREF(node); // asta merge si e super cool
@@ -454,6 +478,8 @@ std::string Ad_Class_Object::Inspect() {
 
 void Ad_Class_Object::Print() {
     std::cout << "ClassObject\n";
+    //std::cout << methods.size();
+    //std::cout << attributes.size();
 }
 
 Ad_Object_Type Ad_Class_Object::Type() {

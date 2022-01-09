@@ -1,0 +1,13 @@
+class Test {
+    def init() {
+        this.a = 7
+    }
+
+    def b() {
+        print(this.a);
+    }
+}
+
+t = Test()
+t.init()
+t.b()

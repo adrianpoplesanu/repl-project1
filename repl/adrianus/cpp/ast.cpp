@@ -653,6 +653,7 @@ Ad_AST_Class::Ad_AST_Class(Token t) {
 }
 
 Ad_AST_Class::~Ad_AST_Class() {
+    // Class objects need a reference to this AST node that they will deallocate on object destruction
     if (name) {
         Ad_DECREF(name);
         free_Ad_AST_Node_memory(name);

@@ -1,0 +1,4 @@
+class T { def a() { print "ingerul pazitor"; } }
+
+t = T()
+t.a()
