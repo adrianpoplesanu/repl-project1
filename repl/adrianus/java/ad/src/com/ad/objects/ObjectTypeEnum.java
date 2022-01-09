@@ -10,5 +10,9 @@ public enum ObjectTypeEnum {
     FUNCTION,
     BUILTIN,
     LIST,
-    HASH
+    HASH,
+    CLASS,
+    INSTANCE,
+    FILE,
+    SOCKET
 }

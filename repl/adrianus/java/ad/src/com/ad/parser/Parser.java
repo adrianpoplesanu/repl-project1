@@ -414,6 +414,7 @@ public class Parser {
 
     private AstNode parseClassStatement() {
         // TODO: implement this
+        AstClassStatement stmt = new AstClassStatement(currentToken);
         return null;
     }
 
@@ -423,8 +424,8 @@ public class Parser {
     }
 
     private AstNode parseNullExpression() {
-        // TODO: implement this
-        return null;
+        AstNullExpression expr = new AstNullExpression(currentToken);
+        return expr;
     }
 
     private AstNode parseThisExpression() {

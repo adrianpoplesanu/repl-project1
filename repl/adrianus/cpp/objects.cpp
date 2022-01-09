@@ -605,6 +605,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             case OBJ_INSTANCE:
                 delete (Ad_Class_Instance*) obj;
             break;
+            case OBJ_FILE:
+                delete (Ad_File_Object*) obj;
+            break;
             default:
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
             break;
@@ -646,10 +649,13 @@ void print_Ad_Object(Ad_Object* obj) {
             std::cout << "signal object\n";
         break;
         case OBJ_CLASS:
-            std::cout << "class object";
+            std::cout << "class object\n";
         break;
         case OBJ_INSTANCE:
-            std::cout << "class instance";
+            std::cout << "class instance\n";
+        break;
+        case OBJ_FILE:
+            std::cout << "file object\n";
         break;
         default:
             std::cout << "no print implmentation for this object type";

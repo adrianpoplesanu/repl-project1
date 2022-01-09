@@ -53,6 +53,7 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.START_COMMENT, "START_COMMENT");
 			put(TokenTypeEnum.END_COMMENT, "END_COMMENT");
 			put(TokenTypeEnum.PLUSPLUS, "INCREMENT_OPERATOR");
+			put(TokenTypeEnum.NULL, "NULL");
 		}
 	};
 	
