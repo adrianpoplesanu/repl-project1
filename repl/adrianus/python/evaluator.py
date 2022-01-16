@@ -7,7 +7,7 @@ from ast import StatementType
 from environment import new_environment, new_enclosed_environment
 from builtins import builtins_map
 from utils import print_ast_nodes
-from handlers.file import read_file_content
+from handlers.file import read_file_content, write_file_content, append_file_content
 
 NULLOBJECT = Ad_Null_Object()
 TRUE = Ad_Boolean_Object(value=True)
@@ -292,8 +292,20 @@ class Evaluator(object):
                 func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
                 klass_instance.instance_environment.set(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
+            self.call_instance_constructor(klass_instance, args_objs, env)
             return klass_instance
         return None
+
+    def call_instance_constructor(self, klass_instance, args_objs, env):
+        klass_method = klass_instance.instance_environment.get("constructor")
+        if klass_method:
+            if len(args_objs) == 1 and self.is_error(args_objs[0]):
+                return args_objs[0]
+            klass_environment = klass_instance.instance_environment
+            klass_environment.outer = env
+            return self.apply_method(klass_method, args_objs, klass_environment)
+        else:
+            return None
 
     def apply_method(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:

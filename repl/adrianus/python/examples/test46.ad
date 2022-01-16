@@ -1,0 +1,14 @@
+class Test {
+    a = 5
+
+    def constructor(m_a) {
+        a = m_a
+    }
+
+    def show() {
+        print(this.a)
+    }
+}
+
+t = Test(12)
+t.show()
