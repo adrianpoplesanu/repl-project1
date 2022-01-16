@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "ast.h"
 
 #define padding 2
@@ -163,4 +164,18 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             std::cout << "->ForExpression" << "\n";
         break;
     }
+}
+
+std::string read_file_content(std::string filename) {
+    std::ifstream in;
+    in.open(filename);
+    std::string line, data = "";
+    bool first = true;
+    while(getline(in, line)) {
+        if (!first) data += "\n";
+        data += line;
+        first = false;
+    }
+    in.close();
+    return data;
 }

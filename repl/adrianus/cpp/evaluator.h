@@ -24,6 +24,7 @@ public:
     Ad_Object* NativeBoolToBooleanObject(bool);
     std::vector<Ad_Object*> EvalExpressions(std::vector<Ad_AST_Node*>, Environment&);
     Ad_Object* ApplyFunction(Ad_Object*, std::vector<Ad_Object*>, Environment&);
+    Ad_Object* CallInstanceConstructor(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     Environment ExtendFunctionEnv(Ad_Object*, std::vector<Ad_Object*>);
     Ad_Object* UnwrapReturnValue(Ad_Object*);
     Ad_Object* EvalWhileExpression(Ad_AST_Node*, Environment&);

@@ -1,4 +1,5 @@
 #include "evaluator.h"
+#include "utils.h"
 #include "hashpair.cpp" // nu-mi place importul asta, as fi preferat sa import doar headerul
 #include "builtins.cpp"
 
@@ -396,7 +397,22 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             //std::cout << def_ident->value << "\n";
             klass_instance->instance_environment->Set(def_ident->value, method_obj);
         }
+        CallInstanceConstructor(klass_instance, args, env);
         return klass_instance;
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::vector<Ad_Object*> args, Environment &env) {
+    Environment* instance_environment = ((Ad_Class_Instance*) klass_instance)->instance_environment;
+    Ad_Object* klass_method = instance_environment->Get("constructor");
+    if (klass_method != NULL) {
+        // a method named constructor was found, calling it
+        if (args.size() == 1 && IsError(args[0])) {
+            return args[0];
+        }
+        instance_environment->outer = &env;
+        return ApplyMethod(klass_method, args, *instance_environment);
     }
     return NULL;
 }
@@ -698,17 +714,7 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) 
         std::string method_name = ((Ad_AST_Identifier*) member_access->member)->value;
         if (method_name == "read") {
             if (owner->_operator == "r") {
-                // TODO: this needs to be put in a utils file
-                std::ifstream in;
-                in.open(owner->filename);
-                std::string line, data = "";
-                bool first = true;
-                while(getline(in, line)) {
-                    if (!first) data += "\n";
-                    data += line;
-                    first = false;
-                }
-                in.close();
+                std::string data = read_file_content(owner->filename);
                 Ad_String_Object* result = new Ad_String_Object(data);
                 return result;
             }
