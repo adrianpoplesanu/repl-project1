@@ -413,9 +413,23 @@ public class Parser {
     }
 
     private AstNode parseClassStatement() {
-        // TODO: implement this
-        AstClassStatement stmt = new AstClassStatement(currentToken);
-        return stmt;
+        AstClassStatement expr = new AstClassStatement(currentToken);
+        nextToken();
+        AstNode name = parseIdentifier();
+        expr.setName(name);
+        nextToken();
+        while(!currentTokenIs(TokenTypeEnum.RBRACE)) {
+            if (currentTokenIs(TokenTypeEnum.DEF)) {
+                AstNode stmt = parseDefStatement();
+                expr.getMethods().add(stmt);
+            }
+            if (currentTokenIs(TokenTypeEnum.IDENT)) {
+                AstNode stmt = parseExpressionStatement();
+                expr.getAttributes().add(stmt);
+            }
+            nextToken();
+        }
+        return expr;
     }
 
     private AstNode parsePrefixPlusPlus() {

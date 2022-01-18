@@ -2,6 +2,7 @@ package com.ad.ast;
 
 import com.ad.token.Token;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AstClassStatement extends AstNode {
@@ -17,6 +18,8 @@ public class AstClassStatement extends AstNode {
     public AstClassStatement(Token t) {
         this();
         token = t;
+        methods = new ArrayList<>();
+        attributes = new ArrayList<>();
     }
 
     public AstClassStatement(Token t, AstNode n) {
