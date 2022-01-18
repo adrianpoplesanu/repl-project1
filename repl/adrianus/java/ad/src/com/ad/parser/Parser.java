@@ -415,7 +415,7 @@ public class Parser {
     private AstNode parseClassStatement() {
         // TODO: implement this
         AstClassStatement stmt = new AstClassStatement(currentToken);
-        return null;
+        return stmt;
     }
 
     private AstNode parsePrefixPlusPlus() {
