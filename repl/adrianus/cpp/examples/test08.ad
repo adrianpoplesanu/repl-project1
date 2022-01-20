@@ -12,7 +12,7 @@ class Server {
     }
 }
 
-server = Server()
+server = Server(1)
 
 context()
 /* server.port */

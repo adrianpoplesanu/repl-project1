@@ -157,9 +157,12 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         result = Eval(obj, env);
         if (result != NULL) {
             //result->Print();
-            std::cout << result->Inspect();
-            std::cout << "\n";
-            //std::cout << "object to be deleted: " << result->type << "\n";
+            if (result->Type() != OBJ_SIGNAL) {
+                // no need to print signal objects
+                std::cout << result->Inspect();
+                std::cout << "\n";
+                //std::cout << "object to be deleted: " << result->type << "\n";
+            }
         }
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         if (result != NULL && result->ref_count <= 0) free_Ad_Object_memory(result);
