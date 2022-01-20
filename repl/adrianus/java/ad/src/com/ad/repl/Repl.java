@@ -10,7 +10,6 @@ import com.ad.parser.Parser;
 
 public class Repl {
 	private Scanner scanner = new Scanner(System.in);
-	//private Parser parser;
 	private Parser parser;
 	private AstProgram program;
 	private Evaluator evaluator;
