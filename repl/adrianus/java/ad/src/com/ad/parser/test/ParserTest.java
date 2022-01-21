@@ -3,7 +3,6 @@ package com.ad.parser.test;
 import com.ad.ast.AstNodeUtils;
 import com.ad.ast.AstProgram;
 import com.ad.parser.Parser;
-import com.ad.parser.ParserOLD;
 
 public class ParserTest {
 	public static final boolean RUN_TESTS = false;
