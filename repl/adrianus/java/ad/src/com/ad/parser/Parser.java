@@ -20,7 +20,6 @@ public class Parser {
     private HashMap<TokenTypeEnum, Function<AstNode, AstNode>> infixParseFns = new HashMap<>();
 
     public Parser() {
-        System.out.println("using Parser v2, this prompt will display for a few iterations");
         lexer = new Lexer();
         prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier);
         prefixParseFns.put(TokenTypeEnum.INT, this::parseIntegerLiteral);

@@ -311,6 +311,39 @@ public class Evaluator {
     		AdBuiltinObject builtin = (AdBuiltinObject) function;
     		return builtin.getBuiltinFunction().call(arguments, env);
     	}
+		if (function.getType() == ObjectTypeEnum.CLASS) {
+			// this will return a class instance object
+			Environment instanceEnv = EnvironmentUtils.newEnvironment();
+			AdClassObject adClassObject = (AdClassObject) function;
+			String name = ((AstIdentifier) adClassObject.getName()).getValue();
+			AdClassInstance adClassInstance = new AdClassInstance(name, adClassObject, instanceEnv);
+			adClassObject.getAttributes().stream().forEach(attribute -> {
+				if (attribute.getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
+					adClassInstance.getEnvironment().setOuter(env);
+					AdObject evaluated = eval(((AstAssignStatement) attribute).getValue(), adClassInstance.getEnvironment());
+					String attributeName = ((AstIdentifier)((AstAssignStatement) attribute).getName()).getValue();
+					adClassInstance.getEnvironment().set(attributeName, evaluated);
+				}
+				if (attribute.getType() == AstNodeTypeEnum.EXPRESSION_STATEMENT) {
+					AstExpressionStatement astExpressionStatement = (AstExpressionStatement) attribute;
+					if (astExpressionStatement.getExpression().getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
+						adClassInstance.getEnvironment().setOuter(env);
+						AstAssignStatement astAssignStatement = (AstAssignStatement) astExpressionStatement.getExpression();
+						AdObject evaluated = eval(astAssignStatement.getValue(), adClassInstance.getEnvironment());
+						String attributeName = ((AstIdentifier)astAssignStatement.getName()).getValue();
+						adClassInstance.getEnvironment().set(attributeName, evaluated);
+					}
+				}
+			});
+			adClassObject.getMethods().stream().forEach(method -> {
+				AstDefStatement astDefStatement = (AstDefStatement) method;
+				AdFunctionObject adFunctionObject = new AdFunctionObject(astDefStatement.getParameters(), astDefStatement.getBody(), adClassInstance.getEnvironment());
+				AstIdentifier astIdentifier = (AstIdentifier) astDefStatement.getName();
+				adClassInstance.getEnvironment().set(astIdentifier.getValue(), adFunctionObject);
+			});
+			// call class instance constructor here
+			return adClassInstance;
+		}
     	return null;
     }
 

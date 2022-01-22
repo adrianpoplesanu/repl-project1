@@ -27,7 +27,7 @@ public class Ad {
 			Repl repl = new Repl(parser, program, evaluator);
 			repl.executeSource(source);
 		} else {
-			System.out.println("Ad interpreter [JAVA]... v1.0");
+			System.out.println("Ad interpreter [JAVA]... v1.2");
 			
 	        ParserTest.testParser();
 	

@@ -53,4 +53,12 @@ public class Environment {
 		out += "}";
 		return out;
 	}
+
+	public Environment getOuter() {
+		return outer;
+	}
+
+	public void setOuter(Environment outer) {
+		this.outer = outer;
+	}
 }

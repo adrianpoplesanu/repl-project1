@@ -98,6 +98,10 @@ public class Lexer {
 			token.setType(TokenTypeEnum.COLON);
 			token.setLiteral(":");
 			break;
+		case '.':
+			token.setType(TokenTypeEnum.DOT);
+			token.setLiteral(".");
+			break;
 		case '<':
 			if (peekChar() == '=') {
 				token.setType(TokenTypeEnum.LTE);
