@@ -312,7 +312,6 @@ public class Evaluator {
     		return builtin.getBuiltinFunction().call(arguments, env);
     	}
 		if (function.getType() == ObjectTypeEnum.CLASS) {
-			// this will return a class instance object
 			Environment instanceEnv = EnvironmentUtils.newEnvironment();
 			AdClassObject adClassObject = (AdClassObject) function;
 			String name = ((AstIdentifier) adClassObject.getName()).getValue();

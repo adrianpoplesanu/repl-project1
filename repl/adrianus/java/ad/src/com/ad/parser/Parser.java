@@ -447,8 +447,19 @@ public class Parser {
     }
 
     private AstNode parseMemberAccess(AstNode left) {
-        // TODO: implement this
-        return null;
+        AstMemberAccess astMemberAccess = new AstMemberAccess(currentToken);
+        nextToken();
+        AstIdentifier right = new AstIdentifier(currentToken, currentToken.getLiteral());
+        astMemberAccess.setOwner(left);
+        astMemberAccess.setMember(right);
+        if (peekTokenIs(TokenTypeEnum.LPAREN)) {
+            astMemberAccess.setIsMethod(true);
+            astMemberAccess.setArguments(parseCallArguments());
+        } else {
+            astMemberAccess.setIsMethod(false);
+            astMemberAccess.clear();
+        }
+        return astMemberAccess;
     }
 
     private AstNode parsePostfixPlusPlus(AstNode left) {

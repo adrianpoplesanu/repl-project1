@@ -23,9 +23,10 @@ public class AstNodeTypeConverter {
 			put(AstNodeTypeEnum.ASSIGN_STATEMENT, "AssignStatement");
 			put(AstNodeTypeEnum.DEF_STATEMENT, "DefStatement");
 			put(AstNodeTypeEnum.INDEX_EXPRESSION, "IndexExpression");
-			put(AstNodeTypeEnum.HASH_EXPRESSION, "HashExpession");
+			put(AstNodeTypeEnum.HASH_EXPRESSION, "HashExpression");
 			put(AstNodeTypeEnum.NULL_EXPRESSION, "NullExpression");
 			put(AstNodeTypeEnum.CLASS_STATEMENT, "ClassStatement");
+			put(AstNodeTypeEnum.MEMBER_ACCESS, "MemberAccess");
 		}
 	};
 	

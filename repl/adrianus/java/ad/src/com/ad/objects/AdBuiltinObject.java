@@ -16,7 +16,7 @@ public class AdBuiltinObject extends AdObject {
 	
 	@Override
 	public String inspect() {
-		return "<funtion at memory address: " + Integer.toHexString(this.hashCode()) + ">";
+		return "<funtion at memory address: 0x" + Integer.toHexString(this.hashCode()) + ">";
 	}
 
 	@Override

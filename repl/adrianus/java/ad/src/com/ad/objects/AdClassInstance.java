@@ -20,12 +20,12 @@ public class AdClassInstance extends AdObject {
 
     @Override
     public String inspect() {
-        return "class instance at 0x0 :)";
+        return "<class instance at memory address: 0x" + Integer.toHexString(this.hashCode()) + ">";
     }
 
     @Override
     public void print() {
-        System.out.println("TODO: implement this method");
+        System.out.println("ClassInstance object");
     }
 
     @Override
