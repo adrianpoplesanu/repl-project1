@@ -66,6 +66,8 @@ public class Evaluator {
 			return evalNullExpression(node, env);
 		case CLASS_STATEMENT:
 			return evalClassStatement(node, env);
+		case MEMBER_ACCESS:
+			return evalMemberAccess(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
@@ -494,6 +496,11 @@ public class Evaluator {
 		obj.setAttributes(stmt.getAttributes());
 		obj.setMethods(stmt.getMethods());
 		env.set(((AstIdentifier)stmt.getName()).getValue(), obj);
+		return null;
+	}
+
+	private AdObject evalMemberAccess(AstNode node, Environment env) {
+		// TODO: implement this
 		return null;
 	}
 
