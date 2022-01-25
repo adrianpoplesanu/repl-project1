@@ -161,6 +161,9 @@ public class Evaluator {
     	if (left.getType() == ObjectTypeEnum.INT && right.getType() == ObjectTypeEnum.INT) {
     		return evalIntegerInfixExpression(operator, left, right);
     	}
+    	if (left.getType() == ObjectTypeEnum.BOOLEAN && right.getType() == ObjectTypeEnum.BOOLEAN) {
+    		return evalBooleanInfixExpression(operator, left, right);
+		}
     	if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.STRING) {
     		return evalStringInfixExpression(operator, left, right);
     	}
@@ -194,6 +197,18 @@ public class Evaluator {
     	}
     	return null;
     }
+
+    private AdObject evalBooleanInfixExpression(String operator, AdObject left, AdObject right) {
+    	boolean left_val = ((AdBooleanObject) left).getValue();
+		boolean right_val = ((AdBooleanObject) left).getValue();
+		switch (operator) {
+			case "==":
+				return nativeBoolToBoolean(left_val == right_val);
+			case "!=":
+				return nativeBoolToBoolean(left_val != right_val);
+		}
+		return null;
+	}
 
     private AdObject evalStringInfixExpression(String operator, AdObject left, AdObject right) {
     	String left_val = ((AdStringObject)left).getValue();

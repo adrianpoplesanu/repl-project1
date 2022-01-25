@@ -1,0 +1,9 @@
+class Test {
+    a = 5
+    def b() {
+        print (a)
+    }
+}
+
+t = Test()
+context()
