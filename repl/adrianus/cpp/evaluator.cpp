@@ -195,6 +195,9 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
     if (left->Type() == OBJ_INT && right->Type() == OBJ_INT) {
         return EvalIntegerInfixExpression(_operator, left, right);
     }
+    if (left->Type() == OBJ_BOOL && right->Type() == OBJ_BOOL) {
+        return EvalBooleanInfixExpression(_operator, left, right);
+    }
     if (left->Type() == OBJ_STRING && right->Type() == OBJ_STRING) {
         return EvalStringInfixExpression(_operator, left, right);
     }
@@ -245,6 +248,18 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
         return NativeBoolToBooleanObject(left_val != right_val);
     }
     //return &NULLOBJECT;
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalBooleanInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    bool left_val = ((Ad_Boolean_Object*)left)->value;
+    bool right_val = ((Ad_Boolean_Object*)right)->value;
+    if (_operator == "==") {
+        return NativeBoolToBooleanObject(left_val == right_val);
+    }
+    if (_operator == "!=") {
+        return NativeBoolToBooleanObject(left_val != right_val);
+    }
     return NULL;
 }
 

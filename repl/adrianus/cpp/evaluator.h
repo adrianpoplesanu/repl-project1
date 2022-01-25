@@ -11,6 +11,7 @@ public:
     Ad_Object* EvalProgram(Ad_AST_Node*, Environment&);
     Ad_Object* EvalInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalIntegerInfixExpression(std::string, Ad_Object*, Ad_Object*);
+    Ad_Object* EvalBooleanInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalPrefixExpression(std::string, Ad_Object*);
     Ad_Object* NewError(std::string);
     Ad_Object* EvalBangOperatorExpression(Ad_Object*);
