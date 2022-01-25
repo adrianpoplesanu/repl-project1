@@ -200,7 +200,7 @@ public class Evaluator {
 
     private AdObject evalBooleanInfixExpression(String operator, AdObject left, AdObject right) {
     	boolean left_val = ((AdBooleanObject) left).getValue();
-		boolean right_val = ((AdBooleanObject) left).getValue();
+		boolean right_val = ((AdBooleanObject) right).getValue();
 		switch (operator) {
 			case "==":
 				return nativeBoolToBoolean(left_val == right_val);
@@ -394,7 +394,8 @@ public class Evaluator {
     		// TODO: treat the error, possibly return an AdError object
 		}
     	while (isTruthy(condition)) {
-    		eval(expr.getBody(), env);
+    		AdObject result = eval(expr.getBody(), env);
+    		if (result != null && result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
     		condition = eval(expr.getCondition(), env);
 		}
     	return null;
