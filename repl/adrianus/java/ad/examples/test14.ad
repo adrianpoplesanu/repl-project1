@@ -16,8 +16,7 @@ def back(k) {
         v = 0
         while(v < 3) {
             sol[k] = v
-            valid = check_sol(k)
-            if (valid == true) {
+            if (check_sol(k)) {
                 back(k + 1)
             }
             v = v + 1
