@@ -17,6 +17,11 @@ public class TokenKeywordConverter {
 		    put("def", TokenTypeEnum.DEF);
 		    put("null", TokenTypeEnum.NULL);
 		    put("class", TokenTypeEnum.CLASS);
+		    put("this", TokenTypeEnum.THIS);
+		    put("and", TokenTypeEnum.AND);
+			put("or", TokenTypeEnum.OR);
+			put("for", TokenTypeEnum.FOR);
+			put("break", TokenTypeEnum.BREAK);
 	    }
 	};
 	

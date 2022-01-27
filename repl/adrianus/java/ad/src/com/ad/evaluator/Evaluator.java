@@ -516,7 +516,7 @@ public class Evaluator {
 	}
 
 	private AdObject evalMemberAccess(AstNode node, Environment env) {
-		// TODO: implement this
+		AstMemberAccess stmt = (AstMemberAccess) node;
 		return null;
 	}
 
