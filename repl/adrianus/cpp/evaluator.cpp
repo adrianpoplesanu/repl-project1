@@ -712,8 +712,11 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
             Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
             Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
             Environment* klass_environment = klass_instance->instance_environment;
-            klass_environment->outer = &env;
+            //klass_environment->outer = &env;
+            Environment* old = klass_environment->outer;
+            klass_environment->outer = NULL;
             Ad_Object* result = Eval(member, *klass_environment);
+            klass_environment->outer = old;
             return result;
         }
     }
