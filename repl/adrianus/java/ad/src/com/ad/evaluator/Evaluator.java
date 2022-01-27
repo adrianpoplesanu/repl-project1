@@ -517,7 +517,30 @@ public class Evaluator {
 
 	private AdObject evalMemberAccess(AstNode node, Environment env) {
 		AstMemberAccess stmt = (AstMemberAccess) node;
+		AdObject evaluated = evalFileObjectMethod(node, env);
+		if (evaluated != null) return evaluated;
+		if (stmt.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
+			// TODO: implement this
+		} else {
+			if (stmt.isMethod()) {
+				// ...
+			} else {
+				AstIdentifier owner = (AstIdentifier) stmt.getOwner();
+				AstIdentifier member = (AstIdentifier) stmt.getMember();
+				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
+				//klassInstance.getEnvironment().setOuter(env);
+				Environment old = klassInstance.getEnvironment();
+				klassInstance.getEnvironment().setOuter(null);
+				AdObject result = eval(member, klassInstance.getEnvironment());
+				klassInstance.getEnvironment().setOuter(old);
+				return result;
+			}
+		}
 		return null;
+	}
+
+	private AdObject evalFileObjectMethod(AstNode node, Environment env) {
+    	return null;
 	}
 
     private AdObject newError(String msg) {

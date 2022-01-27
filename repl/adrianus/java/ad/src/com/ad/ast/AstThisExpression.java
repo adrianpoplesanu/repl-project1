@@ -9,6 +9,11 @@ public class AstThisExpression extends AstNode {
         type = AstNodeTypeEnum.THIS_EXPRESSION;
     }
 
+    public AstThisExpression(Token token) {
+        this();
+        this.token = token;
+    }
+
     @Override
     public String tokenLiteral() {
         return token.getLiteral();

@@ -442,8 +442,8 @@ public class Parser {
     }
 
     private AstNode parseThisExpression() {
-        // TODO: implement this
-        return null;
+        AstThisExpression expr = new AstThisExpression(currentToken);
+        return expr;
     }
 
     private AstNode parseMemberAccess(AstNode left) {
