@@ -363,7 +363,17 @@ public class Evaluator {
     	return null;
     }
 
-    private Environment extendFunctionEnv(AdObject func, ArrayList<AdObject> arguments) {
+	private AdObject applyMethod(AdObject function, List<AdObject> arguments, Environment env) {
+    	if (function.getType() == ObjectTypeEnum.FUNCTION) {
+			extendMethodEnv(function, arguments, env);
+			AdFunctionObject functionObject = (AdFunctionObject) function;
+			AdObject evaluated = eval(functionObject.getBlock(), env);
+			return unwrapReturnValue(evaluated);
+		}
+    	return null;
+	}
+
+    private Environment extendFunctionEnv(AdObject func, List<AdObject> arguments) {
     	AdFunctionObject functionObject = (AdFunctionObject) func;
      	Environment extended = EnvironmentUtils.newEnclosedEnvironment(functionObject.getEnv());
      	int i = 0;
@@ -372,6 +382,15 @@ public class Evaluator {
      	}
     	return extended;
     }
+
+    private Environment extendMethodEnv(AdObject function, List<AdObject> arguments, Environment env) {
+    	AdFunctionObject funcObj = (AdFunctionObject) function;
+    	int i = 0;
+    	for (AstNode param : funcObj.getParameters()) {
+    		env.set(param.tokenLiteral(), arguments.get(i));
+		}
+		return null;
+	}
 
     private AdObject unwrapReturnValue(AdObject evaluated) {
     	if (evaluated == null) return null;
@@ -524,12 +543,25 @@ public class Evaluator {
 		} else {
 			if (stmt.isMethod()) {
 				// ...
+				AstIdentifier owner = (AstIdentifier) stmt.getOwner();
+				AstIdentifier member = (AstIdentifier) stmt.getMember();
+				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
+				AdObject klassMethod = klassInstance.getEnvironment().get(member.getValue());
+				List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
+				if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {
+					return argObjs.get(0);
+				}
+				Environment old = klassInstance.getEnvironment().getOuter();
+				klassInstance.getEnvironment().setOuter(env); // ? env or null
+				AdObject result = applyMethod(klassMethod, argObjs, klassInstance.getEnvironment());
+				klassInstance.getEnvironment().setOuter(old);
+				return result;
 			} else {
 				AstIdentifier owner = (AstIdentifier) stmt.getOwner();
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
 				//klassInstance.getEnvironment().setOuter(env);
-				Environment old = klassInstance.getEnvironment();
+				Environment old = klassInstance.getEnvironment().getOuter();
 				klassInstance.getEnvironment().setOuter(null);
 				AdObject result = eval(member, klassInstance.getEnvironment());
 				klassInstance.getEnvironment().setOuter(old);

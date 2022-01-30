@@ -453,6 +453,7 @@ public class Parser {
         astMemberAccess.setOwner(left);
         astMemberAccess.setMember(right);
         if (peekTokenIs(TokenTypeEnum.LPAREN)) {
+            nextToken();
             astMemberAccess.setIsMethod(true);
             astMemberAccess.setArguments(parseCallArguments());
         } else {
