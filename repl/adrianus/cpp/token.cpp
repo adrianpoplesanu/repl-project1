@@ -22,7 +22,7 @@ void Token::SetLiteral(std::string l) {
 }
 
 TokenType Token::GetType() {
-    return TT_ILLEGAL;
+    return type;
 }
 
 void Token::SetType(TokenType tt) {
