@@ -457,7 +457,18 @@ public class Evaluator {
 	}
 
 	private void evalMemberAccessIndexAssignment(AstNode node, Environment env) {
-
+		AstAssignStatement assignStatement = (AstAssignStatement) node;
+		AstMemberAccess memberAccess = (AstMemberAccess) assignStatement.getName();
+		if (memberAccess.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
+			// TODO: implement this
+		} else {
+			AstIdentifier owner = (AstIdentifier) memberAccess.getOwner();
+			AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
+			AstIdentifier klassMember = (AstIdentifier) memberAccess.getMember();
+			Environment klassEnvironment = klassInstance.getEnvironment();
+			AdObject obj = eval(assignStatement.getValue(), env);
+			klassEnvironment.set(klassMember.getValue(), obj);
+		}
 	}
 
 	private AdObject evalDefStatement(AstNode node, Environment env) {
@@ -542,7 +553,6 @@ public class Evaluator {
 			// TODO: implement this
 		} else {
 			if (stmt.isMethod()) {
-				// ...
 				AstIdentifier owner = (AstIdentifier) stmt.getOwner();
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
