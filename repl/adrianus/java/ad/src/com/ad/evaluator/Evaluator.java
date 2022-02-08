@@ -421,14 +421,24 @@ public class Evaluator {
 	}
 
 	private AdObject evalAssignStatement(AstNode node, Environment env) {
-    	AstAssignStatement stmt = (AstAssignStatement) node;
-    	if (stmt.getName().getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
+    	AstAssignStatement assignStatement = (AstAssignStatement) node;
+    	if (assignStatement.getName().getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
 			return evalIndexExpressionAssign(node, env);
-		} else if (stmt.getName().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
-			evalMemberAccessIndexAssignment(node, env);
+		} else if (assignStatement.getName().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+			AstMemberAccess memberAccess = (AstMemberAccess) assignStatement.getName();
+			if (memberAccess.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
+				// TODO: implement this
+			} else {
+				AstIdentifier owner = (AstIdentifier) memberAccess.getOwner();
+				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
+				AstIdentifier klassMember = (AstIdentifier) memberAccess.getMember();
+				Environment klassEnvironment = klassInstance.getEnvironment();
+				AdObject obj = eval(assignStatement.getValue(), env);
+				klassEnvironment.set(klassMember.getValue(), obj);
+			}
 		} else {
-			AdObject obj = eval(stmt.getValue(), env);
-			AstIdentifier ident = (AstIdentifier) stmt.getName();
+			AdObject obj = eval(assignStatement.getValue(), env);
+			AstIdentifier ident = (AstIdentifier) assignStatement.getName();
 			env.set(ident.getValue(), obj);
 		}
     	return null;
@@ -456,21 +466,6 @@ public class Evaluator {
         return null;
 	}
 
-	private void evalMemberAccessIndexAssignment(AstNode node, Environment env) {
-		AstAssignStatement assignStatement = (AstAssignStatement) node;
-		AstMemberAccess memberAccess = (AstMemberAccess) assignStatement.getName();
-		if (memberAccess.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
-			// TODO: implement this
-		} else {
-			AstIdentifier owner = (AstIdentifier) memberAccess.getOwner();
-			AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
-			AstIdentifier klassMember = (AstIdentifier) memberAccess.getMember();
-			Environment klassEnvironment = klassInstance.getEnvironment();
-			AdObject obj = eval(assignStatement.getValue(), env);
-			klassEnvironment.set(klassMember.getValue(), obj);
-		}
-	}
-
 	private AdObject evalDefStatement(AstNode node, Environment env) {
     	AstDefStatement stmt = (AstDefStatement) node;
     	ArrayList<AstNode> parameters = stmt.getParameters();
@@ -491,29 +486,28 @@ public class Evaluator {
 
 	private AdObject evalIndexExpression(AstNode node, Environment env) {
 		AstIndexExpression expr = (AstIndexExpression) node;
-		AstIdentifier ident = (AstIdentifier) expr.getLeft();
-		AdObject indexedObject = env.get(ident.getValue());
-		if (indexedObject.getType() == ObjectTypeEnum.LIST) {
-			AdObject indexValue = eval(expr.getIndex(), env);
-			if (indexValue.getType() == ObjectTypeEnum.INT) {
-				List<AdObject> elements = ((AdListObject) indexedObject).getElements();
-				int i = ((AdIntegerObject) indexValue).getValue();
-				if (i < 0 || i >= elements.size()) {
-					// this should be an Error object
-					return NULLOBJECT;
-				}
-				return elements.get(i);
-			} else {
-				// this is a syntax error, only INTs can be indexes for LISTs
-				// maybe this should be an Error object
-				return NULLOBJECT;
-			}
-		} else if (indexedObject.getType() == ObjectTypeEnum.HASH) {
-			AdObject indexValue = eval(expr.getIndex(), env);
-			AdObject result = ((AdHashObject)indexedObject).getElements().get(indexValue.hash()).getValue();
-			return result;
+    	AdObject left = eval(expr.getLeft(), env);
+    	AdObject index = eval(expr.getIndex(), env);
+
+    	if (left.getType() == ObjectTypeEnum.LIST && index.getType() == ObjectTypeEnum.INT) {
+    		return evalListIndexExpression(left, index);
+		}
+    	if (left.getType() == ObjectTypeEnum.HASH) {
+    		return evalHashIndexExpression(left, index);
 		}
     	return null;
+	}
+
+	private AdObject evalListIndexExpression(AdObject left, AdObject index) {
+    	int max = ((AdListObject) left).getElements().size();
+    	int idx = ((AdIntegerObject) index).getValue();
+    	if (idx < 0 || idx >= max) return null; // this should be an error object
+    	return ((AdListObject) left).getElements().get(idx);
+	}
+
+	private AdObject evalHashIndexExpression(AdObject left, AdObject index) {
+		AdObject result = ((AdHashObject)left).getElements().get(index.hash()).getValue();
+		return result;
 	}
 
 	private AdObject evalHashExpression(AstNode node, Environment env) {
