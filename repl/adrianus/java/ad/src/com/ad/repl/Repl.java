@@ -3,6 +3,7 @@ package com.ad.repl;
 import java.util.Scanner;
 
 import com.ad.ast.AstProgram;
+import com.ad.bootstrap.Bootstrap;
 import com.ad.environment.Environment;
 import com.ad.environment.EnvironmentUtils;
 import com.ad.evaluator.Evaluator;
@@ -26,6 +27,8 @@ public class Repl {
     
     public void loop() {
     	Environment env = EnvironmentUtils.newEnvironment();
+		Bootstrap bootstrap = new Bootstrap();
+		bootstrap.loadBootstrap();
     	while(true) {
     		System.out.print(">> ");
     		String source = getNextLine();
@@ -39,6 +42,8 @@ public class Repl {
 
     public void executeSource(String source) {
 		Environment env = EnvironmentUtils.newEnvironment();
+		Bootstrap bootstrap = new Bootstrap();
+		bootstrap.loadBootstrap();
 		parser.load(source);
 		program.reset();
 		parser.buildProgramStatements(program);
