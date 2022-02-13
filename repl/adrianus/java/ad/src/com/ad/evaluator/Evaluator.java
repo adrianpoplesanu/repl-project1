@@ -427,7 +427,9 @@ public class Evaluator {
 		} else if (assignStatement.getName().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
 			AstMemberAccess memberAccess = (AstMemberAccess) assignStatement.getName();
 			if (memberAccess.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
-				// TODO: implement this
+				AstIdentifier klassMember = (AstIdentifier) memberAccess.getMember();
+				AdObject obj = eval(assignStatement.getValue(), env);
+				env.set(klassMember.getValue(), obj);
 			} else {
 				AstIdentifier owner = (AstIdentifier) memberAccess.getOwner();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
@@ -544,19 +546,33 @@ public class Evaluator {
 		AdObject evaluated = evalFileObjectMethod(node, env);
 		if (evaluated != null) return evaluated;
 		if (stmt.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
-			// TODO: implement this
+			if (stmt.isMethod()) {
+				AstIdentifier member = (AstIdentifier) stmt.getMember();
+				AdFunctionObject klassMethod = (AdFunctionObject) env.get(member.getValue());
+				List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
+				if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {
+					return argObjs.get(0);
+				}
+				return applyMethod(klassMethod, argObjs, env); // nu sunt sigur de env aici, cred ca null e ok
+			} else {
+				AdObject result = eval(stmt.getMember(), env); // nu sunt sigur de env aici, cred ca null e ok
+				return result;
+			}
 		} else {
 			if (stmt.isMethod()) {
 				AstIdentifier owner = (AstIdentifier) stmt.getOwner();
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
+				Environment old = klassInstance.getEnvironment().getOuter();
+				klassInstance.getEnvironment().setOuter(null);
 				AdObject klassMethod = klassInstance.getEnvironment().get(member.getValue());
+				if (klassMethod == null) {
+					return NULLOBJECT;
+				}
 				List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
 				if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {
 					return argObjs.get(0);
 				}
-				Environment old = klassInstance.getEnvironment().getOuter();
-				klassInstance.getEnvironment().setOuter(env); // ? env or null
 				AdObject result = applyMethod(klassMethod, argObjs, klassInstance.getEnvironment());
 				klassInstance.getEnvironment().setOuter(old);
 				return result;
@@ -572,7 +588,7 @@ public class Evaluator {
 				return result;
 			}
 		}
-		return null;
+		//return null;
 	}
 
 	private AdObject evalFileObjectMethod(AstNode node, Environment env) {

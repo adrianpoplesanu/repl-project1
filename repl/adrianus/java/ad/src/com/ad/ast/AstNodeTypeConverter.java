@@ -27,6 +27,7 @@ public class AstNodeTypeConverter {
 			put(AstNodeTypeEnum.NULL_EXPRESSION, "NullExpression");
 			put(AstNodeTypeEnum.CLASS_STATEMENT, "ClassStatement");
 			put(AstNodeTypeEnum.MEMBER_ACCESS, "MemberAccess");
+			put(AstNodeTypeEnum.THIS_EXPRESSION, "ThisExpression");
 		}
 	};
 	

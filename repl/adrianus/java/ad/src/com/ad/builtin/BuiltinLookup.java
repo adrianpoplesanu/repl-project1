@@ -24,7 +24,11 @@ public class BuiltinLookup {
 			put("__iosocket", new AdBuiltinObject(new IOSocketBuiltin())); // TODO: update this
 			put("eval", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("first", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("last", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("map", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("input", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("list", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("hash", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			// https://www.w3schools.com/python/python_ref_keywords.asp
 			// https://www.w3schools.com/python/python_ref_functions.asp
 		}

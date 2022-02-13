@@ -1,0 +1,16 @@
+class Server {
+    port = 8080
+
+    def add_security_offset(offset) {
+        port = port + offset
+    }
+
+    def listen() {
+        print("listening")
+        print(port)
+    }
+}
+
+server = Server()
+server.add_security_offset(1)
+server.listen()
