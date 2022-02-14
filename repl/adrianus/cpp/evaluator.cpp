@@ -699,14 +699,24 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
             Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
             Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
+
+            Environment* klass_environment = klass_instance->instance_environment;
+            //klass_environment->outer = &env;
+            Environment* old = klass_environment->outer;
+            klass_environment->outer = NULL;
+
             Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
+            if (klass_method == NULL) {
+                return &NULLOBJECT;
+            }
             std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
                 return args_objs[0];
             }
-            Environment* klass_environment = klass_instance->instance_environment;
-            klass_environment->outer = &env;
-            return ApplyMethod(klass_method, args_objs, *klass_environment);
+
+            Ad_Object* result = ApplyMethod(klass_method, args_objs, *klass_environment);
+            klass_environment->outer = old;
+            return result;
         } else {
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
             Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
