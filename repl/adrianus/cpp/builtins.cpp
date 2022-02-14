@@ -131,7 +131,23 @@ Ad_Object* first_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return NULL;
 }
 
+Ad_Object* last_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
+Ad_Object* map_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
 Ad_Object* input_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
+Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
+Ad_Object* hash_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return NULL;
 }
 
@@ -153,7 +169,11 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"__iosocket", new Ad_Builtin_Object(&__iosocket_builtin)},
     {"eval", new Ad_Builtin_Object(&eval_builtin)},
     {"first", new Ad_Builtin_Object(&first_builtin)},
-    {"input", new Ad_Builtin_Object(&input_builtin)}
+    {"last", new Ad_Builtin_Object(&first_builtin)},
+    {"map", new Ad_Builtin_Object(&first_builtin)},
+    {"input", new Ad_Builtin_Object(&input_builtin)},
+    {"list", new Ad_Builtin_Object(&list_builtin)},
+    {"hash", new Ad_Builtin_Object(&hash_builtin)}
     // eval
     // first
     // input
