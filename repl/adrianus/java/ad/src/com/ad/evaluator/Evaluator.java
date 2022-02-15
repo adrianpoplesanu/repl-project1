@@ -592,6 +592,25 @@ public class Evaluator {
 	}
 
 	private AdObject evalFileObjectMethod(AstNode node, Environment env) {
+    	AstMemberAccess memberAccess = (AstMemberAccess) node;
+    	if (memberAccess.getOwner().getType() != AstNodeTypeEnum.IDENTIFIER) {
+    		return null;
+		}
+    	AstIdentifier ownerIdentifier = (AstIdentifier) memberAccess.getOwner();
+    	AstIdentifier memberIdentifier = (AstIdentifier) memberAccess.getMember();
+    	AdObject rawObject = env.get(ownerIdentifier.getValue());
+    	if (rawObject.getType() == ObjectTypeEnum.FILE) {
+			AdFileObject fileObject = (AdFileObject) rawObject;
+			String memberName = memberIdentifier.getValue();
+			if (memberName.equals("read")) {
+				if (fileObject.getOperator() == "r") {
+					// TODO: read file
+					// result trebuie citit din fisier
+					AdStringObject result = new AdStringObject("buna dimineata");
+					return result;
+				}
+			}
+		}
     	return null;
 	}
 
