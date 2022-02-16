@@ -1,6 +1,6 @@
 import sys
 
-from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object
+from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object
 from object_type import ObjectType
 
 def len_builtin(args, env):
@@ -17,7 +17,7 @@ def first_builtin(args, env):
         return Ad_String_Object(value=obj.value[0])
     if obj.type == ObjectType.LIST:
         return obj.elements[0]
-    return Ad_Null_Object
+    return Ad_Null_Object()
 
 def print_builtin(args, env):
     for obj in args:
@@ -69,11 +69,32 @@ def iosocket_builtin(args, env):
 def eval_builtin(args, env):
     pass
 
-def first_builtin(args, env):
+def last_builtin(args, env):
+    pass
+
+def map_builtin(args, env):
     pass
 
 def input_builtin(args, env):
     pass
+
+def list_builtin(args, env):
+    if len(args) == 0:
+        listObject = Ad_List_Object()
+        listObject.elements = []
+        return listObject
+    if args[0].type == ObjectType.INTEGER:
+        number_elements = args[0].value
+        listObject = Ad_List_Object()
+        listObject.elements = []
+        for i in range(number_elements):
+            listObject.elements.append(Ad_Null_Object())
+        return listObject
+
+def hash_builtin(args, env):
+    if len(args) == 0:
+        hashObject = Ad_Hash_Object(pairs={})
+        return hashObject
 
 builtins_map = {
     "len": Ad_Builtin_Object(len_builtin),
@@ -92,7 +113,11 @@ builtins_map = {
     "__iosocket": Ad_Builtin_Object(iosocket_builtin),
     "eval": Ad_Builtin_Object(eval_builtin),
     "first": Ad_Builtin_Object(first_builtin),
-    "input": Ad_Builtin_Object(input_builtin)
+    "last": Ad_Builtin_Object(last_builtin),
+    "map": Ad_Builtin_Object(map_builtin),
+    "input": Ad_Builtin_Object(input_builtin),
+    "list": Ad_Builtin_Object(list_builtin),
+    "hash": Ad_Builtin_Object(hash_builtin),
     # https://www.w3schools.com/python/python_ref_keywords.asp
 	# https://www.w3schools.com/python/python_ref_functions.asp
 }
