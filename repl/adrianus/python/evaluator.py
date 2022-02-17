@@ -125,8 +125,7 @@ class Evaluator(object):
         return obj
 
     def eval_boolean(self, node, env):
-        obj = Ad_Boolean_Object(value=node.value)
-        return obj
+        return self.native_bool_to_boolean_object(node.value)
 
     def eval_string(self, node, env):
         obj = Ad_String_Object(value=node.value)
@@ -332,10 +331,14 @@ class Evaluator(object):
     def eval_boolean_infix_expression(self, operator, left, right):
         left_val = left.value
         right_val = right.value
+        if operator == '==':
+            return self.native_bool_to_boolean_object(left_val == right_val)
+        if operator == '!=':
+            return self.native_bool_to_boolean_object(left_val != right_val)
         if operator == 'and':
-            return Ad_Boolean_Object(value=left_val and right_val)
+            return self.native_bool_to_boolean_object(left_val and right_val)
         if operator == 'or':
-            return Ad_Boolean_Object(value=left_val or right_val)
+            return self.native_bool_to_boolean_object(left_val or right_val)
 
     def eval_string_infix_expression(self, operator, left, right):
         if operator == "+":
