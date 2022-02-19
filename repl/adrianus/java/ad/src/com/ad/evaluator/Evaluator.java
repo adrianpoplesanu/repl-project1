@@ -10,6 +10,7 @@ import com.ad.environment.Environment;
 import com.ad.environment.EnvironmentUtils;
 import com.ad.hash.HashPair;
 import com.ad.objects.*;
+import com.ad.utils.FileUtils;
 
 import static com.ad.ast.AstNodeTypeConverter.astNodeTypeMap;
 
@@ -603,10 +604,9 @@ public class Evaluator {
 			AdFileObject fileObject = (AdFileObject) rawObject;
 			String memberName = memberIdentifier.getValue();
 			if (memberName.equals("read")) {
-				if (fileObject.getOperator() == "r") {
-					// TODO: read file
-					// result trebuie citit din fisier
-					AdStringObject result = new AdStringObject("buna dimineata");
+				if (fileObject.getOperator().equals("r")) {
+					String text = FileUtils.readFile(fileObject.getFilename());
+					AdStringObject result = new AdStringObject(text);
 					return result;
 				}
 			}
