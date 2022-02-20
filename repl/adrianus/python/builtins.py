@@ -83,13 +83,23 @@ def list_builtin(args, env):
         listObject = Ad_List_Object()
         listObject.elements = []
         return listObject
-    if args[0].type == ObjectType.INTEGER:
-        number_elements = args[0].value
-        listObject = Ad_List_Object()
-        listObject.elements = []
-        for i in range(number_elements):
-            listObject.elements.append(Ad_Null_Object())
-        return listObject
+    elif len(args) == 1:
+        if args[0].type == ObjectType.INTEGER:
+            number_elements = args[0].value
+            listObject = Ad_List_Object()
+            listObject.elements = []
+            for i in range(number_elements):
+                listObject.elements.append(Ad_Null_Object())
+            return listObject
+    elif len(args) == 2:
+        if args[0].type == ObjectType.INTEGER:
+            number_elements = args[0].value
+            default_object = args[1]
+            list_object = Ad_List_Object()
+            list_object.elements = []
+            for i in range(number_elements):
+                list_object.elements.append(default_object)
+            return list_object
 
 def hash_builtin(args, env):
     if len(args) == 0:

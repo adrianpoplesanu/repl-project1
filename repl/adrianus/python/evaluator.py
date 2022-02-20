@@ -358,7 +358,9 @@ class Evaluator(object):
         if left.type == ObjectType.LIST and index.type == ObjectType.INTEGER:
             return self.eval_list_index_expression(left, index)
         if left.type == ObjectType.HASH:
-            return self.eval_hash_index_expressions(left, index)
+            return self.eval_hash_index_expression(left, index)
+        if left.type == ObjectType.STRING:
+            return self.eval_string_index_expression(left, index)
         return self.new_error("index expression error for type: {0}".format(left.type))
 
     def eval_list_index_expression(self, left, index):
@@ -383,10 +385,13 @@ class Evaluator(object):
             pairs[hashed.value] = Hash_Pair(key=key, value=value)
         return Ad_Hash_Object(pairs=pairs)
 
-    def eval_hash_index_expressions(self, left, index):
+    def eval_hash_index_expression(self, left, index):
         hashed = index.hash_key()
         pair = left.pairs[hashed.value]
         return pair.value
+
+    def eval_string_index_expression(self, left, index):
+        return Ad_String_Object(left.value[index.value])
 
     def eval_assign_statement(self, node, env):
         if node.name.type == StatementType.INDEX_EXPRESSION:
