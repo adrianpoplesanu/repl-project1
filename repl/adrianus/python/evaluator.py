@@ -494,7 +494,13 @@ class Evaluator(object):
                 if 'r' in owner.operator:
                     return read_file_content(owner.filename)
             if method == 'write':
-                print 'TODO: util function for writing file content'
+                if 'w' in owner.operator:
+                    args_objs = self.eval_expressions(node.arguments, env)
+                    if len(args_objs) == 1 and self.is_error(args_objs[0]):
+                        return args_objs[0]
+                    content = args_objs[0].value
+                    write_file_content(owner.filename, content)
+                    return NULLOBJECT
         else:
             return None
 

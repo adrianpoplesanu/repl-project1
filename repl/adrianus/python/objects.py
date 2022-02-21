@@ -213,6 +213,8 @@ class Ad_File_Object(Ad_Object):
         """
         self.filename = filename
         self.operator = operator
+        # TODO: fix this
+        # the next line is wrong, if the operator is w and no write() method is called, the file is created regardlessly
         self.file_descriptor = open(self.filename, self.operator)
 
     def inspect(self):
