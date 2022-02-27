@@ -28,7 +28,7 @@ public class Repl {
     public void loop() {
     	Environment env = EnvironmentUtils.newEnvironment();
 		Bootstrap bootstrap = new Bootstrap();
-		bootstrap.loadBootstrap();
+		bootstrap.loadBootstrap(program, parser, evaluator, env);
     	while(true) {
     		System.out.print(">> ");
     		String source = getNextLine();
@@ -43,7 +43,7 @@ public class Repl {
     public void executeSource(String source) {
 		Environment env = EnvironmentUtils.newEnvironment();
 		Bootstrap bootstrap = new Bootstrap();
-		bootstrap.loadBootstrap();
+		bootstrap.loadBootstrap(program, parser, evaluator, env);
 		parser.load(source);
 		program.reset();
 		parser.buildProgramStatements(program);
