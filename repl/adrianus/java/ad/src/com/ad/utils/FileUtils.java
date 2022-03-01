@@ -8,7 +8,12 @@ import java.util.stream.Stream;
 
 public class FileUtils {
     public static String readFile(String path) {
-        String content = readLineByLineJava8(path);
+        String content;
+        try {
+            content = readLineByLineJava8(path);
+        } catch(Exception e) {
+            content = "Error reading file. TODO: return either AdError or AdNull";
+        }
         return content;
     }
 
