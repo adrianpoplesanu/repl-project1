@@ -256,6 +256,13 @@ public:
 	virtual std::string Hash();
 };
 
+class Ad_Socket_Object : public Ad_Object {
+public:
+	std::string name;
+	int port;
+	bool isActive;
+};
+
 void Ad_INCREF(Ad_Object*);
 void Ad_DECREF(Ad_Object*);
 
