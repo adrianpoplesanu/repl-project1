@@ -359,10 +359,23 @@ public class Evaluator {
 				adClassInstance.getEnvironment().set(astIdentifier.getValue(), adFunctionObject);
 			});
 			// call class instance constructor here
+			callInstanceController(adClassInstance, arguments, env);
 			return adClassInstance;
 		}
     	return null;
     }
+
+    private void callInstanceController(AdClassInstance adClassInstance, List<AdObject> arguments, Environment env) {
+		Environment instanceEnv = adClassInstance.getEnvironment();
+		AdObject method = instanceEnv.get("constructor");
+		if (method != null) {
+			if (arguments.size() == 1 && arguments.get(0).getType() == ObjectTypeEnum.ERROR) {
+				// do nothing
+			}
+			instanceEnv.setOuter(env);
+			applyMethod(method, arguments, instanceEnv);
+		}
+	}
 
 	private AdObject applyMethod(AdObject function, List<AdObject> arguments, Environment env) {
     	if (function.getType() == ObjectTypeEnum.FUNCTION) {
