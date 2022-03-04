@@ -151,6 +151,18 @@ Ad_Object* hash_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return NULL;
 }
 
+Ad_Object* hasattr_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
+Ad_Object* getattr_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
+Ad_Object* setattr_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -173,7 +185,10 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"map", new Ad_Builtin_Object(&first_builtin)},
     {"input", new Ad_Builtin_Object(&input_builtin)},
     {"list", new Ad_Builtin_Object(&list_builtin)},
-    {"hash", new Ad_Builtin_Object(&hash_builtin)}
+    {"hash", new Ad_Builtin_Object(&hash_builtin)},
+    {"hasattr", new Ad_Builtin_Object(&hasattr_builtin)},
+    {"getattr", new Ad_Builtin_Object(&getattr_builtin)},
+    {"setattr", new Ad_Builtin_Object(&setattr_builtin)}
     // eval
     // first
     // input
