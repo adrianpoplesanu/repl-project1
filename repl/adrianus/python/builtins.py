@@ -106,6 +106,15 @@ def hash_builtin(args, env):
         hashObject = Ad_Hash_Object(pairs={})
         return hashObject
 
+def hasattr_builtin(args, env):
+    pass
+
+def getattr_builtin(args, env):
+    pass
+
+def setattr_builtin(args, env):
+    pass
+
 builtins_map = {
     "len": Ad_Builtin_Object(len_builtin),
     "exit": Ad_Builtin_Object(exit_builtin),
@@ -128,6 +137,9 @@ builtins_map = {
     "input": Ad_Builtin_Object(input_builtin),
     "list": Ad_Builtin_Object(list_builtin),
     "hash": Ad_Builtin_Object(hash_builtin),
+    "hasattr": Ad_Builtin_Object(hasattr_builtin),
+    "getattr": Ad_Builtin_Object(getattr_builtin),
+    "setattr": Ad_Builtin_Object(setattr_builtin),
     # https://www.w3schools.com/python/python_ref_keywords.asp
 	# https://www.w3schools.com/python/python_ref_functions.asp
 }
