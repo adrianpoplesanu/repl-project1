@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 public class FileUtils {
     public static String readFile(String path) {
         String content;
+        // TODO: this is a temporary fix, remove
         try {
             content = readLineByLineJava8(path);
         } catch(Exception e) {

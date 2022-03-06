@@ -3,6 +3,7 @@ package com.ad.evaluator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ad.ast.*;
 import com.ad.builtin.BuiltinLookup;
@@ -246,22 +247,22 @@ public class Evaluator {
     	if (obj == null) return false;
 
     	switch (obj.getType()) {
-    	case NULL:
-    		return false;
-    	case INT:
-    		AdIntegerObject int_obj = (AdIntegerObject) obj;
-    		if (int_obj.getValue() == 0) return false;
-    		return true;
-    	case BOOLEAN:
-    		AdBooleanObject bool_obj = (AdBooleanObject) obj;
-    		if (bool_obj.getValue()) return true;
-    		return false;
-    	case STRING:
-    		AdStringObject string_obj = (AdStringObject) obj;
-    		if (string_obj.getValue().equals("")) return false;
-    		return true;
-    	default:
-    	break;
+			case NULL:
+				return false;
+			case INT:
+				AdIntegerObject int_obj = (AdIntegerObject) obj;
+				if (int_obj.getValue() == 0) return false;
+				return true;
+			case BOOLEAN:
+				AdBooleanObject bool_obj = (AdBooleanObject) obj;
+				if (bool_obj.getValue()) return true;
+				return false;
+			case STRING:
+				AdStringObject string_obj = (AdStringObject) obj;
+				if (string_obj.getValue().equals("")) return false;
+				return true;
+			default:
+			break;
     	}
     	return false;
     }
@@ -298,23 +299,27 @@ public class Evaluator {
     	AstCallExpression callExpression = (AstCallExpression) node;
     	AdObject function = eval(callExpression.getFunction(), env);
     	if (isError(function)) return function;
-    	ArrayList<AdObject> arguments = evalExpressions(callExpression.getArguments(), env);
+    	ArrayList<AdObject> arguments = (ArrayList) evalExpressions(callExpression.getArguments(), env);
     	if (arguments.size() == 1 && isError(arguments.get(0))) {
     		return arguments.get(0);
     	}
     	return applyFunction(function, arguments, env);
     }
 
-    private ArrayList<AdObject> evalExpressions(List<AstNode> params, Environment env) {
-    	ArrayList<AdObject> objects = new ArrayList<AdObject>();
-    	for (AstNode param : params) {
+    private List<AdObject> evalExpressions(List<AstNode> params, Environment env) {
+    	/*ArrayList<AdObject> objects = new ArrayList<AdObject>();
+    	for (AstNode param : params) { // TODO: use streams
     		AdObject evaluated = eval(param, env);
     		if (isError(evaluated)) {
 				ArrayList<AdObject> errorResponse = new ArrayList<>();
 				return errorResponse;
 			}
     		objects.add(evaluated);
-    	}
+    	}*/
+    	List<AdObject> objects = params.stream().map(p -> eval(p, env)).collect(Collectors.toList());
+    	if (objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).findAny().isPresent()) {
+    		return objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).collect(Collectors.toList());
+		}
     	return objects;
     }
 
@@ -334,7 +339,7 @@ public class Evaluator {
 			AdClassObject adClassObject = (AdClassObject) function;
 			String name = ((AstIdentifier) adClassObject.getName()).getValue();
 			AdClassInstance adClassInstance = new AdClassInstance(name, adClassObject, instanceEnv);
-			adClassObject.getAttributes().stream().forEach(attribute -> {
+			adClassObject.getAttributes().forEach(attribute -> {
 				if (attribute.getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
 					adClassInstance.getEnvironment().setOuter(env);
 					AdObject evaluated = eval(((AstAssignStatement) attribute).getValue(), adClassInstance.getEnvironment());
@@ -352,7 +357,7 @@ public class Evaluator {
 					}
 				}
 			});
-			adClassObject.getMethods().stream().forEach(method -> {
+			adClassObject.getMethods().forEach(method -> {
 				AstDefStatement astDefStatement = (AstDefStatement) method;
 				AdFunctionObject adFunctionObject = new AdFunctionObject(astDefStatement.getParameters(), astDefStatement.getBody(), adClassInstance.getEnvironment());
 				AstIdentifier astIdentifier = (AstIdentifier) astDefStatement.getName();
@@ -401,7 +406,7 @@ public class Evaluator {
     	AdFunctionObject funcObj = (AdFunctionObject) function;
     	int i = 0;
     	for (AstNode param : funcObj.getParameters()) {
-    		env.set(param.tokenLiteral(), arguments.get(i));
+    		env.set(param.tokenLiteral(), arguments.get(i++));
 		}
 		return null;
 	}
@@ -530,7 +535,7 @@ public class Evaluator {
     	AstHashExpression expr = (AstHashExpression) node;
     	HashMap<String, HashPair<AdObject>> pairs = new HashMap<>();
 
-    	expr.getPairs().entrySet().stream().forEach(e -> {
+    	expr.getPairs().entrySet().forEach(e -> {
     		AdObject key = eval(e.getKey(), env);
     		AdObject value = eval(e.getValue(), env);
     		pairs.put(key.hash(), new HashPair<>(key, value));
