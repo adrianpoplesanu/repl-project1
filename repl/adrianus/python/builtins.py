@@ -43,7 +43,15 @@ def context_builtin(args, env):
     print env
 
 def pop_builtin(args, env):
-    pass
+    result = None
+    list_obj = args[0]
+    if len(args) == 1:
+        result = list_obj.elements.pop()
+    elif len(args) == 2:
+        idx_obj = args[1]
+        result = list_obj.elements[idx_obj.value]
+        list_obj.elements.pop(idx_obj.value)
+    return result
 
 def remove_builtin(args, env):
     pass
