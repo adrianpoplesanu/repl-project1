@@ -269,4 +269,6 @@ void Ad_DECREF(Ad_Object*);
 void free_Ad_Object_memory(Ad_Object*);
 void print_Ad_Object(Ad_Object*);
 
+Ad_Null_Object NULLOBJECT;
+
 #endif

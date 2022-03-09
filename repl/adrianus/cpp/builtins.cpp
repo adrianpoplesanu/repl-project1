@@ -5,6 +5,8 @@
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
+//Ad_Null_Object NULLOBJECT;
+
 Ad_Object* len_builtin(std::vector<Ad_Object*> args, Environment* env) {
     // toate builtinurile cred ca ar trebui sa primeasca o lista de argumente, ca sa fie unitate in antet
     Ad_Object* obj = args[0];
@@ -144,7 +146,10 @@ Ad_Object* input_builtin(std::vector<Ad_Object*> args, Environment *env) {
 }
 
 Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
-    return NULL;
+    std::cout << args.size() << "\n";
+    //return NULL;
+    //NULLOBJECT2.permanent = true;
+    return &NULLOBJECT;
 }
 
 Ad_Object* hash_builtin(std::vector<Ad_Object*> args, Environment *env) {

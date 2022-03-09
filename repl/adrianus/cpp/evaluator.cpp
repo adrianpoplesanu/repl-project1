@@ -4,7 +4,7 @@
 #include "builtins.cpp"
 
 
-Ad_Null_Object NULLOBJECT;
+//Ad_Null_Object NULLOBJECT;
 Ad_Boolean_Object TRUE(true);
 Ad_Boolean_Object FALSE(false);
 
