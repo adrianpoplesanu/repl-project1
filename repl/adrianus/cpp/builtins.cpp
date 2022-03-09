@@ -146,9 +146,23 @@ Ad_Object* input_builtin(std::vector<Ad_Object*> args, Environment *env) {
 }
 
 Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
-    std::cout << args.size() << "\n";
-    //return NULL;
-    //NULLOBJECT2.permanent = true;
+    //std::cout << args.size() << "\n";
+    if (args.size() == 0) {
+        return new Ad_List_Object();
+    }
+    if (args.size() == 1) {
+        Ad_List_Object* list_object = new Ad_List_Object();
+        int size = ((Ad_Integer_Object*) args[0])->value;
+        std::cout << size << "\n";
+        for (int i = 0; i < size; i++) {
+            list_object->elements.push_back(&NULLOBJECT);
+        }
+        free_builtin_arguments(args);
+        return list_object;
+    }
+    if (args.size() == 2) {
+
+    }
     return &NULLOBJECT;
 }
 
