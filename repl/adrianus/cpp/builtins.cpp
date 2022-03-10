@@ -153,7 +153,7 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
     if (args.size() == 1) {
         Ad_List_Object* list_object = new Ad_List_Object();
         int size = ((Ad_Integer_Object*) args[0])->value;
-        std::cout << size << "\n";
+        //std::cout << size << "\n";
         for (int i = 0; i < size; i++) {
             list_object->elements.push_back(&NULLOBJECT);
         }
@@ -161,7 +161,16 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
         return list_object;
     }
     if (args.size() == 2) {
-
+        Ad_List_Object* list_object = new Ad_List_Object();
+        int size = ((Ad_Integer_Object*) args[0])->value;
+        Ad_Object* default_object = args[1];
+        for (int i = 0; i < size; i++) {
+            Ad_Object* new_object = default_object->copy();
+            Ad_INCREF(new_object);
+            list_object->elements.push_back(new_object);
+        }
+        free_builtin_arguments(args);
+        return list_object;
     }
     return &NULLOBJECT;
 }
