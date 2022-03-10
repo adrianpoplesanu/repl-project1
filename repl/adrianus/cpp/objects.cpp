@@ -24,6 +24,11 @@ std::string Ad_Object::Hash() {
     return "not implementd Hash() in subclass";
 }
 
+Ad_Object* Ad_Object::copy() {
+    std::cout << "ERROR: copy() not implementend for this type of object\n";
+    return NULL;
+}
+
 Ad_Null_Object::Ad_Null_Object() {
     type = OBJ_NULL;
     ref_count = 0;
@@ -81,6 +86,11 @@ Ad_Object_Type Ad_Integer_Object::Type() {
 
 std::string Ad_Integer_Object::Hash() {
     return object_type_map[type] + Inspect();
+}
+
+Ad_Object* Ad_Integer_Object::copy() {
+    Ad_Integer_Object* new_object = new Ad_Integer_Object(value);
+    return new_object;
 }
 
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {

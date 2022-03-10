@@ -55,6 +55,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	virtual Ad_Object* copy();
 };
 
 class Ad_Null_Object : public Ad_Object {
@@ -67,6 +68,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Integer_Object : public Ad_Object {
@@ -80,6 +82,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	virtual Ad_Object* copy();
 };
 
 class Ad_Boolean_Object : public Ad_Object {
@@ -93,6 +96,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_String_Object : public Ad_Object {
@@ -105,6 +109,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_ReturnValue_Object : public Ad_Object {
@@ -119,6 +124,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Environment; // forward declaration for Environment
@@ -137,6 +143,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Error_Object : public Ad_Object {
@@ -149,6 +156,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Builtin_Object : public Ad_Object {
@@ -163,6 +171,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Signal_Object : public Ad_Object {
@@ -174,6 +183,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 //class Ad_List;
@@ -190,6 +200,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Hash_Object : public Ad_Object {
@@ -203,6 +214,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Class_Object : public Ad_Object {
@@ -221,6 +233,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Class_Instance : public Ad_Object {
@@ -237,6 +250,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_File_Object : public Ad_Object {
@@ -254,6 +268,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 class Ad_Socket_Object : public Ad_Object {
