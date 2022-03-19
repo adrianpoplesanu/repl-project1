@@ -1,0 +1,8 @@
+class Server {
+    port = 8080
+}
+
+server = Server()
+server.port = 8081
+
+print(server.port)

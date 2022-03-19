@@ -1,0 +1,18 @@
+class Server {
+    port = 8080
+    offset = 0
+
+    def init(num) {
+        port = num
+    }
+
+    def listening(val) {
+        return port + offset + val; /* merge, dar nu fara ; aici, trebuie investigat de ce */
+    }
+}
+
+server = Server()
+server.init(8081)
+server.offset = 1
+
+print(server.listening(1))

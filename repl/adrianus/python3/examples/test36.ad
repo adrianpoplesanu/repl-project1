@@ -1,0 +1,24 @@
+class File {
+    /*name = null*/
+    /*operator = null*/
+    /*file_object = null*/
+
+    def init(p_name, p_operator) {
+        name = p_name
+        operator = p_operator
+        /*file_object = file(name, operator)*/
+    }
+
+    def read() {
+        /*return file_object.read()*/
+    }
+
+    def write(text) {
+        /*return file_object.write(text)*/
+    }
+}
+
+a = File()
+/*file.init("main.py", "r")*/
+/*file.read()*/
+

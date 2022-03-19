@@ -1,0 +1,14 @@
+/* dp algo for longest growing subset */
+a = [1, 9, 2, 9, 3, 9, 4, 9, 2, 1, 0]
+n = len(a)
+dp = list(11, 1)
+
+for(i = 0; i < n; i++) {
+    for (j = 0; j < i; j++) {
+        if (a[j] < a[i] and dp[j] + 1 > dp[i]) {
+            dp[i] = dp[j] + 1;
+        }
+    }
+}
+
+print(dp)

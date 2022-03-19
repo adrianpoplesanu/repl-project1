@@ -1,0 +1,8 @@
+class Test {
+    def constructor() {
+        a = 5
+    }
+}
+
+t = Test()
+print(t.a)

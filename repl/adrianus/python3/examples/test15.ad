@@ -1,0 +1,17 @@
+class Server {
+    def init(p, t) {
+        port = p
+        timeout = t
+    }
+
+    def listen() {
+        print("listening")
+        print(port)
+        print("timeout")
+        print(timeout)
+    }
+}
+
+server = Server()
+server.init(8080, 90)
+server.listen()

@@ -1,0 +1,15 @@
+class Server {
+    port = 8080
+
+    def listen(a) {
+        /*listening_port = a*/
+        /*print(listening_port)*/
+        return port + a;
+    }
+}
+
+server = Server()
+
+listening_port = server.listen(1)
+
+print(listening_port)

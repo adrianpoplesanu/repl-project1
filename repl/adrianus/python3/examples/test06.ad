@@ -1,0 +1,14 @@
+/* print("start"); */
+
+a = 12
+
+class Server {
+    port = 8080
+}
+
+server = Server()
+server.port
+
+context()
+
+/* print("stop") */

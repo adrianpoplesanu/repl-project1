@@ -1,0 +1,18 @@
+class Server {
+
+    class Port {
+        num = 123
+    }
+
+    /*port = Port()*/
+
+    def print_port(a) {
+        /*port = Port()*/
+        /*context()*/
+        print(8080 + a)
+    }
+}
+
+server = Server()
+
+server.print_port(1)

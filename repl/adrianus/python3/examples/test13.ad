@@ -1,0 +1,30 @@
+class Dexiciul {
+    num = 10
+
+    def init(n) {
+        b = 23
+        /*print(n)*/
+        num = n
+        /*print(num)*/
+        /*print(b)*/
+        /*context()*/ /* this works, it's just not persisted after the method finishes execution */
+    }
+
+    def ham_ham() {
+        i = 0
+        while (i < num) {
+            print("ham ham ham")
+            i = i + 1
+        }
+    }
+}
+
+dex = Dexiciul()
+
+dex.init(4)
+
+print(dex.b)
+print(dex.num)
+/* context() */
+
+dex.ham_ham()
