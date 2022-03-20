@@ -276,18 +276,19 @@ public class Parser {
         }
         nextToken();
         expr.setInitialization(parseExpression(PrecedenceTypeEnum.LOWEST));
-        nextToken();
-        if (!currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+        if (!expectPeek(TokenTypeEnum.SEMICOLON)) {
             return null;
         }
         nextToken();
         expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
-        nextToken();
-        if (!currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+        if (!expectPeek(TokenTypeEnum.SEMICOLON)) {
             return null;
         }
         nextToken();
         expr.setStep(parseExpression(PrecedenceTypeEnum.LOWEST));
+        if (!expectPeek(TokenTypeEnum.RPAREN)) {
+            return null;
+        }
         nextToken();
         if (!currentTokenIs(TokenTypeEnum.LBRACE)) {
             return null;
