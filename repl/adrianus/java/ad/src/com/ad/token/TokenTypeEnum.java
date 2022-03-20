@@ -48,5 +48,6 @@ public enum TokenTypeEnum {
 	START_COMMENT,
 	END_COMMENT,
 	PLUSPLUS,
+	MINUSMINUS,
 	NULL
 }

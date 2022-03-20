@@ -43,8 +43,14 @@ public class Lexer {
 			token.setLiteral("");
 		break;
 		case '+':
-			token.setType(TokenTypeEnum.PLUS);
-			token.setLiteral("+");
+			if (peekChar() == '+') {
+				token.setType(TokenTypeEnum.PLUSPLUS);
+				token.setLiteral("++");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.PLUS);
+				token.setLiteral("+");
+			}
 		break;
 		case '-':
 			token.setType(TokenTypeEnum.MINUS);

@@ -38,6 +38,7 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.STRING, this::parseStringLiteral);
         prefixParseFns.put(TokenTypeEnum.CLASS, this::parseClassStatement);
         prefixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePrefixPlusPlus);
+        prefixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePrefixMinusMinus);
         prefixParseFns.put(TokenTypeEnum.NULL, this::parseNullExpression);
         prefixParseFns.put(TokenTypeEnum.THIS, this::parseThisExpression);
         infixParseFns.put(TokenTypeEnum.PLUS, this::parseInfixExpression);
@@ -55,6 +56,7 @@ public class Parser {
         infixParseFns.put(TokenTypeEnum.ASSIGN, this::parseAssignExpression);
         infixParseFns.put(TokenTypeEnum.DOT, this::parseMemberAccess);
         infixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePostfixPlusPlus);
+        infixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePostfixMinusMinus);
     }
 
     public void load(String s) {
@@ -460,6 +462,11 @@ public class Parser {
         return null;
     }
 
+    private AstNode parsePrefixMinusMinus() {
+        // TODO: implement this
+        return null;
+    }
+
     private AstNode parseNullExpression() {
         AstNullExpression expr = new AstNullExpression(currentToken);
         return expr;
@@ -488,6 +495,11 @@ public class Parser {
     }
 
     private AstNode parsePostfixPlusPlus(AstNode left) {
+        // TODO: implement this
+        return null;
+    }
+
+    private AstNode parsePostfixMinusMinus(AstNode left) {
         // TODO: implement this
         return null;
     }
