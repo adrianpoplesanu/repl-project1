@@ -29,6 +29,8 @@ public class AstNodeTypeConverter {
 			put(AstNodeTypeEnum.MEMBER_ACCESS, "MemberAccess");
 			put(AstNodeTypeEnum.THIS_EXPRESSION, "ThisExpression");
 			put(AstNodeTypeEnum.FOR_EXPRESSION, "ForExpression");
+			put(AstNodeTypeEnum.POSTFIX_INCREMENT, "PostfixIncrement");
+			put(AstNodeTypeEnum.PREFIX_INCREMENT, "PrefixIncrement");
 		}
 	};
 	

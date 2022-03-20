@@ -53,8 +53,14 @@ public class Lexer {
 			}
 		break;
 		case '-':
-			token.setType(TokenTypeEnum.MINUS);
-			token.setLiteral("-");
+			if (peekChar() == '-') {
+				token.setType(TokenTypeEnum.MINUSMINUS);
+				token.setLiteral("--");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.MINUS);
+				token.setLiteral("-");
+			}
 		break;
 		case '*':
 			token.setType(TokenTypeEnum.ASTERISK);

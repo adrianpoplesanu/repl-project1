@@ -24,6 +24,8 @@ public class TokenPrecedenceConverter {
 			put(TokenTypeEnum.ASSIGN, PrecedenceTypeEnum.ASSIGN);
 			put(TokenTypeEnum.LBRACKET, PrecedenceTypeEnum.INDEX);
 			put(TokenTypeEnum.DOT, PrecedenceTypeEnum.MEMBER_ACCESS);
+			put(TokenTypeEnum.PLUSPLUS, PrecedenceTypeEnum.PLUSPLUS);
+			put(TokenTypeEnum.MINUSMINUS, PrecedenceTypeEnum.PLUSPLUS);
 		}
 	};
 	
