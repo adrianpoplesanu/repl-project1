@@ -269,8 +269,31 @@ public class Parser {
     }
 
     private AstNode parseForExpression() {
-        // TODO: implement this
-        return null;
+        AstForExpression expr = new AstForExpression(currentToken);
+        nextToken();
+        if (!currentTokenIs(TokenTypeEnum.LPAREN)) {
+            return null;
+        }
+        nextToken();
+        expr.setInitialization(parseExpression(PrecedenceTypeEnum.LOWEST));
+        nextToken();
+        if (!currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+            return null;
+        }
+        nextToken();
+        expr.setCondition(parseExpression(PrecedenceTypeEnum.LOWEST));
+        nextToken();
+        if (!currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+            return null;
+        }
+        nextToken();
+        expr.setStep(parseExpression(PrecedenceTypeEnum.LOWEST));
+        nextToken();
+        if (!currentTokenIs(TokenTypeEnum.LBRACE)) {
+            return null;
+        }
+        expr.setBody(parseBlockStatement());
+        return expr;
     }
 
     private AstNode parseDefStatement() {
