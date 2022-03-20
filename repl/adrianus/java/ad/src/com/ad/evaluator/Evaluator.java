@@ -70,6 +70,8 @@ public class Evaluator {
 			return evalClassStatement(node, env);
 		case MEMBER_ACCESS:
 			return evalMemberAccess(node, env);
+		case FOR_EXPRESSION:
+			return evalForExpression(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
@@ -434,6 +436,19 @@ public class Evaluator {
     	while (isTruthy(condition)) {
     		AdObject result = eval(expr.getBody(), env);
     		if (result != null && result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
+    		condition = eval(expr.getCondition(), env);
+		}
+    	return null;
+	}
+
+	private AdObject evalForExpression(AstNode node, Environment env) {
+    	AstForExpression expr = (AstForExpression) node;
+    	eval(expr.getInitialization(), env);
+    	AdObject condition = eval(expr.getCondition(), env);
+    	while(isTruthy(condition)) {
+    		AdObject result = eval(expr.getBody(), env);
+    		if (result != null && result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
+    		eval(expr.getStep(), env);
     		condition = eval(expr.getCondition(), env);
 		}
     	return null;
