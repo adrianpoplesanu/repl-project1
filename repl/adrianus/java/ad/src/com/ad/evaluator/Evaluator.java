@@ -72,6 +72,8 @@ public class Evaluator {
 			return evalMemberAccess(node, env);
 		case FOR_EXPRESSION:
 			return evalForExpression(node, env);
+		case POSTFIX_INCREMENT:
+			return evalPostfixIncrement(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
@@ -451,6 +453,10 @@ public class Evaluator {
     		eval(expr.getStep(), env);
     		condition = eval(expr.getCondition(), env);
 		}
+    	return null;
+	}
+
+	private AdObject evalPostfixIncrement(AstNode node, Environment env) {
     	return null;
 	}
 
