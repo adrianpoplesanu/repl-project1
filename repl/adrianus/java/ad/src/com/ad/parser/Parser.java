@@ -55,8 +55,8 @@ public class Parser {
         infixParseFns.put(TokenTypeEnum.LBRACKET, this::parseIndexExpression);
         infixParseFns.put(TokenTypeEnum.ASSIGN, this::parseAssignExpression);
         infixParseFns.put(TokenTypeEnum.DOT, this::parseMemberAccess);
-        infixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePostfixPlusPlus);
-        infixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePostfixMinusMinus);
+        infixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePostfixExpression);
+        infixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePostfixExpression);
     }
 
     public void load(String s) {
@@ -494,18 +494,11 @@ public class Parser {
         return astMemberAccess;
     }
 
-    private AstNode parsePostfixPlusPlus(AstNode left) {
+    private AstNode parsePostfixExpression(AstNode left) {
         AstPostfixIncrement expr = new AstPostfixIncrement(currentToken);
         expr.setName(left);
         expr.setOperation(currentToken.getLiteral());
         return expr;
-    }
-
-    private AstNode parsePostfixMinusMinus(AstNode left) {
-        AstPrefixIncrement expr = new AstPrefixIncrement(currentToken);
-        expr.setName(left);
-        expr.setOperation(currentToken.getLiteral());
-        return null;
     }
 
     private AstNode parseExpression(PrecedenceTypeEnum pte) {
