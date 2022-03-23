@@ -457,7 +457,16 @@ public class Evaluator {
 	}
 
 	private AdObject evalPostfixIncrement(AstNode node, Environment env) {
-    	return null;
+		AstPostfixIncrement expr = (AstPostfixIncrement) node;
+		AstIdentifier ident = (AstIdentifier) expr.getName();
+		AdObject old_obj = env.get(ident.getValue());
+		if (old_obj.getType() == ObjectTypeEnum.INT) {
+			int value = ((AdIntegerObject) old_obj).getValue();
+			AdIntegerObject  new_obj = new AdIntegerObject(value + 1);
+			env.set(ident.getValue(), new_obj);
+			return new AdIntegerObject(value);
+		}
+		return null;
 	}
 
 	private AdObject evalAssignStatement(AstNode node, Environment env) {
