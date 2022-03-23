@@ -462,9 +462,16 @@ public class Evaluator {
 		AdObject old_obj = env.get(ident.getValue());
 		if (old_obj.getType() == ObjectTypeEnum.INT) {
 			int value = ((AdIntegerObject) old_obj).getValue();
-			AdIntegerObject  new_obj = new AdIntegerObject(value + 1);
-			env.set(ident.getValue(), new_obj);
-			return new AdIntegerObject(value);
+			if (expr.getOperation().equals("++")) {
+				AdIntegerObject new_obj = new AdIntegerObject(value + 1);
+				env.set(ident.getValue(), new_obj);
+				return new AdIntegerObject(value);
+			}
+			if (expr.getOperation().equals("--")) {
+				AdIntegerObject new_obj = new AdIntegerObject(value - 1);
+				env.set(ident.getValue(), new_obj);
+				return new AdIntegerObject(value);
+			}
 		}
 		return null;
 	}

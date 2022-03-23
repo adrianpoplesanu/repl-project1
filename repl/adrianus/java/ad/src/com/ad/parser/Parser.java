@@ -497,12 +497,14 @@ public class Parser {
     private AstNode parsePostfixPlusPlus(AstNode left) {
         AstPostfixIncrement expr = new AstPostfixIncrement(currentToken);
         expr.setName(left);
-        expr.setOperation("++"); // this should be either the token literal or an enum
+        expr.setOperation(currentToken.getLiteral());
         return expr;
     }
 
     private AstNode parsePostfixMinusMinus(AstNode left) {
-        // TODO: implement this
+        AstPrefixIncrement expr = new AstPrefixIncrement(currentToken);
+        expr.setName(left);
+        expr.setOperation(currentToken.getLiteral());
         return null;
     }
 
