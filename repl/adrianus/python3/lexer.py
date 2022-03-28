@@ -58,6 +58,7 @@ class Lexer(object):
                 token.literal = self.ch
         elif self.ch == '<':
             if self.peek_char() == '=':
+                self.read_char()
                 token.type = TokenType.LTE
                 token.literal = "<="
             else:
@@ -144,9 +145,13 @@ class Lexer(object):
             self.read_char()
 
     def is_letter(self):
+        if self.ch == 0:
+            return False
         return ('a' <= self.ch and self.ch <= 'z') or ('A' <= self.ch and self.ch <= 'Z') or self.ch == '_'
 
     def is_digit(self):
+        if self.ch == 0:
+            return False
         return '0' <= self.ch and self.ch <= '9'
 
     def lookup_ident(self, ident):

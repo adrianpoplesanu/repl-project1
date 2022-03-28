@@ -5,8 +5,10 @@ from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
 from object_type import ObjectType
 from ast import StatementType
 from environment import new_environment, new_enclosed_environment
-#from builtins import builtins_map
-import builtins
+#from .builtins import builtins_map
+#import builtins
+#from . import builtins
+from builtin_funcs import builtins_map
 from utils import print_ast_nodes
 from handlers.file import read_file_content, write_file_content, append_file_content
 
@@ -117,8 +119,8 @@ class Evaluator(object):
     def eval_identifier(self, node, env):
         if env.check(node.token.literal):
             return env.get(node.token.literal)
-        if node.token.literal in builtins.builtins_map:
-            return builtins.builtins_map[node.value]
+        if node.token.literal in builtins_map:
+            return builtins_map[node.value]
         return NULLOBJECT
 
     def eval_integer(self, node, env):

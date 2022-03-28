@@ -21,13 +21,13 @@ def first_builtin(args, env):
 
 def print_builtin(args, env):
     for obj in args:
-        print obj.inspect()
+        print (obj.inspect())
 
 def exit_builtin(args, env):
     sys.exit(0)
 
 def ref_count_builtin(args, env):
-    print 'ref_count not available in Python implementation'
+    print ('ref_count not available in Python implementation')
 
 def type_builtin(args, env):
     target = args[0]
@@ -40,7 +40,7 @@ def append_builtin(args, env):
         list_obj.elements.append(obj)
 
 def context_builtin(args, env):
-    print env
+    print (env)
 
 def pop_builtin(args, env):
     result = None
