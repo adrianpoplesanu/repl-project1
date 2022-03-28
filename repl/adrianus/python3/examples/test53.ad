@@ -1,0 +1,17 @@
+a = list(3)
+n = len(a)
+
+def back(i, n) {
+    if (i == n) {
+        print(a)
+    } else {
+        k = 0
+        while(k < n) {
+            a[i] = k
+            back(i + 1, n)
+            k = k + 1
+        }
+    }
+}
+
+back(0, n)
