@@ -1,6 +1,0 @@
-class Test {
-    a = 5
-}
-
-test = Test()
-print(test.a)

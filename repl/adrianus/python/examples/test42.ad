@@ -1,3 +1,0 @@
-f = File()
-f.init("README.md", "r")
-f.read()

@@ -1,9 +1,0 @@
-port = 8080
-offset = 1
-
-def a(x) {
-    return port + offset + x
-}
-
-b = a(6)
-print(b)

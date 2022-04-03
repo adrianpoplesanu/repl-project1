@@ -1,8 +1,0 @@
-def test() {
-   f = File()
-   context()
-   f.init("README.md", "r")
-   print (f.read())
-}
-
-test()

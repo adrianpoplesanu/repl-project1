@@ -1,8 +1,0 @@
-class Test {
-    atribut = 4
-}
-
-test = Test()
-test.atribut = 7
-
-print(test.atribut)
