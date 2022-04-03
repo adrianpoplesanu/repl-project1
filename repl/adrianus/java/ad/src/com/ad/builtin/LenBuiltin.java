@@ -6,11 +6,11 @@ import com.ad.objects.AdObject;
 import com.ad.objects.AdStringObject;
 import com.ad.objects.ObjectTypeEnum;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class LenBuiltin implements BuiltinInterface {
     @Override
-    public AdObject call(ArrayList<AdObject> args, Environment env) {
+    public AdObject call(List<AdObject> args, Environment env) {
         AdObject obj = args.get(0);
         if (obj.getType() == ObjectTypeEnum.STRING) {
             AdStringObject stringObject = (AdStringObject) obj;

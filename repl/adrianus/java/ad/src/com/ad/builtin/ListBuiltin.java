@@ -13,7 +13,7 @@ import static com.ad.evaluator.Evaluator.NULLOBJECT;
 
 public class ListBuiltin implements BuiltinInterface {
     @Override
-    public AdObject call(ArrayList<AdObject> args, Environment env) {
+    public AdObject call(List<AdObject> args, Environment env) {
         if (args.size() == 0) {
             List<AdObject> elements = new ArrayList<>();
             return new AdListObject(elements);
