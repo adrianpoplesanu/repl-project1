@@ -142,7 +142,11 @@ Ad_Object* map_builtin(std::vector<Ad_Object*> args, Environment *env) {
 }
 
 Ad_Object* input_builtin(std::vector<Ad_Object*> args, Environment *env) {
-    return NULL;
+    // TODO: add params to input function for printing something before inputting, if no params just silently wait
+    std::string line;
+    std::getline(std::cin, line);
+    Ad_String_Object* obj = new Ad_String_Object(line);
+    return obj;
 }
 
 Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
@@ -172,6 +176,14 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
         free_builtin_arguments(args);
         return list_object;
     }
+    return &NULLOBJECT;
+}
+
+Ad_Object* mat_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    // no arg: [[]]
+    // one arg: [[], [], ... , []]
+    // two arg: [[null, ... null], ... , [null, ... null]]
+    // three arg: [[a, ... a], ... , [a, ... a]]
     return &NULLOBJECT;
 }
 
@@ -209,10 +221,11 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"__iosocket", new Ad_Builtin_Object(&__iosocket_builtin)},
     {"eval", new Ad_Builtin_Object(&eval_builtin)},
     {"first", new Ad_Builtin_Object(&first_builtin)},
-    {"last", new Ad_Builtin_Object(&first_builtin)},
-    {"map", new Ad_Builtin_Object(&first_builtin)},
+    {"last", new Ad_Builtin_Object(&last_builtin)},
+    {"map", new Ad_Builtin_Object(&map_builtin)},
     {"input", new Ad_Builtin_Object(&input_builtin)},
     {"list", new Ad_Builtin_Object(&list_builtin)},
+    {"mat", new Ad_Builtin_Object(&mat_builtin)},
     {"hash", new Ad_Builtin_Object(&hash_builtin)},
     {"hasattr", new Ad_Builtin_Object(&hasattr_builtin)},
     {"getattr", new Ad_Builtin_Object(&getattr_builtin)},
