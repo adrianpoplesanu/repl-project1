@@ -28,7 +28,7 @@ public class AstInteger extends AstNode {
 
 	@Override
 	public String toString() {
-		return "IntegerLiteral [" + token.getLiteral() + "] <" + String.valueOf(value)  + ">";
+		return "IntegerLiteral [" + token.getLiteral() + "] <" + value + ">";
 	}
 
 	public Token getToken() {

@@ -20,6 +20,7 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.DEF, "DEF");
 			put(TokenTypeEnum.IDENT, "IDENT");
 			put(TokenTypeEnum.INT, "INT");
+			put(TokenTypeEnum.FLOAT, "FLOAT");
 			put(TokenTypeEnum.PLUS, "PLUS");
 			put(TokenTypeEnum.MINUS, "MINUS");
 			put(TokenTypeEnum.SLASH, "SLASH");
