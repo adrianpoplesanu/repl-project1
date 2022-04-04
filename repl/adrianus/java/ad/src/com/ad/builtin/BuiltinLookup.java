@@ -28,6 +28,7 @@ public class BuiltinLookup {
 			put("map", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("input", new AdBuiltinObject(new InputBuiltin())); // TODO: update this
 			put("list", new AdBuiltinObject(new ListBuiltin()));
+			put("map", new AdBuiltinObject(new MapBuiltin()));
 			put("hash", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			// https://www.w3schools.com/python/python_ref_keywords.asp
 			// https://www.w3schools.com/python/python_ref_functions.asp

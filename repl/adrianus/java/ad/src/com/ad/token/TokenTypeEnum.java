@@ -15,6 +15,7 @@ public enum TokenTypeEnum {
 	DEF,
 	IDENT,
 	INT,
+	FLOAT,
 	PLUS,
 	MINUS,
 	SLASH,
