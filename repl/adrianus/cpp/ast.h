@@ -12,6 +12,7 @@ enum StatementType {
     ST_EXPRESSION_STATEMENT,
     ST_IDENTIFIER,
     ST_INTEGER,
+    ST_FLOAT,
     ST_BOOLEAN,
     ST_INFIX_EXPRESSION,
     ST_PREFIX_EXPRESSION,
@@ -43,6 +44,7 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_EXPRESSION_STATEMENT, "ExpressionStatement"},
     {ST_IDENTIFIER, "Identifier"},
     {ST_INTEGER, "Integer"},
+    {ST_FLOAT, "Float"},
     {ST_BOOLEAN, "Boolean"},
     {ST_INFIX_EXPRESSION, "InfixExpression"},
     {ST_PREFIX_EXPRESSION, "PrefixExpression"},
@@ -155,6 +157,17 @@ public:
     Ad_AST_Integer();
     Ad_AST_Integer(Token, int);
     ~Ad_AST_Integer();
+    virtual std::string ToString();
+};
+
+class Ad_AST_Float : public Ad_AST_Node {
+public:
+    Token token;
+    float value;
+
+    Ad_AST_Float();
+    Ad_AST_Float(Token, float);
+    ~Ad_AST_Float();
     virtual std::string ToString();
 };
 

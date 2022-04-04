@@ -1,7 +1,8 @@
 #include <iostream>
 #include "parser.h"
 #include "token.h"
-#include "lexer.cpp"
+#include "lexer.cpp" // TODO: remove .cpp imports and use only .h and have all .cpp imports in main.cpp
+//#include "lexer.h" // ^^^
 #include "ast.cpp"
 
 Parser::Parser() {

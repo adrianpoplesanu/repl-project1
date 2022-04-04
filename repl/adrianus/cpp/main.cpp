@@ -4,6 +4,7 @@
 #include "test_objects.cpp"
 #include "test_parser.cpp"
 #include "test_listobject.cpp"
+// #include "lexer.cpp" TODO: remove .cpp imports from other files and fix imports, use only .h
 #include "repl.h"
 #include "repl.cpp"
 
