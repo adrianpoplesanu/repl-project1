@@ -23,6 +23,7 @@ public class Parser {
         lexer = new Lexer();
         prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier);
         prefixParseFns.put(TokenTypeEnum.INT, this::parseIntegerLiteral);
+        prefixParseFns.put(TokenTypeEnum.FLOAT, this::parseFloatLiteral);
         prefixParseFns.put(TokenTypeEnum.BANG, this::parsePrefixExpression);
         prefixParseFns.put(TokenTypeEnum.MINUS, this::parsePrefixExpression);
         prefixParseFns.put(TokenTypeEnum.TRUE, this::parseBoolean);
@@ -171,6 +172,11 @@ public class Parser {
     private AstNode parseIntegerLiteral() {
         String value = getCurrentToken().getLiteral();
         return new AstInteger(getCurrentToken(), Integer.parseInt(value));
+    }
+
+    private AstNode parseFloatLiteral() {
+        String value = getCurrentToken().getLiteral();
+        return new AstFloat(getCurrentToken(), Float.parseFloat(value));
     }
 
     private AstNode parseIfExpression() {

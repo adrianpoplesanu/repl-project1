@@ -163,7 +163,8 @@ public class Lexer {
 			} else
 			if (isDigit()) {
 				String literal = readNumber();
-				token.setType(TokenTypeEnum.INT);
+				if (literal.contains(".")) token.setType(TokenTypeEnum.FLOAT);
+				else token.setType(TokenTypeEnum.INT);
 				token.setLiteral(literal);
 				needs_next_char = false;
 			} else {
@@ -184,6 +185,10 @@ public class Lexer {
 	private boolean isDigit() {
 		return ('0' <= currentChar) && (currentChar <= '9');
 	}
+
+	private boolean isFloatDot() {
+		return currentChar == '.';
+	}
 	
 	private boolean isLetter() {
 		return (('a' <= currentChar) && (currentChar <= 'z')) || (('A' <= currentChar) && (currentChar <= 'Z')) || currentChar == '_';
@@ -201,6 +206,12 @@ public class Lexer {
 		int start = position;
 		while(isDigit()) {
 			readChar();
+		}
+		if (isFloatDot()) {
+			readChar();
+			while(isDigit()) {
+				readChar();
+			}
 		}
 		return source.substring(start, position);
 	}
