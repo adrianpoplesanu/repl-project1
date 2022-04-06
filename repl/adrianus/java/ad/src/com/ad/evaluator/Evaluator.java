@@ -115,7 +115,8 @@ public class Evaluator {
     }
 
     private AdObject evalFloat(AstNode node, Environment env) {
-    	return null;
+    	AstFloat floatLiteral = (AstFloat) node;
+    	return new AdFloatObject(floatLiteral.getValue());
 	}
 
     private AdObject evalPrefixExpression(String operator, AdObject right) {
