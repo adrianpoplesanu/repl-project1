@@ -42,6 +42,8 @@ public class Evaluator {
 			return evalInfixExpression(node, env);
 		case INTEGER_LITERAL:
 			return evalInteger(node, env);
+		case FLOAT_LITERAL:
+			return evalFloat(node, env);
 		case LET_STATEMENT:
 			return evalLetStatement(node, env);
 		case PREFIX_EXPRESSION:
@@ -111,6 +113,10 @@ public class Evaluator {
     	AstInteger integerLiteral = (AstInteger)node;
     	return new AdIntegerObject(integerLiteral.getValue());
     }
+
+    private AdObject evalFloat(AstNode node, Environment env) {
+    	return null;
+	}
 
     private AdObject evalPrefixExpression(String operator, AdObject right) {
     	if (operator == "!") {

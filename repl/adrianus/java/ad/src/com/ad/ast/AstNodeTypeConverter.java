@@ -11,6 +11,7 @@ public class AstNodeTypeConverter {
 			put(AstNodeTypeEnum.RETURN_STATEMENT, "ReturnStatement");
 			put(AstNodeTypeEnum.IDENTIFIER, "Identifier");
 			put(AstNodeTypeEnum.INTEGER_LITERAL, "IntegerLiteral");
+			put(AstNodeTypeEnum.FLOAT_LITERAL, "FloatLiteral");
 			put(AstNodeTypeEnum.BOOLEAN, "Boolean");
 			put(AstNodeTypeEnum.EXPRESSION_STATEMENT, "ExpressionStatement");
 			put(AstNodeTypeEnum.INFIX_EXPRESSION, "InfixExpression");
