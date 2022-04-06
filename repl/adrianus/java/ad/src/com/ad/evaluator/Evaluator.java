@@ -174,6 +174,9 @@ public class Evaluator {
     	if (left.getType() == ObjectTypeEnum.INT && right.getType() == ObjectTypeEnum.INT) {
     		return evalIntegerInfixExpression(operator, left, right);
     	}
+    	if (left.getType() == ObjectTypeEnum.FLOAT && right.getType() == ObjectTypeEnum.FLOAT) {
+    		return evalFloatInfixExpression(operator, left, right);
+		}
     	if (left.getType() == ObjectTypeEnum.BOOLEAN && right.getType() == ObjectTypeEnum.BOOLEAN) {
     		return evalBooleanInfixExpression(operator, left, right);
 		}
@@ -210,6 +213,35 @@ public class Evaluator {
     	}
     	return null;
     }
+
+    private AdObject evalFloatInfixExpression(String operator, AdObject left, AdObject right) {
+    	// TODO: consolidate evalIntegerInfixExpression and evalFloatInfixExpression into one method
+		float left_val = ((AdFloatObject)left).getValue();
+		float right_val = ((AdFloatObject)right).getValue();
+		switch (operator) {
+			case "+":
+				return new AdFloatObject(left_val + right_val);
+			case "-":
+				return new AdFloatObject(left_val - right_val);
+			case "*":
+				return new AdFloatObject(left_val * right_val);
+			case "/":
+				return new AdFloatObject(left_val / right_val);
+			case "<":
+				return nativeBoolToBoolean(left_val < right_val);
+			case ">":
+				return nativeBoolToBoolean(left_val > right_val);
+			case "<=":
+				return nativeBoolToBoolean(left_val <= right_val);
+			case ">=":
+				return nativeBoolToBoolean(left_val >= right_val);
+			case "==":
+				return nativeBoolToBoolean(left_val == right_val);
+			case "!=":
+				return nativeBoolToBoolean(left_val != right_val);
+		}
+		return null;
+	}
 
     private AdObject evalBooleanInfixExpression(String operator, AdObject left, AdObject right) {
     	boolean left_val = ((AdBooleanObject) left).getValue();
