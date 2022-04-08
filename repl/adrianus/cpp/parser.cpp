@@ -8,6 +8,7 @@
 Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_IDENT, &Parser::ParseIdentifier));
     prefixParseFns.insert(std::make_pair(TT_INT, &Parser::ParseIntegerLiteral));
+    prefixParseFns.insert(std::make_pair(TT_FLOAT, &Parser::ParseFloatLiteral));
     prefixParseFns.insert(std::make_pair(TT_BANG, &Parser::ParsePrefixExpression));
     prefixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParsePrefixExpression));
     prefixParseFns.insert(std::make_pair(TT_TRUE, &Parser::ParseBoolean));
@@ -229,6 +230,14 @@ Ad_AST_Node* Parser::ParseIntegerLiteral() {
     integer_node->token = current_token;
     integer_node->value = val;
     return integer_node;
+}
+
+Ad_AST_Node* Parser::ParseFloatLiteral() {
+    Ad_AST_Float* float_node = new Ad_AST_Float();
+    float val = std::stof(current_token.literal);
+    float_node->token = current_token;
+    float_node->value = val;
+    return float_node;
 }
 
 Ad_AST_Node* Parser::ParsePrefixExpression() {

@@ -222,6 +222,26 @@ std::string Ad_AST_Integer::ToString() {
     return std::to_string(value);
 }
 
+Ad_AST_Float::Ad_AST_Float() {
+    type = ST_FLOAT;
+    ref_count = 0;
+}
+
+Ad_AST_Float::Ad_AST_Float(Token t, float val) {
+    type = ST_FLOAT;
+    ref_count = 0;
+    token = t;
+    value = val;
+}
+
+Ad_AST_Float::~Ad_AST_Float() {
+
+}
+
+std::string Ad_AST_Float::ToString() {
+    return std::to_string(value);
+}
+
 Ad_AST_Boolean::Ad_AST_Boolean() {
     type = ST_BOOLEAN;
     ref_count = 0;

@@ -75,6 +75,7 @@ public:
     void PrintNode(Ad_AST_Node*);
     Ad_AST_Node* ParseIdentifier();
     Ad_AST_Node* ParseIntegerLiteral();
+    Ad_AST_Node* ParseFloatLiteral();
     Ad_AST_Node* ParsePrefixExpression();
     Ad_AST_Node* ParseBoolean();
     Ad_AST_Node* ParseGroupedExpression();
