@@ -54,6 +54,12 @@ std::string Lexer::ReadNumber() {
     while(IsDigit()) {
         ReadChar();
     }
+    if (IsFloatDot()) {
+        ReadChar();
+        while(IsDigit()) {
+            ReadChar();
+        }
+    }
     return source.substr(start, position - start);
 }
 
@@ -79,6 +85,10 @@ char Lexer::PeekChar() {
 
 bool Lexer::IsEOF() {
     return current_char == 0;
+}
+
+bool Lexer::IsFloatDot() {
+    return current_char == '.';
 }
 
 Token Lexer::NextToken() {
@@ -215,7 +225,11 @@ Token Lexer::NextToken() {
                 do_read_char_after_lexing = false;
             } else if (IsDigit()) {
                 std::string num = ReadNumber();
-                token.type = TT_INT;
+                if (num.find(".") != std::string::npos) {
+                    token.type = TT_FLOAT;
+                } else {
+                    token.type = TT_INT;
+                }
                 token.literal = num;
                 do_read_char_after_lexing = false;
             } else {

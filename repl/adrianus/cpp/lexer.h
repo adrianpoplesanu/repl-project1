@@ -25,6 +25,7 @@ public:
 	char PeekChar();
 	Token NextToken();
 	bool IsEOF();
+	bool IsFloatDot();
 };
 
 #endif
