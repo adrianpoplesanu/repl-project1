@@ -905,6 +905,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         case ST_INTEGER:
             delete (Ad_AST_Integer*)node;
         break;
+        case ST_FLOAT:
+            delete (Ad_AST_Float*) node;
+        break;
         case ST_BOOLEAN:
             delete (Ad_AST_Boolean*)node;
         break;
