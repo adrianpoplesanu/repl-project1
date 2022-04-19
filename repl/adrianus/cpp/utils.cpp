@@ -48,6 +48,10 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->Integer " << ((Ad_AST_Integer*)node)->token.ToString() << "\n";
         break;
+        case ST_FLOAT:
+            print_level(level);
+            std::cout << "->Float " << ((Ad_AST_Float*)node)->token.ToString() << "\n";
+        break;
         case ST_BOOLEAN:
             print_level(level);
             std::cout << "->Boolean " << ((Ad_AST_Boolean*)node)->token.ToString() << "\n";
