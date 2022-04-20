@@ -13,6 +13,7 @@
 enum Ad_Object_Type {
 	OBJ_NULL,
 	OBJ_INT,
+	OBJ_FLOAT,
 	OBJ_BOOL,
 	OBJ_STRING,
 	OBJ_RETURN_VALUE,
@@ -31,6 +32,7 @@ enum Ad_Object_Type {
 std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_NULL, "NULL"},
 	{OBJ_INT, "INTEGER"},
+	{OBJ_FLOAT, "FLOAT"},
 	{OBJ_BOOL, "BOOLEAN"},
 	{OBJ_STRING, "STRING"},
 	{OBJ_RETURN_VALUE, "RETURN_VALUE"},
@@ -78,6 +80,20 @@ public:
 	Ad_Integer_Object();
 	Ad_Integer_Object(int);
 	~Ad_Integer_Object();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
+	virtual Ad_Object* copy();
+};
+
+class Ad_Float_Object : public Ad_Object {
+public:
+	float value;
+
+	Ad_Float_Object();
+	Ad_Float_Object(float);
+	~Ad_Float_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();

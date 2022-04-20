@@ -93,6 +93,42 @@ Ad_Object* Ad_Integer_Object::copy() {
     return new_object;
 }
 
+Ad_Float_Object::Ad_Float_Object() {
+    // TODO: implement this
+}
+
+Ad_Float_Object::Ad_Float_Object(float v) {
+    // TODO: implement this
+}
+
+Ad_Float_Object::~Ad_Float_Object() {
+    // TODO: implement this
+}
+
+std::string Ad_Float_Object::Inspect() {
+    // TODO: implement this
+    return "todo: implement this";
+}
+
+void Ad_Float_Object::Print() {
+    // TODO: implement this
+}
+
+Ad_Object_Type Ad_Float_Object::Type() {
+    // TODO: implement this
+    return type;
+}
+
+std::string Ad_Float_Object::Hash() {
+    // TODO: implement this
+    return "todo: implement this";
+}
+
+Ad_Object* Ad_Float_Object::copy() {
+    // TODO: implement this
+    return NULL;
+}
+
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {
     type = OBJ_RETURN_VALUE;
     ref_count = 0;
