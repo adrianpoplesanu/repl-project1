@@ -46,6 +46,7 @@ public:
     Ad_Object* EvalPostfixExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalForExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalNullExpression(Ad_AST_Node*, Environment&);
+    Ad_Object* EvalFloatExpression(Ad_AST_Node*, Environment&);
     void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void Init();
 };

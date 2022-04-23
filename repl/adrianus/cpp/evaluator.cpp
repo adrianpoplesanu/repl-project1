@@ -45,6 +45,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return obj;
         }
         break;
+        case ST_FLOAT:
+            return EvalFloatExpression(node, env);
+        break;
         case ST_BOOLEAN: {
             return NativeBoolToBooleanObject(((Ad_AST_Boolean*)node)->value);
         }
@@ -798,6 +801,12 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalNullExpression(Ad_AST_Node* node, Environment& env) {
     return &NULLOBJECT;
+}
+
+Ad_Object* Evaluator::EvalFloatExpression(Ad_AST_Node* node, Environment& env) {
+    Ad_Float_Object* obj = new Ad_Float_Object();
+    obj->value = ((Ad_AST_Float*) node)->value;
+    return obj;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

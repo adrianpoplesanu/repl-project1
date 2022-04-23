@@ -1,3 +1,5 @@
 Ad source code [C++ implementation]
 
-TODO: more info here
+
+testing memory leaks on MacOS:
+leaks -atExit -- ./main
