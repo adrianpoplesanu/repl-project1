@@ -5,6 +5,7 @@ class StatementType(object):
     EXPRESSION_STATEMENT = 'EXPRESSION_STATEMENT'
     IDENTIFIER = 'IDENTIFIER'
     INTEGER = 'INTEGER'
+    FLOAT = 'FLOAT'
     BOOLEAN = 'BOOLEAN'
     INFIX_EXPRESSION = 'INFIX_EXPRESSION'
     PREFIX_EXPRESSION = 'PREFIX_EXPRESSION'
@@ -36,6 +37,7 @@ statement_type_map = {
     StatementType.EXPRESSION_STATEMENT: 'EXPRESSION_STATEMENT',
     StatementType.IDENTIFIER: 'IDENTIFIER',
     StatementType.INTEGER: 'INTEGER',
+    StatementType.FLOAT: 'FLOAT',
     StatementType.BOOLEAN: 'BOOLEAN',
     StatementType.INFIX_EXPRESSION: 'INFIX_EXPRESSION',
     StatementType.PREFIX_EXPRESSION: 'PREFIX_EXPRESSION',
@@ -182,6 +184,24 @@ class ASTInteger(ASTNode):
         #print type(self.token.literal)
         #print type(self.value)
         return 'IntegerLiteral [' + str(self.token.literal) + '] <' + str(self.value) + '>'
+
+
+clas ASTFloat(ASTNode):
+    type = StatementType.FLOAT
+
+    def __init__(self, token=None, value=None):
+        """
+        @param token: the node's token
+        @param value: native float value
+        """
+        self.token = token
+        self.value = value
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'FloatLiteral [' + str(self.token.literal) + '] <' + str(self.value) + '>'
 
 
 class ASTBoolean(ASTNode):
