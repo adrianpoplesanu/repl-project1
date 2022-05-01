@@ -123,7 +123,10 @@ class Lexer(object):
                 skip_read_char = True
             elif self.is_digit():
                 token.literal = self.read_number()
-                token.type = TokenType.INT
+                if '.' in token.literal:
+                    token.type = TokenType.FLOAT
+                else:
+                    token.type = TokenType.INT
                 skip_read_char = True
             else:
                 token.type = TokenType.ILLEGAL
@@ -154,6 +157,9 @@ class Lexer(object):
             return False
         return '0' <= self.ch and self.ch <= '9'
 
+    def is_float_dot(self):
+        return self.ch == '.'
+
     def lookup_ident(self, ident):
         if ident in keywords_map:
             return keywords_map[ident]
@@ -174,6 +180,10 @@ class Lexer(object):
         start = self.position
         while self.is_digit():
             self.read_char()
+        if self.is_float_dot():
+            self.read_char()
+            while self.is_digit():
+                self.read_char()
         return self.source[start:self.position]
 
     def read_string(self):

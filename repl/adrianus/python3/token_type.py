@@ -13,6 +13,7 @@ class TokenType(object):
     DEF = "DEF"
     IDENT = "IDENT"
     INT = "INT"
+    FLOAT = "FLOAT"
     PLUS = "+"
     MINUS = "-"
     SLASH = "/"

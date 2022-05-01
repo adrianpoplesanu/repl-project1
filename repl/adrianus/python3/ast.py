@@ -186,7 +186,7 @@ class ASTInteger(ASTNode):
         return 'IntegerLiteral [' + str(self.token.literal) + '] <' + str(self.value) + '>'
 
 
-clas ASTFloat(ASTNode):
+class ASTFloat(ASTNode):
     type = StatementType.FLOAT
 
     def __init__(self, token=None, value=None):

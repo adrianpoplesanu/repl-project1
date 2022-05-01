@@ -7,7 +7,8 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
                 ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
-                ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression
+                ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
+                ASTFloat
 
 
 class Parser(object):
@@ -21,6 +22,7 @@ class Parser(object):
         self.errors = []
         self.prefix_parse_functions[TokenType.IDENT] = self.parse_identifier
         self.prefix_parse_functions[TokenType.INT] = self.parse_integer_literal
+        self.prefix_parse_functions[TokenType.FLOAT] = self.parse_float_literal
         self.prefix_parse_functions[TokenType.BANG] = self.parse_prefix_expression
         self.prefix_parse_functions[TokenType.MINUS] = self.parse_prefix_expression
         self.prefix_parse_functions[TokenType.TRUE] = self.parse_boolean
@@ -143,6 +145,10 @@ class Parser(object):
 
     def parse_integer_literal(self):
         stmt = ASTInteger(token=self.current_token, value=int(self.current_token.literal))
+        return stmt
+
+    def parse_float_literal(self):
+        stmt = ASTFloat(token=self.current_token, value=float(self.current_token.literal))
         return stmt
 
     def parse_prefix_expression(self):
