@@ -314,11 +314,11 @@ Ad_Builtin_Object::~Ad_Builtin_Object() {
 }
 
 std::string Ad_Builtin_Object::Inspect() {
-    return "todo: implement this";
+    return "todo: implement Ad_Builtin_Object::Inspect()";
 }
 
 void Ad_Builtin_Object::Print() {
-    std::cout << "todo: implement this\n";
+    std::cout << "todo: implement Ad_Builtin_Object::Print()\n";
 }
 
 Ad_Object_Type Ad_Builtin_Object::Type() {

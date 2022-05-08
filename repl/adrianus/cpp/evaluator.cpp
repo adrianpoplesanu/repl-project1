@@ -168,7 +168,8 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
             }
         }
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
-        if (result != NULL && result->ref_count <= 0) free_Ad_Object_memory(result);
+        if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result);
+        // OBJ_BUILTINS get destroyed on termination by free_builtin_map
     }
     return NULL;
 }
@@ -320,6 +321,7 @@ Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
     }
     if (builtins_map.find(((Ad_AST_Identifier*)node)->token.literal) != builtins_map.end()) {
         return builtins_map[((Ad_AST_Identifier*)node)->token.literal];
+        //return NULL;
     }
     //obj = new Ad_Error_Object("ERROR: Identifier " + ((Ad_AST_Identifier*)node)->token.literal + " used before being declared.");
     obj = &NULLOBJECT;
