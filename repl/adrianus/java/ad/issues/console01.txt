@@ -1,0 +1,19 @@
+Ad interpreter [JAVA]... v1.2
+>> def f(m) { m = 2; print(m); }
+>> f(7)
+2
+>> context()
+"{Test: <class at memory address: 0x2e5d6d97>, f: <funtion at memory address: 0x238e0d81>, File: <class at memory address: 0x31221be2>}"
+>>
+>>
+>> m = 8
+>> f(m)
+2
+>> m
+2
+>> x = 9
+>> f(x)
+2
+>> x
+9
+>>

@@ -15,6 +15,9 @@ public class TypeBuiltin implements BuiltinInterface {
 		case INT:
 			type.setValue("INT");
 			break;
+		case FLOAT:
+			type.setValue("FLOAT");
+			break;
 		case BOOLEAN:
 			type.setValue("BOOLEAN");
 			break;
@@ -23,6 +26,12 @@ public class TypeBuiltin implements BuiltinInterface {
 			break;
 		case FUNCTION:
 			type.setValue("FUNCTION");
+			break;
+		case LIST:
+			type.setValue("LIST");
+			break;
+		case HASH:
+			type.setValue("HASH");
 			break;
 		default:
 			type.setValue("UNKNOWN_TYPE");
