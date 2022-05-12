@@ -198,6 +198,9 @@ public class Lexer {
 		int start = position;
 		while(isLetter()) {
 			readChar();
+			while(isLetter() || isDigit()) {
+				readChar();
+			}
 		}
 		return source.substring(start, position);
 	}
