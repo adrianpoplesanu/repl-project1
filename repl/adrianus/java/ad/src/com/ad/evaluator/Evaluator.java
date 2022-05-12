@@ -440,7 +440,8 @@ public class Evaluator {
      	Environment extended = EnvironmentUtils.newEnclosedEnvironment(functionObject.getEnv());
      	int i = 0;
      	for (AstNode param : functionObject.getParameters()) {
-     		extended.set(param.tokenLiteral(), arguments.get(i++));
+     		//extended.set(param.tokenLiteral(), arguments.get(i++));
+			extended.setLocalParam(param.tokenLiteral(), arguments.get(i++));
      	}
     	return extended;
     }
@@ -449,7 +450,8 @@ public class Evaluator {
     	AdFunctionObject funcObj = (AdFunctionObject) function;
     	int i = 0;
     	for (AstNode param : funcObj.getParameters()) {
-    		env.set(param.tokenLiteral(), arguments.get(i++));
+    		//env.set(param.tokenLiteral(), arguments.get(i++));
+			env.set(param.tokenLiteral(), arguments.get(i++));
 		}
 		return null;
 	}

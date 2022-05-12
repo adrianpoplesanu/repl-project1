@@ -34,11 +34,25 @@ public class Environment {
 	}
 	
 	public void set(String key, AdObject value) {
-		if (outer != null && outer.check(key)) {
+		// ... si aici e problema
+		/*if (outer != null && outer.check(key)) {
 			outer.set(key, value);
 		} else {
 			store.put(key, value);
+		}*/
+		if (store.containsKey(key)) {
+			store.put(key, value);
+		} else {
+			if (outer != null && outer.check(key)) {
+				outer.set(key, value);
+			} else {
+				store.put(key, value);
+			}
 		}
+	}
+
+	public void setLocalParam(String key, AdObject value) {
+		store.put(key, value);
 	}
 
 	public String toString() {
