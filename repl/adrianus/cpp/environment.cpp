@@ -5,6 +5,7 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
+    std::cout << "se elibereaza un environment\n";
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
         Ad_DECREF(it->second); // asta merge
         free_Ad_Object_memory(it->second);
@@ -24,7 +25,7 @@ Ad_Object* Environment::Get(std::string key) {
         //if (outer && outer->store.find(key) != outer->store.end()) {
         //    return outer->store[key];
         //}
-        if (outer->Check(key)) {
+        if (outer && outer->Check(key)) {
             return outer->Get(key);
         }
         return NULL;
