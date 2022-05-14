@@ -17,7 +17,7 @@ public:
     void SetCallArgument(std::string, Ad_Object*);
     void SetOuterEnvironment(Environment*);
     void FreeObjectForKey(std::string);
-    void PrintStore();
+    void PrintStore(int);
 };
 
 Environment NewEnvironment();

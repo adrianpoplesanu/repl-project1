@@ -5,7 +5,6 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
-    std::cout << "se elibereaza un environment\n";
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
         Ad_DECREF(it->second); // asta merge
         free_Ad_Object_memory(it->second);
@@ -14,7 +13,8 @@ Environment::~Environment() {
 
 bool Environment::Check(std::string key) {
     if (store.find(key) == store.end()) {
-        if (outer && outer->store.find(key) != outer->store.end()) return true;
+        //if (outer && outer->store.find(key) != outer->store.end()) return true;
+        if (outer && outer->Check(key)) return true;
         return false;
     }
     return true;
@@ -76,7 +76,10 @@ void Environment::FreeObjectForKey(std::string key) {
     free_Ad_Object_memory(store[key]);
 }
 
-void Environment::PrintStore() {
+void Environment::PrintStore(int level) {
+    int k = 0;
+    if (level != 0) std::cout << "\n";
+    while(k++ < level) std::cout << " ";
     std::cout << "store: {";
     int size = store.size();
     int total = 0;
@@ -87,16 +90,19 @@ void Environment::PrintStore() {
         if (total < size) std::cout << ", "; // hmmm, this needs to be fixed
     }
     std::cout << "}\n";
+    k = 0;
+    while(k++ < level) std::cout << " ";
     std::cout << "outer: {";
     if (outer) {
-        size = outer->store.size();
+        /*size = outer->store.size();
         total = 0;
         for(std::map<std::string, Ad_Object* >::const_iterator it = outer->store.begin(); it != outer->store.end(); ++it) {
             std::cout << it->first << ": ";
             std::cout << it->second->Inspect();
             total++;
             if (total < size) std::cout << ", "; // hmmm, this needs to be fixed
-        }
+        }*/
+        outer->PrintStore(level + 4);
     }
     std::cout << "}\n";
 }

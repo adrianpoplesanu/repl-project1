@@ -80,7 +80,7 @@ Ad_Object* lower_builtin(std::vector<Ad_Object*> args, Environment* env) {
 }
 
 Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env) {
-    env->PrintStore();
+    env->PrintStore(0);
     return NULL;
 }
 
