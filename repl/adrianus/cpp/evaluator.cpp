@@ -618,7 +618,6 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
             Ad_Object* obj = Eval(assign_statement->value, env);
             //env.Set(((Ad_AST_Identifier*)klass_member)->value, obj);
             env.outer->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
-            Ad_INCREF(obj);
         } else {
             Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;

@@ -42,14 +42,15 @@ void Environment::Set(std::string key, Ad_Object* obj) {
         FreeObjectForKey(key);
         store[key] = obj;
         Ad_INCREF(obj); // this should be old_ref_count
-        //obj->ref_count = old_ref_count;
+        //obj->ref_count = old_ref_count; // this does not work
         return;
     }
     if (outer && outer->store.find(key) != outer->store.end()) {
         int old_ref_count = outer->store[key]->ref_count;
         outer->FreeObjectForKey(key);
         outer->store[key] = obj;
-        while (old_ref_count--) Ad_INCREF(obj);
+        //while (old_ref_count--) Ad_INCREF(obj); // this does not work
+        Ad_INCREF(obj);
         return;
     }
     if (store.find(key) != store.end()) {

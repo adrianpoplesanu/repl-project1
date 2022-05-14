@@ -1,0 +1,8 @@
+x = 2
+class T { x = 4 def test(x) { context() this.x = x context() } }
+a = T()
+x
+a.x
+a.test(7)
+x
+a.x

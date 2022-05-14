@@ -1,0 +1,10 @@
+class Test {
+    def init() {
+        this.a = 7
+    }
+}
+
+t = Test()
+t.init()
+print(t.a)
+ref_count(t.a)

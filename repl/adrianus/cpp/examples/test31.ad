@@ -2,11 +2,13 @@ class User {
     name = null
     firstname = null
     age = null
+    address = null
 
-    def init(p_name, p_firstname, p_age) {
+    def init(p_name, p_firstname, p_age, p_address) {
         name = p_name
         firstname = p_firstname
         age = p_age
+        address = p_address
     }
 
     def display() {
@@ -19,7 +21,7 @@ class User {
 class Service {
     def createUser() {
         user = User()
-        user.init("bebe", "dex", 11)
+        user.init("bebe", "dex", "11", "buc noi")
         return user
     }
 }
