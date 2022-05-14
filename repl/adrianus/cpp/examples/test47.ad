@@ -1,0 +1,10 @@
+class Generator {
+    def get_number() {
+        x = 123
+        return x
+    }
+}
+
+gen = Generator()
+a = gen.get_number()
+print(a)

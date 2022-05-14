@@ -158,6 +158,7 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         result = NULL;
         Ad_AST_Node *obj = *it;
         result = Eval(obj, env);
+        GarbageCollectEnvironments();
         if (result != NULL) {
             //result->Print();
             if (result->Type() != OBJ_SIGNAL) {
@@ -178,6 +179,13 @@ void Evaluator::Init() {
     NULLOBJECT.permanent = true;
     TRUE.permanent = true;
     FALSE.permanent = true;
+}
+
+void Evaluator::GarbageCollectEnvironments() {
+    for (Environment* env : environment_garbage_collection) {
+        delete env;
+    }
+    environment_garbage_collection.clear();
 }
 
 Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
@@ -446,8 +454,9 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
     if (func->type == OBJ_FUNCTION) {
         //ExtendMethodEnv(func, args, env);
         //Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, env);
-        Environment extendedEnv = ExtendMethodEnv(func, args, env);
-        Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, extendedEnv);
+        Environment* extendedEnv = ExtendMethodEnv(func, args, env);
+        Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
+        environment_garbage_collection.push_back(extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     /*if (func->type == OBJ_BUILTIN) {
@@ -493,14 +502,14 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
     return NULL;
 }
 
-Environment Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*> args_objs, Environment& env) {
+Environment* Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*> args_objs, Environment& env) {
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
     //Environment extended = NewEnclosedEnvironment(&(*(func_obj)->env));
-    Environment extended = NewEnclosedEnvironment((func_obj)->env);
+    Environment* extended = newEnclosedEnvironmentUnfreeable((func_obj)->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
         //env.Set((*it)->TokenLiteral(), args_objs[i]);
-        extended.SetCallArgument((*it)->TokenLiteral(), args_objs[i]);
+        extended->SetCallArgument((*it)->TokenLiteral(), args_objs[i]);
         ++i;
     }
     return extended;
@@ -717,7 +726,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
             Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
 
             Environment* klass_environment = klass_instance->instance_environment;
-            Environment* old = klass_environment->outer;
+            //Environment* old = klass_environment->outer;
             klass_environment->outer = &env;
             //klass_environment->outer = NULL;
 
@@ -731,7 +740,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
             }
 
             Ad_Object* result = ApplyMethod(klass_method, args_objs, *klass_environment);
-            klass_environment->outer = old;
+            //klass_environment->outer = old;
             return result;
         } else {
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;

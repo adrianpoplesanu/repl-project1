@@ -22,5 +22,6 @@ public:
 
 Environment NewEnvironment();
 Environment NewEnclosedEnvironment(Environment*);
+Environment* newEnclosedEnvironmentUnfreeable(Environment*);
 
 #endif

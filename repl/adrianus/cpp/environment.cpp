@@ -7,6 +7,8 @@ Environment::Environment() {
 Environment::~Environment() {
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
         Ad_DECREF(it->second); // asta merge
+        //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
+        //std::cout << mesaj << "\n";
         free_Ad_Object_memory(it->second);
     }
 }
@@ -39,8 +41,8 @@ void Environment::Set(std::string key, Ad_Object* obj) {
         int old_ref_count = store[key]->ref_count;
         FreeObjectForKey(key);
         store[key] = obj;
-        //Ad_INCREF(obj); // this should be old_ref_count
-        obj->ref_count = old_ref_count;
+        Ad_INCREF(obj); // this should be old_ref_count
+        //obj->ref_count = old_ref_count;
         return;
     }
     if (outer && outer->store.find(key) != outer->store.end()) {
@@ -115,5 +117,11 @@ Environment NewEnvironment() {
 Environment NewEnclosedEnvironment(Environment *o) {
     Environment env;
     env.SetOuterEnvironment(o);
+    return env;
+}
+
+Environment* newEnclosedEnvironmentUnfreeable(Environment *o) {
+    Environment* env = new Environment();
+    env->SetOuterEnvironment(o);
     return env;
 }

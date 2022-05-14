@@ -1,0 +1,15 @@
+class T {
+    x = 2
+}
+
+class Generator {
+    def get_number() {
+        t = T()
+        t.x = 234
+        return t
+    }
+}
+
+gen = Generator()
+a = gen.get_number()
+print(a.x)

@@ -7,6 +7,8 @@
 
 class Evaluator {
 public:
+    std::vector<Environment*> environment_garbage_collection;
+
     Ad_Object* Eval(Ad_AST_Node*, Environment&);
     Ad_Object* EvalProgram(Ad_AST_Node*, Environment&);
     Ad_Object* EvalInfixExpression(std::string, Ad_Object*, Ad_Object*);
@@ -47,9 +49,10 @@ public:
     Ad_Object* EvalForExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalNullExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalFloatExpression(Ad_AST_Node*, Environment&);
-    Environment ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
+    Environment* ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     //void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void Init();
+    void GarbageCollectEnvironments();
 };
 
 #endif
