@@ -34,6 +34,14 @@ Ad_Object* Environment::Get(std::string key) {
 }
 
 void Environment::Set(std::string key, Ad_Object* obj) {
+    if (store.find(key) != store.end()) {
+        int old_ref_count = store[key]->ref_count;
+        FreeObjectForKey(key);
+        store[key] = obj;
+        //Ad_INCREF(obj); // this should be old_ref_count
+        obj->ref_count = old_ref_count;
+        return;
+    }
     if (outer && outer->store.find(key) != outer->store.end()) {
         int old_ref_count = outer->store[key]->ref_count;
         outer->FreeObjectForKey(key);
@@ -81,6 +89,7 @@ void Environment::PrintStore() {
     std::cout << "outer: {";
     if (outer) {
         size = outer->store.size();
+        total = 0;
         for(std::map<std::string, Ad_Object* >::const_iterator it = outer->store.begin(); it != outer->store.end(); ++it) {
             std::cout << it->first << ": ";
             std::cout << it->second->Inspect();

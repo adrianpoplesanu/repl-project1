@@ -1,0 +1,4 @@
+Ad interpreter [C++]... v1.0
+>> class T { def test() { this.x = 7 } }
+>> a = T()
+[1]    78487 segmentation fault  ./main

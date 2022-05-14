@@ -681,6 +681,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete (Ad_File_Object*) obj;
             break;
             default:
+                std::cout << obj->type << "\n";
                 std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
             break;
         }
