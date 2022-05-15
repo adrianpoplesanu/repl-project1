@@ -387,7 +387,7 @@ public class Evaluator {
 					adClassInstance.getEnvironment().setOuter(env);
 					AdObject evaluated = eval(((AstAssignStatement) attribute).getValue(), adClassInstance.getEnvironment());
 					String attributeName = ((AstIdentifier)((AstAssignStatement) attribute).getName()).getValue();
-					adClassInstance.getEnvironment().set(attributeName, evaluated);
+					adClassInstance.getEnvironment().setLocalParam(attributeName, evaluated);
 				}
 				if (attribute.getType() == AstNodeTypeEnum.EXPRESSION_STATEMENT) {
 					AstExpressionStatement astExpressionStatement = (AstExpressionStatement) attribute;
@@ -396,7 +396,7 @@ public class Evaluator {
 						AstAssignStatement astAssignStatement = (AstAssignStatement) astExpressionStatement.getExpression();
 						AdObject evaluated = eval(astAssignStatement.getValue(), adClassInstance.getEnvironment());
 						String attributeName = ((AstIdentifier)astAssignStatement.getName()).getValue();
-						adClassInstance.getEnvironment().set(attributeName, evaluated);
+						adClassInstance.getEnvironment().setLocalParam(attributeName, evaluated);
 					}
 				}
 			});
@@ -427,9 +427,9 @@ public class Evaluator {
 
 	private AdObject applyMethod(AdObject function, List<AdObject> arguments, Environment env) {
     	if (function.getType() == ObjectTypeEnum.FUNCTION) {
-			extendMethodEnv(function, arguments, env);
+			Environment extendedEnv = extendMethodEnv(function, arguments, env);
 			AdFunctionObject functionObject = (AdFunctionObject) function;
-			AdObject evaluated = eval(functionObject.getBlock(), env);
+			AdObject evaluated = eval(functionObject.getBlock(), extendedEnv);
 			return unwrapReturnValue(evaluated);
 		}
     	return null;
@@ -448,12 +448,13 @@ public class Evaluator {
 
     private Environment extendMethodEnv(AdObject function, List<AdObject> arguments, Environment env) {
     	AdFunctionObject funcObj = (AdFunctionObject) function;
+		Environment extended = EnvironmentUtils.newEnclosedEnvironment(env);
     	int i = 0;
     	for (AstNode param : funcObj.getParameters()) {
     		//env.set(param.tokenLiteral(), arguments.get(i++));
-			env.set(param.tokenLiteral(), arguments.get(i++));
+			extended.setLocalParam(param.tokenLiteral(), arguments.get(i++));
 		}
-		return null;
+		return extended;
 	}
 
     private AdObject unwrapReturnValue(AdObject evaluated) {
@@ -526,7 +527,7 @@ public class Evaluator {
 			if (memberAccess.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
 				AstIdentifier klassMember = (AstIdentifier) memberAccess.getMember();
 				AdObject obj = eval(assignStatement.getValue(), env);
-				env.set(klassMember.getValue(), obj);
+				env.getOuter().set(klassMember.getValue(), obj);
 			} else {
 				AstIdentifier owner = (AstIdentifier) memberAccess.getOwner();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
@@ -661,7 +662,7 @@ public class Evaluator {
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
 				Environment old = klassInstance.getEnvironment().getOuter();
-				klassInstance.getEnvironment().setOuter(null);
+				klassInstance.getEnvironment().setOuter(env);
 				AdObject klassMethod = klassInstance.getEnvironment().get(member.getValue());
 				if (klassMethod == null) {
 					return NULLOBJECT;

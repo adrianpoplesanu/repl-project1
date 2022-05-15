@@ -10,7 +10,7 @@ public class Environment {
 	public HashMap<String, AdObject> store;
 	
 	public Environment() {
-		store = new HashMap<String, AdObject>();
+		store = new HashMap<>();
 		outer = null;
 	}
 	
@@ -34,12 +34,6 @@ public class Environment {
 	}
 	
 	public void set(String key, AdObject value) {
-		// ... si aici e problema
-		/*if (outer != null && outer.check(key)) {
-			outer.set(key, value);
-		} else {
-			store.put(key, value);
-		}*/
 		if (store.containsKey(key)) {
 			store.put(key, value);
 		} else {
