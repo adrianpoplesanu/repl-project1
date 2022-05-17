@@ -526,13 +526,11 @@ Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj) {
 }
 
 Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
-    //Environment extended = NewEnclosedEnvironment(&(*((Ad_Function_Object*)func)->env));
-    Environment extended = NewEnclosedEnvironment(((Ad_Function_Object*)func)->env);
+    Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
+    Environment extended = NewEnclosedEnvironment(func_obj->env);
     int i = 0;
-    for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_Function_Object*)func)->params.begin() ; it != ((Ad_Function_Object*)func)->params.end(); ++it) {
-        //extended.Set((*it)->TokenLiteral(), args[i]);
-        extended.SetCallArgument((*it)->TokenLiteral(), args[i]);
-        ++i;
+    for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
+        extended.SetCallArgument((*it)->TokenLiteral(), args[i++]);
     }
     return extended;
 }
