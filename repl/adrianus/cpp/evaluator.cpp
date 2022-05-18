@@ -452,53 +452,11 @@ Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::ve
 
 Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
-        //ExtendMethodEnv(func, args, env);
-        //Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, env);
         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
         environment_garbage_collection.push_back(extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
-    /*if (func->type == OBJ_BUILTIN) {
-        return ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
-    }
-    if (func->type == OBJ_CLASS) {
-        Environment* instance_environment = new Environment();
-        Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
-        Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*) klass_object->name;
-        Ad_Class_Instance* klass_instance = new Ad_Class_Instance(klass_ident->value, klass_object, instance_environment);
-        std::vector<Ad_AST_Node*> attributes = klass_object->attributes;
-        for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
-            Ad_AST_Node *node = *it;
-            if (node->type == ST_ASSIGN_STATEMENT) {
-                Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) node;
-                instance_environment->outer = &env;
-                Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
-                Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
-                std::string key = assign_ident->value;
-                klass_instance->instance_environment->Set(key, evaluated);
-            }
-            if (node->type == ST_EXPRESSION_STATEMENT) {
-                Ad_AST_ExpressionStatement * expression_statement = (Ad_AST_ExpressionStatement*) node;
-                if (expression_statement->expression->type == ST_ASSIGN_STATEMENT) {
-                    Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) expression_statement->expression;
-                    instance_environment->outer = &env;
-                    Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
-                    Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
-                    std::string key = assign_ident->value;
-                    klass_instance->instance_environment->Set(key, evaluated);
-                }
-            }
-        }
-        std::vector<Ad_AST_Node*> methods = klass_object->methods;
-        for (std::vector<Ad_AST_Node*>::iterator it = methods.begin(); it != methods.end(); ++it) {
-            Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
-            Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, klass_instance->instance_environment);
-            Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
-            klass_instance->instance_environment->Set(def_ident->value, method_obj);
-        }
-        return klass_instance;
-    }*/
     return NULL;
 }
 
