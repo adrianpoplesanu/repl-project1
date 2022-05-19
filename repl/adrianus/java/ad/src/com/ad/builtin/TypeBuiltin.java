@@ -6,7 +6,12 @@ import com.ad.environment.Environment;
 import com.ad.objects.AdObject;
 import com.ad.objects.AdStringObject;
 
-public class TypeBuiltin implements BuiltinInterface {
+public class TypeBuiltin extends AbstractBuiltin {
+
+	public TypeBuiltin() {
+		super();
+		acceptedParameterSize.add(1);
+	}
 
 	@Override
 	public AdObject call(List<AdObject> args, Environment env) {

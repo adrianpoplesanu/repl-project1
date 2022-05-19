@@ -6,7 +6,12 @@ import com.ad.objects.AdStringObject;
 
 import java.util.List;
 
-public class ContextBuiltin implements BuiltinInterface {
+public class ContextBuiltin extends AbstractBuiltin {
+
+    public ContextBuiltin() {
+        super();
+        acceptedParameterSize.add(0);
+    }
 
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
