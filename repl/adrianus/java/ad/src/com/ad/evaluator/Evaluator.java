@@ -368,6 +368,12 @@ public class Evaluator {
 
     private AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments, Environment env) {
     	if (function.getType() == ObjectTypeEnum.FUNCTION) {
+			AdFunctionObject functionObj = (AdFunctionObject) function;
+			int parametersSize =  functionObj.getParameters().size();
+			int argumentsSize = arguments.size();
+			if (parametersSize != argumentsSize) {
+				return new AdErrorObject("function signature unrecognized, different number of params");
+			}
     		Environment extendedEnv = extendFunctionEnv(function, arguments);
     		AdFunctionObject functionObject = (AdFunctionObject) function;
     		AdObject evaluated = eval(functionObject.getBlock(), extendedEnv);
@@ -375,6 +381,7 @@ public class Evaluator {
     	}
     	if (function.getType() == ObjectTypeEnum.BUILTIN) {
     		AdBuiltinObject builtin = (AdBuiltinObject) function;
+			// la builtins trebuie sa gasesc un mod de a face verificarea de semnatura, nu pot decat daca am un numar acceptat de parametri care pot fi primiti de apel.
     		return builtin.getBuiltinFunction().call(arguments, env);
     	}
 		if (function.getType() == ObjectTypeEnum.CLASS) {
