@@ -382,6 +382,10 @@ public class Evaluator {
     	if (function.getType() == ObjectTypeEnum.BUILTIN) {
     		AdBuiltinObject builtin = (AdBuiltinObject) function;
 			// la builtins trebuie sa gasesc un mod de a face verificarea de semnatura, nu pot decat daca am un numar acceptat de parametri care pot fi primiti de apel.
+			if (builtin.getBuiltinFunction().getAcceptedParameterSize().size() != 0 &&
+					!builtin.getBuiltinFunction().getAcceptedParameterSize().contains(arguments.size())) {
+				return new AdErrorObject("builtin signature unrecognized, different number of params");
+			}
     		return builtin.getBuiltinFunction().call(arguments, env);
     	}
 		if (function.getType() == ObjectTypeEnum.CLASS) {

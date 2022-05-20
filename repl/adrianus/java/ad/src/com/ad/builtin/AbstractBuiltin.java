@@ -8,4 +8,8 @@ public abstract class AbstractBuiltin implements BuiltinInterface {
 
     public AbstractBuiltin() {
     }
+
+    public List<Integer> getAcceptedParameterSize() {
+        return acceptedParameterSize;
+    }
 }

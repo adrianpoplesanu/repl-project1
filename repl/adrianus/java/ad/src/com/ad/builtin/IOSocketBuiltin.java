@@ -5,7 +5,7 @@ import com.ad.objects.AdObject;
 
 import java.util.List;
 
-public class IOSocketBuiltin implements BuiltinInterface {
+public class IOSocketBuiltin extends AbstractBuiltin {
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
         return null;

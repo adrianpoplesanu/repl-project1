@@ -11,7 +11,7 @@ import java.util.List;
 
 import static com.ad.evaluator.Evaluator.NULLOBJECT;
 
-public class ListBuiltin implements BuiltinInterface {
+public class ListBuiltin extends AbstractBuiltin {
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
         if (args.size() == 0) {

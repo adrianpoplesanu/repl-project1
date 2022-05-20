@@ -5,7 +5,7 @@ import com.ad.objects.AdObject;
 
 import java.util.List;
 
-public class MapBuiltin implements BuiltinInterface {
+public class MapBuiltin extends AbstractBuiltin {
 
     @Override
     public AdObject call(List<AdObject> args, Environment env) {

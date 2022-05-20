@@ -1,15 +1,16 @@
 package com.ad.objects;
 
+import com.ad.builtin.AbstractBuiltin;
 import com.ad.builtin.BuiltinInterface;
 
 public class AdBuiltinObject extends AdObject {
-	private BuiltinInterface builtinFunction;
+	private AbstractBuiltin builtinFunction;
 	
 	public AdBuiltinObject() {
 		this.type = ObjectTypeEnum.BUILTIN;
 	}
 
-	public AdBuiltinObject(BuiltinInterface builtinFunction) {
+	public AdBuiltinObject(AbstractBuiltin builtinFunction) {
 		this();
 		this.builtinFunction = builtinFunction;
 	}
@@ -29,11 +30,11 @@ public class AdBuiltinObject extends AdObject {
 		return ObjectTypeConverter.convertToString(type) + inspect();
 	}
 
-	public BuiltinInterface getBuiltinFunction() {
+	public AbstractBuiltin getBuiltinFunction() {
 		return builtinFunction;
 	}
 
-	public void setBuiltinFunction(BuiltinInterface builtinFunction) {
+	public void setBuiltinFunction(AbstractBuiltin builtinFunction) {
 		this.builtinFunction = builtinFunction;
 	}
 }

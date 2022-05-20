@@ -7,7 +7,7 @@ import com.ad.objects.AdStringObject;
 
 import java.util.List;
 
-public class IOFileBuiltin implements BuiltinInterface {
+public class IOFileBuiltin extends AbstractBuiltin {
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
         AdStringObject filenameObject = (AdStringObject) args.get(0);
