@@ -384,8 +384,13 @@ std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> arg
 
 Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
+        Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
+        if (func_obj->params.size() != args.size()) {
+            for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
+            return new Ad_Error_Object("bla bla bli");
+        }
         Environment extendedEnv = ExtendFunctionEnv(func, args);
-        Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, extendedEnv);
+        Ad_Object* evaluated = Eval(func_obj->body, extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
