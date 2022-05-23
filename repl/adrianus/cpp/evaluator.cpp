@@ -387,14 +387,16 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
         if (func_obj->params.size() != args.size()) {
             for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
-            return new Ad_Error_Object("bla bla bli");
+            return new Ad_Error_Object("function signature unrecognized, different number of params");
         }
         Environment extendedEnv = ExtendFunctionEnv(func, args);
         Ad_Object* evaluated = Eval(func_obj->body, extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
-        return ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
+        Ad_Object* result = ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
+        for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
+        return result;
     }
     if (func->type == OBJ_CLASS) {
         Environment* instance_environment = new Environment();

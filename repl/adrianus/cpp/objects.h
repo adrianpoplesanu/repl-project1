@@ -178,10 +178,15 @@ public:
 class Ad_Builtin_Object : public Ad_Object {
 public:
 	//...
+	//typedef Ad_Object* (*BuiltinFunction)(std::vector<Ad_Object*>, Environment*);
+
+	std::vector<int> acceptedNumbersOfArguments;
 	Ad_Object* (*builtin_function)(std::vector<Ad_Object*>, Environment*);
+	//BuiltinFunction builtin_function;
 
 	Ad_Builtin_Object();
 	Ad_Builtin_Object(Ad_Object* (*)(std::vector<Ad_Object*>, Environment*));
+	//Ad_Builtin_Object(BuiltinFunction);
 	~Ad_Builtin_Object();
 	virtual std::string Inspect();
 	virtual void Print();

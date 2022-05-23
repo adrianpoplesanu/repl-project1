@@ -282,7 +282,7 @@ Ad_Error_Object::Ad_Error_Object(std::string m) {
 
 std::string Ad_Error_Object::Inspect() {
     std::string out;
-    out = message;
+    out = "ERROR: " + message;
     return out;
 }
 
