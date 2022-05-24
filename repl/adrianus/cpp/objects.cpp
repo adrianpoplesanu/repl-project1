@@ -303,7 +303,7 @@ Ad_Builtin_Object::Ad_Builtin_Object() {
     ref_count = 0;
 }
 
-Ad_Builtin_Object::Ad_Builtin_Object(Ad_Object* (*bf)(std::vector<Ad_Object*>, Environment*)) {
+Ad_Builtin_Object::Ad_Builtin_Object(BuiltinFunction bf) {
     type = OBJ_BUILTIN;
     ref_count = 0;
     builtin_function = bf;

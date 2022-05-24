@@ -395,7 +395,6 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
     }
     if (func->type == OBJ_BUILTIN) {
         Ad_Object* result = ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
-        for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
         return result;
     }
     if (func->type == OBJ_CLASS) {
