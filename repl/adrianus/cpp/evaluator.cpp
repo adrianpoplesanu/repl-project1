@@ -736,6 +736,12 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) 
                 return result;
             }
         }
+        if (method_name == "write") {
+            if (owner->_operator == "w") {
+                write_file_content(owner->filename, "test");
+                return &NULLOBJECT;
+            }
+        }
     }
     return NULL;
 }

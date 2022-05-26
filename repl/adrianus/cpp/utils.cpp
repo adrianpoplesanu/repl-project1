@@ -183,3 +183,10 @@ std::string read_file_content(std::string filename) {
     in.close();
     return data;
 }
+
+void write_file_content(std::string filename, std::string content) {
+    std::ofstream out;
+    out.open(filename);
+    out << content;
+    out.close();
+}

@@ -3,7 +3,7 @@ class File {
     operator = null
     file_object = null
 
-    def init(p_name, p_operator) {
+    def constructor(p_name, p_operator) {
         name = p_name
         operator = p_operator
         file_object = __iofile(name, operator)
@@ -16,6 +16,8 @@ class File {
     }
 
     def write(text) {
-        return file_object.write(text)
+        if (operator == "w") {
+            return file_object.write(text)
+        }
     }
 }
