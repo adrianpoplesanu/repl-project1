@@ -184,6 +184,7 @@ public:
 
 	Ad_Builtin_Object();
 	Ad_Builtin_Object(BuiltinFunction);
+	Ad_Builtin_Object(BuiltinFunction, std::vector<int>);
 	~Ad_Builtin_Object();
 	virtual std::string Inspect();
 	virtual void Print();

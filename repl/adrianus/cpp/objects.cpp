@@ -309,6 +309,13 @@ Ad_Builtin_Object::Ad_Builtin_Object(BuiltinFunction bf) {
     builtin_function = bf;
 }
 
+Ad_Builtin_Object::Ad_Builtin_Object(BuiltinFunction bf, std::vector<int> anoa) {
+    type = OBJ_BUILTIN;
+    ref_count = 0;
+    builtin_function = bf;
+    acceptedNumbersOfArguments = anoa;
+}
+
 Ad_Builtin_Object::~Ad_Builtin_Object() {
 
 }
