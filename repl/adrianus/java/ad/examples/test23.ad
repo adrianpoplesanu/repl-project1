@@ -1,0 +1,12 @@
+class Test {
+    def constructor() {
+        print("in constructor()");
+    }
+
+    def test() {
+        print("in test()");
+    }
+}
+
+t = Test()
+t.test()
