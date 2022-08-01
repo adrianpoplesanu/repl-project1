@@ -21,19 +21,17 @@ for test_file in test_files:
     expected_output = open(expected_target, 'r').read()
 
     if output != expected_output:
-        #print "FAILURE - " + target
-        #print "EXPECTED:\n" + expected_output
-        #print "ACTUAL:\n" + output
         failure.append("FAILURE - " + target)
         failure_expected.append(expected_output)
         failure_actual.append(output)
     else:
-        #print "SUCCESS - " + target
         success.append(target)
-    #proc = subprocess.Popen(["ls", "-la"])
-    #proc = subprocess.Popen(["../../cpp/main", "../../cpp/examples/test01.ad"])
-    #output = proc.join()
-    #print output
 
-print success
-print failure
+if failure:
+    print "There were errors:"
+    for f in failure:
+        print f
+else:
+    print 'ALL tests passed!'
+    for s in success:
+        print s
