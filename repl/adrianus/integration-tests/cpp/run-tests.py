@@ -9,6 +9,8 @@ test_files = tests_data.readlines()
 
 success = []
 failure = []
+failure_expected = []
+failure_actual = []
 
 for test_file in test_files:
     target = test_file.strip()
@@ -19,12 +21,19 @@ for test_file in test_files:
     expected_output = open(expected_target, 'r').read()
 
     if output != expected_output:
-        print "FAILURE - " + target
-        print "EXPECTED:\n" + expected_output
-        print "ACTUAL:\n" + output
+        #print "FAILURE - " + target
+        #print "EXPECTED:\n" + expected_output
+        #print "ACTUAL:\n" + output
+        failure.append("FAILURE - " + target)
+        failure_expected.append(expected_output)
+        failure_actual.append(output)
     else:
-        print "SUCCESS - " + target
+        #print "SUCCESS - " + target
+        success.append(target)
     #proc = subprocess.Popen(["ls", "-la"])
     #proc = subprocess.Popen(["../../cpp/main", "../../cpp/examples/test01.ad"])
     #output = proc.join()
     #print output
+
+print success
+print failure
