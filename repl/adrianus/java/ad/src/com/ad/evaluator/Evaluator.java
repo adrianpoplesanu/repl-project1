@@ -718,6 +718,12 @@ public class Evaluator {
 					return result;
 				}
 			}
+			if (memberName.equals("write")) {
+				if (fileObject.getOperator().equals("w")) {
+					FileUtils.writeToFile((fileObject.getFilename()), "test content");
+					return NULLOBJECT;
+				}
+			}
 		}
     	return null;
 	}
