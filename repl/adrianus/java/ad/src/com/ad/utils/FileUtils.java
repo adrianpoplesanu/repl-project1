@@ -32,6 +32,10 @@ public class FileUtils {
         return contentBuilder.toString();
     }
 
+    public static void writeToFile(String path, String content) {
+        // TODO: implement this
+    }
+
     public static void test(String[] args) {
         readFile("/Users/adrianpoplesanu/Documents/git-projects/repl-project1/repl/adrianus/java/ad/examples/test16.ad");
     }
