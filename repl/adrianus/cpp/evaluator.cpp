@@ -665,7 +665,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
 
     Ad_Object* evaluated = NULL;
-    evaluated = EvalFileObjectMethod(node, env);
+    evaluated = EvalFileObjectMethod(node, member_access->arguments, env);
     if (evaluated != NULL) return evaluated;
 
     if (member_access->owner->type == ST_THIS_EXPRESSION) {
@@ -718,7 +718,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
     }
 }
 
-Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) {
+Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST_Node*> args, Environment& env) {
     // TODO: implement this
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
     if (member_access->owner->type != ST_IDENTIFIER) {
@@ -738,7 +738,9 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, Environment& env) 
         }
         if (method_name == "write") {
             if (owner->_operator == "w") {
-                write_file_content(owner->filename, "test");
+                std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env); // this needs consolidated somehow, looks like crap
+                // inspect on Ad_Object_String is bad, it needs to be printed out without "" in file writings
+                write_file_content(owner->filename, args_objs[0]->Inspect());
                 return &NULLOBJECT;
             }
         }

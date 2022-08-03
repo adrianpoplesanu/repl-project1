@@ -1,0 +1,2 @@
+file = File("bbb.txt", "w")
+file.write("neatza")
