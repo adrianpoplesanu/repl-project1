@@ -29,8 +29,10 @@ for test_file in test_files:
 
 if failure:
     print "There were errors:"
-    for f in failure:
+    for i, f in enumerate(failure):
         print f
+        print "EXPECTED:\n" + failure_expected[i]
+        print "ACTUAL:\n" + failure_actual[i]
 else:
     print 'ALL tests passed!'
     for s in success:
