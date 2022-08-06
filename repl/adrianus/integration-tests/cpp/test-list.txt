@@ -1,2 +1,10 @@
 examples/test01.ad
 examples/test02.ad
+examples/test03.ad
+examples/test04.ad
+examples/test05.ad
+examples/test06.ad
+examples/test07.ad
+examples/test08.ad
+examples/test09.ad
+examples/test10.ad
