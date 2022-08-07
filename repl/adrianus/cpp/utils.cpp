@@ -190,3 +190,7 @@ void write_file_content(std::string filename, std::string content) {
     out << content;
     out.close();
 }
+
+void append_file_content(std::string filename, std::string content) {
+    
+}
