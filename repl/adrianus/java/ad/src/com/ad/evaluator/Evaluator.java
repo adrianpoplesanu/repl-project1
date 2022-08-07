@@ -652,7 +652,7 @@ public class Evaluator {
 
 	private AdObject evalMemberAccess(AstNode node, Environment env) {
 		AstMemberAccess stmt = (AstMemberAccess) node;
-		AdObject evaluated = evalFileObjectMethod(node, env);
+		AdObject evaluated = evalFileObjectMethod(node, stmt.getArguments(), env);
 		if (evaluated != null) return evaluated;
 		if (stmt.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
 			if (stmt.isMethod()) {
@@ -700,7 +700,7 @@ public class Evaluator {
 		//return null;
 	}
 
-	private AdObject evalFileObjectMethod(AstNode node, Environment env) {
+	private AdObject evalFileObjectMethod(AstNode node, List<AstNode> args, Environment env) {
     	AstMemberAccess memberAccess = (AstMemberAccess) node;
     	if (memberAccess.getOwner().getType() != AstNodeTypeEnum.IDENTIFIER) {
     		return null;
@@ -712,15 +712,23 @@ public class Evaluator {
 			AdFileObject fileObject = (AdFileObject) rawObject;
 			String memberName = memberIdentifier.getValue();
 			if (memberName.equals("read")) {
-				if (fileObject.getOperator().equals("r")) {
+				if (fileObject.getOperator().contains("r")) {
 					String text = FileUtils.readFile(fileObject.getFilename());
 					AdStringObject result = new AdStringObject(text);
 					return result;
 				}
 			}
 			if (memberName.equals("write")) {
-				if (fileObject.getOperator().equals("w")) {
-					FileUtils.writeToFile((fileObject.getFilename()), "test content");
+				if (fileObject.getOperator().contains("w")) {
+					List<AdObject> argObjs = evalExpressions(args, env);
+					// TODO: fix inspect() or use toString() like method that generates the string without ""
+					FileUtils.writeToFile((fileObject.getFilename()), argObjs.get(0).inspect());
+					return NULLOBJECT;
+				} else
+				if (fileObject.getOperator().contains("a")) {
+					List<AdObject> argObjs = evalExpressions(args, env);
+					// TODO: fix inspect() or use toString() like method that generates the string without ""
+					FileUtils.appendToFile((fileObject.getFilename()), argObjs.get(0).inspect());
 					return NULLOBJECT;
 				}
 			}
