@@ -1,4 +1,5 @@
-echo "cleaning up tests" ;
+echo "\033[0;36mcleaning up binaries\033[0m" ;
 cd ../../cpp ; 
 make clean ;
-echo "done!" ; 
+cd - ;
+echo "\033[0;32mfinished!\033[0m" ; 

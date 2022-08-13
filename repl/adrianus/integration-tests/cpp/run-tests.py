@@ -28,12 +28,12 @@ for test_file in test_files:
         success.append(target)
 
 if failure:
-    print "There were errors:"
+    print "\033[0;31mThere were errors:"
     for i, f in enumerate(failure):
-        print f
-        print "EXPECTED:\n" + failure_expected[i]
-        print "ACTUAL:\n" + failure_actual[i]
+        print "\033[0;31m" + f + "\033[0m"
+        print "\033[0;33mEXPECTED:\033[0m\n" + failure_expected[i]
+        print "\033[0;33mACTUAL:\033[0m\n" + failure_actual[i]
 else:
-    print 'ALL tests passed!'
+    print '\033[0;32mALL tests passed!\033[0m'
     for s in success:
         print s

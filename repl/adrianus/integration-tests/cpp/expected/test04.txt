@@ -1,0 +1,6 @@
+"start test"
+"end class declaration"
+store: {Elev: class object at memory address 0x147705880, a: 12, e: class instance at memory address 0x147705920}
+outer: {}
+class instance at memory address 0x147705920
+"end class test"

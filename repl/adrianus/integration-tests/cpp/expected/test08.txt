@@ -1,0 +1,3 @@
+store: {Server: class object at memory address 0x12f705160, server: class instance at memory address 0x12f705260}
+outer: {}
+"end script"

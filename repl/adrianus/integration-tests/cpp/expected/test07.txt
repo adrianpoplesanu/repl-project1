@@ -1,0 +1,2 @@
+"test class parsing for Ad"
+"end test class parsing for Ad"
