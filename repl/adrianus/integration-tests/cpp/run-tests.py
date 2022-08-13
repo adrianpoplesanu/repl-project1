@@ -1,4 +1,5 @@
 import subprocess
+import re
 
 binary_path = "../../cpp/"
 binary_excutable = "main"
@@ -20,7 +21,9 @@ for test_file in test_files:
     expected_target = expected_folder + target.split("/")[-1].replace(".ad", ".txt")
     expected_output = open(expected_target, 'r').read()
 
-    if output != expected_output:
+    ok = re.search(expected_output, output)
+    #if output != expected_output:
+    if not ok:
         failure.append("FAILURE - " + target)
         failure_expected.append(expected_output)
         failure_actual.append(output)
