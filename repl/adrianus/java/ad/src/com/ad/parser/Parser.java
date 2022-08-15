@@ -117,6 +117,8 @@ public class Parser {
             return parseLetStatement();
         } else if (currentToken.getType() == TokenTypeEnum.RETURN) {
             return parseReturnStatement();
+        } else if (currentToken.getType() == TokenTypeEnum.BREAK) {
+            return parseBreakStatement();
         } else {
             return parseExpressionStatement();
         }
@@ -274,6 +276,11 @@ public class Parser {
         }
         expr.setBody(parseBlockStatement());
         return expr;
+    }
+
+    private AstNode parseBreakStatement() {
+        AstBreakStatement stmt = new AstBreakStatement(currentToken);
+        return stmt;
     }
 
     private AstNode parseForExpression() {

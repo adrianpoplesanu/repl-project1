@@ -8,6 +8,7 @@ public enum ObjectTypeEnum {
     BOOLEAN,
     ERROR,
     RETURN_VALUE,
+    BREAK,
     FUNCTION,
     BUILTIN,
     LIST,

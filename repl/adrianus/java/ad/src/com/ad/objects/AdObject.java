@@ -6,7 +6,8 @@ public abstract class AdObject {
 	public abstract String inspect();
 	public abstract void print();
 	public abstract String hash();
-	
+	// public abstract String repr();
+
 	public ObjectTypeEnum getType() {
 		return type;
 	}

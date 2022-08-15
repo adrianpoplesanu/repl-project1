@@ -9,6 +9,7 @@ public class AstNodeTypeConverter {
 			put(AstNodeTypeEnum.PROGRAM, "Program");
 			put(AstNodeTypeEnum.LET_STATEMENT, "LetStatement");
 			put(AstNodeTypeEnum.RETURN_STATEMENT, "ReturnStatement");
+			put(AstNodeTypeEnum.BREAK_STATEMENT, "BreakStatement");
 			put(AstNodeTypeEnum.IDENTIFIER, "Identifier");
 			put(AstNodeTypeEnum.INTEGER_LITERAL, "IntegerLiteral");
 			put(AstNodeTypeEnum.FLOAT_LITERAL, "FloatLiteral");
