@@ -8,3 +8,12 @@ examples/test07.ad
 examples/test08.ad
 examples/test09.ad
 examples/test10.ad
+examples/test11.ad
+examples/test12.ad
+examples/test13.ad
+examples/test14.ad
+examples/test15.ad
+examples/test16.ad
+examples/test17.ad
+examples/test19.ad
+examples/test20.ad

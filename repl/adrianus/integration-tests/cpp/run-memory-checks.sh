@@ -2,4 +2,5 @@ echo "running memory checks - run tests with platform specific memory checkers a
 # 0 leaks for 0 total leaked bytes. trebuie cautat in output-ul memory check-ului
 
 python run-memory-checks.py ;
-echo "done!" ;
+
+rm mem-results.log ;
