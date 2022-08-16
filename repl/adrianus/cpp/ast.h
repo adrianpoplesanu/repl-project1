@@ -33,6 +33,7 @@ enum StatementType {
     ST_PREFIX_INCREMENT,
     ST_POSTFIX_INCREMENT,
     ST_FOR_EXPRESSION,
+    ST_BREAK_STATEMENT,
     ST_NULL_EXPRESSION,
     ST_THIS_EXPRESSION
 };
@@ -65,6 +66,7 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_PREFIX_INCREMENT, "PrefixIncrement"},
     {ST_POSTFIX_INCREMENT, "PostfixIncrement"},
     {ST_FOR_EXPRESSION, "ForExpression"},
+    {ST_BREAK_STATEMENT, "BreakStatement"},
     {ST_NULL_EXPRESSION, "NullExpression"},
     {ST_THIS_EXPRESSION, "ThisExpression"}
 };
@@ -412,6 +414,17 @@ public:
     Ad_AST_ForExprssion(Token);
     Ad_AST_ForExprssion(Token, Ad_AST_Node*, Ad_AST_Node*, Ad_AST_Node*, Ad_AST_Node*);
     ~Ad_AST_ForExprssion();
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
+};
+
+class Ad_AST_BreakStatement : public Ad_AST_Node {
+public:
+    Token token;
+
+    Ad_AST_BreakStatement();
+    Ad_AST_BreakStatement(Token);
+    ~Ad_AST_BreakStatement();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
 };

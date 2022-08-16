@@ -621,6 +621,30 @@ std::string Ad_File_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Break_Object::Ad_Break_Object() {
+    type = OBJ_BREAK;
+}
+
+Ad_Break_Object::~Ad_Break_Object() {
+
+}
+
+std::string Ad_Break_Object::Inspect() {
+    return NULL;
+}
+
+void Ad_Break_Object::Print() {
+
+}
+
+Ad_Object_Type Ad_Break_Object::Type() {
+    return type;
+}
+
+std::string Ad_Break_Object::Hash() {
+    return NULL;
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;

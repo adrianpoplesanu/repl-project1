@@ -871,6 +871,29 @@ std::string Ad_AST_ForExprssion::ToString() {
     return "todo: implemnt ToString() in Ad_AST_ForExprssion";
 }
 
+Ad_AST_BreakStatement::Ad_AST_BreakStatement() {
+    type = ST_BREAK_STATEMENT;
+    ref_count = 0;
+}
+
+Ad_AST_BreakStatement::Ad_AST_BreakStatement(Token t) {
+    type = ST_BREAK_STATEMENT;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_BreakStatement:: ~Ad_AST_BreakStatement() {
+    // no inner pointers, do nothing
+}
+
+std::string Ad_AST_BreakStatement::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_BreakStatement::ToString() {
+    return "Ad_AST_BreakStatement.ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;

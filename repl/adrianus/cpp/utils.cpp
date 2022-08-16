@@ -167,6 +167,10 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->ForExpression" << "\n";
         break;
+        case ST_BREAK_STATEMENT:
+            print_level(level);
+            std::cout << "->BreakStatement" << "\n";
+        break;
     }
 }
 

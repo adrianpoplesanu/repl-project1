@@ -26,7 +26,8 @@ enum Ad_Object_Type {
 	OBJ_CLASS,
 	OBJ_INSTANCE,
 	OBJ_FILE,
-	OBJ_SOCKET
+	OBJ_SOCKET,
+	OBJ_BREAK
 };
 
 std::map<Ad_Object_Type, std::string> object_type_map = {
@@ -45,7 +46,8 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_CLASS, "CLASS"},
 	{OBJ_INSTANCE, "INSTANCE"},
 	{OBJ_FILE, "FILE"},
-	{OBJ_SOCKET, "SOCKET"}
+	{OBJ_SOCKET, "SOCKET"},
+	{OBJ_BREAK, "BREAK"}
 };
 
 class Ad_Object {
@@ -141,6 +143,17 @@ public:
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
 	//virtual Ad_Object* copy(); // TODO: implement this
+};
+
+class Ad_Break_Object : public Ad_Object {
+public:
+	Ad_Break_Object();
+	~Ad_Break_Object();
+
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
 };
 
 class Environment; // forward declaration for Environment

@@ -141,6 +141,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_FOR_EXPRESSION:
             return EvalForExpression(node, env);
         break;
+        case ST_BREAK_STATEMENT:
+            return EvalBreakStatement(node, env);
+        break;
         case ST_NULL_EXPRESSION:
             return EvalNullExpression(node, env);
         break;
@@ -362,6 +365,9 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
         if (result && result->type == OBJ_RETURN_VALUE) {
             return result;
         }
+        if (result && result->type == OBJ_BREAK) {
+            return result;
+        }
         //free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
     }
     return result;
@@ -510,6 +516,7 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
         result = Eval(((Ad_AST_WhileExpression*)node)->consequence, env);
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result; // if a return is encountered in the block statement then that's the object the eval block must return
+        if (result != NULL && result->Type() == OBJ_BREAK) return NULL;
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
     return NULL;
@@ -789,10 +796,15 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
         Ad_Object* result = Eval(expr->body, env);
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result;
         if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result;
+        if (result != NULL && result->Type() == OBJ_BREAK) return NULL;
         Ad_Object* step = Eval(expr->step, env);
         condition = Eval(expr->condition, env);
     }
     return NULL;
+}
+
+Ad_Object* Evaluator::EvalBreakStatement(Ad_AST_Node* node, Environment& env) {
+    return new Ad_Break_Object();
 }
 
 Ad_Object* Evaluator::EvalNullExpression(Ad_AST_Node* node, Environment& env) {
