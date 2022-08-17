@@ -12,6 +12,7 @@ public class ObjectTypeConverter {
 			put(ObjectTypeEnum.STRING, "StringObject");
 			put(ObjectTypeEnum.RETURN_VALUE, "ReturnValueObject");
 			put(ObjectTypeEnum.BREAK, "BreakObject");
+			put(ObjectTypeEnum.CONTINUE, "ContinueObject");
 			put(ObjectTypeEnum.FUNCTION, "FunctionObject");
 			put(ObjectTypeEnum.ERROR, "ErrorObject");
 			put(ObjectTypeEnum.BUILTIN, "BuiltinObject");

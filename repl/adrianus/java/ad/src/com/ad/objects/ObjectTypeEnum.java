@@ -9,6 +9,7 @@ public enum ObjectTypeEnum {
     ERROR,
     RETURN_VALUE,
     BREAK,
+    CONTINUE,
     FUNCTION,
     BUILTIN,
     LIST,

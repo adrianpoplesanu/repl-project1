@@ -54,6 +54,8 @@ public class Evaluator {
 			return evalReturnStatement(node, env);
 		case BREAK_STATEMENT:
 			return evalBreakStatement(node, env);
+		case CONTINUE_STATEMENT:
+			return evalContinueStatement(node, env);
 		case STRING_LITERAL:
 			return evalStringLiteral(node, env);
 		case WHILE_EXPRESSION:
@@ -325,6 +327,9 @@ public class Evaluator {
 			if (result != null && result.getType() == ObjectTypeEnum.BREAK) {
 				return result;
 			}
+			if (result != null && result.getType() == ObjectTypeEnum.CONTINUE) {
+				return result;
+			}
     	}
     	return null; // this should return null, leaving it for now for testing purposes
     }
@@ -337,6 +342,10 @@ public class Evaluator {
 
 	private AdObject evalBreakStatement(AstNode node, Environment env) {
 		return new AdBreakObject();
+	}
+
+	private AdObject evalContinueStatement(AstNode node, Environment env) {
+		return new AdContinueObject();
 	}
 
     private AdObject evalFunctionLiteral(AstNode node, Environment env) {
@@ -501,6 +510,7 @@ public class Evaluator {
     		AdObject result = eval(expr.getBody(), env);
     		if (result != null && result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
 			if (result != null && result.getType() == ObjectTypeEnum.BREAK) return null;
+			//if (result != null && result.getType() == ObjectTypeEnum.CONTINUE) ; // do nothing ???
     		condition = eval(expr.getCondition(), env);
 		}
     	return null;
@@ -514,6 +524,7 @@ public class Evaluator {
     		AdObject result = eval(expr.getBody(), env);
     		if (result != null && result.getType() == ObjectTypeEnum.RETURN_VALUE) return result;
 			if (result != null && result.getType() == ObjectTypeEnum.BREAK) return null;
+			//if (result != null && result.getType() == ObjectTypeEnum.CONTINUE) ; // do nothing ???
     		eval(expr.getStep(), env);
     		condition = eval(expr.getCondition(), env);
 		}

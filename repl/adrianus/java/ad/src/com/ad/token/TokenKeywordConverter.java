@@ -22,6 +22,7 @@ public class TokenKeywordConverter {
 			put("or", TokenTypeEnum.OR);
 			put("for", TokenTypeEnum.FOR);
 			put("break", TokenTypeEnum.BREAK);
+			put("continue", TokenTypeEnum.CONTINUE);
 	    }
 	};
 	
