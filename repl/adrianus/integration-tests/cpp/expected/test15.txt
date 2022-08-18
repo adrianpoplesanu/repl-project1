@@ -1,1 +1,7 @@
-ala bala portocala
+0
+1
+2
+3
+4
+"cinci"
+78

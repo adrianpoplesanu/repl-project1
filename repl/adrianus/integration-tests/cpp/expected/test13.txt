@@ -1,1 +1,8 @@
-ala bala portocala
+store: {a: 5}
+outer: {}
+8080
+"listening..."
+"aaa"
+"bbb"
+store: {Server: class object at memory address (.*), a: 5, server: class instance at memory address (.*)}
+outer: {}
