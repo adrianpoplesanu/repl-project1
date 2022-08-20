@@ -894,6 +894,29 @@ std::string Ad_AST_BreakStatement::ToString() {
     return "Ad_AST_BreakStatement.ToString()";
 }
 
+Ad_AST_ContinueStatement::Ad_AST_ContinueStatement() {
+    type = ST_CONTINUE_STATEMENT;
+    ref_count = 0;
+}
+
+Ad_AST_ContinueStatement::Ad_AST_ContinueStatement(Token t) {
+    type = ST_CONTINUE_STATEMENT;
+    ref_count = 0;
+    token = t;
+}
+
+Ad_AST_ContinueStatement:: ~Ad_AST_ContinueStatement() {
+    // no inner pointers, do nothing
+}
+
+std::string Ad_AST_ContinueStatement::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_ContinueStatement::ToString() {
+    return "Ad_AST_BreakStatement.ToString()";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;

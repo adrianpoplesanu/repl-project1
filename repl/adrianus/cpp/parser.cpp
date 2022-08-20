@@ -132,6 +132,8 @@ Ad_AST_Node* Parser::ParseStatement() {
         return ParseReturnStatement();
     if (current_token.type == TT_BREAK)
         return ParseBreakStatement();
+    if (current_token.type == TT_CONTINUE)
+        return ParseContinueStatement();
     if (current_token.type == TT_STARTCOMMENT)
         return ParseComment();
     return ParseExpressionStatement();
@@ -579,6 +581,11 @@ Ad_AST_Node* Parser::ParseForExpression() {
 
 Ad_AST_Node* Parser::ParseBreakStatement() {
     Ad_AST_BreakStatement *stmt = new Ad_AST_BreakStatement(current_token);
+    return stmt;
+}
+
+Ad_AST_Node* Parser::ParseContinueStatement() {
+    Ad_AST_ContinueStatement *stmt = new Ad_AST_ContinueStatement(current_token);
     return stmt;
 }
 

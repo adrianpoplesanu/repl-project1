@@ -144,6 +144,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_BREAK_STATEMENT:
             return EvalBreakStatement(node, env);
         break;
+        case ST_CONTINUE_STATEMENT:
+            return EvalContinueStatement(node, env);
+        break;
         case ST_NULL_EXPRESSION:
             return EvalNullExpression(node, env);
         break;
@@ -366,6 +369,9 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
             return result;
         }
         if (result && result->type == OBJ_BREAK) {
+            return result;
+        }
+        if (result && result->type == OBJ_CONTINUE) {
             return result;
         }
         //free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
@@ -805,6 +811,10 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalBreakStatement(Ad_AST_Node* node, Environment& env) {
     return new Ad_Break_Object();
+}
+
+Ad_Object* Evaluator::EvalContinueStatement(Ad_AST_Node* node, Environment& env) {
+    return new Ad_Continue_Object();
 }
 
 Ad_Object* Evaluator::EvalNullExpression(Ad_AST_Node* node, Environment& env) {

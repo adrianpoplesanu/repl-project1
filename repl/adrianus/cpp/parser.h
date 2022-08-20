@@ -102,6 +102,7 @@ public:
     Ad_AST_Node* ParsePostfixPlusPlus(Ad_AST_Node*);
     Ad_AST_Node* ParseForExpression();
     Ad_AST_Node* ParseBreakStatement();
+    Ad_AST_Node* ParseContinueStatement();
     Ad_AST_Node* ParseNullExpression();
     Ad_AST_Node* ParseThisExpression();
 };

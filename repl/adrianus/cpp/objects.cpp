@@ -645,6 +645,30 @@ std::string Ad_Break_Object::Hash() {
     return NULL;
 }
 
+Ad_Continue_Object::Ad_Continue_Object() {
+    type = OBJ_CONTINUE;
+}
+
+Ad_Continue_Object::~Ad_Continue_Object() {
+
+}
+
+std::string Ad_Continue_Object::Inspect() {
+    return NULL;
+}
+
+void Ad_Continue_Object::Print() {
+
+}
+
+Ad_Object_Type Ad_Continue_Object::Type() {
+    return type;
+}
+
+std::string Ad_Continue_Object::Hash() {
+    return NULL;
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
