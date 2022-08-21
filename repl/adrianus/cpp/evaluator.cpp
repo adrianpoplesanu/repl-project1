@@ -362,9 +362,9 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
     Ad_Object* result;
     result = NULL;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)node)->statements.begin() ; it != ((Ad_AST_BlockStatement*)node)->statements.end(); ++it) {
-        Ad_AST_Node *obj = *it;
+        Ad_AST_Node *node = *it;
         result = NULL;
-        result = Eval(obj, env);
+        result = Eval(node, env);
         if (result && result->type == OBJ_RETURN_VALUE) {
             return result;
         }
@@ -522,7 +522,10 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
         result = Eval(((Ad_AST_WhileExpression*)node)->consequence, env);
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result; // if a return is encountered in the block statement then that's the object the eval block must return
-        if (result != NULL && result->Type() == OBJ_BREAK) return NULL;
+        if (result != NULL && result->Type() == OBJ_BREAK) {
+            free_Ad_Object_memory(result);
+            return NULL;
+        }
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
     return NULL;
@@ -802,7 +805,10 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
         Ad_Object* result = Eval(expr->body, env);
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result;
         if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result;
-        if (result != NULL && result->Type() == OBJ_BREAK) return NULL;
+        if (result != NULL && result->Type() == OBJ_BREAK) {
+            free_Ad_Object_memory(result);
+            return NULL;
+        }
         Ad_Object* step = Eval(expr->step, env);
         condition = Eval(expr->condition, env);
     }

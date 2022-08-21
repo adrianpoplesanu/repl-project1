@@ -623,6 +623,7 @@ std::string Ad_File_Object::Hash() {
 
 Ad_Break_Object::Ad_Break_Object() {
     type = OBJ_BREAK;
+    ref_count = 0;
 }
 
 Ad_Break_Object::~Ad_Break_Object() {
@@ -734,6 +735,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_FILE:
                 delete (Ad_File_Object*) obj;
+            break;
+            case OBJ_BREAK:
+                delete (Ad_Break_Object*) obj;
             break;
             default:
                 std::cout << obj->type << "\n";
