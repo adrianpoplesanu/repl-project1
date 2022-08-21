@@ -1016,6 +1016,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         case ST_THIS_EXPRESSION:
             delete (Ad_AST_This_Expression*) node;
         break;
+        case ST_BREAK_STATEMENT:
+            delete (Ad_AST_BreakStatement*) node;
+        break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";
         break;
