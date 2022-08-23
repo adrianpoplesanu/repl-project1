@@ -526,6 +526,9 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
             free_Ad_Object_memory(result);
             return NULL;
         }
+        if (result != NULL && result->Type() == OBJ_CONTINUE) {
+            free_Ad_Object_memory(result);
+        }
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
     return NULL;
@@ -808,6 +811,9 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
         if (result != NULL && result->Type() == OBJ_BREAK) {
             free_Ad_Object_memory(result);
             return NULL;
+        }
+        if (result != NULL && result->Type() == OBJ_CONTINUE) {
+            free_Ad_Object_memory(result);
         }
         Ad_Object* step = Eval(expr->step, env);
         condition = Eval(expr->condition, env);

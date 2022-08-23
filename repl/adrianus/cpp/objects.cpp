@@ -648,6 +648,7 @@ std::string Ad_Break_Object::Hash() {
 
 Ad_Continue_Object::Ad_Continue_Object() {
     type = OBJ_CONTINUE;
+    ref_count = 0;
 }
 
 Ad_Continue_Object::~Ad_Continue_Object() {
@@ -738,6 +739,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_BREAK:
                 delete (Ad_Break_Object*) obj;
+            break;
+            case OBJ_CONTINUE:
+                delete (Ad_Continue_Object*) obj;
             break;
             default:
                 std::cout << obj->type << "\n";
