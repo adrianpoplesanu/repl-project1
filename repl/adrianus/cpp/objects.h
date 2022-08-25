@@ -321,6 +321,17 @@ public:
 	std::string name;
 	int port;
 	bool isActive;
+
+	Ad_Socket_Object();
+	Ad_Socket_Object(std::string);
+	Ad_Socket_Object(std::string, int);
+	Ad_Socket_Object(std::string, int, bool);
+	~Ad_Socket_Object();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
+	//virtual Ad_Object* copy(); // TODO: implement this
 };
 
 void Ad_INCREF(Ad_Object*);
