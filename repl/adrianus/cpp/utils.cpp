@@ -171,6 +171,10 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->BreakStatement" << "\n";
         break;
+        case ST_CONTINUE_STATEMENT:
+            print_level(level);
+            std::cout << "->ContinueStatement" << "\n";
+        break;
     }
 }
 
