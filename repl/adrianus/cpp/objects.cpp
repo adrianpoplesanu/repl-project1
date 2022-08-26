@@ -671,6 +671,54 @@ std::string Ad_Continue_Object::Hash() {
     return NULL;
 }
 
+Ad_Socket_Object::Ad_Socket_Object() {
+    type = OBJ_SOCKET;
+    ref_count = 0;
+}
+
+Ad_Socket_Object::Ad_Socket_Object(std::string n) {
+    type = OBJ_SOCKET;
+    ref_count = 0;
+    name = n;
+}
+	
+Ad_Socket_Object::Ad_Socket_Object(std::string n, int p) {
+    type = OBJ_SOCKET;
+    ref_count = 0;
+    name = n;
+    port = p;
+}
+	
+Ad_Socket_Object::Ad_Socket_Object(std::string n, int p, bool a) {
+    type = OBJ_SOCKET;
+    ref_count = 0;
+    name = n;
+    port = p;
+    isActive = a;
+}
+
+Ad_Socket_Object::~Ad_Socket_Object() {
+    // TODO: implement this
+}
+
+std::string Ad_Socket_Object::Inspect() {
+    std::stringstream ss;
+    ss << "Socket [name=" << name << ", port=" << port << ", isActive=" << isActive << "]";
+    return ss.str();
+}
+
+void Ad_Socket_Object::Print() {
+    std::cout << "SocketObject\n";
+}
+
+Ad_Object_Type Ad_Socket_Object::Type() {
+    return type;
+}
+
+std::string Ad_Socket_Object::Hash() {
+    return object_type_map[type] + Inspect();
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
