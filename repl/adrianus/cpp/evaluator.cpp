@@ -687,6 +687,9 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
     evaluated = EvalFileObjectMethod(node, member_access->arguments, env);
     if (evaluated != NULL) return evaluated;
 
+    evaluated = evalSocketObjectMethod(node, member_access->arguments, env);
+    if (evaluated != NULL) return evaluated;
+
     if (member_access->owner->type == ST_THIS_EXPRESSION) {
         if (member_access->is_method) {
             Ad_Object* klass_method = env.Get(((Ad_AST_Identifier*)member_access->member)->value);
@@ -768,6 +771,20 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST
                 return &NULLOBJECT;
             }
         }
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST_Node*> args, Environment& env) {
+    std::cout << "evaluating a socket object member access\n";
+    Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
+    if (member_access->owner->type != ST_IDENTIFIER) {
+        return NULL;
+    }
+    Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
+    Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
+    if (owner_obj_raw->type == OBJ_SOCKET) {
+        return &NULLOBJECT;
     }
     return NULL;
 }

@@ -676,25 +676,28 @@ Ad_Socket_Object::Ad_Socket_Object() {
     ref_count = 0;
 }
 
-Ad_Socket_Object::Ad_Socket_Object(std::string n) {
+/*Ad_Socket_Object::Ad_Socket_Object(std::string n) {
     type = OBJ_SOCKET;
     ref_count = 0;
     name = n;
 }
-	
+
 Ad_Socket_Object::Ad_Socket_Object(std::string n, int p) {
     type = OBJ_SOCKET;
     ref_count = 0;
     name = n;
     port = p;
-}
-	
-Ad_Socket_Object::Ad_Socket_Object(std::string n, int p, bool a) {
+}*/
+
+Ad_Socket_Object::Ad_Socket_Object(std::string n, int p, bool a, bool f, bool c, bool s) {
     type = OBJ_SOCKET;
     ref_count = 0;
     name = n;
     port = p;
     isActive = a;
+    isForever = f;
+    isClient = c;
+    isServer = s;
 }
 
 Ad_Socket_Object::~Ad_Socket_Object() {
@@ -702,9 +705,13 @@ Ad_Socket_Object::~Ad_Socket_Object() {
 }
 
 std::string Ad_Socket_Object::Inspect() {
+    // return "<socket at address 0x0>"; // maybe this?
+    //std::stringstream ss;
+    //ss << "Socket [name=" << name << ", port=" << port << ", isActive=" << isActive << ", isForever" << isForever << ", isClient=" << isClient << ", isServer=" << isServer << "]";
+    //return ss.str();
     std::stringstream ss;
-    ss << "Socket [name=" << name << ", port=" << port << ", isActive=" << isActive << "]";
-    return ss.str();
+    ss << std::hex << this;
+    return "<socket instance at memory address " + ss.str() + ">";
 }
 
 void Ad_Socket_Object::Print() {

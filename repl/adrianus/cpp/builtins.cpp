@@ -125,7 +125,21 @@ Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env) {
 }
 
 Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env) {
-    return NULL;
+    Ad_Socket_Object* socketObject = new Ad_Socket_Object();
+    Ad_String_Object* nameObject = (Ad_String_Object*) args[0];
+    Ad_Integer_Object* portObject = (Ad_Integer_Object*) args[1];
+    Ad_Boolean_Object* isActiveObject = (Ad_Boolean_Object*) args[2];
+    Ad_Boolean_Object* isForeverObject = (Ad_Boolean_Object*) args[3];
+    Ad_Boolean_Object* isClientObject = (Ad_Boolean_Object*) args[4];
+    Ad_Boolean_Object* isServerObject = (Ad_Boolean_Object*) args[5];
+
+    socketObject->name = nameObject->value;
+    socketObject->port = portObject->value;
+    socketObject->isActive = isActiveObject->value;
+    socketObject->isForever = isForeverObject->value;
+    socketObject->isClient = isClientObject->value;
+    socketObject->isServer = isServerObject->value;
+    return socketObject;
 }
 
 Ad_Object* eval_builtin(std::vector<Ad_Object*> args, Environment* env) {

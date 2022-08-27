@@ -202,3 +202,11 @@ void write_file_content(std::string filename, std::string content) {
 void append_file_content(std::string filename, std::string content) {
     
 }
+
+void start_server_socket() {
+    //...
+}
+
+void start_client_socket() {
+    //...
+}

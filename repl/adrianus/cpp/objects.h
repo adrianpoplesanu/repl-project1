@@ -321,11 +321,15 @@ public:
 	std::string name;
 	int port;
 	bool isActive;
+	bool isForever;
+	bool isClient;
+	bool isServer;
 
 	Ad_Socket_Object();
-	Ad_Socket_Object(std::string);
-	Ad_Socket_Object(std::string, int);
-	Ad_Socket_Object(std::string, int, bool);
+	//Ad_Socket_Object(std::string);
+	//Ad_Socket_Object(std::string, int);
+	//Ad_Socket_Object(std::string, int, bool);
+	Ad_Socket_Object(std::string, int, bool, bool, bool, bool);
 	~Ad_Socket_Object();
 	virtual std::string Inspect();
 	virtual void Print();
