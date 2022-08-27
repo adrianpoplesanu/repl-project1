@@ -377,11 +377,11 @@ public class Evaluator {
 			}
     		objects.add(evaluated);
     	}*/
-    	List<AdObject> objects = params.stream().map(p -> eval(p, env)).collect(Collectors.toList());
-    	if (objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).findAny().isPresent()) {
-    		return objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).collect(Collectors.toList());
+		List<AdObject> objects = params.stream().map(param -> eval(param, env)).collect(Collectors.toList());
+		if (objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).findAny().isPresent()) {
+			return objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).collect(Collectors.toList());
 		}
-    	return objects;
+		return objects;
     }
 
     private AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments, Environment env) {
@@ -674,8 +674,17 @@ public class Evaluator {
 
 	private AdObject evalMemberAccess(AstNode node, Environment env) {
 		AstMemberAccess stmt = (AstMemberAccess) node;
+
 		AdObject evaluated = evalFileObjectMethod(node, stmt.getArguments(), env);
-		if (evaluated != null) return evaluated;
+		if (evaluated != null) {
+			return evaluated;
+		}
+
+		evaluated = evalSocketObjectMethod(node, stmt.getArguments(), env);
+		if (evaluated != null) {
+			return evaluated;
+		}
+
 		if (stmt.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
 			if (stmt.isMethod()) {
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
@@ -756,6 +765,21 @@ public class Evaluator {
 			}
 		}
     	return null;
+	}
+
+	private AdObject evalSocketObjectMethod(AstNode node, List<AstNode> args, Environment env) {
+		System.out.println("evaluating a socket instance member access");
+		AstMemberAccess memberAccess = (AstMemberAccess) node;
+		if (memberAccess.getOwner().getType() != AstNodeTypeEnum.IDENTIFIER) {
+			return null;
+		}
+		AstIdentifier ownerIdentifier = (AstIdentifier) memberAccess.getOwner();
+		AstIdentifier memberIdentifier = (AstIdentifier) memberAccess.getMember();
+		AdObject rawObject = env.get(ownerIdentifier.getValue());
+		if (rawObject.getType() == ObjectTypeEnum.SOCKET) {
+			return NULLOBJECT;
+		}
+		return null;
 	}
 
     private AdObject newError(String msg) {

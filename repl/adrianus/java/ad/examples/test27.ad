@@ -1,0 +1,15 @@
+server_sock = __iosocket("server 1", 8080, true, false, false, true)
+
+def serve_response() {
+    return "hello"
+}
+
+server_sock.listen(serve_response)
+
+print(server_sock)
+
+client_sock = __iosocket("client 1", 8080, true, false, false, true)
+
+client_sock.send("neata")
+
+print(client_sock)

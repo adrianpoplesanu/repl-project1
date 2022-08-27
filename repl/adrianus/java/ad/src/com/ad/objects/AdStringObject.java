@@ -3,7 +3,6 @@ package com.ad.objects;
 import com.ad.token.Token;
 
 public class AdStringObject extends AdObject {
-	private Token token;
 	private String value;
 	
 	public AdStringObject() {
@@ -30,14 +29,6 @@ public class AdStringObject extends AdObject {
 	@Override
 	public String hash() {
 		return ObjectTypeConverter.convertToString(type) + inspect();
-	}
-
-	public Token getToken() {
-		return token;
-	}
-
-	public void setToken(Token token) {
-		this.token = token;
 	}
 
 	public String getValue() {
