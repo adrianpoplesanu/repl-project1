@@ -1,0 +1,30 @@
+numbers = [0, 0, 0]
+length = 3
+magnitude = 5
+
+def check_solution(k) {
+    i = 0
+    while(i < k) {
+        if (numbers[i] == numbers[k]) {
+            return false
+        }
+        i++
+    }
+    return true
+}
+
+def back(k) {
+    if (k == length) {
+        print (numbers)
+    } else {
+        numbers[k] = 0
+        while (numbers[k] < magnitude) {
+            if (check_solution(k)) {
+                back(k + 1)
+            }
+            numbers[k] = numbers[k] + 1
+        }
+    }
+}
+
+back(0)
