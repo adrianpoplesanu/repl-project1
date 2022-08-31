@@ -6,6 +6,7 @@ import java.util.Map;
 import com.ad.objects.AdObject;
 
 public class Environment {
+	private BuiltinEnvironment builtins;
 	private Environment outer;
 	public HashMap<String, AdObject> store;
 	
@@ -17,6 +18,17 @@ public class Environment {
 	public Environment(Environment outer) {
 		this();
 		this.outer = outer;
+	}
+
+	public Environment(BuiltinEnvironment builtins) {
+		this();
+		this.builtins = builtins;
+	}
+
+	public Environment(Environment outer, BuiltinEnvironment builtins) {
+		this();
+		this.outer = outer;
+		this.builtins = builtins;
 	}
 	
 	public boolean check(String key) {
