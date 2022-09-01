@@ -3,6 +3,7 @@
 #include "repl.h"
 #include "parser.cpp"
 #include "evaluator.cpp"
+#include "environment_builtins.cpp"
 #include "environment.cpp"
 #include "bootstrap.cpp"
 

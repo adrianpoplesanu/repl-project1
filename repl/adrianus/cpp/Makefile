@@ -6,6 +6,7 @@ all:
 	g++ -g -std=c++17 hashpair.cpp -c -o hashpair.o
 	g++ -g -std=c++17 objects.cpp -c -o objects.o
 	g++ -g -std=c++17 listobject.cpp -c -o listobject.o
+	g++ -g -std=c++17 environment_builtins.cpp -c -o environment_builtins.o
 	g++ -g -std=c++17 environment.cpp -c -o environment.o
 	g++ -g -std=c++17 evaluator.cpp -c -o evaluator.o
 	g++ -g -std=c++17 signal.cpp -c -o signal.o
