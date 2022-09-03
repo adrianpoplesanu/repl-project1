@@ -232,7 +232,7 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"remove", new Ad_Builtin_Object(&remove_builtin)},
     {"upper", new Ad_Builtin_Object(&upper_builtin)},
     {"lower", new Ad_Builtin_Object(&lower_builtin)},
-    {"context", new Ad_Builtin_Object(&context_builtin)},
+    {"context", new Ad_Builtin_Object(&context_builtin, {0})},
     {"__iofile", new Ad_Builtin_Object(&__iofile_builtin)},
     {"__syssystem", new Ad_Builtin_Object(&__syssystem_builtin)},
     {"__iosocket", new Ad_Builtin_Object(&__iosocket_builtin)},

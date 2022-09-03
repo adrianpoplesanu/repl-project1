@@ -406,7 +406,14 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
-        Ad_Object* result = ((Ad_Builtin_Object*)func)->builtin_function(args, &env);
+        Ad_Builtin_Object* builtinObject = (Ad_Builtin_Object*) func;
+        if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
+                !std::count(builtinObject->acceptedNumbersOfArguments.begin(),
+                            builtinObject->acceptedNumbersOfArguments.end(),
+                            args.size())) {
+            return new Ad_Error_Object("builtin signature unrecognized, different number of params");
+        }
+        Ad_Object* result = builtinObject->builtin_function(args, &env);
         return result;
     }
     if (func->type == OBJ_CLASS) {
