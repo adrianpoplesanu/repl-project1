@@ -1,4 +1,4 @@
 class Definition:
-    def __init__(self):
-        self.name = ""
-        self.operand_widths = []
+    def __init__(self, name=None, operand_widths=None):
+        self.name = name
+        self.operand_widths = operand_widths
