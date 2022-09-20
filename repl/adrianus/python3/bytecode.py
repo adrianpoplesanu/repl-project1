@@ -1,6 +1,5 @@
-import sys
-import os
-sys.path.append(os.path.abspath('../code'))
+from code.instructions import Instructions
+
 
 class Bytecode:
     def __init__(self):

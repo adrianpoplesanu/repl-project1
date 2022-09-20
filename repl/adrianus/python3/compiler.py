@@ -1,8 +1,5 @@
-import sys
-import os
-sys.path.append(os.path.abspath('../code'))
+from code.instructions import Instructions
 
-from instructions import Instructions
 
 class Compiler:
     def __init__(self):
@@ -14,7 +11,8 @@ class Compiler:
         constants = []
 
     def compile(self, node):
-        # AstNode node
+        if node.type == StatementType.PROGRAM:
+            pass
         return None
 
     def bytecode(self):
