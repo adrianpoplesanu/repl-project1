@@ -9,3 +9,6 @@ class Instructions:
 
     def get(self, i):
         return self.instructions[i]
+
+    def add(self, ins):
+        self.instructions.append(ins)

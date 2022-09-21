@@ -1,4 +1,4 @@
-from code.instructions import Instructions
+from instructions import Instructions
 
 
 class Bytecode:

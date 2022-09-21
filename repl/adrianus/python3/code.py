@@ -17,7 +17,7 @@ class Code:
             return self.definitions[op]
         raise Exception("Opcode {0} is undefined".format(op))
 
-    def make(self, op, *args):
+    def make(self, op, operands):
         definition = self.definitions[op.byte_code]
         instruction_len = 1
         for operand_width in definition.operand_widths:
@@ -27,7 +27,7 @@ class Code:
 
         offset = 1
         i = 0
-        for operand in args:
+        for operand in operands:
             width = definition.operand_widths[i]
             i += 1
             if width == 2:
@@ -77,9 +77,9 @@ class Code:
 
 if __name__ == '__main__':
     code = Code()
-    instructions = [code.make(Opcode(OpcodeEnum.OP_ADD)),
-                    code.make(Opcode(OpcodeEnum.OP_CONSTANT), 2),
-                    code.make(Opcode(OpcodeEnum.OP_CONSTANT), 65534)]
+    instructions = [code.make(Opcode(OpcodeEnum.OP_ADD), []),
+                    code.make(Opcode(OpcodeEnum.OP_CONSTANT), [2]),
+                    code.make(Opcode(OpcodeEnum.OP_CONSTANT), [65534])]
     for instruction in instructions:
         for i in instruction:
             code.instructions.instructions.append(i)
