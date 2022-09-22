@@ -6,8 +6,6 @@ from opcode import Opcode, OpcodeEnum
 class Code:
     def __init__(self):
         self.instructions = Instructions()
-        #self.opcode = None
-
         self.definitions = {}
         self.definitions[OpcodeEnum.OP_CONSTANT] = Definition("OpConstant", [2])
         self.definitions[OpcodeEnum.OP_ADD] = Definition("OpAdd", [])

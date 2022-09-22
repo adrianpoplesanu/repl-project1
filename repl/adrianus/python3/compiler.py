@@ -10,16 +10,13 @@ from opcode import OpConstant, OpAdd
 
 class Compiler:
     def __init__(self):
-        self.instructions = Instructions()
+        self.instructions = Instructions() # maybe None and define it in reset
         self.code = Code()
         self.constants = []
 
-    def new(self):
+    def reset(self):
         self.instructions = Instructions()
-        constants = []
-
-    def init(self):
-        self.instructions = Instructions()
+        constants = [] # maybe this will need to be preserved from one step to another
         self.bytecode = Bytecode()
 
     def compile(self, node):
@@ -68,7 +65,7 @@ if __name__ == '__main__':
     program = ASTProgram()
     program.reset()
     parser.build_program_statements(program)
-    compiler.init()
+    compiler.reset()
     compiler.compile(program)
     bytecode = compiler.get_bytecode()
     compiler.code.instructions = bytecode.instructions
