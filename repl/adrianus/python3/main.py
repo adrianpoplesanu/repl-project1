@@ -4,6 +4,8 @@ from parser import Parser
 from ast import ASTProgram
 from evaluator import Evaluator
 from test_parser import test_parser, test_parser2, test_parser3
+from compiler import Compiler
+from vm import VM
 
 DEBUG = False
 
@@ -16,7 +18,9 @@ def main(args):
     parser = Parser()
     program = ASTProgram()
     evaluator = Evaluator()
-    repl = Repl(parser=parser, program=program, evaluator=evaluator)
+    compiler = Compiler()
+    vm = VM()
+    repl = Repl(parser=parser, program=program, evaluator=evaluator, compiler=compiler, vm=vm)
     if args:
         filename = open(args[0], "r")
         source = filename.read()
