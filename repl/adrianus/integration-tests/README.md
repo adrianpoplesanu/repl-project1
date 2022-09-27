@@ -1,1 +1,13 @@
-framework that checks example/testXX.ad output versus desired output
+#framework that checks example/testXX.ad output versus desired output
+
+##Requirements:
+###cpp
+```g++
+make
+python3
+```
+
+###java
+```mvn
+python3
+```
