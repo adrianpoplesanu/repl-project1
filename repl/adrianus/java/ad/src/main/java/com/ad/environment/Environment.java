@@ -6,13 +6,14 @@ import java.util.Map;
 import com.ad.objects.AdObject;
 
 public class Environment {
-	private BuiltinEnvironment builtins;
+	private Environment bootstrap;
 	private Environment outer;
 	public HashMap<String, AdObject> store;
 	
 	public Environment() {
 		store = new HashMap<>();
 		outer = null;
+		bootstrap = null;
 	}
 	
 	public Environment(Environment outer) {
@@ -20,20 +21,16 @@ public class Environment {
 		this.outer = outer;
 	}
 
-	public Environment(BuiltinEnvironment builtins) {
-		this();
-		this.builtins = builtins;
-	}
-
-	public Environment(Environment outer, BuiltinEnvironment builtins) {
+	public Environment(Environment outer, Environment bootstrap) {
 		this();
 		this.outer = outer;
-		this.builtins = builtins;
+		this.bootstrap = bootstrap;
 	}
 	
 	public boolean check(String key) {
 		if (store.containsKey(key)) return true;
 		if (outer != null && outer.check(key)) return true;
+		if (bootstrap != null && bootstrap.check(key)) return true;
 		return false;
 	}
 	
@@ -42,6 +39,7 @@ public class Environment {
 			return store.get(key);
 		}
 		if (outer != null && outer.check(key)) return outer.get(key);
+		if (bootstrap != null && bootstrap.check(key)) return bootstrap.get(key);
 		return null;
 	}
 	
@@ -61,6 +59,22 @@ public class Environment {
 		store.put(key, value);
 	}
 
+	public Environment getOuter() {
+		return outer;
+	}
+
+	public void setOuter(Environment outer) {
+		this.outer = outer;
+	}
+
+	public Environment getBootstrap() {
+		return bootstrap;
+	}
+
+	public void setBootstrap(Environment bootstrap) {
+		this.bootstrap = bootstrap;
+	}
+
 	public String toString() {
 		String out = "{";
 		int total = store.size();
@@ -72,13 +86,5 @@ public class Environment {
 		}
 		out += "}";
 		return out;
-	}
-
-	public Environment getOuter() {
-		return outer;
-	}
-
-	public void setOuter(Environment outer) {
-		this.outer = outer;
 	}
 }

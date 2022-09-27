@@ -6,8 +6,13 @@ public class EnvironmentUtils {
         return env;
     }
 
-    public static Environment newEnclosedEnvironment(Environment o) {
-        Environment env = new Environment(o);
+    public static Environment newEnclosedEnvironment(Environment outer) {
+        Environment env = new Environment(outer);
+        return env;
+    }
+
+    public static Environment newEnclosedEnvironment(Environment outer, Environment bootstrap) {
+        Environment env = new Environment(outer, bootstrap);
         return env;
     }
 }

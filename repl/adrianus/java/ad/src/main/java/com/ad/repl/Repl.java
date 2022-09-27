@@ -26,9 +26,11 @@ public class Repl {
     }
     
     public void loop() {
-    	Environment env = EnvironmentUtils.newEnvironment();
+    	Environment bootstrapEnv = EnvironmentUtils.newEnvironment();
 		Bootstrap bootstrap = new Bootstrap();
-		bootstrap.loadBootstrap(program, parser, evaluator, env);
+		bootstrap.loadBootstrap(program, parser, evaluator, bootstrapEnv);
+		Environment env = EnvironmentUtils.newEnvironment();
+		env.setBootstrap(bootstrapEnv);
     	while(true) {
     		System.out.print(">> ");
     		String source = getNextLine();
@@ -41,9 +43,11 @@ public class Repl {
     }
 
     public void executeSource(String source) {
-		Environment env = EnvironmentUtils.newEnvironment();
+		Environment bootstrapEnv = EnvironmentUtils.newEnvironment();
 		Bootstrap bootstrap = new Bootstrap();
-		bootstrap.loadBootstrap(program, parser, evaluator, env);
+		bootstrap.loadBootstrap(program, parser, evaluator, bootstrapEnv);
+		Environment env = EnvironmentUtils.newEnvironment();
+		env.setBootstrap(bootstrapEnv);
 		parser.load(source);
 		program.reset();
 		parser.buildProgramStatements(program);
