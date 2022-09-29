@@ -74,6 +74,10 @@ void Environment::SetOuterEnvironment(Environment* o) {
     outer = o;
 }
 
+void Environment::SetBuiltinEnvironment(Environment *b) {
+    builtin = b;
+}
+
 void Environment::FreeObjectForKey(std::string key) {
     Ad_DECREF(store[key]);
     free_Ad_Object_memory(store[key]);
@@ -118,6 +122,13 @@ Environment NewEnvironment() {
 Environment NewEnclosedEnvironment(Environment *o) {
     Environment env;
     env.SetOuterEnvironment(o);
+    return env;
+}
+
+Environment NewEnclosedEnvironment(Environment *o, Environment *b) {
+    Environment env;
+    env.SetOuterEnvironment(o);
+    env.SetBuiltinEnvironment(b);
     return env;
 }
 
