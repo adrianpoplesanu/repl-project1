@@ -783,7 +783,7 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST
 }
 
 Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST_Node*> args, Environment& env) {
-    std::cout << "evaluating a socket object member access\n";
+    //std::cout << "evaluating a socket object member access\n"; // commenting this out for tests to pass
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
     if (member_access->owner->type != ST_IDENTIFIER) {
         return NULL;
