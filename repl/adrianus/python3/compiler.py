@@ -69,4 +69,4 @@ if __name__ == '__main__':
     compiler.compile(program)
     bytecode = compiler.get_bytecode()
     compiler.code.instructions = bytecode.instructions
-    print (compiler.code.print())
+    print (compiler.code.to_string())

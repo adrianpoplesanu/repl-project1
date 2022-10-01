@@ -37,7 +37,7 @@ class Code:
             offset += width
         return instruction
 
-    def print(self):
+    def to_string(self):
         out = ""
         i = 0
         while i < self.instructions.size():
@@ -81,4 +81,4 @@ if __name__ == '__main__':
     for instruction in instructions:
         for i in instruction:
             code.instructions.instructions.append(i)
-    print (code.print())
+    print (code.to_string())
