@@ -67,9 +67,10 @@ class Code:
             return definition.name
         elif operand_count == 2:
             return "{0} {1}".format(definition.name, operands[0])
+        else:
+            print("unknowm instruction format")
 
     def read_uint16(self, instructions, offset):
-        # TODO: calculate this
         return int.from_bytes([instructions.get(offset), instructions.get(offset + 1)], byteorder='big')
 
 

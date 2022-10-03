@@ -33,6 +33,10 @@ class Repl(object):
                 bytecode = self.compiler.get_bytecode()
                 self.vm.load(bytecode)
                 self.vm.run()
+                # TODO: remove the next 3 lines
+                result = self.vm.stack_top()
+                if result:
+                    print (result.inspect())
             else:
                 self.evaluator.eval(self.program, env)
             #self.program.debug()
