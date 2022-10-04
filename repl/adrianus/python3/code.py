@@ -10,18 +10,18 @@ class Code:
         self.definitions[OpcodeEnum.OP_CONSTANT] = Definition("OpConstant", [2])
         self.definitions[OpcodeEnum.OP_ADD] = Definition("OpAdd", [])
 
-    def lookup(self, op):
-        if op in self.definitions:
-            return self.definitions[op]
-        raise Exception("Opcode {0} is undefined".format(op))
+    def lookup(self, op_bytecode):
+        if op_bytecode in self.definitions:
+            return self.definitions[op_bytecode]
+        raise Exception("Opcode with bytecode {0} is undefined".format(op_bytecode))
 
     def make(self, op, operands):
         definition = self.definitions[op.byte_code]
         instruction_len = 1
         for operand_width in definition.operand_widths:
             instruction_len += operand_width
-        instruction = [None] * instruction_len # new byte[instruction_len]
-        instruction[0] = op
+        instructions = [None] * instruction_len # new byte[instruction_len]
+        instructions[0] = op.byte_code
 
         offset = 1
         i = 0
@@ -31,17 +31,17 @@ class Code:
             if width == 2:
                 # binary.BigEndian.PutUint16(instruction[offset:], uint16(o))
                 operand_bytes = operand.to_bytes(2, 'big')
-                instruction[offset] = operand_bytes[0] # TODO: calculate this
-                instruction[offset + 1] = operand_bytes[1] # TODO: calculate this
+                instructions[offset] = operand_bytes[0] # TODO: calculate this
+                instructions[offset + 1] = operand_bytes[1] # TODO: calculate this
                 pass
             offset += width
-        return instruction
+        return instructions
 
     def to_string(self):
         out = ""
         i = 0
         while i < self.instructions.size():
-            definition = self.lookup(self.instructions.get(i).byte_code)
+            definition = self.lookup(self.instructions.get(i))
             res = self.read_operands(definition, self.instructions, i + 1)
             operands = res[0]
             read = res[1]

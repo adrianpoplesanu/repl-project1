@@ -26,12 +26,11 @@ class VM:
         ip = 0
         while ip < self.instructions.size():
             op = self.instructions.get(ip)
-            #print (op)
-            if op.byte_code == OpcodeEnum.OP_CONSTANT:
+            if op == OpcodeEnum.OP_CONSTANT:
                 const_index = self.code.read_uint16(self.instructions, ip + 1)
                 self.push(self.constants[const_index])
                 ip += 2
-            elif op.byte_code == OpcodeEnum.OP_ADD:
+            elif op == OpcodeEnum.OP_ADD:
                 right = self.pop()
                 left = self.pop()
                 result = right.value + left.value
