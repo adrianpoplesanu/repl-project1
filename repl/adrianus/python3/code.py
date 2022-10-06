@@ -72,14 +72,3 @@ class Code:
 
     def read_uint16(self, instructions, offset):
         return int.from_bytes([instructions.get(offset), instructions.get(offset + 1)], byteorder='big')
-
-
-if __name__ == '__main__':
-    code = Code()
-    instructions = [code.make(Opcode(OpcodeEnum.OP_ADD), []),
-                    code.make(Opcode(OpcodeEnum.OP_CONSTANT), [2]),
-                    code.make(Opcode(OpcodeEnum.OP_CONSTANT), [65534])]
-    for instruction in instructions:
-        for i in instruction:
-            code.instructions.instructions.append(i)
-    print (code.to_string())
