@@ -18,7 +18,7 @@ class Repl(object):
 
     def loop(self, use_vm=None):
         signal.signal(signal.SIGINT, signal_ctrl_c_handler)
-        print ("Ad interpreter [Python]... v1.1")
+        print ("Ad interpreter [Python]... v3.0") # v2 - classes, v3 - bytecode
         env = new_environment()
         load_bootstrap(self.program, self.parser, self.evaluator, env)
         while True:

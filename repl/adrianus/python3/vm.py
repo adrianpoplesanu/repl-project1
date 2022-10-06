@@ -12,6 +12,7 @@ class VM:
         self.code = Code()
 
     def load(self, bytecode):
+        #print (bytecode) # useful print for seeing the actual bytecode
         self.constants = bytecode.constants
         self.instructions = bytecode.instructions
         self.stack = []

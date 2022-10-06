@@ -12,3 +12,9 @@ class Instructions:
 
     def add(self, ins):
         self.instructions.append(ins)
+
+    def __str__(self):
+        out = ""
+        for instruction in self.instructions:
+            out += str(instruction) + "\n"
+        return out

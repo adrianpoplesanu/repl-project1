@@ -17,8 +17,9 @@ def simple_test():
     output = code.to_string()
     if output == expected:
         print ("success")
+        print (output)
     else:
-        print ("FAILED")
+        print ("FAILED!!!")
         print ("expected: ", expected)
         print ("actual: ", output)
 
