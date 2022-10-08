@@ -13,7 +13,18 @@ def simple_test():
     compiler.compile(program)
     bytecode = compiler.get_bytecode()
     compiler.code.instructions = bytecode.instructions
-    print (compiler.code.to_string())
+    out = compiler.code.to_string()
+    expected = """0000 OpConstant 0
+0003 OpConstant 1
+0006 OpAdd
+"""
+    if out == expected:
+        print ('success')
+        print (out)
+    else:
+        print ('FAILED!!!')
+        print ('expected: ', expected)
+        print ('actual: ', out)
 
 if __name__ == '__main__':
     simple_test()
