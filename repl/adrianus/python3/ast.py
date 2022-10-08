@@ -87,6 +87,9 @@ class ASTProgram(ASTNode):
         for statement in self.statements:
             print (statement)
 
+    def __str__(self):
+        return "ASTProgram"
+
 
 class ASTLetStatement(ASTNode):
     type = StatementType.LET_STATEMENT

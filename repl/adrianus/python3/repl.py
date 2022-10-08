@@ -34,7 +34,7 @@ class Repl(object):
                 self.vm.load(bytecode)
                 self.vm.run()
                 # TODO: remove the next 3 lines
-                result = self.vm.stack_top()
+                result = self.vm.last_popped_stack_element()
                 if result:
                     print (result.inspect())
             else:

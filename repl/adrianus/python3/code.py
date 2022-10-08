@@ -9,6 +9,7 @@ class Code:
         self.definitions = {}
         self.definitions[OpcodeEnum.OP_CONSTANT] = Definition("OpConstant", [2])
         self.definitions[OpcodeEnum.OP_ADD] = Definition("OpAdd", [])
+        self.definitions[OpcodeEnum.OP_POP] = Definition("OpPop", [])
 
     def lookup(self, op_bytecode):
         if op_bytecode in self.definitions:

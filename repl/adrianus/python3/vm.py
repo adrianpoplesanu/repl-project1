@@ -7,7 +7,7 @@ class VM:
     def __init__(self):
         self.constants = []
         self.instructions = None
-        self.stack = []
+        self.stack = [None] * 2048
         self.sp = 0
         self.code = Code()
 
@@ -15,12 +15,17 @@ class VM:
         #print (bytecode) # useful print for seeing the actual bytecode
         self.constants = bytecode.constants
         self.instructions = bytecode.instructions
-        self.stack = []
+        self.stack = [None] * 2048
         self.sp = 0
 
     def stack_top(self):
-        if len(self.stack):
-            return self.stack[-1]
+        if self.sp == 0:
+            return None
+        return self.stack[self.sp - 1]
+
+    def last_popped_stack_element(self):
+        if self.sp >= 0:
+            return self.stack[self.sp]
         return None
 
     def run(self):
@@ -36,13 +41,15 @@ class VM:
                 left = self.pop()
                 result = right.value + left.value
                 self.push(Ad_Integer_Object(result))
+            elif op == OpcodeEnum.OP_POP:
+                self.pop()
             ip += 1
 
     def push(self, obj):
         if self.sp >= 2048:
             raise Exception("stack limit reached")
+        self.stack[self.sp] = obj
         self.sp += 1
-        self.stack.append(obj)
 
     def pop(self):
         res = self.stack[self.sp - 1]

@@ -5,7 +5,7 @@ from parser import Parser
 from code import Code
 from ast import ASTProgram
 from ast import StatementType
-from opcode import OpConstant, OpAdd
+from opcode import OpConstant, OpAdd, OpPop
 
 
 class Compiler:
@@ -25,6 +25,7 @@ class Compiler:
                 self.compile(stmt)
         elif node.type == StatementType.EXPRESSION_STATEMENT:
             self.compile(node.expression)
+            self.emit(OpPop(), [])
         elif node.type == StatementType.INFIX_EXPRESSION:
             self.compile(node.left)
             self.compile(node.right)
