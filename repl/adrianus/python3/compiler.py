@@ -57,16 +57,3 @@ class Compiler:
         self.bytecode.instructions = self.instructions
         self.bytecode.constants = self.constants
         return self.bytecode
-
-if __name__ == '__main__':
-    compiler = Compiler()
-    parser = Parser()
-    parser.reset("1+2")
-    program = ASTProgram()
-    program.reset()
-    parser.build_program_statements(program)
-    compiler.reset()
-    compiler.compile(program)
-    bytecode = compiler.get_bytecode()
-    compiler.code.instructions = bytecode.instructions
-    print (compiler.code.to_string())
