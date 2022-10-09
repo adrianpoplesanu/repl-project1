@@ -1,7 +1,7 @@
 from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                     Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
                     Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Hash_Pair, \
-                    Ad_Class_Object, Ad_Class_Instance
+                    Ad_Class_Object, Ad_Class_Instance, Ad_Float_Object
 from object_type import ObjectType
 from ast import StatementType
 from environment import new_environment, new_enclosed_environment
@@ -107,6 +107,8 @@ class Evaluator(object):
             return self.eval_for_expression(node, env)
         elif node.type == StatementType.NULL_EXPRESSION:
             return self.eval_null_expression(node, env)
+        elif node.type == StatementType.FLOAT:
+            return self.eval_float(node, env)
         else:
             print ('unknown AST node: ' + node.type)
 
@@ -127,6 +129,10 @@ class Evaluator(object):
         obj = Ad_Integer_Object(value=node.value)
         return obj
 
+    def eval_float(self, node, env):
+        obj = Ad_Float_Object(value=node.value)
+        return obj
+
     def eval_boolean(self, node, env):
         return self.native_bool_to_boolean_object(node.value)
 
@@ -143,6 +149,8 @@ class Evaluator(object):
             return right
         if left.type == ObjectType.INTEGER and right.type == ObjectType.INTEGER:
             return self.eval_integer_infix_expression(operator, left, right)
+        if left.type == ObjectType.FLOAT and right.type == ObjectType.FLOAT:
+            return self.eval_float_infix_expression(operator, left, right)
         if left.type == ObjectType.STRING and right.type == ObjectType.STRING:
             return self.eval_string_infix_expression(operator, left, right)
         if left.type == ObjectType.BOOLEAN and right.type == ObjectType.BOOLEAN:
@@ -165,6 +173,31 @@ class Evaluator(object):
             return Ad_Integer_Object(value=left_val * right_val)
         if operator == '/':
             return Ad_Integer_Object(value=left_val / right_val)
+        if operator == '<':
+            return self.native_bool_to_boolean_object(left_val < right_val)
+        if operator == '>':
+            return self.native_bool_to_boolean_object(left_val > right_val)
+        if operator == '<=':
+            return self.native_bool_to_boolean_object(left_val <= right_val)
+        if operator == '>=':
+            return self.native_bool_to_boolean_object(left_val >= right_val)
+        if operator == '==':
+            return self.native_bool_to_boolean_object(left_val == right_val)
+        if operator == '!=':
+            return self.native_bool_to_boolean_object(left_val != right_val)
+        return None
+
+    def eval_float_infix_expression(self, operator, left, right):
+        left_val = left.value
+        right_val = right.value
+        if operator == '+':
+            return Ad_Float_Object(value=left_val + right_val)
+        if operator == '-':
+            return Ad_Float_Object(value=left_val - right_val)
+        if operator == '*':
+            return Ad_Float_Object(value=left_val * right_val)
+        if operator == '/':
+            return Ad_Float_Object(value=left_val / right_val)
         if operator == '<':
             return self.native_bool_to_boolean_object(left_val < right_val)
         if operator == '>':

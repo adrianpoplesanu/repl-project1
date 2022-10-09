@@ -38,6 +38,22 @@ class Ad_Integer_Object(Ad_Object):
         return HashKey(type=type, value=hash(self.value))
 
 
+class Ad_Float_Object(Ad_Object):
+    type = ObjectType.FLOAT
+
+    def __init__(self, value=None):
+        """
+        @param value: float
+        """
+        self.value = value
+
+    def inspect(self):
+        return str(self.value)
+
+    def hash_key(self):
+        return HashMap(type=type, value=hash(self.value))
+
+
 class Ad_Boolean_Object(Ad_Object):
     type = ObjectType.BOOLEAN
 

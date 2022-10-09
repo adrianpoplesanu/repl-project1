@@ -1,6 +1,7 @@
 class ObjectType(object):
     NULL = "NULL"
     INTEGER = "INTEGER"
+    FLOAT = "FLOAT"
     BOOLEAN = "BOOLEAN"
     STRING = "STRING"
     RETURN_VALUE = "RETURN_VALUE"
