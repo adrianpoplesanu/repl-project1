@@ -21,3 +21,15 @@ class OpConstant(Opcode):
 class OpPop(Opcode):
     def __init__(self):
         super().__init__(OpcodeEnum.OP_POP)
+
+
+class OpSub(Opcode):
+    pass
+
+
+class OpMul(Opcode):
+    pass
+
+
+class OpDiv(Opcode):
+    pass
