@@ -5,7 +5,7 @@ from parser import Parser
 from code import Code
 from ast import ASTProgram
 from ast import StatementType
-from opcode import OpConstant, OpAdd, OpPop
+from opcode import OpConstant, OpAdd, OpPop, OpSub, OpMul, OpDiv
 
 
 class Compiler:
@@ -31,6 +31,12 @@ class Compiler:
             self.compile(node.right)
             if node.operator == '+':
                 self.emit(OpAdd(), [])
+            if node.operator == '-':
+                self.emit(OpSub(), [])
+            if node.operator == '*':
+                self.emit(OpMul(), [])
+            if node.operator == '/':
+                self.emit(OpDiv(), [])
         elif node.type == StatementType.INTEGER:
             integer = Ad_Integer_Object(node.value)
             self.emit(OpConstant(), [self.add_constant(integer)])
