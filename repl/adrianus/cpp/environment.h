@@ -8,7 +8,7 @@ class Environment {
 public:
     std::map<std::string, Ad_Object*> store;
     Environment* outer;
-    Environment* builtin;
+    Environment* bootstrap;
 
     Environment();
     ~Environment();
@@ -17,7 +17,7 @@ public:
     void Set(std::string, Ad_Object*);
     void SetCallArgument(std::string, Ad_Object*);
     void SetOuterEnvironment(Environment*);
-    void SetBuiltinEnvironment(Environment*);
+    void SetBootstrapEnvironment(Environment*);
     void FreeObjectForKey(std::string);
     void PrintStore(int);
 };

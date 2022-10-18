@@ -2,6 +2,7 @@
 
 Environment::Environment() {
     outer = NULL;
+    bootstrap = NULL;
 }
 
 Environment::~Environment() {
@@ -17,6 +18,7 @@ bool Environment::Check(std::string key) {
     if (store.find(key) == store.end()) {
         //if (outer && outer->store.find(key) != outer->store.end()) return true;
         if (outer && outer->Check(key)) return true;
+        if (bootstrap && bootstrap->Check(key)) return true;
         return false;
     }
     return true;
@@ -29,6 +31,9 @@ Ad_Object* Environment::Get(std::string key) {
         //}
         if (outer && outer->Check(key)) {
             return outer->Get(key);
+        }
+        if (bootstrap && bootstrap->Check(key)) {
+            return bootstrap->Get(key);
         }
         return NULL;
     } else {
@@ -53,7 +58,7 @@ void Environment::Set(std::string key, Ad_Object* obj) {
         Ad_INCREF(obj);
         return;
     }
-    if (store.find(key) != store.end()) {
+    if (store.find(key) != store.end()) { // pe aici nu cred ca se mai intra
         // sterge obiectul vechi daca e o suprascriere de element
         FreeObjectForKey(key);
     }
@@ -74,8 +79,8 @@ void Environment::SetOuterEnvironment(Environment* o) {
     outer = o;
 }
 
-void Environment::SetBuiltinEnvironment(Environment *b) {
-    builtin = b;
+void Environment::SetBootstrapEnvironment(Environment *b) {
+    bootstrap = b;
 }
 
 void Environment::FreeObjectForKey(std::string key) {
@@ -128,7 +133,7 @@ Environment NewEnclosedEnvironment(Environment *o) {
 Environment NewEnclosedEnvironment(Environment *o, Environment *b) {
     Environment env;
     env.SetOuterEnvironment(o);
-    env.SetBuiltinEnvironment(b);
+    env.SetBootstrapEnvironment(b);
     return env;
 }
 
