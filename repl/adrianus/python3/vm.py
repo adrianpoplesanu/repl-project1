@@ -39,10 +39,27 @@ class VM:
             elif op == OpcodeEnum.OP_ADD:
                 right = self.pop()
                 left = self.pop()
-                result = right.value + left.value
+                result = left.value + right.value
+                self.push(Ad_Integer_Object(result))
+            elif op == OpcodeEnum.OP_SUB:
+                right = self.pop()
+                left = self.pop()
+                result = left.value - right.value
+                self.push(Ad_Integer_Object(result))
+            elif op == OpcodeEnum.OP_MUL:
+                right = self.pop()
+                left = self.pop()
+                result = left.value * right.value
+                self.push(Ad_Integer_Object(result))
+            elif op == OpcodeEnum.OP_DIV:
+                right = self.pop()
+                left = self.pop()
+                result = left.value / right.value
                 self.push(Ad_Integer_Object(result))
             elif op == OpcodeEnum.OP_POP:
                 self.pop()
+            else:
+                print ("error: unknow opcode in vm.run()")
             ip += 1
 
     def push(self, obj):
