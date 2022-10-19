@@ -5,7 +5,8 @@
 #include "bootstrap.h"
 
 std::vector<std::string> bootstrap_files {
-    "bootstrap/file.ad"
+    "bootstrap/file.ad",
+    "bootstrap/test.ad"
 };
 
 void add_bootstrap_code(Ad_AST_Program &program, Parser parser, Evaluator evaluator, Environment& env, std::string source) {
