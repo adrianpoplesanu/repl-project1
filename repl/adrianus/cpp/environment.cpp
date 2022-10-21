@@ -12,6 +12,9 @@ Environment::~Environment() {
         //std::cout << mesaj << "\n";
         free_Ad_Object_memory(it->second);
     }
+    if (bootstrap) {
+        delete bootstrap;
+    }
 }
 
 bool Environment::Check(std::string key) {
