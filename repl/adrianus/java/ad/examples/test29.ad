@@ -1,0 +1,10 @@
+def test() {
+    class A() {
+        x = 2
+    }
+
+    a = A()
+    print (a.x)
+}
+
+test()
