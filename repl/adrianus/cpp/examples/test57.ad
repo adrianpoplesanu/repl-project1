@@ -1,0 +1,12 @@
+def test() {
+    class A() { b = 0 }
+    class B() { a = 0 }
+    q = A()
+    print (q.b)
+    w = B()
+    print (w.a)
+    q.b = w
+    w.a = q
+}
+
+test()
