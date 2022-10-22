@@ -31,7 +31,7 @@ void Repl::Loop() {
 void Repl::ExecuteFile(std::ifstream &target) {
     //load_bootstrap(program, parser, evaluator, env);
     Environment* bootstrap = load_bootstrap(program, parser, evaluator);
-    Environment env = NewEnvironment();
+    env = NewEnvironment();
     env.SetBootstrapEnvironment(bootstrap);
     if (target.is_open()) {
         std::string line;

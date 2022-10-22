@@ -1022,8 +1022,11 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         case ST_CONTINUE_STATEMENT:
             delete (Ad_AST_ContinueStatement*) node;
         break;
+        case ST_PROGRAM:
+            delete (Ad_AST_Program*) node;
+        break;
         default:
-            std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << "\n";
+            std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << " node-type: " << node->type << " ref_count: " << node->ref_count << " address: " << node << "\n";
         break;
     }
 }
