@@ -1,0 +1,5 @@
+    class A {
+        x = 5
+    }
+    a = A()
+    print (a.x)

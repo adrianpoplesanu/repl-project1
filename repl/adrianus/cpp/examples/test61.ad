@@ -1,0 +1,13 @@
+def test() {
+    class A {
+        x = 5
+    }
+    a = A()
+    print (a.x)
+}
+
+test()
+
+t = Test()
+print (t.a)
+print (t.a())

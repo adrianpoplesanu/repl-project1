@@ -1,0 +1,11 @@
+class A {
+    def b() {
+        x++
+    }
+}
+
+a = A()
+a.x = 5
+print (a.x)
+a.b()
+print (a.x)
