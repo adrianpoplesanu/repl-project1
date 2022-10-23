@@ -22,6 +22,10 @@ for test_file in test_files:
         errors_detected = True
         print '\033[0;31mMEMORY ERROR!\033[0m'
         print test_file
+    elif 'MEMORY ERROR!!!' in result_file.read():
+        errors_detected = True
+        print '\033[0;31mMEMORY ERROR!\033[0m'
+        print test_file
     else:
         print 'MEMORY OK!'
 
