@@ -1,0 +1,10 @@
+class A {
+    def test() {
+        print ("test")
+    }
+}
+
+a = A()
+a.test()
+b = A()
+b.test()

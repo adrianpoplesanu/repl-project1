@@ -1,0 +1,8 @@
+def t() {
+    def b() {
+        print ("bbb")
+    }
+    b()
+}
+
+t()

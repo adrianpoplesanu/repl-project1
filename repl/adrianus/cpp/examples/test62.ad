@@ -1,0 +1,11 @@
+def t() {
+    class A {
+        def test() {
+            print ("test")
+        }
+    }
+    a = A()
+    a.test()
+}
+
+t()
