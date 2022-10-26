@@ -401,8 +401,9 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
             return new Ad_Error_Object("function signature unrecognized, different number of params");
         }
-        Environment extendedEnv = ExtendFunctionEnv(func, args);
-        Ad_Object* evaluated = Eval(func_obj->body, extendedEnv);
+        Environment* extendedEnv = extendFunctionEnv(func, args);
+        Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
+        environment_garbage_collection.push_back(extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
@@ -514,6 +515,17 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
         extended.SetCallArgument((*it)->TokenLiteral(), args[i++]);
+    }
+    return extended;
+}
+
+Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
+    Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
+    //Environment extended = NewEnclosedEnvironment(func_obj->env);
+    Environment* extended = newEnclosedEnvironment(func_obj->env);
+    int i = 0;
+    for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
+        extended->SetCallArgument((*it)->TokenLiteral(), args[i++]);
     }
     return extended;
 }

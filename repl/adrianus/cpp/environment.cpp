@@ -133,6 +133,12 @@ Environment NewEnclosedEnvironment(Environment *o) {
     return env;
 }
 
+Environment* newEnclosedEnvironment(Environment *o) {
+    Environment* env = new Environment();
+    env->SetOuterEnvironment(o);
+    return env;
+}
+
 Environment NewEnclosedEnvironment(Environment *o, Environment *b) {
     Environment env;
     env.SetOuterEnvironment(o);
