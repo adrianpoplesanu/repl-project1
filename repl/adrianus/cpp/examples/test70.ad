@@ -1,0 +1,9 @@
+def t() {
+    class A {
+
+    }
+}
+
+print ("inainte de apelul lui t()")
+t()
+print ("dupa apelul lui t()")
