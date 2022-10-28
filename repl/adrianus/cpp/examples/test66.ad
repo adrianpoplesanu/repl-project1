@@ -1,0 +1,35 @@
+def test() {
+    def rahat() {
+        class A {
+            def aaa() {
+                print ("aaa")
+            }
+        }
+    a = A()
+    return a
+    }
+
+    b = rahat()
+    b.aaa()
+}
+
+
+test()
+
+
+FunctionalLiteral [test]
+   - expression statement
+       - class statement
+            - list<atribute> null
+            - list<methods> [functionliteral [aaa] -
+                                - arguments: null
+                                - body: list[staments]: [print: 
+                                                          - string]]
+    - expression statement
+        - assignment [
+            - identifier [a]
+            - right val: function_call
+        ]
+    - expression statement
+        member access: owner: a
+                       targe: aaa... aaa e o function, trebuie sa fac ce fac pentru functii
