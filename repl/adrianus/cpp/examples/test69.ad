@@ -1,0 +1,16 @@
+def test() {
+    def rahat() {
+        class A {
+            def aaa() {
+                print ("aaa")
+            }
+        }
+    a = A()
+    return a
+    }
+
+    b = rahat()
+    b.aaa()
+}
+
+test()
