@@ -1,0 +1,10 @@
+a = 5
+b = 77
+
+def test(a) {
+    a = 88
+    print (b)
+}
+
+test(7)
+print(a)

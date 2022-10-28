@@ -1,0 +1,8 @@
+def test(n) {
+    print (n)
+    if (n > 0) {
+        test(n - 1)
+    }
+}
+
+test(10)
