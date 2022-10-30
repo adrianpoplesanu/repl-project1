@@ -1,0 +1,23 @@
+tests:
+
+    linux:
+        - test40.ad: test is written wrong, File bootstrap class has no init() method
+        - test54.ad: socket is not yet implemented in cpp version
+        - test55.ad: expression statements in blocks are not free'd, this can be tested with: <code>i = 0 while (i < 10) { print (i) i++ }</code>
+        - test56.ad: circular references memory leak, darn!
+        - test57.ad: circular references memory leak, darn!
+        - FIXED test61.ad: unknown memory issue, IsError is the first place to check... invetigate more... done, fixed
+        - test66.ad: wrong syntax in test, it's not really a test
+        - test69.ad: it used to work and have a minor memory leak, now it doesn't even run anymore, don't know why... investigate more
+        - test73.ad: again the expression statements in blocks seems to be the issue
+
+    macos:
+        - test40.ad: test is written wrong, File bootstrap class has no init() method
+        - test54.ad: socket is not yet implemented in cpp version
+        - test55.ad: expression statements in blocks are not free'd, this can be tested with: <code>i = 0 while (i < 10) { print (i) i++ }</code>
+        - test56.ad: circular references memory leak, darn!
+        - test57.ad: circular references memory leak, darn!
+        - FIXED test61.ad: unknown memory issue... investigate more... done, fixed
+        - test66.ad: wrong syntax in test, it's not really a test
+        - test69.ad: unknown memory issue... investigate more
+        - test73.ad: again the expression statements in blocks seems to be the issue
