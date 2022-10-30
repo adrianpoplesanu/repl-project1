@@ -769,6 +769,7 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST
     }
     Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
     Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
+    if (owner_obj_raw == NULL) return NULL;
     if (owner_obj_raw->type == OBJ_FILE) {
         Ad_File_Object* owner = (Ad_File_Object*) owner_obj_raw;
         std::string method_name = ((Ad_AST_Identifier*) member_access->member)->value;
@@ -886,6 +887,7 @@ bool Evaluator::IsTruthy(Ad_Object* obj) {
 }
 
 bool Evaluator::IsError(Ad_Object* obj) {
+    if (obj == NULL) return false;
     return obj->type == OBJ_ERROR;
 }
 

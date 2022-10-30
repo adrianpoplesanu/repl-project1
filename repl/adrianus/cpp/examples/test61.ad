@@ -11,3 +11,4 @@ test()
 t = Test()
 print (t.a)
 print (t.a())
+/* problema mai sus e ca a() din Test din bootstrap nu are return */
