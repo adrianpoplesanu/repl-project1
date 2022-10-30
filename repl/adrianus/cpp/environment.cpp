@@ -6,6 +6,7 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
+    //std::cout << "cleaning up an env\n";
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
         Ad_DECREF(it->second); // asta merge
         //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
@@ -124,6 +125,11 @@ void Environment::PrintStore(int level) {
 
 Environment NewEnvironment() {
     Environment env;
+    return env;
+}
+
+Environment* newEnvironment() {
+    Environment *env = new Environment();
     return env;
 }
 

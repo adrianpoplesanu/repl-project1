@@ -162,6 +162,7 @@ Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
 
 Ad_AST_ExpressionStatement::~Ad_AST_ExpressionStatement() {
     if (expression) { // TODO: de ce trebuie asta? nu inteleg de ce trebuie if-ul asta aici
+        //Ad_DECREF(expression);
         free_Ad_AST_Node_memory(expression);
     }
 }
@@ -402,6 +403,19 @@ Ad_AST_BlockStatement::Ad_AST_BlockStatement(Token t) {
 Ad_AST_BlockStatement::~Ad_AST_BlockStatement() {
     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
         Ad_AST_Node *node = *it;
+        //Ad_DECREF(node);
+        // ******
+        if (true) {
+            if (node->type == ST_EXPRESSION_STATEMENT) {
+                Ad_AST_ExpressionStatement* expr = (Ad_AST_ExpressionStatement*) node;
+                if (expr->expression != NULL) {
+                    if (expr->expression->type == ST_CLASS_STATEMENT) {
+                        Ad_DECREF(expr->expression);
+                    }
+                }
+            }
+        }
+        // ******
         free_Ad_AST_Node_memory(node);
     }
 }
@@ -674,6 +688,7 @@ Ad_AST_Class::Ad_AST_Class(Token t) {
 
 Ad_AST_Class::~Ad_AST_Class() {
     // Class objects need a reference to this AST node that they will deallocate on object destruction
+    //std::cout << "deleting a class AST node " << this << "\n";
     if (name) {
         Ad_DECREF(name);
         free_Ad_AST_Node_memory(name);
@@ -999,6 +1014,7 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
             delete (Ad_AST_Comment*)node;
         break;
         case ST_CLASS_STATEMENT:
+            //std::cout << "deleting a class AST: " << (Ad_AST_Class*)node << '\n';
             delete (Ad_AST_Class*)node;
         break;
         case ST_MEMBER_ACCESS:

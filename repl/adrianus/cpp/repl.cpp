@@ -11,7 +11,8 @@ Repl::Repl() {
 }
 
 Repl::~Repl() {
-
+    //env->PrintStore(0);
+    //delete env2;
 }
 
 void Repl::Loop() {
@@ -33,6 +34,9 @@ void Repl::ExecuteFile(std::ifstream &target) {
     Environment* bootstrap = load_bootstrap(program, parser, evaluator);
     env = NewEnvironment();
     env.SetBootstrapEnvironment(bootstrap);
+
+    //env2 = newEnvironment();
+    //env2->SetBootstrapEnvironment(bootstrap);
     if (target.is_open()) {
         std::string line;
         std::string text;

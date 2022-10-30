@@ -476,6 +476,27 @@ Ad_AST_Node* Parser::ParseDefExpression() {
     Ad_AST_Node* body = ParseBlockStatement();
     stmt->body = body;
     Ad_INCREF(stmt->body);
+
+    // ****
+    if (true) {
+        for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)body)->statements.begin() ; it != ((Ad_AST_BlockStatement*)body)->statements.end(); ++it) {
+            Ad_AST_Node *node = *it;
+            //free_Ad_AST_Node_memory(node);
+            //std::cout << statement_type_map[node->type] << "\n";
+            //Ad_INCREF(node);
+            if (node->type == ST_EXPRESSION_STATEMENT) {
+                Ad_AST_ExpressionStatement* expr = (Ad_AST_ExpressionStatement*) node;
+                if (expr->expression != NULL) {
+                    if (expr->expression->type == ST_CLASS_STATEMENT) {
+                        //std::cout << "aaa\n";
+                        Ad_INCREF(expr->expression);
+                    }
+                }
+            }
+        }
+    }
+    // ****
+
     return stmt;
 }
 

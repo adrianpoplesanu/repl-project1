@@ -374,6 +374,7 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
         if (result && result->type == OBJ_CONTINUE) {
             return result;
         }
+        // TODO: fix this, this is an important memory leak, test55.ad ran with valgrind has this issue, when doint i++ in a while block
         //free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
     }
     return result;
@@ -401,19 +402,20 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
             return new Ad_Error_Object("function signature unrecognized, different number of params");
         }
-        Environment* extendedEnv = extendFunctionEnv(func, args);
-        Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
-        environment_garbage_collection.push_back(extendedEnv);
+        //Environment* extendedEnv = extendFunctionEnv(func, args);
+        Environment extendedEnv = ExtendFunctionEnv(func, args);
+        Ad_Object* evaluated = Eval(func_obj->body, extendedEnv);
+        //environment_garbage_collection.push_back(extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
         Ad_Builtin_Object* builtinObject = (Ad_Builtin_Object*) func;
-        if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
+        /*if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
                 !std::count(builtinObject->acceptedNumbersOfArguments.begin(),
                             builtinObject->acceptedNumbersOfArguments.end(),
                             args.size())) {
             return new Ad_Error_Object("builtin signature unrecognized, different number of params");
-        }
+        }*/
         Ad_Object* result = builtinObject->builtin_function(args, &env);
         return result;
     }

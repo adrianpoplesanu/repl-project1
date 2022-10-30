@@ -784,6 +784,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete ((Ad_Hash_Object*)obj);
             break;
             case OBJ_CLASS:
+                //std::cout << "deleting a class object " << obj << "\n";
                 delete (Ad_Class_Object*) obj;
             break;
             case OBJ_INSTANCE:

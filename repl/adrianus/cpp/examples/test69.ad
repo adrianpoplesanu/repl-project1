@@ -5,8 +5,8 @@ def test() {
                 print ("aaa")
             }
         }
-    a = A()
-    return a
+        a = A()
+        return a
     }
 
     b = rahat()
