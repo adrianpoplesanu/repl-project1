@@ -3,6 +3,7 @@
 Environment::Environment() {
     outer = NULL;
     bootstrap = NULL;
+    isBootstrapEnvironment = false;
 }
 
 Environment::~Environment() {
@@ -11,6 +12,13 @@ Environment::~Environment() {
         Ad_DECREF(it->second); // asta merge
         //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
         //std::cout << mesaj << "\n";
+        if (isBootstrapEnvironment) {
+            Ad_Object* obj = it->second;
+            if (obj->type == OBJ_CLASS) {
+                Ad_Class_Object* klass_object = (Ad_Class_Object*) obj;
+                klass_object->attemptASTNodesDeletion = true;
+            }
+        }
         free_Ad_Object_memory(it->second);
     }
     if (bootstrap) {

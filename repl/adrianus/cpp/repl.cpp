@@ -12,11 +12,11 @@ Repl::Repl() {
 
 Repl::~Repl() {
     //env->PrintStore(0);
-    //delete env2;
+    delete env2;
 }
 
 void Repl::Loop() {
-    load_bootstrap(program, parser, evaluator, env);
+    /*load_bootstrap(program, parser, evaluator, env);
     while (1) {
         std::string line;
         std::cout << ">> ";
@@ -26,17 +26,18 @@ void Repl::Loop() {
             break;
         }
     }
-    free_builtin_map();
+    free_builtin_map();*/
 }
 
 void Repl::ExecuteFile(std::ifstream &target) {
     //load_bootstrap(program, parser, evaluator, env);
     Environment* bootstrap = load_bootstrap(program, parser, evaluator);
-    env = NewEnvironment();
-    env.SetBootstrapEnvironment(bootstrap);
+    bootstrap->isBootstrapEnvironment = true;
+    //env = NewEnvironment();
+    //env.SetBootstrapEnvironment(bootstrap);
 
-    //env2 = newEnvironment();
-    //env2->SetBootstrapEnvironment(bootstrap);
+    env2 = newEnvironment();
+    env2->SetBootstrapEnvironment(bootstrap);
     if (target.is_open()) {
         std::string line;
         std::string text;
@@ -46,7 +47,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
         parser.Load(text);
         program.reset();
         parser.ParseProgram(program);
-        Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env); // TODO: asta cicleaza in momentul executiei fisierului la while
+        Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2); // TODO: asta cicleaza in momentul executiei fisierului la while
         // in python nu cicleaza pentru ca fac .read() care ia tot continutul fisierului o data, poate la fel ar trebui sa fac si aici
         if (res && res->Type() == OBJ_SIGNAL) {
             free_Ad_Object_memory(res);
@@ -61,7 +62,7 @@ bool Repl::ParseLine(std::string line) {
     program.reset();
     parser.ParseProgram(program);
 
-    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);
+    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2);
     if (res && res->Type() == OBJ_SIGNAL) {
         // if res->signal_type == SIGNAL_EXIT, else it's a different signal
         free_Ad_Object_memory(res);

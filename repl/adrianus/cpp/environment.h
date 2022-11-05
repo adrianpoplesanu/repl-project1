@@ -9,6 +9,7 @@ public:
     std::map<std::string, Ad_Object*> store;
     Environment* outer;
     Environment* bootstrap;
+    bool isBootstrapEnvironment;
 
     Environment();
     ~Environment();

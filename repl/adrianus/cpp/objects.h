@@ -268,6 +268,7 @@ public:
 	Ad_AST_Node* name;
 	std::vector<Ad_AST_Node*> methods;
 	std::vector<Ad_AST_Node*> attributes;
+	bool attemptASTNodesDeletion;
 
 	Ad_Class_Object();
 	Ad_Class_Object(std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>);
@@ -278,6 +279,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
+	void deleteASTNodeFromBootstrapEnvironment(); // maybe use a gc pool here for ast nodes? - the method name si so specific, i don't like it
 	//virtual Ad_Object* copy(); // TODO: implement this
 };
 

@@ -452,11 +452,13 @@ std::string Ad_Hash_Object::Hash() {
 Ad_Class_Object::Ad_Class_Object() {
     type = OBJ_CLASS;
     ref_count = 0;
+    attemptASTNodesDeletion = false;
 }
 
 Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
     type = OBJ_CLASS;
     ref_count = 0;
+    attemptASTNodesDeletion = false;
     methods = m;
     for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
         Ad_AST_Node *node = *it;
@@ -472,6 +474,7 @@ Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST
 Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
     type = OBJ_CLASS;
     ref_count = 0;
+    attemptASTNodesDeletion = false;
     name = n;
     Ad_INCREF(name);
     methods = m;
@@ -489,6 +492,7 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
 Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*>a, Ad_AST_Node* c) {
     type = OBJ_CLASS;
     ref_count = 0;
+    attemptASTNodesDeletion = false;
     class_ast_node = c;
     Ad_INCREF(class_ast_node);
 
@@ -507,6 +511,30 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
 }
 
 Ad_Class_Object::~Ad_Class_Object() {
+    Ad_DECREF(class_ast_node);
+    if (attemptASTNodesDeletion) {
+        free_Ad_AST_Node_memory(class_ast_node);
+    }
+
+    // if i deallocate the ast node that references all the methods and attributes ast, do i really need to try and manually free them again?
+    for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        if (attemptASTNodesDeletion) {
+            free_Ad_AST_Node_memory(node);
+        }
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin() ; it != attributes.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        if (attemptASTNodesDeletion) {
+            free_Ad_AST_Node_memory(node);
+        }
+    }
+}
+
+void Ad_Class_Object::deleteASTNodeFromBootstrapEnvironment() { // this is unused anymore
+    // this is just like the destructor, if just does the delete also
     Ad_DECREF(class_ast_node);
     free_Ad_AST_Node_memory(class_ast_node);
 

@@ -402,10 +402,10 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
             return new Ad_Error_Object("function signature unrecognized, different number of params");
         }
-        //Environment* extendedEnv = extendFunctionEnv(func, args);
-        Environment extendedEnv = ExtendFunctionEnv(func, args);
-        Ad_Object* evaluated = Eval(func_obj->body, extendedEnv);
-        //environment_garbage_collection.push_back(extendedEnv);
+        Environment* extendedEnv = extendFunctionEnv(func, args);
+        //Environment extendedEnv = ExtendFunctionEnv(func, args);
+        Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
+        environment_garbage_collection.push_back(extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
