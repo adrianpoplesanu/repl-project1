@@ -1,0 +1,247 @@
+diff --git a/repl/adrianus/cpp/docs/issue-list.txt b/repl/adrianus/cpp/docs/issue-list.txt
+index 5f1700c..8f1ef2b 100644
+--- a/repl/adrianus/cpp/docs/issue-list.txt
++++ b/repl/adrianus/cpp/docs/issue-list.txt
+@@ -6,10 +6,11 @@ tests:
+         - test55.ad: expression statements in blocks are not free'd, this can be tested with: <code>i = 0 while (i < 10) { print (i) i++ }</code>
+         - test56.ad: circular references memory leak, darn!
+         - test57.ad: circular references memory leak, darn!
+-        - FIXED test61.ad: unknown memory issue, IsError is the first place to check... invetigate more... done, fixed
++        - FIXED test61.ad: unknown memory issue, IsError is the first place to check... invetigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/44c0ef9d19b008a82f3b6e2f3d43f7876a2ce4c4
+         - test66.ad: wrong syntax in test, it's not really a test
+         - test69.ad: it used to work and have a minor memory leak, now it doesn't even run anymore, don't know why... investigate more
+         - test73.ad: again the expression statements in blocks seems to be the issue
++        - test75.ad: might be same issue as test69.ad... investigate more... done, fixed: 
+ 
+     macos:
+         - test40.ad: test is written wrong, File bootstrap class has no init() method
+@@ -17,7 +18,10 @@ tests:
+         - test55.ad: expression statements in blocks are not free'd, this can be tested with: <code>i = 0 while (i < 10) { print (i) i++ }</code>
+         - test56.ad: circular references memory leak, darn!
+         - test57.ad: circular references memory leak, darn!
+-        - FIXED test61.ad: unknown memory issue... investigate more... done, fixed
++        - FIXED test61.ad: unknown memory issue... investigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/44c0ef9d19b008a82f3b6e2f3d43f7876a2ce4c4
+         - test66.ad: wrong syntax in test, it's not really a test
+         - test69.ad: unknown memory issue... investigate more
+         - test73.ad: again the expression statements in blocks seems to be the issue
++        - test75.ad: might be the same issue as test69.ad... investigate more... done, fixed: 
++
++fixul pentru nested classes in scopes care incercau sa elibereze aceeasi memorie de doua ori: https://github.com/adrianpoplesanu/repl-project1/commit/f1c5097224ad058f5b2bf088829b5608df287b45
+\ No newline at end of file
+diff --git a/repl/adrianus/cpp/environment.cpp b/repl/adrianus/cpp/environment.cpp
+index 1b536df..5d77ba2 100644
+--- a/repl/adrianus/cpp/environment.cpp
++++ b/repl/adrianus/cpp/environment.cpp
+@@ -3,6 +3,7 @@
+ Environment::Environment() {
+     outer = NULL;
+     bootstrap = NULL;
++    isBootstrapEnvironment = false;
+ }
+ 
+ Environment::~Environment() {
+@@ -11,6 +12,13 @@ Environment::~Environment() {
+         Ad_DECREF(it->second); // asta merge
+         //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
+         //std::cout << mesaj << "\n";
++        if (isBootstrapEnvironment) {
++            Ad_Object* obj = it->second;
++            if (obj->type == OBJ_CLASS) {
++                Ad_Class_Object* klass_object = (Ad_Class_Object*) obj;
++                klass_object->attemptASTNodesDeletion = true;
++            }
++        }
+         free_Ad_Object_memory(it->second);
+     }
+     if (bootstrap) {
+diff --git a/repl/adrianus/cpp/environment.h b/repl/adrianus/cpp/environment.h
+index 7e19915..2b0e651 100644
+--- a/repl/adrianus/cpp/environment.h
++++ b/repl/adrianus/cpp/environment.h
+@@ -9,6 +9,7 @@ public:
+     std::map<std::string, Ad_Object*> store;
+     Environment* outer;
+     Environment* bootstrap;
++    bool isBootstrapEnvironment;
+ 
+     Environment();
+     ~Environment();
+diff --git a/repl/adrianus/cpp/evaluator.cpp b/repl/adrianus/cpp/evaluator.cpp
+index e9cdc97..2c04397 100644
+--- a/repl/adrianus/cpp/evaluator.cpp
++++ b/repl/adrianus/cpp/evaluator.cpp
+@@ -402,10 +402,10 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
+             for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
+             return new Ad_Error_Object("function signature unrecognized, different number of params");
+         }
+-        //Environment* extendedEnv = extendFunctionEnv(func, args);
+-        Environment extendedEnv = ExtendFunctionEnv(func, args);
+-        Ad_Object* evaluated = Eval(func_obj->body, extendedEnv);
+-        //environment_garbage_collection.push_back(extendedEnv);
++        Environment* extendedEnv = extendFunctionEnv(func, args);
++        //Environment extendedEnv = ExtendFunctionEnv(func, args);
++        Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
++        environment_garbage_collection.push_back(extendedEnv);
+         return UnwrapReturnValue(evaluated);
+     }
+     if (func->type == OBJ_BUILTIN) {
+diff --git a/repl/adrianus/cpp/objects.cpp b/repl/adrianus/cpp/objects.cpp
+index da0ba98..b01565f 100644
+--- a/repl/adrianus/cpp/objects.cpp
++++ b/repl/adrianus/cpp/objects.cpp
+@@ -452,11 +452,13 @@ std::string Ad_Hash_Object::Hash() {
+ Ad_Class_Object::Ad_Class_Object() {
+     type = OBJ_CLASS;
+     ref_count = 0;
++    attemptASTNodesDeletion = false;
+ }
+ 
+ Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
+     type = OBJ_CLASS;
+     ref_count = 0;
++    attemptASTNodesDeletion = false;
+     methods = m;
+     for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
+         Ad_AST_Node *node = *it;
+@@ -472,6 +474,7 @@ Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST
+ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
+     type = OBJ_CLASS;
+     ref_count = 0;
++    attemptASTNodesDeletion = false;
+     name = n;
+     Ad_INCREF(name);
+     methods = m;
+@@ -489,6 +492,7 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
+ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*>a, Ad_AST_Node* c) {
+     type = OBJ_CLASS;
+     ref_count = 0;
++    attemptASTNodesDeletion = false;
+     class_ast_node = c;
+     Ad_INCREF(class_ast_node);
+ 
+@@ -507,6 +511,30 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
+ }
+ 
+ Ad_Class_Object::~Ad_Class_Object() {
++    Ad_DECREF(class_ast_node);
++    if (attemptASTNodesDeletion) {
++        free_Ad_AST_Node_memory(class_ast_node);
++    }
++
++    // if i deallocate the ast node that references all the methods and attributes ast, do i really need to try and manually free them again?
++    for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
++        Ad_AST_Node *node = *it;
++        Ad_DECREF(node); // asta merge si e super cool
++        if (attemptASTNodesDeletion) {
++            free_Ad_AST_Node_memory(node);
++        }
++    }
++    for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin() ; it != attributes.end(); ++it) {
++        Ad_AST_Node *node = *it;
++        Ad_DECREF(node); // asta merge si e super cool
++        if (attemptASTNodesDeletion) {
++            free_Ad_AST_Node_memory(node);
++        }
++    }
++}
++
++void Ad_Class_Object::deleteASTNodeFromBootstrapEnvironment() { // this is unused anymore
++    // this is just like the destructor, if just does the delete also
+     Ad_DECREF(class_ast_node);
+     free_Ad_AST_Node_memory(class_ast_node);
+ 
+diff --git a/repl/adrianus/cpp/objects.h b/repl/adrianus/cpp/objects.h
+index ceb7c26..e846ec7 100644
+--- a/repl/adrianus/cpp/objects.h
++++ b/repl/adrianus/cpp/objects.h
+@@ -268,6 +268,7 @@ public:
+ 	Ad_AST_Node* name;
+ 	std::vector<Ad_AST_Node*> methods;
+ 	std::vector<Ad_AST_Node*> attributes;
++	bool attemptASTNodesDeletion;
+ 
+ 	Ad_Class_Object();
+ 	Ad_Class_Object(std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>);
+@@ -278,6 +279,7 @@ public:
+ 	virtual void Print();
+ 	virtual Ad_Object_Type Type();
+ 	virtual std::string Hash();
++	void deleteASTNodeFromBootstrapEnvironment(); // maybe use a gc pool here for ast nodes? - the method name si so specific, i don't like it
+ 	//virtual Ad_Object* copy(); // TODO: implement this
+ };
+ 
+diff --git a/repl/adrianus/cpp/repl.cpp b/repl/adrianus/cpp/repl.cpp
+index 25c9337..20b5697 100644
+--- a/repl/adrianus/cpp/repl.cpp
++++ b/repl/adrianus/cpp/repl.cpp
+@@ -12,11 +12,11 @@ Repl::Repl() {
+ 
+ Repl::~Repl() {
+     //env->PrintStore(0);
+-    //delete env2;
++    delete env2;
+ }
+ 
+ void Repl::Loop() {
+-    load_bootstrap(program, parser, evaluator, env);
++    /*load_bootstrap(program, parser, evaluator, env);
+     while (1) {
+         std::string line;
+         std::cout << ">> ";
+@@ -26,17 +26,18 @@ void Repl::Loop() {
+             break;
+         }
+     }
+-    free_builtin_map();
++    free_builtin_map();*/
+ }
+ 
+ void Repl::ExecuteFile(std::ifstream &target) {
+     //load_bootstrap(program, parser, evaluator, env);
+     Environment* bootstrap = load_bootstrap(program, parser, evaluator);
+-    env = NewEnvironment();
+-    env.SetBootstrapEnvironment(bootstrap);
++    bootstrap->isBootstrapEnvironment = true;
++    //env = NewEnvironment();
++    //env.SetBootstrapEnvironment(bootstrap);
+ 
+-    //env2 = newEnvironment();
+-    //env2->SetBootstrapEnvironment(bootstrap);
++    env2 = newEnvironment();
++    env2->SetBootstrapEnvironment(bootstrap);
+     if (target.is_open()) {
+         std::string line;
+         std::string text;
+@@ -46,7 +47,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
+         parser.Load(text);
+         program.reset();
+         parser.ParseProgram(program);
+-        Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env); // TODO: asta cicleaza in momentul executiei fisierului la while
++        Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2); // TODO: asta cicleaza in momentul executiei fisierului la while
+         // in python nu cicleaza pentru ca fac .read() care ia tot continutul fisierului o data, poate la fel ar trebui sa fac si aici
+         if (res && res->Type() == OBJ_SIGNAL) {
+             free_Ad_Object_memory(res);
+@@ -61,7 +62,7 @@ bool Repl::ParseLine(std::string line) {
+     program.reset();
+     parser.ParseProgram(program);
+ 
+-    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);
++    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2);
+     if (res && res->Type() == OBJ_SIGNAL) {
+         // if res->signal_type == SIGNAL_EXIT, else it's a different signal
+         free_Ad_Object_memory(res);
+diff --git a/repl/adrianus/cpp/repl.h b/repl/adrianus/cpp/repl.h
+index d9f27f3..6f1f2e5 100644
+--- a/repl/adrianus/cpp/repl.h
++++ b/repl/adrianus/cpp/repl.h
+@@ -12,8 +12,8 @@ private:
+ public:
+     Parser parser;
+     Evaluator evaluator;
+-    Environment env;
+-    //Environment *env2;
++    //Environment env;
++    Environment *env2;
+     Ad_AST_Program program;
+ 
+     Repl();
