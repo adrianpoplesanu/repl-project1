@@ -1,0 +1,138 @@
+Memory issues for command line flow after attemptASTNodesDeletion flag added to class objects destructors and pointer to env and gc for them
+
+>> class A { def test() { print("aaa") } }
+>> a = A()
+>> a.test()
+
+==31179== 816 (112 direct, 704 indirect) bytes in 1 blocks are definitely lost in loss record 12 of 12
+==31179==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==31179==    by 0x1207D4: Parser::ParseClassStatement() (parser.cpp:512)
+==31179==    by 0x1214AB: Parser::ParseExpression(PrecedenceType) (parser.cpp:629)
+==31179==    by 0x11E99F: Parser::ParseExpressionStatement() (parser.cpp:182)
+==31179==    by 0x11E51F: Parser::ParseStatement() (parser.cpp:139)
+==31179==    by 0x11E035: Parser::ParseProgram(Ad_AST_Program&) (parser.cpp:71)
+==31179==    by 0x129D03: Repl::ParseLine(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (repl.cpp:79)
+==31179==    by 0x129814: Repl::Loop() (repl.cpp:40)
+==31179==    by 0x129E1F: main (main.cpp:41)
+
+
+
+
+
+
+
+
+
+
+>> def t() { class T { def test() { print("aaa") } } b = T() b.test() }
+>> t()
+"aaa"
+>> exit()
+==32890== 
+==32890== HEAP SUMMARY:
+==32890==     in use at exit: 0 bytes in 0 blocks
+==32890==   total heap usage: 549 allocs, 549 frees, 127,318 bytes allocated
+==32890== 
+==32890== All heap blocks were freed -- no leaks are possible
+==32890== 
+==32890== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+
+
+
+
+
+
+
+
+
+
+Ad interpreter [C++]... v1.0
+>> def t() { class T { def test() { print("aaa") } } b = T() b.test() }
+>> t()
+"aaa"
+>> t()
+"aaa"
+>> exit()
+==32910== 
+==32910== HEAP SUMMARY:
+==32910==     in use at exit: 88 bytes in 1 blocks
+==32910==   total heap usage: 570 allocs, 569 frees, 128,342 bytes allocated
+==32910== 
+==32910== 88 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==32910==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==32910==    by 0x11EA90: Parser::ParseIdentifier() (parser.cpp:190)
+==32910==    by 0x12080A: Parser::ParseClassStatement() (parser.cpp:514)
+==32910==    by 0x1214AB: Parser::ParseExpression(PrecedenceType) (parser.cpp:629)
+==32910==    by 0x11E99F: Parser::ParseExpressionStatement() (parser.cpp:182)
+==32910==    by 0x11E51F: Parser::ParseStatement() (parser.cpp:139)
+==32910==    by 0x11FA7A: Parser::ParseBlockStatement() (parser.cpp:359)
+==32910==    by 0x120496: Parser::ParseDefExpression() (parser.cpp:476)
+==32910==    by 0x1214AB: Parser::ParseExpression(PrecedenceType) (parser.cpp:629)
+==32910==    by 0x11E99F: Parser::ParseExpressionStatement() (parser.cpp:182)
+==32910==    by 0x11E51F: Parser::ParseStatement() (parser.cpp:139)
+==32910==    by 0x11E035: Parser::ParseProgram(Ad_AST_Program&) (parser.cpp:71)
+==32910== 
+==32910== LEAK SUMMARY:
+==32910==    definitely lost: 88 bytes in 1 blocks
+==32910==    indirectly lost: 0 bytes in 0 blocks
+==32910==      possibly lost: 0 bytes in 0 blocks
+==32910==    still reachable: 0 bytes in 0 blocks
+==32910==         suppressed: 0 bytes in 0 blocks
+==32910== 
+==32910== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==32916== Memcheck, a memory error detector
+==32916== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==32916== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==32916== Command: ./main
+==32916== 
+Ad interpreter [C++]... v1.0
+>> def t() { class T { def test() { print("aaa") } } b = T() b.test() }
+>> t()
+"aaa"
+>> t()
+"aaa"
+>> t()
+"aaa"
+>> exit()
+==32916== 
+==32916== HEAP SUMMARY:
+==32916==     in use at exit: 88 bytes in 1 blocks
+==32916==   total heap usage: 591 allocs, 590 frees, 129,366 bytes allocated
+==32916== 
+==32916== 88 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==32916==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==32916==    by 0x11EA90: Parser::ParseIdentifier() (parser.cpp:190)
+==32916==    by 0x12080A: Parser::ParseClassStatement() (parser.cpp:514)
+==32916==    by 0x1214AB: Parser::ParseExpression(PrecedenceType) (parser.cpp:629)
+==32916==    by 0x11E99F: Parser::ParseExpressionStatement() (parser.cpp:182)
+==32916==    by 0x11E51F: Parser::ParseStatement() (parser.cpp:139)
+==32916==    by 0x11FA7A: Parser::ParseBlockStatement() (parser.cpp:359)
+==32916==    by 0x120496: Parser::ParseDefExpression() (parser.cpp:476)
+==32916==    by 0x1214AB: Parser::ParseExpression(PrecedenceType) (parser.cpp:629)
+==32916==    by 0x11E99F: Parser::ParseExpressionStatement() (parser.cpp:182)
+==32916==    by 0x11E51F: Parser::ParseStatement() (parser.cpp:139)
+==32916==    by 0x11E035: Parser::ParseProgram(Ad_AST_Program&) (parser.cpp:71)
+==32916== 
+==32916== LEAK SUMMARY:
+==32916==    definitely lost: 88 bytes in 1 blocks
+==32916==    indirectly lost: 0 bytes in 0 blocks
+==32916==      possibly lost: 0 bytes in 0 blocks
+==32916==    still reachable: 0 bytes in 0 blocks
+==32916==         suppressed: 0 bytes in 0 blocks
+==32916== 
+==32916== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
