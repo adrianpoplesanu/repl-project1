@@ -27,6 +27,22 @@ void Repl::Loop() {
         }
     }
     free_builtin_map();*/
+    Environment* bootstrap = load_bootstrap(program, parser, evaluator);
+    bootstrap->isBootstrapEnvironment = true;
+
+    env2 = newEnvironment();
+    env2->SetBootstrapEnvironment(bootstrap);
+
+    while (1) {
+        std::string line;
+        std::cout << ">> ";
+        std::getline(std::cin, line);
+        bool end_singal = ParseLine(line);
+        if (end_singal) {
+            break;
+        }
+    }
+    free_builtin_map();
 }
 
 void Repl::ExecuteFile(std::ifstream &target) {
