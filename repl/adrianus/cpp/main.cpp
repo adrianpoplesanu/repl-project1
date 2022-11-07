@@ -7,6 +7,7 @@
 // #include "lexer.cpp" TODO: remove .cpp imports from other files and fix imports, use only .h
 #include "repl.h"
 #include "repl.cpp"
+#include "settings.h"
 
 // 0 - no test is being run ar startinme, 1 - all tests are run at startime
 #define RUN_TESTS 0

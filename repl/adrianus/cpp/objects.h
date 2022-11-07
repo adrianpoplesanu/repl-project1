@@ -9,6 +9,7 @@
 #include "ast.h"
 #include "signal.h"
 #include "hashpair.h"
+#include "settings.h"
 
 enum Ad_Object_Type {
 	OBJ_NULL,

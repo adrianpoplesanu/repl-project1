@@ -10,6 +10,7 @@ public:
     Environment* outer;
     Environment* bootstrap;
     bool isBootstrapEnvironment;
+    bool isGlobalEnvironment;
 
     Environment();
     ~Environment();

@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "objects.h"
 #include "environment.h"
+#include "settings.h"
 
 class Evaluator {
 public:

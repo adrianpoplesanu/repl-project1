@@ -4,6 +4,7 @@ Environment::Environment() {
     outer = NULL;
     bootstrap = NULL;
     isBootstrapEnvironment = false;
+    isGlobalEnvironment = false;
 }
 
 Environment::~Environment() {

@@ -5,6 +5,7 @@
 #include "evaluator.h"
 #include "environment.h"
 #include "objects.h"
+#include "settings.h"
 
 class Repl {
 private:
