@@ -34,7 +34,7 @@ void Repl::Loop() {
     env2->SetBootstrapEnvironment(bootstrap);
     env2->isGlobalEnvironment = true;
 
-    is_console_run = true;
+    IS_CONSOLE_RUN = true;
 
     while (1) {
         std::string line;

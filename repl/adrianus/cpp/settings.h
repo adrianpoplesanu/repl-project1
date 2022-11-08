@@ -1,6 +1,6 @@
 #ifndef __SETTINGS_H
 #define __SETTINGS_H
 
-bool is_console_run = false;
+bool IS_CONSOLE_RUN = false;
 
 #endif
