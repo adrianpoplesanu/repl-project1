@@ -2,5 +2,6 @@
 #define __SETTINGS_H
 
 bool IS_CONSOLE_RUN = false;
+bool USE_FIX_FOR_CLASS_STATEMENT_AS_EXPRESSION_STATEMENT_IN_BLOCK = true;
 
 #endif

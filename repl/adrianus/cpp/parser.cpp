@@ -478,7 +478,7 @@ Ad_AST_Node* Parser::ParseDefExpression() {
     Ad_INCREF(stmt->body);
 
     // ****
-    if (true) {
+    if (USE_FIX_FOR_CLASS_STATEMENT_AS_EXPRESSION_STATEMENT_IN_BLOCK) {
         for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)body)->statements.begin() ; it != ((Ad_AST_BlockStatement*)body)->statements.end(); ++it) {
             Ad_AST_Node *node = *it;
             //free_Ad_AST_Node_memory(node);

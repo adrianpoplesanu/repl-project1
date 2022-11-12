@@ -405,7 +405,7 @@ Ad_AST_BlockStatement::~Ad_AST_BlockStatement() {
         Ad_AST_Node *node = *it;
         //Ad_DECREF(node);
         // ******
-        if (true) {
+        if (USE_FIX_FOR_CLASS_STATEMENT_AS_EXPRESSION_STATEMENT_IN_BLOCK) {
             if (node->type == ST_EXPRESSION_STATEMENT) {
                 Ad_AST_ExpressionStatement* expr = (Ad_AST_ExpressionStatement*) node;
                 if (expr->expression != NULL) {

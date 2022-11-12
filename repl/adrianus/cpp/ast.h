@@ -2,6 +2,7 @@
 #define __AST_H
 
 #include "token.h"
+#include "settings.h"
 #include <string>
 #include <vector>
 
