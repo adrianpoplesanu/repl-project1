@@ -768,7 +768,7 @@ public class Evaluator {
 	}
 
 	private AdObject evalSocketObjectMethod(AstNode node, List<AstNode> args, Environment env) {
-		System.out.println("evaluating a socket instance member access");
+		//System.out.println("evaluating a socket instance member access");
 		AstMemberAccess memberAccess = (AstMemberAccess) node;
 		if (memberAccess.getOwner().getType() != AstNodeTypeEnum.IDENTIFIER) {
 			return null;
