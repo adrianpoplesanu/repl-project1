@@ -374,10 +374,22 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
         if (result && result->type == OBJ_CONTINUE) {
             return result;
         }
+        if (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS) {
+            if (result) {
+                //result->Print();
+                //std::cout << result->Inspect() << "\n"; // maybe have this on for command line flow and disabled for file execution
+                free_Ad_Object_memory(result);
+            }
+        }
         // TODO: fix this, this is an important memory leak, test55.ad ran with valgrind has this issue, when doint i++ in a while block
         //free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
     }
-    return result;
+    //return result;
+    if (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS) {
+        return NULL;
+    } else {
+        return result;
+    }
 }
 
 std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> args, Environment &env) {
