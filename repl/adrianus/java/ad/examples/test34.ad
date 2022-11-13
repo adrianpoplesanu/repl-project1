@@ -1,0 +1,9 @@
+def test() {
+    class A {
+        a = 5
+    }
+    b = A()
+    print(b.a)
+}
+
+test()

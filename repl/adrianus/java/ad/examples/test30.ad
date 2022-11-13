@@ -1,0 +1,15 @@
+def generator() {
+    def analyzer(n) {
+        if (n >= 5) {
+            print ("life")
+        } else {
+            print ("bad")
+        }
+    }
+    print (analyzer)
+    return analyzer
+}
+
+callback = generator()
+print (callback)
+callback(5)
