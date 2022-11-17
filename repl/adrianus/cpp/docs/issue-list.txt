@@ -12,6 +12,7 @@ tests:
         - test73.ad: again the expression statements in blocks seems to be the issue
         - FIXED test75.ad: might be same issue as test69.ad... investigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/16142403e633838b5bb47e30f62ebcdf22413a0f
         - test82.ad: returned nested functions fail when called... investigate more...
+        - test85.ad: same as test82.ad...
 
     macos:
         - test40.ad: test is written wrong, File bootstrap class has no init() method
@@ -25,5 +26,6 @@ tests:
         - FIXED test73.ad: again the expression statements in blocks seems to be the issue
         - FIXED test75.ad: might be the same issue as test69.ad... investigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/16142403e633838b5bb47e30f62ebcdf22413a0f
         - test82.ad: returned nested functions fail when called... investigate more...
+        - test85.ad: same as test82.ad...
 
 fixul pentru nested classes in scopes care incercau sa elibereze aceeasi zona de memorie de doua ori: https://github.com/adrianpoplesanu/repl-project1/commit/f1c5097224ad058f5b2bf088829b5608df287b45
