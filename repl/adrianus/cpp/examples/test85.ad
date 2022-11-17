@@ -1,0 +1,10 @@
+def generator() {
+    def a(n) {
+        print (2 * n)
+    }
+
+    return a
+}
+
+callback = generator()
+callback(3)

@@ -1,0 +1,7 @@
+def generator() {
+    return 5
+}
+
+a = generator()
+a++
+print(a)

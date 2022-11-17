@@ -13,3 +13,6 @@ def generator() {
 callback = generator()
 print (callback)
 callback(5)
+callback(8)
+callback(10)
+callback(4)
