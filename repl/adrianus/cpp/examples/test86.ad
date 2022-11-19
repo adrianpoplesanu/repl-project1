@@ -1,0 +1,12 @@
+def generator() {
+    class A() {
+        def test() {
+            print("test")
+        }
+    }
+    return A
+}
+
+B = generator()
+b = B()
+b.test()
