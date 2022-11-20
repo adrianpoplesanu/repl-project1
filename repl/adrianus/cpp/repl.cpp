@@ -45,6 +45,7 @@ void Repl::Loop() {
             break;
         }
     }
+    evaluator.GarbageCollectEnvironments();
     free_builtin_map();
 }
 
@@ -74,6 +75,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
         }
     }
     target.close();
+    evaluator.GarbageCollectEnvironments();
     free_builtin_map();
 }
 

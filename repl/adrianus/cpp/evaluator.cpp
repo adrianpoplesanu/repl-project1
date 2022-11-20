@@ -71,7 +71,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_BLOCK_STATEMENT: {
-            return EvalBlockStatement(node, env);
+            Ad_Object* result = EvalBlockStatement(node, env);
+            //GarbageCollectEnvironments(); // after a block statement eval is ended it's NOT safe to garbage collect the environment, a nested while/if would trigger an unwanted garbage collect
+            return result;
         }
         break;
         case ST_FUNCTION_LITERAL: {
@@ -86,7 +88,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
                 return args_objs[0];
             }
-            return ApplyFunction(func, args_objs, env);
+            Ad_Object* result = ApplyFunction(func, args_objs, env);
+            //GarbageCollectEnvironments(); // this also doesn't work, i need to document why
+            return result;
         }
         break;
         case ST_WHILE_EXPRESSION: {
@@ -164,7 +168,7 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         result = NULL;
         Ad_AST_Node *obj = *it;
         result = Eval(obj, env);
-        GarbageCollectEnvironments();
+        //GarbageCollectEnvironments(); // commented this because garbage collecting after each statement might clear the environment before all the statements in the block got evaluated
         if (result != NULL) {
             //result->Print();
             if (result->Type() != OBJ_SIGNAL) {
@@ -188,6 +192,7 @@ void Evaluator::Init() {
 }
 
 void Evaluator::GarbageCollectEnvironments() {
+    //std::cout << "cleaning up environments\n";
     for (Environment* env : environment_garbage_collection) {
         delete env;
     }
@@ -418,6 +423,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         //Environment extendedEnv = ExtendFunctionEnv(func, args);
         Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
         environment_garbage_collection.push_back(extendedEnv);
+        //std::cout << "se va returna un obiect de tipul: " << object_type_map[evaluated->type] << "\n";
         return UnwrapReturnValue(evaluated);
     }
     if (func->type == OBJ_BUILTIN) {
@@ -518,6 +524,10 @@ Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj) {
     if (obj->Type() == OBJ_RETURN_VALUE) {
         Ad_Object* returned_obj = ((Ad_ReturnValue_Object*)obj)->value;
         free_Ad_Object_memory(obj);
+        /*if (returned_obj->type == OBJ_FUNCTION) {
+            std::cout << "pe aici!!!!\n";
+            //Ad_INCREF(returned_obj);
+        }*/
         return returned_obj;
     }
     return obj;

@@ -28,6 +28,7 @@ Environment::~Environment() {
 }
 
 bool Environment::Check(std::string key) {
+    //std::cout << "CAUT CHEIA: " << key << "\n";
     if (store.find(key) == store.end()) {
         //if (outer && outer->store.find(key) != outer->store.end()) return true;
         if (outer && outer->Check(key)) return true;
