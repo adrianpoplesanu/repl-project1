@@ -1,0 +1,17 @@
+def generator() {
+    def analyzer(n) {
+        while (n < 10) {
+            print (n)
+            n++
+        }
+    }
+
+    return analyzer
+}
+
+a = generator()
+a(0)
+a(9)
+b = generator()
+b(0)
+b(1)

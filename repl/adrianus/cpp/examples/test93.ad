@@ -1,0 +1,12 @@
+def generator() {
+    def test(n) {
+        a = 2
+        return 3 * n
+    }
+
+    return test
+}
+
+callback = generator()
+b = callback(3)
+print (b)
