@@ -1,3 +1,6 @@
+#ifndef __GC_H
+#define __GC_H
+
 #include "environment.h"
 #include "objects.h"
 #include "ast.h"
@@ -16,4 +19,6 @@ public:
     void sweepEnvironments();
     void sweepObjects();
     void sweepAstNodes();
-}
+};
+
+#endif

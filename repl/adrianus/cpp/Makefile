@@ -7,6 +7,7 @@ all:
 	g++ -g -std=c++17 objects.cpp -c -o objects.o
 	g++ -g -std=c++17 listobject.cpp -c -o listobject.o
 	g++ -g -std=c++17 environment.cpp -c -o environment.o
+	g++ -g -std=c++17 gc.cpp -c -o gc.o
 	g++ -g -std=c++17 evaluator.cpp -c -o evaluator.o
 	g++ -g -std=c++17 signal.cpp -c -o signal.o
 	g++ -g -std=c++17 bootstrap.cpp -c -o bootstrap.o

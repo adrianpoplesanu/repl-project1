@@ -5,10 +5,12 @@
 #include "objects.h"
 #include "environment.h"
 #include "settings.h"
+#include "gc.h"
 
 class Evaluator {
 public:
     std::vector<Environment*> environment_garbage_collection;
+    GarbageCollector garbageCollector;
 
     Ad_Object* Eval(Ad_AST_Node*, Environment&);
     Ad_Object* EvalProgram(Ad_AST_Node*, Environment&);

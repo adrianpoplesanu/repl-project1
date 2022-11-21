@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "hashpair.cpp" // nu-mi place importul asta, as fi preferat sa import doar headerul
 #include "builtins.cpp"
+#include "gc.cpp"
 
 
 //Ad_Null_Object NULLOBJECT;
