@@ -9,6 +9,7 @@ public:
     std::map<std::string, Ad_Object*> store;
     Environment* outer;
     Environment* bootstrap;
+    int ref_count;
     bool isBootstrapEnvironment;
     bool isGlobalEnvironment;
 
