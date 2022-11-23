@@ -60,6 +60,7 @@ public:
     //void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void Init();
     void GarbageCollectEnvironments();
+    void addEnvironmentGarbageCollectorListener(Environment *);
 };
 
 #endif

@@ -13,9 +13,12 @@ public:
 
     GarbageCollector();
     ~GarbageCollector();
-    void markEnvironment(Environment*);
-    void markObject(Ad_Object*);
-    void markAstNode(Ad_AST_Node*);
+    void addEnvironment(Environment*);
+    void addObject(Ad_Object*);
+    void addAstNode(Ad_AST_Node*);
+    void clearEnvironments();
+    void clearObjects();
+    void clearAstNodes();
     void sweepEnvironments();
     void sweepObjects();
     void sweepAstNodes();

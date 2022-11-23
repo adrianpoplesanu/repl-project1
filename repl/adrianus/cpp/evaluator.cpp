@@ -194,10 +194,13 @@ void Evaluator::Init() {
 
 void Evaluator::GarbageCollectEnvironments() {
     //std::cout << "cleaning up environments\n";
+    garbageCollector.sweepEnvironments();
     for (Environment* env : environment_garbage_collection) {
-        delete env;
+        //delete env;
+        //free_Ad_environment_memory(env);
     }
-    environment_garbage_collection.clear();
+    //environment_garbage_collection.clear();
+    garbageCollector.clearEnvironments();
 }
 
 Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
@@ -424,6 +427,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         //Environment extendedEnv = ExtendFunctionEnv(func, args);
         Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
         environment_garbage_collection.push_back(extendedEnv);
+        garbageCollector.addEnvironment(extendedEnv);
         //std::cout << "se va returna un obiect de tipul: " << object_type_map[evaluated->type] << "\n";
         return UnwrapReturnValue(evaluated);
     }
@@ -502,6 +506,7 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
         environment_garbage_collection.push_back(extendedEnv);
+        garbageCollector.addEnvironment(extendedEnv);
         return UnwrapReturnValue(evaluated);
     }
     return NULL;

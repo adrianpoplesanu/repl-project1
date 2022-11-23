@@ -168,3 +168,8 @@ Environment* newEnclosedEnvironmentUnfreeable(Environment *o) {
     env->SetOuterEnvironment(o);
     return env;
 }
+
+void free_Ad_environment_memory(Environment* env) {
+    if (env->ref_count > 0) return;
+    delete env;
+}
