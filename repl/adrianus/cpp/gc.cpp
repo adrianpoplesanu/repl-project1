@@ -9,24 +9,38 @@ GarbageCollector::~GarbageCollector() {
 }
 
 void GarbageCollector::addEnvironment(Environment *env) {
-    garbage_collect_environments.push_back(env);
+    gc_environments.push_back(env);
 }
 
 void GarbageCollector::sweepEnvironments() {
-    std::cout << "running sweepEnvironments()\n";
-    for (Environment *env : garbage_collect_environments) {
+    //std::cout << "running sweepEnvironments()\n";
+    std::vector<Environment*> referencedEnvironments;
+    for (Environment *env : gc_environments) {
+        if (env->ref_count > 0) {
+            //...
+            referencedEnvironments.push_back(env);
+        } else {
+            free_Ad_environment_memory(env);
+        }
+    }
+    gc_environments = referencedEnvironments;
+}
+
+void GarbageCollector::forceFreeEnvironments() {
+    for (Environment *env : gc_environments) {
+        env->ref_count = 0;
         free_Ad_environment_memory(env);
     }
 }
 
 void GarbageCollector::clearAstNodes() {
-    garbage_collect_ast_nodes.clear();
+    gc_ast_nodes.clear();
 }
 
 void GarbageCollector::clearEnvironments() {
-    garbage_collect_environments.clear();
+    gc_environments.clear();
 }
 
 void GarbageCollector::clearObjects() {
-    garbage_collect_objects.clear();
+    gc_objects.clear();
 }

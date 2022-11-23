@@ -173,3 +173,15 @@ void free_Ad_environment_memory(Environment* env) {
     if (env->ref_count > 0) return;
     delete env;
 }
+
+void Ad_INCREF(Environment* env) {
+    if (env) {
+        env->ref_count++;
+    }
+}
+
+void Ad_DECREF(Environment* env) {
+    if (env) {
+        env->ref_count--;
+    }
+}

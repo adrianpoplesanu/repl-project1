@@ -32,5 +32,7 @@ Environment NewEnclosedEnvironment(Environment*, Environment*);
 Environment* newEnclosedEnvironmentUnfreeable(Environment*);
 
 void free_Ad_environment_memory(Environment*);
+void Ad_INCREF(Environment*);
+void Ad_DECREF(Environment*);
 
 #endif

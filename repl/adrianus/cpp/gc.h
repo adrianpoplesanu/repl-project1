@@ -7,9 +7,9 @@
 
 class GarbageCollector {
 public:
-    std::vector<Environment*> garbage_collect_environments;
-    std::vector<Ad_Object*> garbage_collect_objects;
-    std::vector<Ad_AST_Node*> garbage_collect_ast_nodes;
+    std::vector<Environment*> gc_environments;
+    std::vector<Ad_Object*> gc_objects;
+    std::vector<Ad_AST_Node*> gc_ast_nodes;
 
     GarbageCollector();
     ~GarbageCollector();
@@ -22,6 +22,9 @@ public:
     void sweepEnvironments();
     void sweepObjects();
     void sweepAstNodes();
+    void forceFreeEnvironments();
+    void forceFreeObjects();
+    void forceFreeAstNodes();
 };
 
 #endif
