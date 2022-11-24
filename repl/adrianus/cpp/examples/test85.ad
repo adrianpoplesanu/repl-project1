@@ -8,3 +8,4 @@ def generator() {
 
 callback = generator()
 callback(3)
+callback(4)

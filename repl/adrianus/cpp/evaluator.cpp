@@ -425,13 +425,13 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             return new Ad_Error_Object("function signature unrecognized, different number of params");
         }
         Environment* extendedEnv = extendFunctionEnv(func, args);
-        extendedEnv->ref_count = 1;
-        //Environment extendedEnv = ExtendFunctionEnv(func, args);
-        Ad_INCREF(func_obj->env);
-        Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
-        //environment_garbage_collection.push_back(extendedEnv);
+        //extendedEnv->ref_count = 1;
         garbageCollector.addEnvironment(extendedEnv);
-        extendedEnv->ref_count = 0;
+        //Environment extendedEnv = ExtendFunctionEnv(func, args);
+        //Ad_INCREF(func_obj->env);
+        Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
+        //environment_garbage_collection.push_back(extendedEnv);        
+        //extendedEnv->ref_count = 0;
         //std::cout << "se va returna un obiect de tipul: " << object_type_map[evaluated->type] << "\n";
         return UnwrapReturnValue(evaluated);
     }

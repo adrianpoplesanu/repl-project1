@@ -66,8 +66,8 @@ Ad_Integer_Object::Ad_Integer_Object(int v) {
 }
 
 Ad_Integer_Object::~Ad_Integer_Object() {
-    //std::cout << value << "\n";
-    //std::cout << "doing some deletion here\n";
+    std::cout << value << "\n";
+    std::cout << "doing some deletion here\n";
 }
 
 std::string Ad_Integer_Object::Inspect() {
@@ -222,7 +222,7 @@ Ad_Function_Object::~Ad_Function_Object() {
         Ad_DECREF(obj);
         free_Ad_AST_Node_memory(obj);
     }
-    Ad_DECREF(env);
+    //Ad_DECREF(env);
 }
 
 std::string Ad_Function_Object::Inspect() {
