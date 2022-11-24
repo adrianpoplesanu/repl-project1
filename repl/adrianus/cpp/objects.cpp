@@ -222,6 +222,7 @@ Ad_Function_Object::~Ad_Function_Object() {
         Ad_DECREF(obj);
         free_Ad_AST_Node_memory(obj);
     }
+    Ad_DECREF(env);
 }
 
 std::string Ad_Function_Object::Inspect() {

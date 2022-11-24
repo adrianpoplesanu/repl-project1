@@ -12,7 +12,7 @@ Repl::Repl() {
 
 Repl::~Repl() {
     //env->PrintStore(0);
-    delete env2;
+    delete env2; // this could be a regular env that gets deleted by the garbage collector mechanism
 }
 
 void Repl::Loop() {

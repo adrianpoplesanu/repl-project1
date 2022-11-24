@@ -90,7 +90,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
                 return args_objs[0];
             }
             Ad_Object* result = ApplyFunction(func, args_objs, env);
-            //GarbageCollectEnvironments(); // this also doesn't work, i need to document why
+            //GarbageCollectEnvironments(); // this also doesn't work, i need to document why, why is this not working?!?
+            //Ad_DECREF(((Ad_Function_Object*)func)->env);
             return result;
         }
         break;
@@ -195,10 +196,10 @@ void Evaluator::Init() {
 void Evaluator::GarbageCollectEnvironments() {
     //std::cout << "cleaning up environments\n";
     garbageCollector.sweepEnvironments();
-    for (Environment* env : environment_garbage_collection) {
+    //for (Environment* env : environment_garbage_collection) {
         //delete env;
         //free_Ad_environment_memory(env);
-    }
+    //}
     //environment_garbage_collection.clear();
     garbageCollector.clearEnvironments();
 }
@@ -424,10 +425,13 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             return new Ad_Error_Object("function signature unrecognized, different number of params");
         }
         Environment* extendedEnv = extendFunctionEnv(func, args);
+        extendedEnv->ref_count = 1;
         //Environment extendedEnv = ExtendFunctionEnv(func, args);
+        Ad_INCREF(func_obj->env);
         Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
-        environment_garbage_collection.push_back(extendedEnv);
+        //environment_garbage_collection.push_back(extendedEnv);
         garbageCollector.addEnvironment(extendedEnv);
+        extendedEnv->ref_count = 0;
         //std::cout << "se va returna un obiect de tipul: " << object_type_map[evaluated->type] << "\n";
         return UnwrapReturnValue(evaluated);
     }
@@ -505,7 +509,7 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
     if (func->type == OBJ_FUNCTION) {
         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
-        environment_garbage_collection.push_back(extendedEnv);
+        //environment_garbage_collection.push_back(extendedEnv);
         garbageCollector.addEnvironment(extendedEnv);
         return UnwrapReturnValue(evaluated);
     }

@@ -13,16 +13,19 @@ void GarbageCollector::addEnvironment(Environment *env) {
 }
 
 void GarbageCollector::sweepEnvironments() {
-    //std::cout << "running sweepEnvironments()\n";
+    std::cout << "running sweepEnvironments()\n";
+    int count = 0;
     std::vector<Environment*> referencedEnvironments;
     for (Environment *env : gc_environments) {
         if (env->ref_count > 0) {
             //...
             referencedEnvironments.push_back(env);
         } else {
+            count++;
             free_Ad_environment_memory(env);
         }
     }
+    std::cout << "freed " << count << " environments\n";
     gc_environments = referencedEnvironments;
 }
 
