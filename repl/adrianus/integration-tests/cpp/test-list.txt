@@ -24,5 +24,6 @@ examples/test24.ad
 examples/test25.ad
 examples/test26.ad
 examples/test27.ad
+examples/test28.ad
 examples/test29.ad
 examples/test30.ad

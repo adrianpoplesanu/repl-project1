@@ -11,7 +11,7 @@ errors_detected = False
 for test_file in test_files:
     target = test_file.strip()
     #proc = subprocess.Popen(["leaks", "--atExit", "--", "{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)], stdout=subprocess.PIPE)
-    proc = subprocess.Popen(["./memory-check.sh", "{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)])
+    proc = subprocess.Popen(["./memory-check-macos.sh", "{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)])
 
     proc.wait()
     proc.communicate()

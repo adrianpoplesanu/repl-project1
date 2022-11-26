@@ -10,9 +10,9 @@ target = 'examples/test01.ad'
 #proc = subprocess.Popen(["leaks", "--atExit", "--", "../../cpp/main", "examples/test01.ad"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 #proc = subprocess.Popen(["leaks", "-atExit", "--", "../../cpp/main", "examples/test01.ad"], stdout=subprocess.PIPE)
 #proc = subprocess.Popen("leaks --atExit -- ../../cpp/main examples/test01.ad", shell=True)
-#proc = subprocess.Popen(["./memory-check.sh", "../../cpp/main", "examples/test01.ad"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-#proc = subprocess.Popen(["./memory-check.sh", "../../cpp/main", "examples/test01.ad"], stdout=subprocess.PIPE)
-proc = subprocess.Popen(["./memory-check.sh", "../../cpp/main", "examples/test01.ad"])
+#proc = subprocess.Popen(["./memory-check-macos.sh", "../../cpp/main", "examples/test01.ad"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#proc = subprocess.Popen(["./memory-check-macos.sh", "../../cpp/main", "examples/test01.ad"], stdout=subprocess.PIPE)
+proc = subprocess.Popen(["./memory-check-macos.sh", "../../cpp/main", "examples/test01.ad"])
 #proc = subprocess.Popen(["ls"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 proc.wait()
