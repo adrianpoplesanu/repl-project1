@@ -1,0 +1,26 @@
+a = [0, 0, 0]
+
+def valid(k) {
+    for (i = 0; i < k; i++) {
+        if (a[i] == a[k]) {
+            return false
+        }
+    }
+    return true
+}
+
+def back(k) {
+    if (k == 3) {
+        print(a)
+    } else {
+        a[k] = 0
+        while (a[k] < 3) {
+            if (valid(k)) {
+                back(k + 1)
+            }
+            a[k] = a[k] + 1
+        }
+    }
+}
+
+back(0)
