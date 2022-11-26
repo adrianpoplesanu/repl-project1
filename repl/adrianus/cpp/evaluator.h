@@ -33,7 +33,7 @@ public:
     Ad_Object* CallInstanceConstructor(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     Environment ExtendFunctionEnv(Ad_Object*, std::vector<Ad_Object*>);
     Environment* extendFunctionEnv(Ad_Object*, std::vector<Ad_Object*>);
-    Ad_Object* UnwrapReturnValue(Ad_Object*);
+    Ad_Object* UnwrapReturnValue(Ad_Object*, Environment*);
     Ad_Object* EvalWhileExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalString(Ad_AST_Node*, Environment&);
     Ad_Object* EvalStringInfixExpression(std::string, Ad_Object*, Ad_Object*);

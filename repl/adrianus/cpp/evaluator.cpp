@@ -92,6 +92,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             Ad_Object* result = ApplyFunction(func, args_objs, env);
             //GarbageCollectEnvironments(); // this also doesn't work, i need to document why, why is this not working?!?
             //Ad_DECREF(((Ad_Function_Object*)func)->env);
+            garbageCollector.consumeScheduledDECREFEnvironments();
             return result;
         }
         break;
@@ -164,13 +165,16 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
+    // for the next if to work include utils.cpp and comment out the test_parser.cpp import in main.cpp and the code references from main.cpp
+    //if (node) {
+    //    print_ast_nodes(node, 0);
+    //}
     Init();
     Ad_Object* result;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_Program*)node)->statements.begin() ; it != ((Ad_AST_Program*)node)->statements.end(); ++it) {
         result = NULL;
         Ad_AST_Node *obj = *it;
         result = Eval(obj, env);
-        //GarbageCollectEnvironments(); // commented this because garbage collecting after each statement might clear the environment before all the statements in the block got evaluated
         if (result != NULL) {
             //result->Print();
             if (result->Type() != OBJ_SIGNAL) {
@@ -183,6 +187,8 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result); // TODO: remove OBJ_BUILTIN check and use ref_count
         // OBJ_BUILTINS get destroyed on termination by free_builtin_map
+        //std::cout << statement_type_map[obj->type] << "\n";
+        GarbageCollectEnvironments(); // commented this because garbage collecting after each statement might clear the environment before all the statements in the block got evaluated
     }
     return NULL;
 }
@@ -201,7 +207,7 @@ void Evaluator::GarbageCollectEnvironments() {
         //free_Ad_environment_memory(env);
     //}
     //environment_garbage_collection.clear();
-    garbageCollector.clearEnvironments();
+    //garbageCollector.clearEnvironments();
 }
 
 Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
@@ -425,15 +431,17 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             return new Ad_Error_Object("function signature unrecognized, different number of params");
         }
         Environment* extendedEnv = extendFunctionEnv(func, args);
+        Ad_INCREF(extendedEnv);
         //extendedEnv->ref_count = 1;
         garbageCollector.addEnvironment(extendedEnv);
+        garbageCollector.scheduleEnvironmentToDECREF(extendedEnv);
         //Environment extendedEnv = ExtendFunctionEnv(func, args);
         //Ad_INCREF(func_obj->env);
         Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
         //environment_garbage_collection.push_back(extendedEnv);        
         //extendedEnv->ref_count = 0;
         //std::cout << "se va returna un obiect de tipul: " << object_type_map[evaluated->type] << "\n";
-        return UnwrapReturnValue(evaluated);
+        return UnwrapReturnValue(evaluated, extendedEnv);
     }
     if (func->type == OBJ_BUILTIN) {
         Ad_Builtin_Object* builtinObject = (Ad_Builtin_Object*) func;
@@ -511,7 +519,7 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
         //environment_garbage_collection.push_back(extendedEnv);
         garbageCollector.addEnvironment(extendedEnv);
-        return UnwrapReturnValue(evaluated);
+        return UnwrapReturnValue(evaluated, extendedEnv);
     }
     return NULL;
 }
@@ -529,15 +537,17 @@ Environment* Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*>
     return extended;
 }
 
-Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj) {
+Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj, Environment *env) {
     if (obj == NULL) return obj; // found when doing the Java implementation
     if (obj->Type() == OBJ_RETURN_VALUE) {
         Ad_Object* returned_obj = ((Ad_ReturnValue_Object*)obj)->value;
         free_Ad_Object_memory(obj);
-        /*if (returned_obj->type == OBJ_FUNCTION) {
-            std::cout << "pe aici!!!!\n";
-            //Ad_INCREF(returned_obj);
-        }*/
+        if (returned_obj->type == OBJ_FUNCTION) {
+            if (!env->isGlobalEnvironment) {
+                /* function objects have a reference to their enclosing environment, so i need to make sure that environment is not garbage collected */
+                Ad_INCREF(env);
+            }
+        }
         return returned_obj;
     }
     return obj;
@@ -557,6 +567,7 @@ Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
     //Environment extended = NewEnclosedEnvironment(func_obj->env);
     Environment* extended = newEnclosedEnvironment(func_obj->env);
+    Ad_INCREF(func_obj->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
         extended->SetCallArgument((*it)->TokenLiteral(), args[i++]);

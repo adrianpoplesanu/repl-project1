@@ -66,8 +66,7 @@ Ad_Integer_Object::Ad_Integer_Object(int v) {
 }
 
 Ad_Integer_Object::~Ad_Integer_Object() {
-    std::cout << value << "\n";
-    std::cout << "doing some deletion here\n";
+    // nothing to free here: type, ref_count and value are not pointers
 }
 
 std::string Ad_Integer_Object::Inspect() {

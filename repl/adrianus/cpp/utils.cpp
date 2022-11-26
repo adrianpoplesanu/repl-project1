@@ -9,6 +9,7 @@ void print_level(int level) {
 }
 
 void print_ast_nodes(Ad_AST_Node* node, int level) {
+    if (node == NULL) return;
     switch(node->type) {
         case ST_PROGRAM:
             print_level(level);

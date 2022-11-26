@@ -8,6 +8,7 @@
 class GarbageCollector {
 public:
     std::vector<Environment*> gc_environments;
+    std::vector<Environment*> scheduled_to_DECREF_environments;
     std::vector<Ad_Object*> gc_objects;
     std::vector<Ad_AST_Node*> gc_ast_nodes;
 
@@ -25,6 +26,8 @@ public:
     void forceFreeEnvironments();
     void forceFreeObjects();
     void forceFreeAstNodes();
+    void scheduleEnvironmentToDECREF(Environment*);
+    void consumeScheduledDECREFEnvironments();
 };
 
 #endif
