@@ -29,3 +29,6 @@ tests:
         - test85.ad: same as test82.ad...
 
 fixul pentru nested classes in scopes care incercau sa elibereze aceeasi zona de memorie de doua ori: https://github.com/adrianpoplesanu/repl-project1/commit/f1c5097224ad058f5b2bf088829b5608df287b45
+commituri importante pentru garbage collection:
+    - https://github.com/adrianpoplesanu/repl-project1/commit/5eb71fdc1e158bfb52b4ca869f8cffc708ee249d
+    - https://github.com/adrianpoplesanu/repl-project1/commit/276bb090e9c190b89a7f29a97b161b361c776d4c
