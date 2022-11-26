@@ -139,10 +139,10 @@ Ad_ReturnValue_Object::~Ad_ReturnValue_Object() {
 
 std::string Ad_ReturnValue_Object::Inspect() {
     // TODO: fix this
-    return "todo: implement inspect in Ad_ReturnValue_Object";
-    /*std::string out = "";
-    out = std::to_string(value->value);
-    return out;*/
+    //return "todo: implement inspect in Ad_ReturnValue_Object";
+    std::string out = "";
+    out = value->Inspect();
+    return out;
 }
 
 void Ad_ReturnValue_Object::Print() {
