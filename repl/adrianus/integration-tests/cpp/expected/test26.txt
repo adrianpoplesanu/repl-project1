@@ -1,1 +1,4 @@
-ala bala portocala
+56
+"buna dimineata!!!"
+store: {Student: class object at memory address (.*), s: class instance at memory address (.*)}
+outer: {}

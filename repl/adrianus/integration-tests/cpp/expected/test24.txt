@@ -1,1 +1,5 @@
-ala bala portocala
+"start test"
+"end class declaration"
+store: {Elev: class object at memory address (.*), a: 12}
+outer: {}
+"end class test"
