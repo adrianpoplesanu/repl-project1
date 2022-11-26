@@ -1,5 +1,5 @@
 def a() {
-    if (3 > 1) { 1001; } else { 1002; }
+    if (3 > 1) { return 1001; } else { return 1002; }
 }
 
 a()
