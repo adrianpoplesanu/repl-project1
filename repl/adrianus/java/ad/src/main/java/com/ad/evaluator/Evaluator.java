@@ -533,6 +533,35 @@ public class Evaluator {
 
 	private AdObject evalPostfixIncrement(AstNode node, Environment env) {
 		AstPostfixIncrement expr = (AstPostfixIncrement) node;
+		if (expr.getName().getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
+			AstIndexExpression indexExpression = (AstIndexExpression) expr.getName();
+			AdObject old_obj = evalIndexExpression(indexExpression, env);
+			int value = ((AdIntegerObject) old_obj).getValue();
+			if ("++".equals(expr.getOperation())) {
+				AdIntegerObject new_obj = new AdIntegerObject(value + 1);
+				AstNode left = indexExpression.getLeft();
+				AstNode index = indexExpression.getIndex();
+				AdObject leftObj = eval(left, env);
+				AdObject indexObj = eval(index, env);
+				if (leftObj.getType() == ObjectTypeEnum.LIST) {
+					if (indexObj.getType() == ObjectTypeEnum.INT) {
+						int i = ((AdIntegerObject) indexObj).getValue();
+						AdListObject target = (AdListObject) leftObj;
+						target.getElements().set(i, new_obj);
+						return new AdIntegerObject(value);
+					}
+				}
+				if (leftObj.getType() == ObjectTypeEnum.HASH) {
+					if (indexObj.getType() == ObjectTypeEnum.INT) {
+						System.out.println("doing a postfix ++ for a hash element");
+						AdHashObject target = (AdHashObject) leftObj;
+						//target.getElements().put("aaa", new HashPair(ceva, new_obj));
+						// return new AdIntegerObject(value);
+					}
+				}
+			}
+			return null;
+		}
 		AstIdentifier ident = (AstIdentifier) expr.getName();
 		AdObject old_obj = env.get(ident.getValue());
 		if (old_obj.getType() == ObjectTypeEnum.INT) {
