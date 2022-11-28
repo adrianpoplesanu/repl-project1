@@ -111,11 +111,12 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_INDEX_EXPRESSION: {
-            Ad_Object* left = Eval(((Ad_AST_IndexExpression*)node)->left, env);
+            /*Ad_Object* left = Eval(((Ad_AST_IndexExpression*)node)->left, env);
             if (IsError(left)) return left;
             Ad_Object* index = Eval(((Ad_AST_IndexExpression*)node)->index, env);
             if (IsError(index)) return index;
-            return EvalIndexExpression(left, index);
+            return EvalIndexExpression(left, index);*/
+            return evalIndexExpression(node, &env);
         }
         break;
         case ST_HASH_LITERAL: {
@@ -598,7 +599,14 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
     return NULL;
 }
 
-Ad_Object* Evaluator::EvalIndexExpression(Ad_Object* left, Ad_Object* index) {
+//Ad_Object* Evaluator::EvalIndexExpression(Ad_Object* left, Ad_Object* index) {
+Ad_Object* Evaluator::evalIndexExpression(Ad_AST_Node* node, Environment* env) {
+
+    Ad_Object* left = Eval(((Ad_AST_IndexExpression*)node)->left, *env);
+    if (IsError(left)) return left;
+    Ad_Object* index = Eval(((Ad_AST_IndexExpression*)node)->index, *env);
+    if (IsError(index)) return index;
+
     if (left->type == OBJ_LIST && index->type == OBJ_INT) {
         return EvalListIndexExpression(left, index);
     }
