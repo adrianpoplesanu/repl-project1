@@ -19,6 +19,11 @@ public class LenBuiltin extends AbstractBuiltin {
             AdIntegerObject result = new AdIntegerObject(stringObject.getValue().length());
             return result;
         }
+        if (obj.getType() == ObjectTypeEnum.LIST) {
+            AdListObject listObject = (AdListObject) obj;
+            AdIntegerObject result = new AdIntegerObject(listObject.getElements().size());
+            return result;
+        }
         return null;
     }
 }

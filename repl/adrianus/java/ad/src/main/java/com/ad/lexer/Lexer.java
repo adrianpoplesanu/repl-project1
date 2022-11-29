@@ -63,12 +63,24 @@ public class Lexer {
 			}
 		break;
 		case '*':
-			token.setType(TokenTypeEnum.ASTERISK);
-			token.setLiteral("*");
+			if (peekChar() == '/') {
+				token.setType(TokenTypeEnum.END_COMMENT);
+				token.setLiteral("*/");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.ASTERISK);
+				token.setLiteral("*");
+			}
 		break;
 		case '/':
-			token.setType(TokenTypeEnum.SLASH);
-			token.setLiteral("/");
+			if (peekChar() == '*') {
+				token.setType(TokenTypeEnum.START_COMMENT);
+				token.setLiteral("/*");
+				readChar();
+			} else {
+				token.setType(TokenTypeEnum.SLASH);
+				token.setLiteral("/");
+			}
 		break;
 		case ';':
 			token.setType(TokenTypeEnum.SEMICOLON);

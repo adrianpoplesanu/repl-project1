@@ -9,6 +9,11 @@ public class AstComment extends AstNode {
         type = AstNodeTypeEnum.COMMENT;
     }
 
+    public AstComment(Token token) {
+        this();
+        this.token = token;
+    }
+
     @Override
     public String tokenLiteral() {
         return token.getLiteral();

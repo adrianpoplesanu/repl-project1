@@ -56,6 +56,8 @@ public class Evaluator {
 			return evalBreakStatement(node, env);
 		case CONTINUE_STATEMENT:
 			return evalContinueStatement(node, env);
+		case COMMENT:
+			return evalCommentStatement(node, env);
 		case STRING_LITERAL:
 			return evalStringLiteral(node, env);
 		case WHILE_EXPRESSION:
@@ -147,6 +149,11 @@ public class Evaluator {
 		env.set(letStatement.getName().getValue(), obj);
     	return null;
     }
+
+	private AdObject evalCommentStatement(AstNode node, Environment env) {
+		// this is just a comment, do nothing in the evaluator
+		return null;
+	}
 
     private AdObject evalIdentifier(AstNode node, Environment env) {
     	AstIdentifier ident = (AstIdentifier)node;

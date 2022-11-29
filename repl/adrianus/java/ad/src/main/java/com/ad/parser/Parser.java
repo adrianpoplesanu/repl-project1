@@ -121,6 +121,8 @@ public class Parser {
             return parseBreakStatement();
         } else if (currentToken.getType() == TokenTypeEnum.CONTINUE) {
             return parseContinueStatement();
+        } else if (currentToken.getType() == TokenTypeEnum.START_COMMENT) {
+            return parseCommentStatement();
         } else {
             return parseExpressionStatement();
         }
@@ -154,6 +156,14 @@ public class Parser {
             nextToken();
         }
         return stmt;
+    }
+
+    private AstNode parseCommentStatement() {
+        AstComment node = new AstComment(currentToken);
+        while(!currentTokenIs(TokenTypeEnum.END_COMMENT)) {
+            nextToken();
+        }
+        return node;
     }
 
     private AstNode parseExpressionStatement() {
