@@ -1,0 +1,7 @@
+def mat(n, default_obj) {
+    a = list(n, list(n, default_obj))
+    return a
+}
+
+a = mat(3, 0)
+print(a)

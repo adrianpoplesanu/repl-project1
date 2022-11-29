@@ -1,0 +1,3 @@
+a = AdMatrixLibrary.generateMatrix(3, 3, 0)
+/*print (a)*/
+AdMatrixLibrary.printMatrix(a)
