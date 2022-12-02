@@ -473,6 +473,13 @@ public class Parser {
         AstNode name = parseIdentifier();
         expr.setName(name);
         nextToken();
+        if (currentTokenIs(TokenTypeEnum.COLON)) {
+            System.out.println("TODO: should do inheritence here");
+            while (!currentTokenIs(TokenTypeEnum.LBRACE)) {
+                System.out.println(currentToken);
+                nextToken();
+            }
+        }
         while(!currentTokenIs(TokenTypeEnum.RBRACE)) {
             if (currentTokenIs(TokenTypeEnum.DEF)) {
                 AstNode stmt = parseDefStatement();
