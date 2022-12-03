@@ -1,0 +1,10 @@
+class Country {
+    name = "USA"
+}
+
+def generator() {
+    country = Country()
+    return country
+}
+
+print (generator().name)

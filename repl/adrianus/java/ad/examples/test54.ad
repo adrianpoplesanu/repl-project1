@@ -1,0 +1,23 @@
+class Flag {
+    colors = ["red", "white", "purple"]
+}
+
+class Country {
+    flag = Flag()
+
+    def constructor(name) {
+        this.name = name
+    }
+
+    def getFlag(n) {
+        print (2 * n)
+        return flag;
+    }
+}
+
+class Continent {
+    country = Country("USA")
+}
+
+america = Continent()
+print (america.country.getFlag(4).colors)

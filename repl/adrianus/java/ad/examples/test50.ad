@@ -1,0 +1,21 @@
+def freedom(n) {
+    return n + 1
+}
+
+class Flag {
+    colors = ["red", "white", "yellow"]
+}
+
+class Country {
+    def constructor(name) {
+        this.name = "USA"
+        this.year = freedom(1989)
+        this.flag = Flag()
+    }
+}
+
+country = Country("USA")
+flag = Flag()
+print (country.name)
+print (country.year)
+print (flag.colors)

@@ -1,0 +1,27 @@
+class Size {
+    height = 55
+}
+
+class Flag {
+    colors = ["red", "white", "purple"]
+    size = Size()
+}
+
+class Country {
+    flag = Flag()
+
+    def constructor(name) {
+        this.name = name
+    }
+
+    def getFlag() {
+        return flag;
+    }
+}
+
+class Continent {
+    country = Country("USA")
+}
+
+america = Continent()
+print (america.country.getFlag().size.height)

@@ -1,0 +1,15 @@
+class Flag {
+    colors = ["red", "white", "yellow"]
+}
+
+class Country {
+    name = "USA"
+    flag = Flag()
+}
+
+def generator() {
+    country = Country()
+    return country
+}
+
+print (generator().flag.colors)
