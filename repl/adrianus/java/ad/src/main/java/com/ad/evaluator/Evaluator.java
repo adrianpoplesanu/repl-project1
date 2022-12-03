@@ -15,6 +15,7 @@ import com.ad.objects.*;
 import com.ad.utils.FileUtils;
 
 import static com.ad.ast.AstNodeTypeConverter.astNodeTypeMap;
+import static com.ad.environment.EnvironmentUtils.newEnvironment;
 
 public class Evaluator {
 	public static AdBooleanObject TrueObject = new AdBooleanObject(true);
@@ -415,7 +416,7 @@ public class Evaluator {
     		return builtin.getBuiltinFunction().call(arguments, env);
     	}
 		if (function.getType() == ObjectTypeEnum.CLASS) {
-			Environment instanceEnv = EnvironmentUtils.newEnvironment();
+			Environment instanceEnv = newEnvironment();
 			AdClassObject adClassObject = (AdClassObject) function;
 			String name = ((AstIdentifier) adClassObject.getName()).getValue();
 			AdClassInstance adClassInstance = new AdClassInstance(name, adClassObject, instanceEnv);
@@ -785,7 +786,69 @@ public class Evaluator {
 	}
 
 	private AdObject recursiveMemberAccessCall(AstNode node, Environment env) {
+		List<AstMemberAccess> chainedMemberAccesses = new ArrayList<>();
+		while (node.getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+			chainedMemberAccesses.add((AstMemberAccess) node);
+			node = ((AstMemberAccess) node).getOwner();
+		}
+		Environment currentEnv = env;
+
+		// initialize env
+		AstNode initialMemberAccess = chainedMemberAccesses.get(0);
+		while (initialMemberAccess.getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+			initialMemberAccess = ((AstMemberAccess)initialMemberAccess).getOwner();
+		}
+
+		if (initialMemberAccess.getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
+			AdObject obj = eval(initialMemberAccess, currentEnv);
+			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				currentEnv = ((AdClassInstance) obj).getEnvironment();
+			}
+		}
+
+		if (initialMemberAccess.getType() == AstNodeTypeEnum.IDENTIFIER) {
+			AdObject obj = eval(initialMemberAccess, currentEnv);
+			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				currentEnv = ((AdClassInstance) obj).getEnvironment();
+			}
+		}
+		// end initialize env
+
+		for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
+            AstMemberAccess currentMemberAccess = chainedMemberAccesses.get(i);
+			if (currentMemberAccess.isMethod()) {
+				// am de a face cu un call
+				AdObject obj = eval(currentMemberAccess.getMember(), currentEnv);
+				if (obj.getType() == ObjectTypeEnum.FUNCTION) {
+					List<AdObject> argObjs = evalExpressions(chainedMemberAccesses.get(i).getArguments(), env);
+					AdObject obj2 = applyMethod(obj, argObjs, ((AdFunctionObject) obj).getEnv());
+					if (i == 0) {
+						// i have reached the end, i need to return
+						return obj2;
+					}
+					if (obj2.getType() == ObjectTypeEnum.INSTANCE) {
+						currentEnv = ((AdClassInstance) obj2).getEnvironment();
+					}
+				}
+			} else {
+				// am de a face cu un identificator
+				AdObject obj = eval(currentMemberAccess.getMember(), currentEnv);
+				if (i == 0) {
+					// i have reached the end, i need to return
+					return obj;
+				}
+				if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+					currentEnv = ((AdClassInstance) obj).getEnvironment();
+				}
+			}
+		}
+		// daca am ajuns aici atunci nu cred ca e ok
+		return null;
+	}
+
+	private AdObject recursiveMemberAccessCall2(AstNode node, Environment env) {
 		// TODO: review and cleanup this
+		// this is the old way of doing recursive member access calls, the new version is much more elegant
 		List<AstMemberAccess> chainedMemberAccesses = new ArrayList<>();
 		while (node.getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
 			chainedMemberAccesses.add((AstMemberAccess) node);
@@ -819,6 +882,16 @@ public class Evaluator {
 								return obj3;
 							}
 						}
+					} else {
+						if (current.isMethod() && obj2.getType() == ObjectTypeEnum.INSTANCE) {
+							AdObject obj3 = eval(current.getMember(), ((AdClassInstance) obj2).getEnvironment());
+							if (obj3.getType() == ObjectTypeEnum.FUNCTION) {
+								List<AdObject> argObjs = evalExpressions(chainedMemberAccesses.get(i).getArguments(), env);
+								AdObject obj4 = applyMethod(obj3, argObjs, ((AdFunctionObject) obj3).getEnv());
+								//currentEnv = ((AdClassInstance) obj4).getEnvironment();
+								System.out.println(obj4);
+							}
+						}
 					}
 					continue;
 				}
@@ -830,6 +903,22 @@ public class Evaluator {
 				recursiveMemberAccess.setOwner(new AstIdentifier(null, owner.getValue()));
 			} else {
 				AstMemberAccess current = chainedMemberAccesses.get(i);
+				if (current.getType() == AstNodeTypeEnum.MEMBER_ACCESS &&
+						current.isMethod() &&
+						current.getOwner().getType() == AstNodeTypeEnum.MEMBER_ACCESS &&
+						((AstMemberAccess)current.getOwner()).getOwner().getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
+					AstCallExpression astCallExpression = (AstCallExpression) ((AstMemberAccess)current.getOwner()).getOwner();
+					AdObject obj2 = eval(astCallExpression, env);
+					AdObject obj3 = eval(((AstMemberAccess)current.getOwner()).getOwner(), ((AdClassInstance) obj2).getEnvironment());
+					if (obj3.getType() == ObjectTypeEnum.FUNCTION) {
+						List<AdObject> argObjs = evalExpressions(chainedMemberAccesses.get(i).getArguments(), env);
+						AdObject obj4 = applyMethod(obj3, argObjs, ((AdFunctionObject) obj3).getEnv());
+						Environment newEnv = ((AdClassInstance) obj3).getEnvironment();
+						currentEnv = newEnv;
+
+					}
+					continue;
+				}
 				AstIdentifier member = (AstIdentifier) current.getMember();
 				AstMemberAccess owner = (AstMemberAccess) current.getOwner();
 				AstIdentifier newOwner = (AstIdentifier) owner.getMember();
