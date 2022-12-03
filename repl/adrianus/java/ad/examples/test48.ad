@@ -1,0 +1,22 @@
+def a() {
+    print("first")
+}
+
+def a() {
+    print("second")
+}
+
+a()
+
+class B {
+    def a() {
+        print("B.a() first")
+    }
+
+    def a() {
+        print("B.a() second")
+    }
+}
+
+b = B()
+b.a()
