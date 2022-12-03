@@ -59,6 +59,19 @@ public class Environment {
 		store.put(key, value);
 	}
 
+	public AdObject lookupOnlyInStore(String key) {
+		return store.get(key);
+	}
+
+	public AdObject lookupConstructor() {
+		// constructor needs to be specific to current store
+		// the normal lookup mechanism searches for "constructor" identifier in store and then recursive in outer
+		// this means that if no constructor in current class then the higher up class that nests the current one
+		// will hit a constructor on the env.get if one is present
+		// search for "constructor" only in local env, I don't want the constructor of a higher class
+		return lookupOnlyInStore("constructor");
+	}
+
 	public Environment getOuter() {
 		return outer;
 	}
