@@ -1,0 +1,13 @@
+class A {
+    a = 5
+}
+
+a = A()
+print(a.a)
+
+class B : A {
+    b = 6
+}
+
+b = B()
+print(b.b)
