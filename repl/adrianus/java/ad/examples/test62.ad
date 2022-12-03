@@ -1,0 +1,15 @@
+class Flag {
+    def constructor() {
+        this.colors = ["red", "white", "yellow"]
+    }
+}
+
+class Country {
+    def constructor(name) {
+        this.name = name
+        this.flag = Flag()
+    }
+}
+
+america = Country("USA")
+print (america.flag.colors)
