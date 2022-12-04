@@ -502,7 +502,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
 
 Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::vector<Ad_Object*> args, Environment &env) {
     Environment* instance_environment = ((Ad_Class_Instance*) klass_instance)->instance_environment;
-    Ad_Object* klass_method = instance_environment->Get("constructor");
+    Ad_Object* klass_method = instance_environment->lookupConstructor();
     if (klass_method != NULL) {
         // a method named constructor was found, calling it
         if (args.size() == 1 && IsError(args[0])) {

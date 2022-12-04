@@ -21,6 +21,8 @@ public:
     void SetCallArgument(std::string, Ad_Object*);
     void SetOuterEnvironment(Environment*);
     void SetBootstrapEnvironment(Environment*);
+    Ad_Object* lookupOnlyInStore(std::string);
+    Ad_Object* lookupConstructor();
     void FreeObjectForKey(std::string);
     void PrintStore(int);
 };

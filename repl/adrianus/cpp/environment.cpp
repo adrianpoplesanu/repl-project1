@@ -56,6 +56,18 @@ Ad_Object* Environment::Get(std::string key) {
     }
 }
 
+Ad_Object* Environment::lookupOnlyInStore(std::string key) {
+    if (store.find(key) == store.end()) {
+        return NULL;
+    } else {
+        return store[key];
+    }
+}
+
+Ad_Object* Environment::lookupConstructor() {
+    return lookupOnlyInStore("constructor");
+}
+
 void Environment::Set(std::string key, Ad_Object* obj) {
     if (store.find(key) != store.end()) {
         int old_ref_count = store[key]->ref_count;
