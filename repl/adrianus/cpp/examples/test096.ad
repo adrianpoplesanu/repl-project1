@@ -1,0 +1,19 @@
+let a = function() {
+    print ("aaa")
+}
+
+a()
+print (a)
+
+let b = function(n) {
+    while (n > 0) {
+        print (n * 2)
+        n = n - 1
+        function(n)
+    }
+}
+
+c = 9
+b(c)
+print(b)
+print(c)
