@@ -755,7 +755,7 @@ Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     return NULL;
 }
 
-Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
+Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { // TODO: cleanup aici si in acelsi loc la implementarea in java
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
 
     Ad_Object* evaluated = NULL;
@@ -779,6 +779,12 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
         return evaluated;
     } else {
         if (member_access->is_method) {
+            if (member_access->owner->type == ST_MEMBER_ACCESS) {
+                return evalRecursiveMemberAccessCall(member_access, env);
+            }
+            if (member_access->owner->type == ST_CALL_EXPRESSION) {
+                return evalRecursiveMemberAccessCall(member_access, env);
+            }
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
             Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
             Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
@@ -801,18 +807,31 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) {
             //klass_environment->outer = old;
             return result;
         } else {
-            Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
-            Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
-            Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
-            Environment* klass_environment = klass_instance->instance_environment;
-            //klass_environment->outer = &env;
-            Environment* old = klass_environment->outer;
-            klass_environment->outer = NULL;
-            Ad_Object* result = Eval(member, *klass_environment);
-            klass_environment->outer = old;
-            return result;
+            if (member_access->owner->type == ST_IDENTIFIER) {
+                Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
+                Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
+                Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
+                Environment* klass_environment = klass_instance->instance_environment;
+                //klass_environment->outer = &env;
+                Environment* old = klass_environment->outer;
+                klass_environment->outer = NULL;
+                Ad_Object* result = Eval(member, *klass_environment);
+                klass_environment->outer = old;
+                return result;
+            }
+            if (member_access->owner->type == ST_MEMBER_ACCESS) {
+                return evalRecursiveMemberAccessCall(member_access, env);
+            }
+            if (member_access->owner->type == ST_CALL_EXPRESSION) {
+                return evalRecursiveMemberAccessCall(member_access, env);
+            }
         }
     }
+    return NULL;
+}
+
+Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environment& env) {
+    return NULL;
 }
 
 Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST_Node*> args, Environment& env) {
