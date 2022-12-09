@@ -9,8 +9,9 @@ public class PrintBuiltin extends AbstractBuiltin {
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
         AdObject obj = args.get(0);
-        // TODO: maybe add if (obj != null)
-        System.out.println(obj.inspect());
+        if (obj != null) {
+            System.out.println(obj.inspect());
+        }
         return null;
     }
 }

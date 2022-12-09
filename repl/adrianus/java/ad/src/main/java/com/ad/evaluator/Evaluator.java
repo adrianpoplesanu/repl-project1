@@ -387,8 +387,7 @@ public class Evaluator {
     		objects.add(evaluated);
     	}*/
 		List<AdObject> objects = params.stream().map(param -> eval(param, env)).collect(Collectors.toList());
-		// TODO: maybe add the not null check: if (objects.stream().filter(e -> e != null && e.getType() == ObjectTypeEnum.ERROR).findAny().isPresent()) {
-		if (objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).findAny().isPresent()) {
+		if (objects.stream().filter(e -> e != null && e.getType() == ObjectTypeEnum.ERROR).findAny().isPresent()) {
 			return objects.stream().filter(e -> e.getType() == ObjectTypeEnum.ERROR).collect(Collectors.toList());
 		}
 		return objects;
@@ -777,7 +776,6 @@ public class Evaluator {
 					return recursiveMemberAccessCall(stmt, env);
 				}
 				if (stmt.getOwner().getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
-					// TODO: do something here for test59.ad
 					return recursiveMemberAccessCall(stmt, env);
 				}
 			}
@@ -1013,8 +1011,6 @@ public class Evaluator {
     }
 
     private boolean isError(AdObject obj) {
-		// TODO: maybe replace with:
-		// return (obj != null && obj.getType() == ObjectTypeEnum.ERROR);
-        return obj.getType() == ObjectTypeEnum.ERROR;
+		return (obj != null && obj.getType() == ObjectTypeEnum.ERROR);
     }
 }
