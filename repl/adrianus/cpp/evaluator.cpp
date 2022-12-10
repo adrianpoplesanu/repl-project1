@@ -831,6 +831,29 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
 }
 
 Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environment& env) {
+    std::cout << "Evaluator::evalRecursiveMemberAccessCall()\n";
+    std::vector<Ad_AST_MemberAccess*> chainedMemberAccesses;
+    while (node->type == ST_MEMBER_ACCESS) {
+        chainedMemberAccesses.push_back((Ad_AST_MemberAccess*) node);
+        node = ((Ad_AST_MemberAccess*) node)->owner;
+    }
+
+    Environment currentEnvironment = env;
+
+    Ad_AST_Node* initialMemberAccess = chainedMemberAccesses.at(0);
+
+    while(initialMemberAccess->type == ST_MEMBER_ACCESS) {
+        initialMemberAccess = ((Ad_AST_MemberAccess*) initialMemberAccess)->owner;
+    }
+
+    if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
+        std::cout << "initialMemberAccess is a CALL_EXPRESSION\n";
+    }
+
+    if (initialMemberAccess->type == ST_IDENTIFIER) {
+        std::cout << "initialMemberAccess is an IDENTIFIER\n";
+    }
+
     return NULL;
 }
 
