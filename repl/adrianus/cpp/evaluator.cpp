@@ -831,7 +831,6 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
 }
 
 Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environment& env) {
-    std::cout << "Evaluator::evalRecursiveMemberAccessCall()\n";
     std::vector<Ad_AST_MemberAccess*> chainedMemberAccesses;
     while (node->type == ST_MEMBER_ACCESS) {
         chainedMemberAccesses.push_back((Ad_AST_MemberAccess*) node);
@@ -847,7 +846,6 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
     }
 
     if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
-        std::cout << "initialMemberAccess is a CALL_EXPRESSION\n";
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
@@ -855,7 +853,6 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
-        std::cout << "initialMemberAccess is an IDENTIFIER\n";
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
@@ -864,19 +861,35 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
     // end initialize env
 
     for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
-        Ad_AST_MemberAccess* currentMemberAccess = chainedMemberAccesses.at(i);
-        if (currentMemberAccess->is_method()) {
+        Ad_AST_MemberAccess* currentMemberAccess = (Ad_AST_MemberAccess*) chainedMemberAccesses.at(i);
+        if (currentMemberAccess->is_method) {
             // am de a face cu un call
-            Ad_Object* obj = Eval(currentMemberAccess->member, currentEnvironment);
+            Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
             if (obj->type == OBJ_FUNCTION) {
-                //...
+                std::vector<Ad_Object*> args_objs = EvalExpressions(currentMemberAccess->arguments, env);
+                Ad_Object* obj2 = ApplyMethod(obj, args_objs, *(((Ad_Function_Object*) obj)->env));
+
+                if (i == 0) {
+                    return obj2;
+                }
+                if (obj2->type == OBJ_INSTANCE) {
+                    currentEnvironment = ((Ad_Class_Instance*) obj2)->instance_environment;
+                }
             }
         } else {
             // am de a face cu un identificator
-            Ad_Object* obj = Eval(currentMemberAccess->member, currentEnvironment);
+            Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
+
+            if (i == 0) {
+                return obj;
+            }
+
+            if (obj->type == OBJ_INSTANCE) {
+                currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            }
         }
     }
-
+    // daca am ajuns aici atunci nu cred ca e ok
     return NULL;
 }
 

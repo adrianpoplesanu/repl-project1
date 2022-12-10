@@ -9,13 +9,13 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/main",
-            "args": ["${workspaceFolder}/examples/test61.ad"],
+            "args": ["${workspaceFolder}/examples/test099.ad"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": true,
-            //"MIMode": "lldb", // this is used for macos debugging, comment for linux
-            "miDebuggerPath": "/usr/bin/gdb" // this is used for linux debugging, comment for macos
+            "MIMode": "lldb", // this is used for macos debugging, comment for linux
+            //"miDebuggerPath": "/usr/bin/gdb" // this is used for linux debugging, comment for macos
         }
     ]
 }
