@@ -838,20 +838,43 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
         node = ((Ad_AST_MemberAccess*) node)->owner;
     }
 
-    Environment currentEnvironment = env;
+    Environment *currentEnvironment = &env; // super tare, daca fac currentEnv = env atunci cand metoda ajunge la final currentEnv face ::~Environment() de unde rezulta un seg fault cand &env face la randul lui ::~Environment()
 
+    // initialize env
     Ad_AST_Node* initialMemberAccess = chainedMemberAccesses.at(0);
-
     while(initialMemberAccess->type == ST_MEMBER_ACCESS) {
         initialMemberAccess = ((Ad_AST_MemberAccess*) initialMemberAccess)->owner;
     }
 
     if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
         std::cout << "initialMemberAccess is a CALL_EXPRESSION\n";
+        Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
+        if (obj->type == OBJ_INSTANCE) {
+            currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+        }
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
         std::cout << "initialMemberAccess is an IDENTIFIER\n";
+        Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
+        if (obj->type == OBJ_INSTANCE) {
+            currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+        }
+    }
+    // end initialize env
+
+    for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
+        Ad_AST_MemberAccess* currentMemberAccess = chainedMemberAccesses.at(i);
+        if (currentMemberAccess->is_method()) {
+            // am de a face cu un call
+            Ad_Object* obj = Eval(currentMemberAccess->member, currentEnvironment);
+            if (obj->type == OBJ_FUNCTION) {
+                //...
+            }
+        } else {
+            // am de a face cu un identificator
+            Ad_Object* obj = Eval(currentMemberAccess->member, currentEnvironment);
+        }
     }
 
     return NULL;
