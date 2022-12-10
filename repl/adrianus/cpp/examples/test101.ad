@@ -1,0 +1,65 @@
+class Flag {
+    colors = ["red", "white", "yellow"]
+
+    def getColors() {
+        return colors
+    }
+}
+
+class Country {
+    flag = Flag()
+
+    def constructor(name) {
+        this.name = name
+    }
+
+    def getFlag() {
+        return flag
+    }
+}
+
+class Continent {
+    america = Country("USA")
+
+    def constructor(name) {
+        this.name = name
+    }
+
+    def getCountry() {
+        return america
+    }
+}
+
+north_america = Continent("North America")
+print (north_america.name)
+print (north_america.getCountry().name)
+print (north_america.getCountry().getFlag().colors)
+print (north_america.getCountry().getFlag().getColors())
+
+def generator() {
+    asia = Continent("Asia")
+    return asia
+}
+
+def generator2() {
+    return north_america
+}
+
+print (generator().name)
+print (generator().getCountry().name)
+print (generator().getCountry().getFlag().colors)
+print (generator().getCountry().getFlag().getColors())
+
+print (generator2().name)
+print (generator2().getCountry().name)
+print (generator2().getCountry().getFlag().colors)
+print (generator2().getCountry().getFlag().getColors())
+
+flag2 = generator2().getCountry().getFlag()
+flag2.colors = ["red", "red", "wine"]
+print (generator2().getCountry().getFlag().getColors())
+print (north_america.getCountry().getFlag().getColors())
+
+/*generator2().getCountry().getFlag().colors = ["red", "white", "green"]
+print (generator2().getCountry().getFlag().colors)
+print (generator2().getCountry().getFlag().getColors())*/

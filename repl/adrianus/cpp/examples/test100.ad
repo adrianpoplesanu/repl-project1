@@ -1,0 +1,14 @@
+class Country {
+    name = "USA"
+
+    def getName() {
+        return name
+    }
+}
+
+def generate() {
+    country = Country()
+    return country
+}
+
+print(generate().getName())
