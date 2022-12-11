@@ -987,6 +987,7 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
             free_Ad_Object_memory(result);
         }
         Ad_Object* step = Eval(expr->step, env);
+        free_Ad_Object_memory(step);
         condition = Eval(expr->condition, env);
     }
     return NULL;

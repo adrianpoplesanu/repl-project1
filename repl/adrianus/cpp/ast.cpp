@@ -875,7 +875,22 @@ Ad_AST_ForExprssion::Ad_AST_ForExprssion(Token t, Ad_AST_Node* i, Ad_AST_Node* c
 }
 
 Ad_AST_ForExprssion::~Ad_AST_ForExprssion() {
-    //... TODO
+    if (initialization) {
+        Ad_DECREF(initialization);
+        free_Ad_AST_Node_memory(initialization);
+    }
+    if (condition) {
+        Ad_DECREF(condition);
+        free_Ad_AST_Node_memory(condition);
+    }
+    if (step) {
+        Ad_DECREF(step);
+        free_Ad_AST_Node_memory(step);
+    }
+    if (body) {
+        Ad_DECREF(body);
+        free_Ad_AST_Node_memory(body);
+    }
 }
 
 std::string Ad_AST_ForExprssion::TokenLiteral() {
