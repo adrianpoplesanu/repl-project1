@@ -831,13 +831,14 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
 }
 
 Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environment& env) {
+    // TODO: recursive member access assign statement should work this way also, not only retrievals
     std::vector<Ad_AST_MemberAccess*> chainedMemberAccesses;
     while (node->type == ST_MEMBER_ACCESS) {
         chainedMemberAccesses.push_back((Ad_AST_MemberAccess*) node);
         node = ((Ad_AST_MemberAccess*) node)->owner;
     }
 
-    Environment *currentEnvironment = &env; // super tare, daca fac currentEnv = env atunci cand metoda ajunge la final currentEnv face ::~Environment() de unde rezulta un seg fault cand &env face la randul lui ::~Environment()
+    Environment *currentEnvironment = &env; // super tare, daca fac currentEnv = env atunci cand metoda ajunge la final currentEnv(care e pe stack) face ::~Environment() de unde rezulta un seg fault cand &env face la randul lui ::~Environment()
 
     // initialize env
     Ad_AST_Node* initialMemberAccess = chainedMemberAccesses.at(0);

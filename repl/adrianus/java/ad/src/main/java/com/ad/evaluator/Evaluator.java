@@ -784,6 +784,7 @@ public class Evaluator {
 	}
 
 	private AdObject recursiveMemberAccessCall(AstNode node, Environment env) {
+		// TODO: recursive member access assign statement should work this way also, not only retrievals
 		List<AstMemberAccess> chainedMemberAccesses = new ArrayList<>();
 		while (node.getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
 			chainedMemberAccesses.add((AstMemberAccess) node);
