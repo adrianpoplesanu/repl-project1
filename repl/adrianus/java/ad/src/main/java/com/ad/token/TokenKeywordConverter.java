@@ -23,6 +23,7 @@ public class TokenKeywordConverter {
 			put("for", TokenTypeEnum.FOR);
 			put("break", TokenTypeEnum.BREAK);
 			put("continue", TokenTypeEnum.CONTINUE);
+			put("super", TokenTypeEnum.SUPER);
 	    }
 	};
 	

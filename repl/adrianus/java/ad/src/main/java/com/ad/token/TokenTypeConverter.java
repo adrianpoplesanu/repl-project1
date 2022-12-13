@@ -56,6 +56,7 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.PLUSPLUS, "INCREMENT_OPERATOR");
 			put(TokenTypeEnum.MINUSMINUS, "DECREMENT_OPERATOR");
 			put(TokenTypeEnum.NULL, "NULL");
+			put(TokenTypeEnum.SUPER, "SUPER");
 		}
 	};
 	
