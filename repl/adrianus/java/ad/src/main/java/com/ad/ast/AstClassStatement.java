@@ -10,6 +10,7 @@ public class AstClassStatement extends AstNode {
     private AstNode name;
     private List<AstNode> methods;
     private List<AstNode> attributes;
+    private List<AstNode> inheritFrom;
 
     public AstClassStatement() {
         type = AstNodeTypeEnum.CLASS_STATEMENT;
@@ -20,6 +21,7 @@ public class AstClassStatement extends AstNode {
         token = t;
         methods = new ArrayList<>();
         attributes = new ArrayList<>();
+        inheritFrom = new ArrayList<>();
     }
 
     public AstClassStatement(Token t, AstNode n) {
@@ -73,5 +75,13 @@ public class AstClassStatement extends AstNode {
 
     public void setAttributes(List<AstNode> attributes) {
         this.attributes = attributes;
+    }
+
+    public List<AstNode> getInheritFrom() {
+        return inheritFrom;
+    }
+
+    public void setInheritFrom(List<AstNode> inheritFrom) {
+        this.inheritFrom = inheritFrom;
     }
 }

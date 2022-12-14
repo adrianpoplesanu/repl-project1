@@ -9,6 +9,7 @@ public class AdClassObject extends AdObject {
     private AstNode name;
     private List<AstNode> methods;
     private List<AstNode> attributes;
+    private List<AstNode> inheritFrom;
 
     public AdClassObject() {
         type = ObjectTypeEnum.CLASS;
