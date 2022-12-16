@@ -474,9 +474,10 @@ public class Parser {
         expr.setName(name);
         nextToken();
         if (currentTokenIs(TokenTypeEnum.COLON)) {
-            System.out.println("TODO: should do inheritence here");
+            nextToken();
             while (!currentTokenIs(TokenTypeEnum.LBRACE)) {
-                System.out.println(currentToken);
+                AstNode parent = parseIdentifier();
+                expr.getInheritFrom().add(parent);
                 nextToken();
             }
         }
