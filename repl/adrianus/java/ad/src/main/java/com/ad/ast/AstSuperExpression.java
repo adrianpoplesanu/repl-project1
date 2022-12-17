@@ -5,6 +5,7 @@ import com.ad.token.Token;
 public class AstSuperExpression extends AstNode {
 
     private Token token;
+    private AstNode target;
 
     public AstSuperExpression() {
         type = AstNodeTypeEnum.SUPER_EXPRESSION;
@@ -31,5 +32,13 @@ public class AstSuperExpression extends AstNode {
 
     public void setToken(Token token) {
         this.token = token;
+    }
+
+    public AstNode getTarget() {
+        return target;
+    }
+
+    public void setTarget(AstNode target) {
+        this.target = target;
     }
 }

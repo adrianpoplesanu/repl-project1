@@ -42,6 +42,7 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePrefixMinusMinus);
         prefixParseFns.put(TokenTypeEnum.NULL, this::parseNullExpression);
         prefixParseFns.put(TokenTypeEnum.THIS, this::parseThisExpression);
+        prefixParseFns.put(TokenTypeEnum.SUPER, this::parseSuperExpression);
         infixParseFns.put(TokenTypeEnum.PLUS, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.MINUS, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.ASTERISK, this::parseInfixExpression);
@@ -512,6 +513,21 @@ public class Parser {
 
     private AstNode parseThisExpression() {
         AstThisExpression expr = new AstThisExpression(currentToken);
+        return expr;
+    }
+
+    private AstNode parseSuperExpression() {
+        AstSuperExpression expr = new AstSuperExpression(currentToken);
+        nextToken();
+        if (!currentTokenIs(TokenTypeEnum.LPAREN)) {
+            return null;
+        }
+        nextToken();
+        AstNode target = parseIdentifier();
+        expr.setTarget(target);
+        if (!expectPeek(TokenTypeEnum.RPAREN)) {
+            return null;
+        }
         return expr;
     }
 
