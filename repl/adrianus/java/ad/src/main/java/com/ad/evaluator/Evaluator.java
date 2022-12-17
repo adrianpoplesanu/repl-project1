@@ -420,6 +420,7 @@ public class Evaluator {
 			AdClassObject adClassObject = (AdClassObject) function;
 			String name = ((AstIdentifier) adClassObject.getName()).getValue();
 			AdClassInstance adClassInstance = new AdClassInstance(name, adClassObject, instanceEnv);
+			updateInstanceWithInheritedClasses(adClassInstance, env);
 			adClassObject.getAttributes().forEach(attribute -> {
 				if (attribute.getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
 					adClassInstance.getEnvironment().setOuter(env);
@@ -444,6 +445,7 @@ public class Evaluator {
 				AstIdentifier astIdentifier = (AstIdentifier) astDefStatement.getName();
 				adClassInstance.getEnvironment().set(astIdentifier.getValue(), adFunctionObject);
 			});
+			//updateInstanceWithInheritedClasses(adClassInstance, env);
 			// call class instance constructor here
 			callInstanceConstructor(adClassInstance, arguments, env);
 			return adClassInstance;
@@ -460,6 +462,50 @@ public class Evaluator {
 			}
 			instanceEnv.setOuter(env);
 			applyMethod(method, arguments, instanceEnv);
+		}
+	}
+
+	private void updateInstanceWithInheritedClasses(AdClassInstance adClassInstance, Environment env) {
+		List<AstNode> superKlasses = adClassInstance.getAdClassObject().getInheritFrom();
+		for (AstNode superKlass : superKlasses) {
+			String identifier = superKlass.tokenLiteral();
+			adClassInstance.getInheritFrom().add(identifier);
+			Environment klassEnv = EnvironmentUtils.newEnvironment(); // newEnvironment() ??? newOuterEnvironment() ???
+			HashMap<String, Environment> baseEnvironments = adClassInstance.getInheritedEnvs();
+			baseEnvironments.put(identifier, klassEnv);
+			klassEnv.setOuter(env);
+			baseEnvironments.get(identifier).setOuter(env);
+			AdClassObject adClassObject = (AdClassObject) env.get(identifier);
+			adClassObject.getAttributes().forEach(attribute -> {
+				if (attribute.getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
+					adClassInstance.getEnvironment().setOuter(env);
+					AdObject evaluated = eval(((AstAssignStatement) attribute).getValue(), adClassInstance.getEnvironment());
+					String attributeName = ((AstIdentifier)((AstAssignStatement) attribute).getName()).getValue();
+					adClassInstance.getEnvironment().setLocalParam(attributeName, evaluated);
+
+					// TODO: store the new env as entry in inherited map
+				}
+				if (attribute.getType() == AstNodeTypeEnum.EXPRESSION_STATEMENT) {
+					AstExpressionStatement astExpressionStatement = (AstExpressionStatement) attribute;
+					if (astExpressionStatement.getExpression().getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
+						adClassInstance.getEnvironment().setOuter(env);
+						AstAssignStatement astAssignStatement = (AstAssignStatement) astExpressionStatement.getExpression();
+						AdObject evaluated = eval(astAssignStatement.getValue(), adClassInstance.getEnvironment());
+						String attributeName = ((AstIdentifier)astAssignStatement.getName()).getValue();
+						adClassInstance.getEnvironment().setLocalParam(attributeName, evaluated);
+
+						// TODO: store the new env as entry in inherited map
+					}
+				}
+			});
+			adClassObject.getMethods().forEach(method -> {
+				AstDefStatement astDefStatement = (AstDefStatement) method;
+				AdFunctionObject adFunctionObject = new AdFunctionObject(astDefStatement.getParameters(), astDefStatement.getBody(), adClassInstance.getEnvironment());
+				AstIdentifier astIdentifier = (AstIdentifier) astDefStatement.getName();
+				adClassInstance.getEnvironment().set(astIdentifier.getValue(), adFunctionObject);
+
+				// TODO: store the new env as entry in inherited map
+			});
 		}
 	}
 
@@ -706,6 +752,7 @@ public class Evaluator {
 		obj.setName(stmt.getName());
 		obj.setAttributes(stmt.getAttributes());
 		obj.setMethods(stmt.getMethods());
+		obj.setInheritFrom(stmt.getInheritFrom());
 		env.set(((AstIdentifier)stmt.getName()).getValue(), obj);
 		return null;
 	}
@@ -735,6 +782,13 @@ public class Evaluator {
 			} else {
 				AdObject result = eval(stmt.getMember(), env); // nu sunt sigur de env aici, cred ca null e ok
 				return result;
+			}
+		} else if (stmt.getOwner().getType() == AstNodeTypeEnum.SUPER_EXPRESSION) {
+			System.out.println("evaluate a super() call");
+			if (stmt.isMethod()) {
+				System.out.println("evaluate super() isMethod=true");
+			} else {
+				System.out.println("evaluate super() isMethod=false");
 			}
 		} else {
 			if (stmt.isMethod()) {

@@ -61,4 +61,12 @@ public class AdClassObject extends AdObject {
     public void setName(AstNode name) {
         this.name = name;
     }
+
+    public List<AstNode> getInheritFrom() {
+        return inheritFrom;
+    }
+
+    public void setInheritFrom(List<AstNode> inheritFrom) {
+        this.inheritFrom = inheritFrom;
+    }
 }
