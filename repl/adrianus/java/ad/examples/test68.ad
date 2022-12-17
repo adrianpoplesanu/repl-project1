@@ -1,0 +1,33 @@
+class Flag {
+    def getColors() {
+        return ["red", "white", "yellow"]
+    }
+}
+
+class Country {
+    flag = Flag()
+
+    def getFlag() {
+        return flag
+    }
+}
+
+class Continent {
+    country = Country()
+
+    def getCountry() {
+        return country
+    }
+
+    def getColors() {
+        return this.country.flag.getColors()
+    }
+}
+
+def getContinent() {
+    america = Continent()
+    return america
+
+}
+
+print (getContinent().getColors())
