@@ -478,16 +478,20 @@ public class Evaluator {
 			AdClassObject adClassObject = (AdClassObject) env.get(identifier);
 			adClassObject.getAttributes().forEach(attribute -> {
 				if (attribute.getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
+					// this adds everything to main class
 					adClassInstance.getEnvironment().setOuter(env);
 					AdObject evaluated = eval(((AstAssignStatement) attribute).getValue(), adClassInstance.getEnvironment());
 					String attributeName = ((AstIdentifier)((AstAssignStatement) attribute).getName()).getValue();
 					adClassInstance.getEnvironment().setLocalParam(attributeName, evaluated);
 
 					// TODO: store the new env as entry in inherited map
+					// this adds everything to map of parent classes envs
+					klassEnv.setLocalParam(attributeName, evaluated);
 				}
 				if (attribute.getType() == AstNodeTypeEnum.EXPRESSION_STATEMENT) {
 					AstExpressionStatement astExpressionStatement = (AstExpressionStatement) attribute;
 					if (astExpressionStatement.getExpression().getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
+						// this adds everything to main class
 						adClassInstance.getEnvironment().setOuter(env);
 						AstAssignStatement astAssignStatement = (AstAssignStatement) astExpressionStatement.getExpression();
 						AdObject evaluated = eval(astAssignStatement.getValue(), adClassInstance.getEnvironment());
@@ -495,17 +499,23 @@ public class Evaluator {
 						adClassInstance.getEnvironment().setLocalParam(attributeName, evaluated);
 
 						// TODO: store the new env as entry in inherited map
+						// this adds everything to map of parent classes envs
+						klassEnv.setLocalParam(attributeName, evaluated);
 					}
 				}
 			});
 			adClassObject.getMethods().forEach(method -> {
+				// this adds everything to main class
 				AstDefStatement astDefStatement = (AstDefStatement) method;
 				AdFunctionObject adFunctionObject = new AdFunctionObject(astDefStatement.getParameters(), astDefStatement.getBody(), adClassInstance.getEnvironment());
 				AstIdentifier astIdentifier = (AstIdentifier) astDefStatement.getName();
 				adClassInstance.getEnvironment().set(astIdentifier.getValue(), adFunctionObject);
 
 				// TODO: store the new env as entry in inherited map
+				// this adds everything to map of parent classes envs
+				klassEnv.set(astIdentifier.getValue(), adFunctionObject);
 			});
+			adClassInstance.getInheritedEnvs().put(identifier, klassEnv);
 		}
 	}
 
