@@ -1,0 +1,37 @@
+class Dog {
+    age = 0
+    speak = "wooof"
+    ham = "ham ham ham"
+
+    def bark() {
+        print (ham)
+    }
+}
+
+class Dex : Dog {
+    age = 12
+
+    def bark() {
+        print (speak)
+    }
+
+    def bark2() {
+        super(Dog).bark()
+    }
+
+    def initial_age() {
+        print (super(Dog).age)
+    }
+}
+
+dex = Dex()
+print (dex.age)
+dex.bark()
+dex.bark2()
+dex.initial_age()
+
+/*
+paracetamol 8h
+nurofen raceala si gripa 8h
+teraflu pentru raceala si tuse
+plantusin / meltus */
