@@ -9,9 +9,11 @@ public class Environment {
 	private Environment bootstrap;
 	private Environment outer;
 	public HashMap<String, AdObject> store;
+	public HashMap<String, Environment> siblings;
 	
 	public Environment() {
 		store = new HashMap<>();
+		siblings = new HashMap<>();
 		outer = null;
 		bootstrap = null;
 	}
@@ -70,6 +72,16 @@ public class Environment {
 		// will hit a constructor on the env.get if one is present
 		// search for "constructor" only in local env, I don't want the constructor of a higher class
 		return lookupOnlyInStore("constructor");
+	}
+
+	public Environment getSibling(String ident) {
+		// used for super() on inherited classes
+		return siblings.get(ident);
+	}
+
+	public void addSibling(String ident, Environment env) {
+		// used for super() on inherited classes
+		siblings.put(ident, env);
 	}
 
 	public Environment getOuter() {
