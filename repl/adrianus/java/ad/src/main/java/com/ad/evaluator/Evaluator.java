@@ -797,6 +797,13 @@ public class Evaluator {
 			System.out.println("evaluate a super() call");
 			if (stmt.isMethod()) {
 				System.out.println("evaluate super() isMethod=true");
+				List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
+				if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {
+					return argObjs.get(0);
+				}
+				//Environment klassEnv =
+				//i need the current class context so i can parentKlassEnv = siblings[stmt.getOwner().tokenLiteral]
+				//AdFunctionObject klassMethod = (AdFunctionObject) parentKlassEnv.get(member.getValue());
 			} else {
 				System.out.println("evaluate super() isMethod=false");
 			}
