@@ -487,6 +487,7 @@ public class Evaluator {
 					// TODO: store the new env as entry in inherited map
 					// this adds everything to map of parent classes envs
 					klassEnv.setLocalParam(attributeName, evaluated);
+					adClassInstance.getEnvironment().addSibling(superKlass.tokenLiteral(), klassEnv);
 				}
 				if (attribute.getType() == AstNodeTypeEnum.EXPRESSION_STATEMENT) {
 					AstExpressionStatement astExpressionStatement = (AstExpressionStatement) attribute;
@@ -501,6 +502,7 @@ public class Evaluator {
 						// TODO: store the new env as entry in inherited map
 						// this adds everything to map of parent classes envs
 						klassEnv.setLocalParam(attributeName, evaluated);
+						adClassInstance.getEnvironment().addSibling(superKlass.tokenLiteral(), klassEnv);
 					}
 				}
 			});
@@ -514,6 +516,7 @@ public class Evaluator {
 				// TODO: store the new env as entry in inherited map
 				// this adds everything to map of parent classes envs
 				klassEnv.set(astIdentifier.getValue(), adFunctionObject);
+				adClassInstance.getEnvironment().addSibling(superKlass.tokenLiteral(), klassEnv);
 			});
 			adClassInstance.getInheritedEnvs().put(identifier, klassEnv);
 		}
@@ -794,18 +797,24 @@ public class Evaluator {
 				return result;
 			}
 		} else if (stmt.getOwner().getType() == AstNodeTypeEnum.SUPER_EXPRESSION) {
-			System.out.println("evaluate a super() call");
 			if (stmt.isMethod()) {
-				System.out.println("evaluate super() isMethod=true");
 				List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
 				if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {
 					return argObjs.get(0);
 				}
-				//Environment klassEnv =
+
 				//i need the current class context so i can parentKlassEnv = siblings[stmt.getOwner().tokenLiteral]
-				//AdFunctionObject klassMethod = (AdFunctionObject) parentKlassEnv.get(member.getValue());
+				AstSuperExpression superExpression = (AstSuperExpression) stmt.getOwner();
+				Environment parentKlassEnv = env.getOuter().getSibling(superExpression.getTarget().tokenLiteral());
+				AstIdentifier member = (AstIdentifier) stmt.getMember();
+				AdFunctionObject parentMethod = (AdFunctionObject) parentKlassEnv.get(member.getValue());
+				return applyMethod(parentMethod, argObjs, env);
 			} else {
-				System.out.println("evaluate super() isMethod=false");
+				AstSuperExpression superExpression = (AstSuperExpression) stmt.getOwner();
+				Environment parentKlassEnv = env.getOuter().getSibling(superExpression.getTarget().tokenLiteral());
+				AstIdentifier member = (AstIdentifier) stmt.getMember();
+				AdObject result = eval(member, parentKlassEnv);
+				return result;
 			}
 		} else {
 			if (stmt.isMethod()) {
