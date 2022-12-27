@@ -727,6 +727,9 @@ public class Evaluator {
     	if (left.getType() == ObjectTypeEnum.HASH) {
     		return evalHashIndexExpression(left, index);
 		}
+		if (left.getType() == ObjectTypeEnum.STRING && index.getType() == ObjectTypeEnum.INT) {
+			return evalStringIndexExpression(left, index);
+		}
     	return null;
 	}
 
@@ -739,6 +742,13 @@ public class Evaluator {
 
 	private AdObject evalHashIndexExpression(AdObject left, AdObject index) {
 		AdObject result = ((AdHashObject)left).getElements().get(index.hash()).getValue();
+		return result;
+	}
+
+	private AdObject evalStringIndexExpression(AdObject left, AdObject index) {
+		AdStringObject target = (AdStringObject) left;
+		AdIntegerObject indexObj = (AdIntegerObject) index;
+		AdStringObject result = new AdStringObject(target.getValue().substring(indexObj.getValue(), indexObj.getValue() + 1));
 		return result;
 	}
 
