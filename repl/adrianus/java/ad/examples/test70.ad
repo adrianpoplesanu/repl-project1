@@ -24,3 +24,10 @@ dex.printSuperAge()
 dex.setSuperAge()
 dex.printAge()
 dex.printSuperAge()
+
+/* expected output:
+12
+0
+12
+17
+*/

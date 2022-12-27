@@ -1,0 +1,14 @@
+class Dog {
+    age = 0
+
+    def constructor(age) {
+        this.age = age
+    }
+}
+
+dex = Dog(12)
+print (dex.age)
+
+/* expected output:
+12
+*/
