@@ -111,11 +111,6 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_INDEX_EXPRESSION: {
-            /*Ad_Object* left = Eval(((Ad_AST_IndexExpression*)node)->left, env);
-            if (IsError(left)) return left;
-            Ad_Object* index = Eval(((Ad_AST_IndexExpression*)node)->index, env);
-            if (IsError(index)) return index;
-            return EvalIndexExpression(left, index);*/
             return evalIndexExpression(node, &env);
         }
         break;
@@ -203,12 +198,6 @@ void Evaluator::Init() {
 void Evaluator::GarbageCollectEnvironments() {
     //std::cout << "cleaning up environments\n";
     garbageCollector.sweepEnvironments();
-    //for (Environment* env : environment_garbage_collection) {
-        //delete env;
-        //free_Ad_environment_memory(env);
-    //}
-    //environment_garbage_collection.clear();
-    //garbageCollector.clearEnvironments();
 }
 
 Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
@@ -433,19 +422,14 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         }
         Environment* extendedEnv = extendFunctionEnv(func, args);
         Ad_INCREF(extendedEnv);
-        //extendedEnv->ref_count = 1;
         garbageCollector.addEnvironment(extendedEnv);
         garbageCollector.scheduleEnvironmentToDECREF(extendedEnv);
-        //Environment extendedEnv = ExtendFunctionEnv(func, args);
-        //Ad_INCREF(func_obj->env);
         Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
-        //environment_garbage_collection.push_back(extendedEnv);        
-        //extendedEnv->ref_count = 0;
-        //std::cout << "se va returna un obiect de tipul: " << object_type_map[evaluated->type] << "\n";
         return UnwrapReturnValue(evaluated, extendedEnv);
     }
     if (func->type == OBJ_BUILTIN) {
         Ad_Builtin_Object* builtinObject = (Ad_Builtin_Object*) func;
+        // TODO: fix this
         /*if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
                 !std::count(builtinObject->acceptedNumbersOfArguments.begin(),
                             builtinObject->acceptedNumbersOfArguments.end(),
@@ -518,7 +502,6 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
     if (func->type == OBJ_FUNCTION) {
         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
-        //environment_garbage_collection.push_back(extendedEnv);
         garbageCollector.addEnvironment(extendedEnv);
         return UnwrapReturnValue(evaluated, extendedEnv);
     }
@@ -527,11 +510,9 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
 
 Environment* Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*> args_objs, Environment& env) {
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
-    //Environment extended = NewEnclosedEnvironment(&(*(func_obj)->env));
     Environment* extended = newEnclosedEnvironmentUnfreeable((func_obj)->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
-        //env.Set((*it)->TokenLiteral(), args_objs[i]);
         extended->SetCallArgument((*it)->TokenLiteral(), args_objs[i]);
         ++i;
     }
@@ -566,7 +547,6 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
 
 Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
-    //Environment extended = NewEnclosedEnvironment(func_obj->env);
     Environment* extended = newEnclosedEnvironment(func_obj->env);
     Ad_INCREF(func_obj->env);
     int i = 0;
@@ -599,7 +579,6 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
     return NULL;
 }
 
-//Ad_Object* Evaluator::EvalIndexExpression(Ad_Object* left, Ad_Object* index) {
 Ad_Object* Evaluator::evalIndexExpression(Ad_AST_Node* node, Environment* env) {
 
     Ad_Object* left = Eval(((Ad_AST_IndexExpression*)node)->left, *env);
@@ -669,7 +648,6 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
             Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
             Ad_AST_Node* klass_member = member_access->member;
             Ad_Object* obj = Eval(assign_statement->value, env);
-            //env.Set(((Ad_AST_Identifier*)klass_member)->value, obj);
             env.outer->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
         } else {
             Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
