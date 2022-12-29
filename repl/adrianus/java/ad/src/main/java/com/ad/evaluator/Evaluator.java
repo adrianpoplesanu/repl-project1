@@ -659,7 +659,12 @@ public class Evaluator {
 				AdObject obj = eval(assignStatement.getValue(), env);
 				env.getOuter().set(klassMember.getValue(), obj);
 			} else if (memberAccess.getOwner().getType() == AstNodeTypeEnum.SUPER_EXPRESSION) { // maybe super() should be used only for methods?
-				System.out.println("evaluating an assign statement involving a super expression");
+				AstMemberAccess stmt = (AstMemberAccess) assignStatement.getName();
+				AstSuperExpression superExpression = (AstSuperExpression) stmt.getOwner();
+				Environment parentKlassEnv = env.getOuter().getSibling(superExpression.getTarget().tokenLiteral());
+				AstIdentifier member = (AstIdentifier) stmt.getMember();
+				AdObject obj = eval(assignStatement.getValue(), env);
+				parentKlassEnv.set(member.getValue(), obj);
 			} else {
 				AstIdentifier owner = (AstIdentifier) memberAccess.getOwner();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
@@ -859,7 +864,6 @@ public class Evaluator {
 					AstIdentifier owner = (AstIdentifier) stmt.getOwner(); // stmt: "AstMemberAccess"
 					AstIdentifier member = (AstIdentifier) stmt.getMember();
 					AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
-					//klassInstance.getEnvironment().setOuter(env);
 					Environment old = klassInstance.getEnvironment().getOuter();
 					klassInstance.getEnvironment().setOuter(null);
 					AdObject result = eval(member, klassInstance.getEnvironment());
