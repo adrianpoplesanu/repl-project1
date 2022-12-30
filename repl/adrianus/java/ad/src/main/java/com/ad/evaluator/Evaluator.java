@@ -533,12 +533,29 @@ public class Evaluator {
 	}
 
     private Environment extendFunctionEnv(AdObject func, List<AdObject> arguments) {
+		// arguments is the list of evaluated object passed as arguments
+		// evalIdentifier returns the env.get object, this is why lists are passed as pseudo-"reference"
+		// class instances have an internal env, that's why class instances are passed as pseudo-"reference"
+		// ints are passed just the same, but all changing operation produce a new object
     	AdFunctionObject functionObject = (AdFunctionObject) func;
      	Environment extended = EnvironmentUtils.newEnclosedEnvironment(functionObject.getEnv());
      	int i = 0;
      	for (AstNode param : functionObject.getParameters()) {
+			AdObject currentObject = arguments.get(i++);
      		//extended.set(param.tokenLiteral(), arguments.get(i++));
-			extended.setLocalParam(param.tokenLiteral(), arguments.get(i++));
+			// bucata asta de cod face imutabila lista cand e pasata ca argument, noua lista inca pointeaza catre vechile obiecte
+			/*if (currentObject.getType() == ObjectTypeEnum.LIST) {
+				AdListObject oldList = (AdListObject) currentObject;
+				AdListObject newList = new AdListObject();
+				List<AdObject> elements = new ArrayList<>();
+				for (AdObject o : oldList.getElements()) {
+					elements.add(o);
+				}
+				newList.setElements(elements);
+				extended.setLocalParam(param.tokenLiteral(), newList);
+				continue;
+			}*/
+			extended.setLocalParam(param.tokenLiteral(), currentObject);
      	}
     	return extended;
     }
