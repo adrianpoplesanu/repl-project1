@@ -1,0 +1,8 @@
+a = 5
+
+def change(a) {
+    a++
+}
+
+change(a)
+print(a)

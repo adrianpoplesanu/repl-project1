@@ -1,0 +1,9 @@
+a = [1,2,3]
+
+def change(a) {
+    b = a
+    b[1] = 77
+}
+
+change(a)
+print(a)

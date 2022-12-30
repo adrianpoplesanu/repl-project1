@@ -1,0 +1,8 @@
+a = [3, 4, 5]
+
+def change(a) {
+    a[0] = 99
+}
+
+change(a)
+print(a)

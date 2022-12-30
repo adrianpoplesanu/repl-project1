@@ -1,0 +1,8 @@
+a = [[5], [6], [7]]
+
+def change(a) {
+    a[0][0] = 9
+}
+
+change(a)
+print(a)
