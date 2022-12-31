@@ -1,1 +1,4 @@
 chained multi member access processing: https://github.com/adrianpoplesanu/repl-project1/commit/38f00ce18686c6a5de889ff1480abd89a430818f
+multi member access assignation: https://github.com/adrianpoplesanu/repl-project1/commit/dd537b668ea5c1ebf008bbdc598bbfef766063bf
+
+TODO: implement copy() on all Ad object
