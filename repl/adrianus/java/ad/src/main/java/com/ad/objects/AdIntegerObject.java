@@ -27,6 +27,11 @@ public class AdIntegerObject extends AdObject {
 		return ObjectTypeConverter.convertToString(type) + inspect();
 	}
 
+	public AdObject copy() {
+		AdIntegerObject newObject = new AdIntegerObject(value);
+		return newObject;
+	}
+
 	public int getValue() {
 		return value;
 	}

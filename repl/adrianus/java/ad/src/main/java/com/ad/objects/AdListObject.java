@@ -1,5 +1,6 @@
 package com.ad.objects;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdListObject extends AdObject {
@@ -35,6 +36,15 @@ public class AdListObject extends AdObject {
     @Override
     public String hash() {
         return ObjectTypeConverter.convertToString(type) + inspect();
+    }
+
+    public AdObject copy() {
+        List<AdObject> newElements = new ArrayList<>();
+        for (AdObject e : elements) {
+            newElements.add(e.copy());
+        }
+        AdListObject newList = new AdListObject(newElements);
+        return newList;
     }
 
     public List<AdObject> getElements() {

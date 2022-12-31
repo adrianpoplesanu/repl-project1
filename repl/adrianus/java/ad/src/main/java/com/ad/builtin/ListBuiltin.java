@@ -28,7 +28,8 @@ public class ListBuiltin extends AbstractBuiltin {
         if (args.size() == 2) {
             List<AdObject> elements = new ArrayList<>();
             int size = ((AdIntegerObject) args.get(0)).getValue();
-            for (int i = 0; i < size; i++) elements.add(args.get(1));
+            AdObject defaultObject = args.get(1);
+            for (int i = 0; i < size; i++) elements.add(defaultObject.copy());
             AdListObject listObject = new AdListObject(elements);
             return listObject;
         }

@@ -7,6 +7,9 @@ public abstract class AdObject {
 	public abstract void print();
 	public abstract String hash();
 	// public abstract String repr();
+	public AdObject copy() {
+		return null;
+	}
 
 	public ObjectTypeEnum getType() {
 		return type;
