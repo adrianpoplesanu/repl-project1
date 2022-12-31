@@ -682,6 +682,8 @@ public class Evaluator {
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
 				AdObject obj = eval(assignStatement.getValue(), env);
 				parentKlassEnv.set(member.getValue(), obj);
+			} else if (memberAccess.getOwner().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+				return recursiveMemberAccessAssign(node, env);
 			} else {
 				AstIdentifier owner = (AstIdentifier) memberAccess.getOwner();
 				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
@@ -696,6 +698,77 @@ public class Evaluator {
 			env.set(ident.getValue(), obj);
 		}
     	return null;
+	}
+
+	private AdObject recursiveMemberAccessAssign(AstNode node, Environment env) {
+		// TODO: clean this up, and the other recursive access method, this needs consolidated, and more elegant
+		AstAssignStatement assignStatement = (AstAssignStatement) node;
+		AstMemberAccess memberAccess = (AstMemberAccess) assignStatement.getName();
+		List<AstMemberAccess> chainedMemberAccesses = new ArrayList<>();
+		node = ((AstAssignStatement) node).getName();
+		while (node.getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+			chainedMemberAccesses.add((AstMemberAccess) node);
+			node = ((AstMemberAccess) node).getOwner();
+		}
+		Environment currentEnv = env;
+
+		// initialize env
+		AstNode initialMemberAccess = chainedMemberAccesses.get(0);
+		while (initialMemberAccess.getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+			initialMemberAccess = ((AstMemberAccess)initialMemberAccess).getOwner();
+		}
+
+		if (initialMemberAccess.getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
+			AdObject obj = eval(initialMemberAccess, currentEnv);
+			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				currentEnv = ((AdClassInstance) obj).getEnvironment();
+			}
+		}
+
+		if (initialMemberAccess.getType() == AstNodeTypeEnum.IDENTIFIER) {
+			AdObject obj = eval(initialMemberAccess, currentEnv);
+			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				currentEnv = ((AdClassInstance) obj).getEnvironment();
+			}
+		}
+		// end initialize env
+
+		for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
+			AstMemberAccess currentMemberAccess = chainedMemberAccesses.get(i);
+			if (currentMemberAccess.isMethod()) {
+				// am de a face cu un call
+				AdObject obj = eval(currentMemberAccess.getMember(), currentEnv);
+				if (obj.getType() == ObjectTypeEnum.FUNCTION) {
+					List<AdObject> argObjs = evalExpressions(chainedMemberAccesses.get(i).getArguments(), env);
+					AdObject obj2 = applyMethod(obj, argObjs, ((AdFunctionObject) obj).getEnv());
+					if (i == 0) {
+						// i have reached the end, i need to return
+						//return obj2;
+						// maybe break here?
+					}
+					if (obj2.getType() == ObjectTypeEnum.INSTANCE) {
+						currentEnv = ((AdClassInstance) obj2).getEnvironment();
+					}
+				}
+			} else {
+				// am de a face cu un identificator
+				AdObject obj = eval(currentMemberAccess.getMember(), currentEnv);
+				if (i == 0) {
+					// i have reached the end, i need to return
+					//return obj;
+					// maybe break here?
+				}
+				if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+					currentEnv = ((AdClassInstance) obj).getEnvironment();
+				}
+			}
+		}
+		// once here currentEnv should be updated with the proper assigned object
+		AdObject obj = eval(assignStatement.getValue(), env);
+		AstIdentifier identifier = (AstIdentifier) memberAccess.getMember();
+		currentEnv.set(identifier.getValue(), obj); // nu sunt sigur de asta
+
+		return null;
 	}
 
 	private AdObject evalIndexExpressionAssign(AstNode node, Environment env) {
