@@ -1,0 +1,29 @@
+class __StringUtils {
+    def substring(target, start, end) {
+        result = ""
+        for (i = start; i < end; i++) {
+            result = result + target[i]
+        }
+        return result
+    }
+
+    def indexOf(target, lookFor) {
+        sizeTarget = len(target)
+        sizeLookFor = len(lookFor)
+        for (i = 0; i < sizeTarget - sizeLookFor; i++) {
+            found = true
+            for (j = 0; j < sizeLookFor; j++) {
+                if (target[i + j] != lookFor[j]) {
+                    found = false
+                    break
+                }
+            }
+            if (found) {
+                return i
+            }
+        }
+        return -1
+    }
+}
+
+StringUtils = __StringUtils()

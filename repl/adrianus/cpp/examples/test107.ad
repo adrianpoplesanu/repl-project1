@@ -1,0 +1,2 @@
+name = "bebe dexiciut"
+print (StringUtils.substring(name, 5, 8))
