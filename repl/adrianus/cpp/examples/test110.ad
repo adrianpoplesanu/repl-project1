@@ -21,3 +21,14 @@ def change_numbers(numbers) {
 print (numbers)
 change_numbers(numbers)
 print (numbers)
+
+age = 11
+
+def change_age(age) {
+    /* ints are not passed in as references */
+    age = 12
+}
+
+print (age)
+change_age(age)
+print (age)
