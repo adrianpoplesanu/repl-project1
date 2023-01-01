@@ -592,6 +592,9 @@ Ad_Object* Evaluator::evalIndexExpression(Ad_AST_Node* node, Environment* env) {
     if (left->type == OBJ_HASH) {
         return EvalHashIndexExpression(left, index);
     }
+    if (left->type == OBJ_STRING) {
+        return evalStringIndexExpression(left, index);
+    }
     // addig free calls here for freeing temp objects(like the index int) were allocated for evaluating an index expression
     free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
     free_Ad_Object_memory(index);
@@ -635,6 +638,16 @@ Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index)
     Ad_Object* result = ((Ad_Hash_Object*)left)->pairs[std::to_string(hash_string(index->Hash()))].value;
 
     free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
+    free_Ad_Object_memory(index);
+    return result;
+}
+
+Ad_Object* Evaluator::evalStringIndexExpression(Ad_Object* left, Ad_Object* index) {
+    Ad_String_Object* obj = (Ad_String_Object*) left;
+    int idx = ((Ad_Integer_Object*)index)->value;
+    if (idx < 0 || idx >= obj->value.size()) return &NULLOBJECT;
+    Ad_Object* result = new Ad_String_Object(obj->value.substr(idx, 1));
+    free_Ad_Object_memory(left);
     free_Ad_Object_memory(index);
     return result;
 }
