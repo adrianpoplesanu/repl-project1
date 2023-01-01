@@ -246,7 +246,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	virtual Ad_Object* copy();
 };
 
 class Ad_Hash_Object : public Ad_Object {

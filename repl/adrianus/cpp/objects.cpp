@@ -405,6 +405,16 @@ std::string Ad_List_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Object* Ad_List_Object::copy() {
+    std::vector<Ad_Object*> newElements;
+    for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
+        newElements.push_back((*it)->copy());
+    }
+
+    Ad_List_Object* new_object = new Ad_List_Object(newElements);
+    return new_object;
+}
+
 Ad_Hash_Object::Ad_Hash_Object() {
     type = OBJ_HASH;
     ref_count = 0;
