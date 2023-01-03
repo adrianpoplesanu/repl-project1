@@ -47,6 +47,7 @@ public:
     Ad_Object* EvalIndexExpressionAssign(Ad_AST_Node*, Environment&);
     Ad_Object* EvalDefStatement(Ad_AST_Node*, Environment&);
     Ad_Object* EvalClassStatement(Ad_AST_Node*, Environment&);
+    void updateInstanceWithInheritedClasses(Ad_Object*, Environment&);
     Ad_Object* EvalMemberAccess(Ad_AST_Node*, Environment&);
     Ad_Object* evalRecursiveMemberAccessCall(Ad_AST_Node*, Environment&);
     Ad_Object* EvalFileObjectMethod(Ad_AST_Node*, std::vector<Ad_AST_Node*>, Environment&);

@@ -445,6 +445,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*) klass_object->name;
         Ad_Class_Instance* klass_instance = new Ad_Class_Instance(klass_ident->value, klass_object, instance_environment);
         std::vector<Ad_AST_Node*> attributes = klass_object->attributes;
+        updateInstanceWithInheritedClasses(klass_instance, env);
         for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
             Ad_AST_Node *node = *it;
             if (node->type == ST_ASSIGN_STATEMENT) {
@@ -454,7 +455,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
                 Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
                 std::string key = assign_ident->value;
                 //klass_instance->instance_environment->Set(key, evaluated);
-                klass_instance->instance_environment->SetCallArgument(key, evaluated);
+                klass_instance->instance_environment->setLocalParam(key, evaluated);
             }
             if (node->type == ST_EXPRESSION_STATEMENT) {
                 Ad_AST_ExpressionStatement * expression_statement = (Ad_AST_ExpressionStatement*) node;
@@ -466,7 +467,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
                     std::string key = assign_ident->value;
                     //std::cout << key << "\n";
                     //klass_instance->instance_environment->Set(key, evaluated);
-                    klass_instance->instance_environment->SetCallArgument(key, evaluated);
+                    klass_instance->instance_environment->setLocalParam(key, evaluated);
                 }
             }
         }
@@ -513,7 +514,7 @@ Environment* Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*>
     Environment* extended = newEnclosedEnvironmentUnfreeable((func_obj)->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
-        extended->SetCallArgument((*it)->TokenLiteral(), args_objs[i]);
+        extended->setLocalParam((*it)->TokenLiteral(), args_objs[i]);
         ++i;
     }
     return extended;
@@ -540,7 +541,7 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
     Environment extended = NewEnclosedEnvironment(func_obj->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
-        extended.SetCallArgument((*it)->TokenLiteral(), args[i++]);
+        extended.setLocalParam((*it)->TokenLiteral(), args[i++]);
     }
     return extended;
 }
@@ -551,7 +552,7 @@ Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object
     Ad_INCREF(func_obj->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
-        extended->SetCallArgument((*it)->TokenLiteral(), args[i++]);
+        extended->setLocalParam((*it)->TokenLiteral(), args[i++]);
     }
     return extended;
 }
@@ -662,6 +663,16 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
             Ad_AST_Node* klass_member = member_access->member;
             Ad_Object* obj = Eval(assign_statement->value, env);
             env.outer->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
+        } else if (((Ad_AST_MemberAccess*)(assign_statement->name))->owner->type == ST_SUPER_EXPRESSION) {
+            //std::cout << "evaluating an assign statement on a super() expression\n";
+            Ad_AST_MemberAccess *member_access = (Ad_AST_MemberAccess*) assign_statement->name;
+            Ad_AST_Super_Expression *superExpression = (Ad_AST_Super_Expression*) member_access->owner;
+            Environment *parentKlassEnv = env.outer->getSibling(superExpression->target->TokenLiteral());
+            Ad_AST_Identifier *member = (Ad_AST_Identifier*) member_access->member;
+            Ad_Object *obj = Eval(assign_statement->value, env);
+            parentKlassEnv->Set(member->value, obj);
+        } else if (((Ad_AST_MemberAccess*)(assign_statement->name))->owner->type == ST_MEMBER_ACCESS) {
+            std::cout << "do a recursive member access assignment\n";
         } else {
             Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
@@ -737,6 +748,7 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
 Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_Class* class_node = (Ad_AST_Class*) node;
     Ad_Class_Object* klass_object = new Ad_Class_Object(class_node->name, class_node->methods, class_node->attributes, class_node);
+    klass_object->inheritFrom = class_node->inheritFrom;
     Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*)(class_node->name);
     if (IS_CONSOLE_RUN && env.isGlobalEnvironment) {
         klass_object->attemptASTNodesDeletion = true;
@@ -744,6 +756,62 @@ Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     std::string klass_name = klass_ident->value;
     env.Set(klass_name, klass_object);
     return NULL;
+}
+
+void Evaluator::updateInstanceWithInheritedClasses(Ad_Object* obj, Environment& env) {
+    Ad_Class_Instance* adClassInstance = (Ad_Class_Instance*) obj;
+    std::vector<Ad_AST_Node*> superKlasses = ((Ad_Class_Object*)adClassInstance->klass_object)->inheritFrom;
+    for (int i = 0; i < superKlasses.size(); i++) {
+        std::string identifier = superKlasses.at(i)->TokenLiteral();
+        adClassInstance->inheritFrom.push_back(identifier);
+        Environment *parentKlassEnv = newEnvironment();
+        Ad_Class_Object* parentAdClassObject = (Ad_Class_Object*) env.Get(identifier);
+
+        for (std::vector<Ad_AST_Node*>::iterator it = parentAdClassObject->attributes.begin(); it != parentAdClassObject->attributes.end(); ++it) {
+            Ad_AST_Node *node = *it;
+            if (node->type == ST_ASSIGN_STATEMENT) {
+                // this adds everything to main class
+                Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) node;
+                adClassInstance->instance_environment->outer = &env;
+                Ad_Object* evaluated = Eval(assign_statement->value, *adClassInstance->instance_environment);
+                Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
+                std::string key = assign_ident->value;
+                adClassInstance->instance_environment->setLocalParam(key, evaluated);
+
+                // this adds everything to map of parent classes envs
+                parentKlassEnv->setLocalParam(key, evaluated);
+                adClassInstance->instance_environment->addSibling(identifier, parentKlassEnv);
+            }
+            if (node->type == ST_EXPRESSION_STATEMENT) {
+                Ad_AST_ExpressionStatement * expression_statement = (Ad_AST_ExpressionStatement*) node;
+                if (expression_statement->expression->type == ST_ASSIGN_STATEMENT) {
+                    // this adds everything to main class
+                    Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) expression_statement->expression;
+                    adClassInstance->instance_environment->outer = &env;
+                    Ad_Object* evaluated = Eval(assign_statement->value, *adClassInstance->instance_environment);
+                    Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
+                    std::string key = assign_ident->value;
+                    adClassInstance->instance_environment->setLocalParam(key, evaluated);
+
+                    // this adds everything to map of parent classes envs
+                    parentKlassEnv->setLocalParam(key, evaluated);
+                    adClassInstance->instance_environment->addSibling(identifier, parentKlassEnv);
+                }
+            }
+        }
+        std::vector<Ad_AST_Node*> methods = parentAdClassObject->methods;
+        for (std::vector<Ad_AST_Node*>::iterator it = parentAdClassObject->methods.begin(); it != parentAdClassObject->methods.end(); ++it) {
+            // this adds everything to main class
+            Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
+            Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, adClassInstance->instance_environment);
+            Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
+            adClassInstance->instance_environment->Set(def_ident->value, method_obj);
+
+            // this adds everything to map of parent classes envs
+            parentKlassEnv->Set(def_ident->value, method_obj);
+            adClassInstance->instance_environment->addSibling(identifier, parentKlassEnv);
+        }
+    }
 }
 
 Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { // TODO: cleanup aici si in acelsi loc la implementarea in java
@@ -768,6 +836,25 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             evaluated = Eval(member_access->member, *env.outer);
         }
         return evaluated;
+    } else if (member_access->owner->type == ST_SUPER_EXPRESSION) {
+        if (member_access->is_method) {
+            std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
+            if (args_objs.size() == 1 && IsError(args_objs[0])) {
+                return args_objs[0];
+            }
+            Ad_AST_Super_Expression *superExpression = (Ad_AST_Super_Expression*) member_access->owner;
+            Environment *parentKlassEnv = env.outer->getSibling(superExpression->target->TokenLiteral());
+            Ad_AST_Identifier *member = (Ad_AST_Identifier*) member_access->member;
+            Ad_Function_Object *parentMethod = (Ad_Function_Object*) parentKlassEnv->Get(member->value);
+            Ad_Object *result = ApplyMethod(parentMethod, args_objs, *env.outer);
+            return result;
+        } else {
+            Ad_AST_Super_Expression *superExpression = (Ad_AST_Super_Expression*) member_access->owner;
+            Environment *parentKlassEnv = env.outer->getSibling(superExpression->target->TokenLiteral());
+            Ad_AST_Identifier *member = (Ad_AST_Identifier*) member_access->member;
+            Ad_Object *result = Eval(member, *parentKlassEnv);
+            return result;
+        }
     } else {
         if (member_access->is_method) {
             if (member_access->owner->type == ST_MEMBER_ACCESS) {

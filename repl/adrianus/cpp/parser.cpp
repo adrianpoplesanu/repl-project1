@@ -26,6 +26,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePrefixPlusPlus));
     prefixParseFns.insert(std::make_pair(TT_NULL, &Parser::ParseNullExpression));
     prefixParseFns.insert(std::make_pair(TT_THIS, &Parser::ParseThisExpression));
+    prefixParseFns.insert(std::make_pair(TT_SUPER, &Parser::parseSuperExpression));
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -514,6 +515,14 @@ Ad_AST_Node* Parser::ParseClassStatement() {
     Ad_AST_Node* name = ParseIdentifier();
     expr->name = name;
     NextToken();
+    if (CurrentTokenIs(TT_COLON)) {
+        NextToken();
+        while (!CurrentTokenIs(TT_LBRACE)) {
+            Ad_AST_Node* parent = ParseIdentifier();
+            expr->inheritFrom.push_back(parent);
+            NextToken();
+        }
+    }
     while(!CurrentTokenIs(TT_RBRACE)) {
         if (CurrentTokenIs(TT_DEF)) {
             Ad_AST_Node* stmt = ParseDefExpression();
@@ -617,6 +626,21 @@ Ad_AST_Node* Parser::ParseNullExpression() {
 
 Ad_AST_Node* Parser::ParseThisExpression() {
     Ad_AST_This_Expression* expr = new Ad_AST_This_Expression(current_token);
+    return expr;
+}
+
+Ad_AST_Node* Parser::parseSuperExpression() {
+    Ad_AST_Super_Expression *expr = new Ad_AST_Super_Expression(current_token);
+    NextToken();
+    if (!CurrentTokenIs(TT_LPAREN)) {
+        return NULL;
+    }
+    NextToken();
+    Ad_AST_Node *target = ParseIdentifier();
+    expr->target = target;
+    if (!ExpectPeek(TT_RPAREN)) {
+        return NULL;
+    }
     return expr;
 }
 

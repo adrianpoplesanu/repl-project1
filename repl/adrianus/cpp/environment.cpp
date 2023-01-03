@@ -23,6 +23,11 @@ Environment::~Environment() {
         }
         free_Ad_Object_memory(it->second);
     }
+    for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
+        // TODO: do this proper, maybe mark the env for seeping unsing the gc?
+        //Ad_DECREF(it->second);
+        //delete it->second;
+    }
     if (bootstrap) {
         delete bootstrap;
     }
@@ -93,13 +98,24 @@ void Environment::Set(std::string key, Ad_Object* obj) {
     Ad_INCREF(obj);
 }
 
-void Environment::SetCallArgument(std::string key, Ad_Object* obj) {
+void Environment::setLocalParam(std::string key, Ad_Object* obj) {
     if (store.find(key) != store.end()) {
         // sterge obiectul vechi daca e o suprascriere de element
         FreeObjectForKey(key);
     }
     store[key] = obj;
     Ad_INCREF(obj);
+}
+
+void Environment::addSibling(std::string key, Environment *env) {
+    if (siblings.find(key) != siblings.end()) {
+        delete siblings[key];
+    }
+    siblings[key] = env;
+}
+
+Environment* Environment::getSibling(std::string key) {
+    return siblings[key];
 }
 
 void Environment::SetOuterEnvironment(Environment* o) {

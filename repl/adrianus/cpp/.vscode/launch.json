@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/main",
-            "args": ["${workspaceFolder}/examples/test099.ad"],
+            "args": ["${workspaceFolder}/examples/test115.ad"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

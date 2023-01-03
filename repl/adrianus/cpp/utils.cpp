@@ -156,6 +156,10 @@ void print_ast_nodes(Ad_AST_Node* node, int level) {
             print_level(level);
             std::cout << "->ThisObject " << "\n";
         break;
+        case ST_SUPER_EXPRESSION:
+            print_level(level);
+            std::cout << "->SuperObject " << "\n";
+        break;
         case ST_PREFIX_INCREMENT:
             print_level(level);
             std::cout << "->PrefixIncrement " << "\n";

@@ -9,6 +9,7 @@ public:
     std::map<std::string, Ad_Object*> store;
     Environment* outer;
     Environment* bootstrap;
+    std::map<std::string, Environment*> siblings;
     int ref_count;
     bool isBootstrapEnvironment;
     bool isGlobalEnvironment;
@@ -18,7 +19,9 @@ public:
     Ad_Object* Get(std::string);
     bool Check(std::string);
     void Set(std::string, Ad_Object*);
-    void SetCallArgument(std::string, Ad_Object*);
+    void setLocalParam(std::string, Ad_Object*);
+    void addSibling(std::string, Environment*);
+    Environment* getSibling(std::string);
     void SetOuterEnvironment(Environment*);
     void SetBootstrapEnvironment(Environment*);
     Ad_Object* lookupOnlyInStore(std::string);
@@ -28,6 +31,7 @@ public:
 };
 
 Environment NewEnvironment();
+Environment* newEnvironment();
 Environment NewEnclosedEnvironment(Environment*);
 Environment* newEnclosedEnvironment(Environment*);
 Environment NewEnclosedEnvironment(Environment*, Environment*);

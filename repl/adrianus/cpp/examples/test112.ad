@@ -1,0 +1,2 @@
+a = list(2, {"aaa": 5})
+print (a)

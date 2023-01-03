@@ -37,7 +37,8 @@ enum StatementType {
     ST_BREAK_STATEMENT,
     ST_CONTINUE_STATEMENT,
     ST_NULL_EXPRESSION,
-    ST_THIS_EXPRESSION
+    ST_THIS_EXPRESSION,
+    ST_SUPER_EXPRESSION
 };
 
 std::map<StatementType, std::string> statement_type_map = {
@@ -71,7 +72,8 @@ std::map<StatementType, std::string> statement_type_map = {
     {ST_BREAK_STATEMENT, "BreakStatement"},
     {ST_CONTINUE_STATEMENT, "ContinueStatement"},
     {ST_NULL_EXPRESSION, "NullExpression"},
-    {ST_THIS_EXPRESSION, "ThisExpression"}
+    {ST_THIS_EXPRESSION, "ThisExpression"},
+    {ST_SUPER_EXPRESSION, "SuperExpression"}
 };
 
 class Ad_AST_Node {
@@ -355,6 +357,7 @@ public:
     Ad_AST_Node* name;
     std::vector<Ad_AST_Node*> methods;
     std::vector<Ad_AST_Node*> attributes;
+    std::vector<Ad_AST_Node*> inheritFrom;
 
     Ad_AST_Class();
     Ad_AST_Class(Token);
@@ -459,6 +462,16 @@ public:
     Ad_AST_This_Expression();
     Ad_AST_This_Expression(Token);
     ~Ad_AST_This_Expression();
+};
+
+class Ad_AST_Super_Expression : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node *target;
+
+    Ad_AST_Super_Expression();
+    Ad_AST_Super_Expression(Token);
+    ~Ad_AST_Super_Expression();
 };
 
 bool StatementIs(Ad_AST_Node *stmt, StatementType st) {

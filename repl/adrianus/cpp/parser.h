@@ -105,6 +105,7 @@ public:
     Ad_AST_Node* ParseContinueStatement();
     Ad_AST_Node* ParseNullExpression();
     Ad_AST_Node* ParseThisExpression();
+    Ad_AST_Node* parseSuperExpression();
 };
 
 #endif

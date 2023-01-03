@@ -269,6 +269,7 @@ public:
 	Ad_AST_Node* name;
 	std::vector<Ad_AST_Node*> methods;
 	std::vector<Ad_AST_Node*> attributes;
+	std::vector<Ad_AST_Node*> inheritFrom;
 	bool attemptASTNodesDeletion;
 
 	Ad_Class_Object();
@@ -289,6 +290,7 @@ public:
 	std::string name; // this might not be needed
 	Ad_Object* klass_object;
     Environment* instance_environment;
+	std::vector<std::string> inheritFrom;
 
 	Ad_Class_Instance();
 	Ad_Class_Instance(Ad_Object*, Environment*);
