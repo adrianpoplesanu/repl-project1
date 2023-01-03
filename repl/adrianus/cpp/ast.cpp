@@ -1062,6 +1062,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         case ST_THIS_EXPRESSION:
             delete (Ad_AST_This_Expression*) node;
         break;
+        case ST_SUPER_EXPRESSION:
+            delete (Ad_AST_Super_Expression*) node;
+        break;
         case ST_BREAK_STATEMENT:
             delete (Ad_AST_BreakStatement*) node;
         break;
