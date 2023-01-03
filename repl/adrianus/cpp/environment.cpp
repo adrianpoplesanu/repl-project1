@@ -25,8 +25,8 @@ Environment::~Environment() {
     }
     for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
         // TODO: do this proper, maybe mark the env for seeping unsing the gc?
-        //Ad_DECREF(it->second);
-        //delete it->second;
+        Ad_DECREF(it->second);
+        delete it->second;
     }
     if (bootstrap) {
         delete bootstrap;

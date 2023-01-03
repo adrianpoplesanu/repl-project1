@@ -703,6 +703,11 @@ Ad_AST_Class::~Ad_AST_Class() {
         Ad_DECREF(node); // asta merge si e super cool
         free_Ad_AST_Node_memory(node);
     }
+    for (std::vector<Ad_AST_Node*>::iterator it = inheritFrom.begin() ; it != inheritFrom.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node);
+        free_Ad_AST_Node_memory(node);
+    }
 }
 
 std::string Ad_AST_Class::TokenLiteral() {
@@ -800,6 +805,8 @@ Ad_AST_Super_Expression::Ad_AST_Super_Expression(Token t) {
 
 Ad_AST_Super_Expression::~Ad_AST_Super_Expression() {
     // nothing to do here, type and ref_count are deallocated automatically(because they are not pointers)
+    Ad_DECREF(target);
+    free_Ad_AST_Node_memory(target);
 }
 
 Ad_AST_PrefixIncrement::Ad_AST_PrefixIncrement() {
