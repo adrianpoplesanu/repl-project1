@@ -108,9 +108,10 @@ void Environment::setLocalParam(std::string key, Ad_Object* obj) {
 }
 
 void Environment::addSibling(std::string key, Environment *env) {
-    if (siblings.find(key) != siblings.end()) {
+    // TODO: determine a proper way to delete siblings
+    /*if (siblings.find(key) != siblings.end()) {
         delete siblings[key];
-    }
+    }*/
     siblings[key] = env;
 }
 
