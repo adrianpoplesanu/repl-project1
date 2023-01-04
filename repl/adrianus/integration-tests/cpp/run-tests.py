@@ -21,7 +21,8 @@ for test_file in test_files:
     expected_target = expected_folder + target.split("/")[-1].replace(".ad", ".txt")
     expected_output = open(expected_target, 'r').read()
 
-    ok = re.search(expected_output, output)
+    #ok = re.search(expected_output, output)
+    ok = re.fullmatch(expected_output, output.decode('utf-8'))
     #if output != expected_output:
     if not ok:
         failure.append("FAILURE - " + target)
@@ -31,12 +32,12 @@ for test_file in test_files:
         success.append(target)
 
 if failure:
-    print "\033[0;31mThere were errors:"
+    print ("\033[0;31mThere were errors:")
     for i, f in enumerate(failure):
-        print "\033[0;31m" + f + "\033[0m"
-        print "\033[0;33mEXPECTED:\033[0m\n" + failure_expected[i]
-        print "\033[0;33mACTUAL:\033[0m\n" + failure_actual[i]
+        print ("\033[0;31m" + f + "\033[0m")
+        print ("\033[0;33mEXPECTED:\033[0m\n" + failure_expected[i])
+        print ("\033[0;33mACTUAL:\033[0m\n" + failure_actual[i].decode('utf-8'))
 else:
-    print '\033[0;32mALL tests passed!\033[0m'
+    print ('\033[0;32mALL tests passed!\033[0m')
     for s in success:
-        print s
+        print (s)
