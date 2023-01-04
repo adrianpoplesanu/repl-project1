@@ -1,0 +1,11 @@
+class Dog {
+    age = 12
+}
+
+class Dex : Dog {
+    name = "bebe dex"
+}
+
+dex = Dex()
+print (dex.age)
+print (dex.name)

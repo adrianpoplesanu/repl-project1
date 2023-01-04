@@ -471,10 +471,6 @@ public class Evaluator {
 			String identifier = superKlass.tokenLiteral();
 			adClassInstance.getInheritFrom().add(identifier);
 			Environment klassEnv = EnvironmentUtils.newEnvironment(); // newEnvironment() ??? newOuterEnvironment() ???
-			HashMap<String, Environment> baseEnvironments = adClassInstance.getInheritedEnvs();
-			baseEnvironments.put(identifier, klassEnv);
-			klassEnv.setOuter(env);
-			baseEnvironments.get(identifier).setOuter(env);
 			AdClassObject adClassObject = (AdClassObject) env.get(identifier);
 			adClassObject.getAttributes().forEach(attribute -> {
 				if (attribute.getType() == AstNodeTypeEnum.ASSIGN_STATEMENT) {
@@ -518,7 +514,6 @@ public class Evaluator {
 				klassEnv.set(astIdentifier.getValue(), adFunctionObject);
 				adClassInstance.getEnvironment().addSibling(superKlass.tokenLiteral(), klassEnv);
 			});
-			adClassInstance.getInheritedEnvs().put(identifier, klassEnv);
 		}
 	}
 

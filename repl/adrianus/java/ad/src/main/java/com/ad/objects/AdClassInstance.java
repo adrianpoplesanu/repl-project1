@@ -3,14 +3,12 @@ package com.ad.objects;
 import com.ad.environment.Environment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class AdClassInstance extends AdObject {
     private AdClassObject adClassObject;
     private String name;
     private Environment environment;
-    private HashMap<String, Environment> inheritedEnvs;
     private List<String> inheritFrom;
 
     public AdClassInstance() {
@@ -22,7 +20,6 @@ public class AdClassInstance extends AdObject {
         this.name = name;
         this.adClassObject = adClassObject;
         this.environment = environment;
-        inheritedEnvs = new HashMap<>();
         inheritFrom = new ArrayList<>();
     }
 
@@ -63,14 +60,6 @@ public class AdClassInstance extends AdObject {
 
     public void setEnvironment(Environment environment) {
         this.environment = environment;
-    }
-
-    public HashMap<String, Environment> getInheritedEnvs() {
-        return inheritedEnvs;
-    }
-
-    public void setInheritedEnvs(HashMap<String, Environment> inheritedEnvs) {
-        this.inheritedEnvs = inheritedEnvs;
     }
 
     public List<String> getInheritFrom() {
