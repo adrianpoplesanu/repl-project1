@@ -1,0 +1,5 @@
+- overriding methods based on param number
+- fix circular memory leak issue
+- more test scripts for classes validation
+- streamline gc
+- use gc for regular objects? currently gc pseudo mark & sweep is used for envs. objects use ref_counts, maybe do gc also, maybe a re-architecture for gc & a re-write
