@@ -7,3 +7,4 @@
 - sa fac un eval() care evalueaza stringul dat ca parametru in cadrul contextului, gen eval din python sau js, spel din java
 - sa fac testele sa ruleze si pe linux/windows
 - sa testez binerele de cpp pe windows
+- sa fixez seg fault-ul cand se ruleaza un fisier inexistent... done
