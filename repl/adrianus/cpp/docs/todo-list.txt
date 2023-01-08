@@ -1,5 +1,9 @@
 - overriding methods based on param number
 - fix circular memory leak issue
+- fix all the tests
 - more test scripts for classes validation
 - streamline gc
 - use gc for regular objects? currently gc pseudo mark & sweep is used for envs. objects use ref_counts, maybe do gc also, maybe a re-architecture for gc & a re-write
+- sa fac un eval() care evalueaza stringul dat ca parametru in cadrul contextului, gen eval din python sau js, spel din java
+- sa fac testele sa ruleze si pe linux/windows
+- sa testez binerele de cpp pe windows
