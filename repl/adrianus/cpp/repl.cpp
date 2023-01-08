@@ -73,6 +73,9 @@ void Repl::ExecuteFile(std::ifstream &target) {
         if (res && res->Type() == OBJ_SIGNAL) {
             free_Ad_Object_memory(res);
         }
+    } else {
+        std::cout << "empty or missing ad source file\n";
+        program.reset();
     }
     target.close();
     evaluator.GarbageCollectEnvironments();
