@@ -20,18 +20,18 @@ for test_file in test_files:
 
     if ' 0 leaks for 0 total leaked bytes.' not in result_file.read():
         errors_detected = True
-        print '\033[0;31mMEMORY ERROR!\033[0m'
-        print test_file
+        print ('\033[0;31mMEMORY ERROR!\033[0m')
+        print (test_file)
     elif 'MEMORY ERROR!!!' in result_file.read():
         errors_detected = True
-        print '\033[0;31mMEMORY ERROR!\033[0m'
-        print test_file
+        print ('\033[0;31mMEMORY ERROR!\033[0m')
+        print (test_file)
     else:
-        print 'MEMORY OK!'
+        print ('MEMORY OK!')
 
     result_file.close()
 
 if not errors_detected:
-    print '\033[0;32mALL memory tests passed!\033[0m'
+    print ('\033[0;32mALL memory tests passed!\033[0m')
 
 tests_data.close()

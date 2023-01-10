@@ -15,6 +15,7 @@ examples/test014.ad
 examples/test015.ad
 examples/test016.ad
 examples/test017.ad
+examples/test018.ad
 examples/test019.ad
 examples/test020.ad
 examples/test021.ad
