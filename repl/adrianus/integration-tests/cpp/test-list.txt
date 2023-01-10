@@ -28,3 +28,14 @@ examples/test027.ad
 examples/test028.ad
 examples/test029.ad
 examples/test030.ad
+examples/test030.ad
+examples/test031.ad
+examples/test032.ad
+examples/test033.ad
+examples/test034.ad
+examples/test035.ad
+examples/test036.ad
+examples/test037.ad
+examples/test038.ad
+examples/test039.ad
+examples/test040.ad
