@@ -181,6 +181,10 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
             }
         }
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
+        if (result != NULL && result->Type() == OBJ_ERROR) {
+            free_Ad_Object_memory(result);
+            return NULL;
+        }
         if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result); // TODO: remove OBJ_BUILTIN check and use ref_count
         // OBJ_BUILTINS get destroyed on termination by free_builtin_map
         //std::cout << statement_type_map[obj->type] << "\n";
@@ -479,7 +483,11 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             //std::cout << def_ident->value << "\n";
             klass_instance->instance_environment->Set(def_ident->value, method_obj);
         }
-        CallInstanceConstructor(klass_instance, args, env);
+        Ad_Object* constructorReturn = CallInstanceConstructor(klass_instance, args, env);
+        if (IsError(constructorReturn)) {
+            free_Ad_Object_memory(klass_instance);
+            return constructorReturn;
+        }
         return klass_instance;
     }
     return NULL;
@@ -501,6 +509,10 @@ Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::ve
 
 Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
+        Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
+        if (func_obj->params.size() != args.size()) {
+            return new Ad_Error_Object("some error message here");
+        }
         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
         garbageCollector.addEnvironment(extendedEnv);
@@ -684,6 +696,9 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
         }
     } else {
         Ad_Object* obj = Eval(assign_statement->value, env);
+        if (IsError(obj)) {
+            return obj;
+        }
         Ad_AST_Identifier* identifier = (Ad_AST_Identifier*)assign_statement->name;
         env.Set(identifier->value, obj);
     }
