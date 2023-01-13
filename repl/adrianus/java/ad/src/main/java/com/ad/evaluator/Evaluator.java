@@ -95,6 +95,10 @@ public class Evaluator {
     	for (AstNode stmt : program.statements) {
     		AdObject result = eval(stmt, env);
     		if (result != null) System.out.println(result.inspect());
+			if (result != null && result.getType() == ObjectTypeEnum.ERROR) {
+				// an error was raised, stop execution
+				break;
+			}
     	}
     	return null;
     }
@@ -447,13 +451,17 @@ public class Evaluator {
 			});
 			//updateInstanceWithInheritedClasses(adClassInstance, env);
 			// call class instance constructor here
-			callInstanceConstructor(adClassInstance, arguments, env);
+			// constructor call should return null or an Error object, null is fine, the error object is surfaced all the way back to the progeam evaluator
+			AdObject constructorReturn = callInstanceConstructor(adClassInstance, arguments, env);
+			if (isError(constructorReturn)) {
+				return constructorReturn;
+			}
 			return adClassInstance;
 		}
     	return null;
     }
 
-    private void callInstanceConstructor(AdClassInstance adClassInstance, List<AdObject> arguments, Environment env) {
+    private AdObject callInstanceConstructor(AdClassInstance adClassInstance, List<AdObject> arguments, Environment env) {
 		Environment instanceEnv = adClassInstance.getEnvironment();
 		AdObject method = instanceEnv.lookupConstructor();
 		if (method != null) {
@@ -461,8 +469,9 @@ public class Evaluator {
 				// do nothing
 			}
 			instanceEnv.setOuter(env);
-			applyMethod(method, arguments, instanceEnv);
+			return applyMethod(method, arguments, instanceEnv);
 		}
+		return null;
 	}
 
 	private void updateInstanceWithInheritedClasses(AdClassInstance adClassInstance, Environment env) {
@@ -519,8 +528,13 @@ public class Evaluator {
 
 	private AdObject applyMethod(AdObject function, List<AdObject> arguments, Environment env) {
     	if (function.getType() == ObjectTypeEnum.FUNCTION) {
-			Environment extendedEnv = extendMethodEnv(function, arguments, env);
 			AdFunctionObject functionObject = (AdFunctionObject) function;
+
+			if (arguments.size() != functionObject.getParameters().size()) {
+				return new AdErrorObject("some error message here");
+			}
+
+			Environment extendedEnv = extendMethodEnv(function, arguments, env);
 			AdObject evaluated = eval(functionObject.getBlock(), extendedEnv);
 			return unwrapReturnValue(evaluated);
 		}
@@ -689,6 +703,9 @@ public class Evaluator {
 			}
 		} else {
 			AdObject obj = eval(assignStatement.getValue(), env);
+			if (isError(obj)) {
+				return obj;
+			}
 			AstIdentifier ident = (AstIdentifier) assignStatement.getName();
 			env.set(ident.getValue(), obj);
 		}
