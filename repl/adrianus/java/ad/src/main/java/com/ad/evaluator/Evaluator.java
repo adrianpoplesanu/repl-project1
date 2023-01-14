@@ -373,7 +373,11 @@ public class Evaluator {
     	AstCallExpression callExpression = (AstCallExpression) node;
     	AdObject function = eval(callExpression.getFunction(), env);
     	if (isError(function)) return function;
-    	ArrayList<AdObject> arguments = (ArrayList) evalExpressions(callExpression.getArguments(), env);
+		if (function.getType() == ObjectTypeEnum.NULL) {
+			// function was not found
+			return new AdErrorObject("function " + ((AstIdentifier) callExpression.getFunction()).getValue() + " was not found.");
+		}
+		ArrayList<AdObject> arguments = (ArrayList) evalExpressions(callExpression.getArguments(), env);
     	if (arguments.size() == 1 && isError(arguments.get(0))) {
     		return arguments.get(0);
     	}
@@ -457,6 +461,9 @@ public class Evaluator {
 				return constructorReturn;
 			}
 			return adClassInstance;
+		}
+		if (function.getType() == ObjectTypeEnum.NULL) {
+			return new AdErrorObject("function missing");
 		}
     	return null;
     }
