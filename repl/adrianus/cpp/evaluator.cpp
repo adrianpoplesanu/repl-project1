@@ -490,6 +490,11 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         }
         return klass_instance;
     }
+    if (func->type == OBJ_NULL) {
+        for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
+        Ad_Object *result = new Ad_Error_Object("function not found");
+        return result;
+    }
     return NULL;
 }
 
