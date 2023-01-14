@@ -83,17 +83,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_CALL_EXPRESSION: {
-            Ad_Object* func = Eval(((Ad_AST_CallExpression*)node)->function, env);
-            if (IsError(func)) return func;
-            std::vector<Ad_Object*> args_objs = EvalExpressions(((Ad_AST_CallExpression*)node)->arguments, env);
-            if (args_objs.size() == 1 && IsError(args_objs[0])) {
-                return args_objs[0];
-            }
-            Ad_Object* result = ApplyFunction(func, args_objs, env);
-            //GarbageCollectEnvironments(); // this also doesn't work, i need to document why, why is this not working?!?
-            //Ad_DECREF(((Ad_Function_Object*)func)->env);
-            garbageCollector.consumeScheduledDECREFEnvironments();
-            return result;
+            return evalCallExpression(node, &env);
         }
         break;
         case ST_WHILE_EXPRESSION: {
@@ -1098,6 +1088,24 @@ Ad_Object* Evaluator::EvalBreakStatement(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalContinueStatement(Ad_AST_Node* node, Environment& env) {
     return new Ad_Continue_Object();
+}
+
+Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
+    Ad_AST_CallExpression *callExpression = (Ad_AST_CallExpression*) node;
+    Ad_Object* func = Eval(callExpression->function, *env);
+    if (IsError(func)) return func;
+    if (func->type == OBJ_NULL) {
+        return new Ad_Error_Object("function " + ((Ad_AST_Identifier*)callExpression->function)->value + " not found.");
+    }
+    std::vector<Ad_Object*> args_objs = EvalExpressions(callExpression->arguments, *env);
+    if (args_objs.size() == 1 && IsError(args_objs[0])) {
+        return args_objs[0];
+    }
+    Ad_Object* result = ApplyFunction(func, args_objs, *env);
+    //GarbageCollectEnvironments(); // this also doesn't work, i need to document why, why is this not working?!?
+    //Ad_DECREF(((Ad_Function_Object*)func)->env);
+    garbageCollector.consumeScheduledDECREFEnvironments();
+    return result;
 }
 
 Ad_Object* Evaluator::EvalNullExpression(Ad_AST_Node* node, Environment& env) {
