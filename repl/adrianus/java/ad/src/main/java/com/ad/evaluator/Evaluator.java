@@ -555,35 +555,40 @@ public class Evaluator {
 		// ints are passed just the same, but all changing operation produce a new object
     	AdFunctionObject functionObject = (AdFunctionObject) func;
      	Environment extended = EnvironmentUtils.newEnclosedEnvironment(functionObject.getEnv());
-     	int i = 0;
-     	for (AstNode param : functionObject.getParameters()) {
+		final int[] i = {0};
+     	/*for (AstNode param : functionObject.getParameters()) {
 			AdObject currentObject = arguments.get(i++);
      		//extended.set(param.tokenLiteral(), arguments.get(i++));
 			// bucata asta de cod face imutabila lista cand e pasata ca argument, noua lista inca pointeaza catre vechile obiecte
-			/*if (currentObject.getType() == ObjectTypeEnum.LIST) {
-				AdListObject oldList = (AdListObject) currentObject;
-				AdListObject newList = new AdListObject();
-				List<AdObject> elements = new ArrayList<>();
-				for (AdObject o : oldList.getElements()) {
-					elements.add(o);
-				}
-				newList.setElements(elements);
-				extended.setLocalParam(param.tokenLiteral(), newList);
-				continue;
-			}*/
+			//if (currentObject.getType() == ObjectTypeEnum.LIST) {
+			//	AdListObject oldList = (AdListObject) currentObject;
+			//	AdListObject newList = new AdListObject();
+			//	List<AdObject> elements = new ArrayList<>();
+			//	for (AdObject o : oldList.getElements()) {
+			//		elements.add(o);
+			//	}
+			//	newList.setElements(elements);
+			//	extended.setLocalParam(param.tokenLiteral(), newList);
+			//	continue;
+			//}
 			extended.setLocalParam(param.tokenLiteral(), currentObject);
-     	}
+     	}*/
+		functionObject.getParameters().stream().forEach(param -> {
+			AdObject currentObject = arguments.get(i[0]++);
+			extended.setLocalParam(param.tokenLiteral(), currentObject);
+		});
     	return extended;
     }
 
     private Environment extendMethodEnv(AdObject function, List<AdObject> arguments, Environment env) {
     	AdFunctionObject funcObj = (AdFunctionObject) function;
 		Environment extended = EnvironmentUtils.newEnclosedEnvironment(env);
-    	int i = 0;
-    	for (AstNode param : funcObj.getParameters()) {
-    		//env.set(param.tokenLiteral(), arguments.get(i++));
-			extended.setLocalParam(param.tokenLiteral(), arguments.get(i++));
-		}
+		final int[] i = {0};
+    	/*for (AstNode param : funcObj.getParameters()) {
+    		//env.set(param.tokenLiteral(), arguments.get(i[0]++));
+			extended.setLocalParam(param.tokenLiteral(), arguments.get(i[0]++));
+		}*/
+		funcObj.getParameters().stream().forEach(param -> extended.setLocalParam(param.tokenLiteral(), arguments.get(i[0]++)));
 		return extended;
 	}
 
