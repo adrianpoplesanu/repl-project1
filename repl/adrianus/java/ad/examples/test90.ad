@@ -1,0 +1,48 @@
+class Flag {
+    colors = ["red", "white", "purple"]
+}
+
+class Country {
+    flag = Flag()
+
+    def constructor(name) {
+        this.name = name
+    }
+
+    def getFlag() {
+        return flag;
+    }
+}
+
+class Continent {
+    country = Country("USA")
+
+    def constructor(name, colors) {
+        country = Country(name)
+        country.flag.colors = colors
+    }
+}
+
+class Globe {
+    continents = [Continent("USA", ["red", "green", "blue"]), Continent("Asia", ["yellow", "red", "black"]), Continent("Africa", ["ros", "galb", "albas"])]
+}
+
+globe = Globe()
+
+for (i = 0; i < 3; i++) {
+    print (globe.continents[i].country.flag.colors)
+}
+
+new_colors = ["cyan", "cyanish", "cyaner"]
+for (i = 0; i < 3; i++) {
+    globe.continents[i].country.getFlag().colors[i] = new_colors[i]
+}
+
+for (i = 0; i < 3; i++) {
+    print (globe.continents[i].country.getFlag().colors)
+}
+
+for (i = 0; i < 3; i++) {
+    cont = globe.continents[i]
+    print (cont.country.flag.colors)
+}

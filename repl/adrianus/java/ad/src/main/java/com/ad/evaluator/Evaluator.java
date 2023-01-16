@@ -755,6 +755,13 @@ public class Evaluator {
 				currentEnv = ((AdClassInstance) obj).getEnvironment();
 			}
 		}
+
+		if (initialMemberAccess.getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
+			AdObject obj = eval(initialMemberAccess, currentEnv);
+			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				currentEnv = ((AdClassInstance) obj).getEnvironment();
+			}
+		}
 		// end initialize env
 
 		for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
