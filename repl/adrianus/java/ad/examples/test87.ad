@@ -1,0 +1,35 @@
+class Flag {
+    colors = ["red", "white", "purple"]
+}
+
+class Country {
+    flag = Flag()
+
+    def constructor(name) {
+        this.name = name
+    }
+
+    def getFlag() {
+        return flag;
+    }
+}
+
+class Continent {
+    country = Country("USA")
+
+    def constructor(name, colors) {
+        country = Country(name)
+        country.flag.colors = colors
+    }
+}
+
+continents = [Continent("USA", ["red", "green", "blue"]), Continent("Asia", ["yellow", "red", "black"]), Continent("Africa", ["ros", "galb", "albas"])]
+
+for (i = 0; i < 3; i++) {
+    print (continents[i].country.flag.colors)
+}
+
+for (i = 0; i < 3; i++) {
+    cont = continents[i]
+    print (cont.country.flag.colors)
+}
