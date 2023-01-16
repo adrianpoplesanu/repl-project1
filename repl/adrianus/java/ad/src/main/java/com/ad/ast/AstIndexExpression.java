@@ -29,7 +29,7 @@ public class AstIndexExpression extends AstNode {
 
     @Override
     public String toString() {
-        return null;
+        return "AstIndexExpression";
     }
 
     public Token getToken() {
