@@ -679,7 +679,8 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
             Ad_Object *obj = Eval(assign_statement->value, env);
             parentKlassEnv->Set(member->value, obj);
         } else if (((Ad_AST_MemberAccess*)(assign_statement->name))->owner->type == ST_MEMBER_ACCESS) {
-            std::cout << "do a recursive member access assignment\n";
+            //std::cout << "do a recursive member access assignment\n";
+            return recursiveMemberAccessAssign(node, &env);
         } else {
             Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
@@ -920,6 +921,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
 
 Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environment& env) {
     // TODO: recursive member access assign statement should work this way also, not only retrievals
+    // TODO: add index expression as initial member access handler
     std::vector<Ad_AST_MemberAccess*> chainedMemberAccesses;
     while (node->type == ST_MEMBER_ACCESS) {
         chainedMemberAccesses.push_back((Ad_AST_MemberAccess*) node);
@@ -979,6 +981,79 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
         }
     }
     // daca am ajuns aici atunci nu cred ca e ok
+    return NULL;
+}
+
+Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment *env) {
+    // TODO: clean this up, and the other recursive access method, this needs consolidated, and more elegant
+    // TODO: add index expression as initial member access handler
+    Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) node;
+    Ad_AST_MemberAccess *memberAccess = (Ad_AST_MemberAccess*) assignStatement->name;
+    std::vector<Ad_AST_MemberAccess*> chainedMemberAccesses;
+    // aici ceva trebuie facut diferit pentru ca *node pointeaza catre assign statement, nu catre un member access
+    Ad_AST_Node *memberAccessNode = (Ad_AST_MemberAccess*) assignStatement->name;
+    while (memberAccessNode->type == ST_MEMBER_ACCESS) {
+        chainedMemberAccesses.push_back((Ad_AST_MemberAccess*) memberAccessNode);
+        memberAccessNode = ((Ad_AST_MemberAccess*) memberAccessNode)->owner;
+    }
+
+    Environment *currentEnvironment = env; // super tare, daca fac currentEnv = env atunci cand metoda ajunge la final currentEnv(care e pe stack) face ::~Environment() de unde rezulta un seg fault cand &env face la randul lui ::~Environment()
+
+    // initialize env
+    Ad_AST_Node* initialMemberAccess = chainedMemberAccesses.at(0);
+    while(initialMemberAccess->type == ST_MEMBER_ACCESS) {
+        initialMemberAccess = ((Ad_AST_MemberAccess*) initialMemberAccess)->owner;
+    }
+
+    if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
+        Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
+        if (obj->type == OBJ_INSTANCE) {
+            currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+        }
+    }
+
+    if (initialMemberAccess->type == ST_IDENTIFIER) {
+        Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
+        if (obj->type == OBJ_INSTANCE) {
+            currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+        }
+    }
+    // end initialize env
+
+    for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
+        Ad_AST_MemberAccess* currentMemberAccess = (Ad_AST_MemberAccess*) chainedMemberAccesses.at(i);
+        if (currentMemberAccess->is_method) {
+            // am de a face cu un call
+            Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
+            if (obj->type == OBJ_FUNCTION) {
+                std::vector<Ad_Object*> args_objs = EvalExpressions(currentMemberAccess->arguments, *env);
+                Ad_Object* obj2 = ApplyMethod(obj, args_objs, *(((Ad_Function_Object*) obj)->env));
+
+                if (i == 0) {
+                    //return obj2;
+                }
+                if (obj2->type == OBJ_INSTANCE) {
+                    currentEnvironment = ((Ad_Class_Instance*) obj2)->instance_environment;
+                }
+            }
+        } else {
+            // am de a face cu un identificator
+            Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
+
+            if (i == 0) {
+                //return obj;
+            }
+
+            if (obj->type == OBJ_INSTANCE) {
+                currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            }
+        }
+    }
+
+    Ad_Object *obj = Eval(assignStatement->value, *env);
+    Ad_AST_Identifier *identifier = (Ad_AST_Identifier*) memberAccess->member;
+    currentEnvironment->Set(identifier->value, obj);
+
     return NULL;
 }
 
@@ -1095,6 +1170,7 @@ Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
     Ad_Object* func = Eval(callExpression->function, *env);
     if (IsError(func)) return func;
     if (func->type == OBJ_NULL) {
+        // function was not found
         return new Ad_Error_Object("function " + ((Ad_AST_Identifier*)callExpression->function)->value + " not found.");
     }
     std::vector<Ad_Object*> args_objs = EvalExpressions(callExpression->arguments, *env);
