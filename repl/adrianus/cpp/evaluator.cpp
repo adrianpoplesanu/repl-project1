@@ -949,6 +949,13 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
         }
     }
+
+    if (initialMemberAccess->type == ST_INDEX_EXPRESSION) {
+        Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
+        if (obj->type == OBJ_INSTANCE) {
+            currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+        }
+    }
     // end initialize env
 
     for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
