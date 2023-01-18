@@ -1025,6 +1025,13 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
         }
     }
+
+    if (initialMemberAccess->type == ST_IDENTIFIER) {
+        Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
+        if (obj->type == OBJ_INSTANCE) {
+            currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+        }
+    }
     // end initialize env
 
     for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
