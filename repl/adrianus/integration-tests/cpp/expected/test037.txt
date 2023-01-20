@@ -1,0 +1,10 @@
+store: {}
+outer: {
+    store: {file_object: File \[README.md, r\], init: function at memory address (.*), name: "README.md", operator: "r", read: function at memory address (.*), write: function at memory address (.*)}
+    outer: {
+        store: {File: class object at memory address (.*), file: class instance at memory address (.*)}
+        outer: {}
+}
+}
+"r"
+""

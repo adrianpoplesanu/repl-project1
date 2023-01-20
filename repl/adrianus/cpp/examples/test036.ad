@@ -1,6 +1,6 @@
 class Test {
     def read() {
-        print("pisat")
+        print("some text")
     }
 }
 
