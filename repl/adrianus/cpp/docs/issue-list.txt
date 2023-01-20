@@ -1,21 +1,21 @@
 tests:
 
     linux:
-        - test40.ad: test is written wrong, File bootstrap class has no init() method
+        - FIXED test40.ad: test is written wrong, File bootstrap class has no init() method
         - test54.ad: socket is not yet implemented in cpp version
-        - test55.ad: expression statements in blocks are not free'd, this can be tested with: <code>i = 0 while (i < 10) { print (i) i++ }</code>
+        - FIXED test55.ad: expression statements in blocks are not free'd, this can be tested with: <code>i = 0 while (i < 10) { print (i) i++ }</code>
         - test56.ad: circular references memory leak, darn!
         - test57.ad: circular references memory leak, darn!
         - FIXED test61.ad: unknown memory issue, IsError is the first place to check... invetigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/44c0ef9d19b008a82f3b6e2f3d43f7876a2ce4c4
         - test66.ad: wrong syntax in test, it's not really a test
         - FIXED test69.ad: it used to work and have a minor memory leak, now it doesn't even run anymore, don't know why... investigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/16142403e633838b5bb47e30f62ebcdf22413a0f
-        - test73.ad: again the expression statements in blocks seems to be the issue
+        - FIXED test73.ad: again the expression statements in blocks seems to be the issue
         - FIXED test75.ad: might be same issue as test69.ad... investigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/16142403e633838b5bb47e30f62ebcdf22413a0f
-        - test82.ad: returned nested functions fail when called... investigate more...
-        - test85.ad: same as test82.ad...
+        - FIXED test82.ad: returned nested functions fail when called... investigate more...
+        - FIXED test85.ad: same as test82.ad...
 
     macos:
-        - test40.ad: test is written wrong, File bootstrap class has no init() method
+        - FIXED test40.ad: test is written wrong, File bootstrap class has no init() method
         - test54.ad: socket is not yet implemented in cpp version
         - FIXED test55.ad: expression statements in blocks are not free'd, this can be tested with: <code>i = 0 while (i < 10) { print (i) i++ }</code>
         - test56.ad: circular references memory leak, darn!
@@ -25,8 +25,8 @@ tests:
         - FIXED test69.ad: unknown memory issue... investigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/16142403e633838b5bb47e30f62ebcdf22413a0f
         - FIXED test73.ad: again the expression statements in blocks seems to be the issue
         - FIXED test75.ad: might be the same issue as test69.ad... investigate more... done, fixed: https://github.com/adrianpoplesanu/repl-project1/commit/16142403e633838b5bb47e30f62ebcdf22413a0f
-        - test82.ad: returned nested functions fail when called... investigate more...
-        - test85.ad: same as test82.ad...
+        - FIXED test82.ad: returned nested functions fail when called... investigate more...
+        - FIXED test85.ad: same as test82.ad...
 
 fixul pentru nested classes in scopes care incercau sa elibereze aceeasi zona de memorie de doua ori: https://github.com/adrianpoplesanu/repl-project1/commit/f1c5097224ad058f5b2bf088829b5608df287b45
 commituri importante pentru garbage collection:
