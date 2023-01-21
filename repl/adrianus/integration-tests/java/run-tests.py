@@ -1,7 +1,42 @@
 import subprocess
 import re
 
-proc = subprocess.Popen(["java", "-jar", "../../java/ad/ad-1.0-SNAPSHOT.jar", "examples/test01.ad"], stdout=subprocess.PIPE)
-proc.wait()
-output = proc.communicate()[0]
-print(output.decode("utf-8"))
+expected_folder = "expected/"
+jar_path = "../../java/ad/"
+jar_name = "ad-1.0-SNAPSHOT.jar"
+
+tests_data = open("test-list.txt", "r")
+test_files = tests_data.readlines()
+
+success = []
+failure = []
+failure_expected = []
+failure_actual = []
+
+for test_file in test_files:
+    target = test_file.strip()
+    proc = subprocess.Popen(["java", "-jar", jar_path + jar_name, target], stdout=subprocess.PIPE)
+    proc.wait()
+    output = proc.communicate()[0]
+    expected_target = expected_folder + target.split("/")[-1].replace(".ad", ".txt")
+    expected_output = open(expected_target, 'r').read()
+    #print(output.decode("utf-8"))
+    ok = re.fullmatch(expected_output, output.decode('utf-8'))
+
+    if not ok:
+        failure.append("FAILURE - " + target)
+        failure_expected.append(expected_output)
+        failure_actual.append(output)
+    else:
+        success.append(target)
+
+if failure:
+    print ("\033[0;31mThere were errors:")
+    for i, f in enumerate(failure):
+        print ("\033[0;31m" + f + "\033[0m")
+        print ("\033[0;33mEXPECTED:\033[0m\n" + failure_expected[i])
+        print ("\033[0;33mACTUAL:\033[0m\n" + failure_actual[i].decode('utf-8'))
+else:
+    print ('\033[0;32mALL tests passed!\033[0m')
+    for s in success:
+        print (s)
