@@ -173,9 +173,9 @@ public class Evaluator {
 			return obj;
 		} else {
     		// maybe this should return NULLOBJECT for consistency with cpp and python implementation
-			/*AdErrorObject error = new AdErrorObject(((AstIdentifier) node).getToken().getLiteral() + " used before definition.");
-			return error;*/
-			return NULLOBJECT;
+			AdErrorObject error = new AdErrorObject("variable " + ((AstIdentifier) node).getToken().getLiteral() + " undefined.");
+			return error;
+			//return NULLOBJECT;
 		}
     }
 
@@ -971,7 +971,8 @@ public class Evaluator {
 				klassInstance.getEnvironment().setOuter(env);
 				AdObject klassMethod = klassInstance.getEnvironment().get(member.getValue());
 				if (klassMethod == null) {
-					return NULLOBJECT;
+					return new AdErrorObject("method " + member.getValue() + " not found in class " + klassInstance.getAdClassObject().getName().tokenLiteral());
+					//return NULLOBJECT;
 				}
 				List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
 				if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {

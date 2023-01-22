@@ -1,0 +1,8 @@
+class Test {
+    def a() {
+        return 5
+    }
+}
+
+t = Test()
+t.b()
