@@ -38,6 +38,24 @@ public class TypeBuiltin extends AbstractBuiltin {
 		case HASH:
 			type.setValue("HASH");
 			break;
+		case BUILTIN:
+			type.setValue("BUILTIN");
+			break;
+		case CLASS:
+			type.setValue("CLASS");
+			break;
+		case INSTANCE:
+			type.setValue("INSTANCE");
+			break;
+		case FILE:
+			type.setValue("FILE");
+			break;
+		case SOCKET:
+			type.setValue("SOCKET");
+			break;
+		case NULL:
+			type.setValue("NULL");
+			break;
 		default:
 			type.setValue("UNKNOWN_TYPE");
 			break;
