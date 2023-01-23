@@ -520,6 +520,12 @@ class Evaluator(object):
             evaluated = self.eval(node.member, klass_environment)
         return evaluated
 
+    def eval_recursive_member_access_call(self, node ,env):
+        pass
+
+    def eval_recursive_member_access_assign(self, node ,env):
+        pass
+
     def eval_file_object_method(self, node, env):
         if node.owner.type != StatementType.IDENTIFIER:
             return None

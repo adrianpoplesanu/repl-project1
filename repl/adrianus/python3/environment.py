@@ -21,6 +21,30 @@ class Environment(object):
             return
         self.store[key] = value
 
+    def set_local_param(self, key, value):
+        # TODO: implement this
+        pass
+
+    def add_sibling(self, key, env):
+        # TODO: implement this
+        pass
+
+    def get_sibling(self, key):
+        # TODO: implement this
+        return None
+
+    def lookup_only_in_store(self, key):
+        # TODO: implement this
+        return None
+
+    def lookup_constructor(self):
+        # TODO: implement this
+        return None
+
+    def print_store(self, level):
+        # TODO: implement this
+        pass
+
     def __str__(self):
         out = "[Env] store: " + str(self.store) + "\n"
         if self.outer:
