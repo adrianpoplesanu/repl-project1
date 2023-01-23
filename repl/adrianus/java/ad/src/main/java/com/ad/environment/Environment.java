@@ -1,6 +1,8 @@
 package com.ad.environment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.ad.objects.AdObject;
@@ -98,6 +100,12 @@ public class Environment {
 
 	public void setBootstrap(Environment bootstrap) {
 		this.bootstrap = bootstrap;
+	}
+
+	public List<String> populateGetattrs() {
+		List<String> result = new ArrayList<>();
+		store.keySet().stream().forEach(key -> result.add(key));
+		return result;
 	}
 
 	public String toString() {
