@@ -337,8 +337,8 @@ Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
         return builtins_map[((Ad_AST_Identifier*)node)->token.literal];
         //return NULL;
     }
-    //obj = new Ad_Error_Object("ERROR: Identifier " + ((Ad_AST_Identifier*)node)->token.literal + " used before being declared.");
-    obj = &NULLOBJECT;
+    obj = new Ad_Error_Object("variable " + ((Ad_AST_Identifier*)node)->token.literal + " undefined.");
+    //obj = &NULLOBJECT;
     //obj = new Ad_Null_Object();
     return obj;
 }
@@ -885,7 +885,8 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
 
             Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
             if (klass_method == NULL) {
-                return &NULLOBJECT;
+                //return &NULLOBJECT;
+                return new Ad_Error_Object(" method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
             }
             std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
