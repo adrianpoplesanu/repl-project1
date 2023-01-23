@@ -67,6 +67,9 @@ public:
     void Init();
     void GarbageCollectEnvironments();
     void addEnvironmentGarbageCollectorListener(Environment *);
+
+private:
+    bool validateNumberOfArguments(std::vector<int>, int);
 };
 
 #endif
