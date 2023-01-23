@@ -33,6 +33,7 @@ public class BuiltinLookup {
 			put("hasattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("getattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("setattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("getallattrs", new AdBuiltinObject(new GetallattrsBuiltin()));
 			// https://www.w3schools.com/python/python_ref_keywords.asp
 			// https://www.w3schools.com/python/python_ref_functions.asp
 		}
