@@ -48,27 +48,29 @@ token_type_map = {
 	TokenType.START_COMMENT: "STRAT_COMMENT",
 	TokenType.END_COMMENT: "END_COMMENT",
 	TokenType.PLUSPLUS: 'INCREMENT_OPERATOR',
-	TokenType.NULL: 'NULL'
+	TokenType.NULL: 'NULL',
+	TokenType.SUPER: 'SUPER'
 }
 
 keywords_map = {
 	"let": TokenType.LET,
 	"return": TokenType.RETURN,
-	"break": TokenType.BREAK,
-	"continue": TokenType.CONTINUE,
-	"while": TokenType.WHILE,
-	"for": TokenType.FOR,
 	"function": TokenType.FUNCTION,
-	"def": TokenType.DEF,
 	"if": TokenType.IF,
 	"else": TokenType.ELSE,
 	"true": TokenType.TRUE,
 	"false": TokenType.FALSE,
-	"and": TokenType.AND,
-	"or": TokenType.OR,
+	"while": TokenType.WHILE,
+	"def": TokenType.DEF,
+	"null": TokenType.NULL,
 	"class": TokenType.CLASS,
 	"this": TokenType.THIS,
-	"null": TokenType.NULL
+	"and": TokenType.AND,
+	"or": TokenType.OR,
+	"for": TokenType.FOR,
+	"break": TokenType.BREAK,
+	"continue": TokenType.CONTINUE,
+	"super": TokenType.SUPER
 }
 
 

@@ -48,3 +48,4 @@ class TokenType(object):
     END_COMMENT = "*/"
     PLUSPLUS = "++"
     NULL = "NULL"
+    SUPER = "SUPER"
