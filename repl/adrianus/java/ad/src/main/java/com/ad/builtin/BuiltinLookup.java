@@ -26,14 +26,15 @@ public class BuiltinLookup {
 			put("__first", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("__last", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("map", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
-			put("__input", new AdBuiltinObject(new InputBuiltin())); // TODO: update this
+			put("input", new AdBuiltinObject(new InputBuiltin())); // TODO: update this
 			put("list", new AdBuiltinObject(new ListBuiltin()));
 			put("mat", new AdBuiltinObject(new MapBuiltin()));
 			put("hash", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("hasattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
-			put("getattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("getattr", new AdBuiltinObject(new GetattrBuiltin()));
 			put("setattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
-			put("getallattrs", new AdBuiltinObject(new GetallattrsBuiltin()));
+			put("getattrs", new AdBuiltinObject(new GetattrsBuiltin()));
+			put("thread", new AdBuiltinObject(new ContextBuiltin())); // TODO: reasearch this
 			// https://www.w3schools.com/python/python_ref_keywords.asp
 			// https://www.w3schools.com/python/python_ref_functions.asp
 		}
