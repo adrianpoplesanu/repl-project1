@@ -1,0 +1,27 @@
+class Test {
+    a = 5
+    def b() {
+        a++
+        print (a)
+    }
+
+    c = 10
+    def d(offset) {
+        c = c + offset
+        print (c)
+    }
+
+    e = 100
+}
+
+t = Test()
+print (getattrs(t))
+print (getattrs(Test))
+
+print (getattr(t, "a"))
+print (getattr(t, "b"))
+getattr(t, "b")()
+print (t.a)
+getattr(t, "d")(10)
+t.e = getattr(t, "e") + t.e
+print (t.e)
