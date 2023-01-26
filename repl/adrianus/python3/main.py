@@ -28,7 +28,7 @@ def main(args):
     if len(args) == 1:
         if args[0] == '--vm':
             use_vm = True
-        elif args[1] == '--eval':
+        elif args[0] == '--eval':
             use_vm = False
         else:
             filename = args[0]
@@ -45,7 +45,7 @@ def main(args):
     repl = Repl(parser=parser, program=program, evaluator=evaluator, compiler=compiler, vm=vm)
     if filename:
         data = open(filename, "r")
-        source = filename.read()
+        source = data.read()
         repl.execute_file(source=source, use_vm=use_vm)
     else:
         repl.loop(use_vm)

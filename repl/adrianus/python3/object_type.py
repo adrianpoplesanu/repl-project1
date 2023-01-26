@@ -5,6 +5,8 @@ class ObjectType(object):
     BOOLEAN = "BOOLEAN"
     STRING = "STRING"
     RETURN_VALUE = "RETURN_VALUE"
+    BREAK = "BREAK"
+    CONTINUE = "CONTINUE"
     FUNCTION = "FUNCTION"
     ERROR = "ERROR"
     BUILTIN = "BUILTIN"

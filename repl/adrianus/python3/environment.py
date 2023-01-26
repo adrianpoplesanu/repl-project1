@@ -3,6 +3,7 @@ class Environment(object):
     def __init__(self):
         self.store = {}
         self.outer = None
+        self.siblings = {}
 
     def check(self, key):
         return key in self.store or (self.outer and key in self.outer.store)
