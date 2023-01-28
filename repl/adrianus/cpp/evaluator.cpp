@@ -423,11 +423,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
     }
     if (func->type == OBJ_BUILTIN) {
         Ad_Builtin_Object* builtinObject = (Ad_Builtin_Object*) func;
-        // TODO: fix this
         if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
-                /*std::count(builtinObject->acceptedNumbersOfArguments.begin(),
-                            builtinObject->acceptedNumbersOfsArguments.end(),
-                            args.size()) != 0) {*/
                 !validateNumberOfArguments(builtinObject->acceptedNumbersOfArguments, args.size())) {
             return new Ad_Error_Object("builtin signature unrecognized, different number of params");
         }

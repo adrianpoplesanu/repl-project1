@@ -58,7 +58,51 @@ Ad_Object* ref_count(std::vector<Ad_Object*> args, Environment* env) {
 
 Ad_Object* type_builtin(std::vector<Ad_Object*> args, Environment* env) {
     Ad_Object* target = args[0];
-    std::string type = object_type_map[target->Type()];
+    std::string type;
+    switch (target->Type()) {
+        case OBJ_BOOL:
+            type = "BOOLEAN";
+        break;
+        case OBJ_INT:
+            type = "INT";
+        break;
+        case OBJ_FLOAT:
+            type = "FLOAT";
+        break;
+        case OBJ_STRING:
+            type = "STRING";
+        break;
+        case OBJ_FUNCTION:
+            type = "FUNCTION";
+        break;
+        case OBJ_LIST:
+            type = "LIST";
+        break;
+        case OBJ_HASH:
+            type = "HASH";
+        break;
+        case OBJ_BUILTIN:
+            type = "BUILTIN";
+        break;
+        case OBJ_CLASS:
+            type = "CLASS";
+        break;
+        case OBJ_INSTANCE:
+            type = "INSTANCE";
+        break;
+        case OBJ_FILE:
+            type = "FILE";
+        break;
+        case OBJ_SOCKET:
+            type = "SOCKET";
+        break;
+        case OBJ_NULL:
+            type = "NULL";
+        break;
+        default:
+            type = "UNKNOWN_TYPE";
+        break;
+    }
     Ad_String_Object* obj = new Ad_String_Object(type);
     return obj; // TODO: check for potential memory leak
 }
@@ -225,6 +269,14 @@ Ad_Object* setattr_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return NULL;
 }
 
+Ad_Object* getattrs_builtin(std::vector<Ad_Object*> args, Environment *env) {
+    return NULL;
+}
+
+Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environemtn *env) {
+    return NULL;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -232,18 +284,18 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"print", new Ad_Builtin_Object(&print_builtin)},
     {"ref_count", new Ad_Builtin_Object(&ref_count)},
     {"type", new Ad_Builtin_Object(&type_builtin)},
-    {"append", new Ad_Builtin_Object(&append_builtin)},
-    {"pop", new Ad_Builtin_Object(&pop_builtin)},
-    {"remove", new Ad_Builtin_Object(&remove_builtin)},
-    {"upper", new Ad_Builtin_Object(&upper_builtin)},
-    {"lower", new Ad_Builtin_Object(&lower_builtin)},
+    {"__append", new Ad_Builtin_Object(&append_builtin)},
+    {"__pop", new Ad_Builtin_Object(&pop_builtin)},
+    {"__remove", new Ad_Builtin_Object(&remove_builtin)},
+    {"__upper", new Ad_Builtin_Object(&upper_builtin)},
+    {"__lower", new Ad_Builtin_Object(&lower_builtin)},
     {"context", new Ad_Builtin_Object(&context_builtin, {0})},
     {"__iofile", new Ad_Builtin_Object(&__iofile_builtin)},
     {"__syssystem", new Ad_Builtin_Object(&__syssystem_builtin)},
     {"__iosocket", new Ad_Builtin_Object(&__iosocket_builtin)},
     {"eval", new Ad_Builtin_Object(&eval_builtin)},
-    {"first", new Ad_Builtin_Object(&first_builtin)},
-    {"last", new Ad_Builtin_Object(&last_builtin)},
+    {"__first", new Ad_Builtin_Object(&first_builtin)},
+    {"__last", new Ad_Builtin_Object(&last_builtin)},
     {"map", new Ad_Builtin_Object(&map_builtin)},
     {"input", new Ad_Builtin_Object(&input_builtin)},
     {"list", new Ad_Builtin_Object(&list_builtin)},
@@ -251,7 +303,9 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"hash", new Ad_Builtin_Object(&hash_builtin)},
     {"hasattr", new Ad_Builtin_Object(&hasattr_builtin)},
     {"getattr", new Ad_Builtin_Object(&getattr_builtin)},
-    {"setattr", new Ad_Builtin_Object(&setattr_builtin)}
+    {"setattr", new Ad_Builtin_Object(&setattr_builtin)},
+    {"getattrs", new Ad_Builtin_Object(&getattrs_builtin)},
+    {"thread", new Ad_Builtin_Object(&thread_builtin)}
     // eval
     // first
     // input
