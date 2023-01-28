@@ -23,8 +23,7 @@ class Environment(object):
         self.store[key] = value
 
     def set_local_param(self, key, value):
-        # TODO: implement this
-        pass
+        self.store[key] = value
 
     def add_sibling(self, key, env):
         # TODO: implement this
@@ -35,12 +34,10 @@ class Environment(object):
         return None
 
     def lookup_only_in_store(self, key):
-        # TODO: implement this
-        return None
+        return self.store[key]
 
     def lookup_constructor(self):
-        # TODO: implement this
-        return None
+        return self.store["constructor"]
 
     def print_store(self, level):
         # TODO: implement this

@@ -83,7 +83,7 @@ class Ad_ReturnValue_Object(Ad_Object):
         self.value = value
 
 
- class Ad_Break_Object(Ad_Object):
+class Ad_Break_Object(Ad_Object):
     type = ObjectType.BREAK
 
     def __init__(self):

@@ -8,7 +8,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
                 ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
                 ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
-                ASTFloat
+                ASTFloat, ASTSuperExpression
 
 
 class Parser(object):
@@ -40,6 +40,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.PLUSPLUS] = self.parse_prefix_plus_plus
         self.prefix_parse_functions[TokenType.NULL] = self.parse_null_expression
         self.prefix_parse_functions[TokenType.THIS] = self.parse_this_expression
+        self.prefix_parse_functions[TokenType.SUPER] = self.parse_super_expression
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
@@ -349,6 +350,15 @@ class Parser(object):
         self.next_token()
         expr.attributes = []
         expr.methods = []
+        expr.inherit_from = []
+
+        if self.current_token_is(TokenType.COLON):
+            self.next_token()
+            while not self.current_token_is(TokenType.LBRACE):
+                parent = self.parse_identifier()
+                expr.inherit_from.append(parent)
+                self.next_token()
+
         while not self.current_token_is(TokenType.RBRACE):
             if self.current_token_is(TokenType.DEF):
                 stmt = self.parse_def_expression()
@@ -422,6 +432,21 @@ class Parser(object):
 
     def parse_this_expression(self):
         expr = ASTThisExpression(self.current_token)
+        return expr
+
+    def parse_super_expression(self):
+        expr = ASTSuperExpression(self.current_token)
+        self.next_token()
+
+        if not self.current_token_is(TokenType.LRAREN):
+            return None
+
+        target = self.parse_identifier()
+        expr.target = target
+
+        if not self.peek_token_is(TokenType.RPAREN):
+            return None
+
         return expr
 
     def parse_expression(self, precedence):

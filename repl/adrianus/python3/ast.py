@@ -28,6 +28,7 @@ class StatementType(object):
     FOR_EXPRESSION = 'FOR_EXPRESSION'
     NULL_EXPRESSION = 'NULL_EXPRESSION'
     THIS_EXPRESSION = 'THIS_EXPRESSION'
+    SUPER_EXPRESSION = 'SUPER_EXPRESSION'
 
 
 statement_type_map = {
@@ -59,7 +60,8 @@ statement_type_map = {
     StatementType.POSTFIX_INCREMENT: 'POSTFIX_INCREMENT',
     StatementType.FOR_EXPRESSION: 'FOR_EXPRESSION',
     StatementType.NULL_EXPRESSION: 'NULL_EXPRESSION',
-    StatementType.THIS_EXPRESSION: 'THIS_EXPRESSION'
+    StatementType.THIS_EXPRESSION: 'THIS_EXPRESSION',
+    StatementType.SUPER_EXPRESSION: 'SUPER_EXPRESSION'
 }
 
 
@@ -488,17 +490,19 @@ class ASTComment(ASTNode):
 class ASTClassStatement(ASTNode):
     type = StatementType.CLASS_STATEMENT
 
-    def __init__(self, token=None, name=None, methods=None, attributes=None):
+    def __init__(self, token=None, name=None, methods=None, attributes=None, inherit_from=None):
         """
         @param token: the node's token
         @param name: ASTIdentifier, name of the class
         @param methods: list of ASTDefStatement
         @param attributes: list of ASTAssignStatement
+        @param inherit_from: list of parents the class inherits from
         """
         self.token = token
         self.name = name
         self.methods = methods
         self.attributes = attributes
+        self.inherit_from = inherit_from
 
     def token_literal(self):
         return self.token.literal
@@ -604,6 +608,22 @@ class ASTNullExpression(ASTNode):
 
 class ASTThisExpression(ASTNode):
     type = StatementType.THIS_EXPRESSION
+
+    def __init__(self, token=None):
+        """
+        @param token: the node's token
+        """
+        self.token = token
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)
+
+
+class ASTSuperExpression(ASTNode):
+    type = StatementType.SUPER_EXPRESSION
 
     def __init__(self, token=None):
         """
