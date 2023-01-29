@@ -490,6 +490,10 @@ class Evaluator(object):
             # this needs re-written, looks crappy
             return evaluated
 
+        evaluated = self.eval_socket_object_method(node, env)
+        if evaluated:
+            return evaluated
+
         if node.owner.type == StatementType.THIS_EXPRESSION:
             if node.is_method:
                 # should this be env or env.store?
@@ -543,6 +547,16 @@ class Evaluator(object):
                     content = args_objs[0].value
                     write_file_content(owner.filename, content)
                     return NULLOBJECT
+        else:
+            return None
+
+    def eval_socket_object_method(self, node, env):
+        # TODO: check and fix this
+        if node.owner.type != StatementType.IDENTIFIER:
+            return None
+        owner = env.get(node.owner.value)
+        if owner.type == ObjectType.SOCKET:
+            return NULLOBJECT
         else:
             return None
 
