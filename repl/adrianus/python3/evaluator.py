@@ -302,13 +302,17 @@ class Evaluator(object):
 
     def apply_function(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:
+            if len(func.parameters) != len(args_objs):
+                return Ad_Error_Object("function signature unrecognized, different number of params")
             extended_env = self.extend_function_env(func, args_objs)
             evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
         if func.type == ObjectType.BUILTIN:
+            # TODO: add builting number of parameters validation
             return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
             # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
         if func.type == ObjectType.CLASS:
+            # TODO: update this with java version
             instance_environment = new_environment()
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
             for attribute in func.attributes:
@@ -507,21 +511,23 @@ class Evaluator(object):
                 # should this be env or env.store ?
                 evaluated = self.eval(node.member, env)
             return evaluated
-
-        if node.is_method:
-            klass_instance = env.get(node.owner.value)
-            klass_method = klass_instance.instance_environment.get(node.member.value)
-            args_objs = self.eval_expressions(node.arguments, env)
-            if len(args_objs) == 1 and self.is_error(args_objs[0]):
-                return args_objs[0]
-            klass_environment = klass_instance.instance_environment
-            klass_environment.outer = env
-            return self.apply_method(klass_method, args_objs, klass_environment)
+        elif node.owner.type == StatementType.SUPER_EXPRESSION:
+            pass
         else:
-            klass_instance = env.get(node.owner.value)
-            klass_environment = klass_instance.instance_environment
-            klass_environment.outer = env
-            evaluated = self.eval(node.member, klass_environment)
+            if node.is_method:
+                klass_instance = env.get(node.owner.value)
+                klass_method = klass_instance.instance_environment.get(node.member.value)
+                args_objs = self.eval_expressions(node.arguments, env)
+                if len(args_objs) == 1 and self.is_error(args_objs[0]):
+                    return args_objs[0]
+                klass_environment = klass_instance.instance_environment
+                klass_environment.outer = env
+                return self.apply_method(klass_method, args_objs, klass_environment)
+            else:
+                klass_instance = env.get(node.owner.value)
+                klass_environment = klass_instance.instance_environment
+                klass_environment.outer = env
+                evaluated = self.eval(node.member, klass_environment)
         return evaluated
 
     def eval_recursive_member_access_call(self, node ,env):
