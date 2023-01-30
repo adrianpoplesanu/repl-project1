@@ -40,7 +40,8 @@ def append_builtin(args, env):
         list_obj.elements.append(obj)
 
 def context_builtin(args, env):
-    print (env)
+    result = Ad_String_Object(str(env))
+    return result
 
 def pop_builtin(args, env):
     result = None
@@ -130,32 +131,32 @@ def thread_builtin(args, env):
     pass
 
 builtins_map = {
-    "len": Ad_Builtin_Object(len_builtin),
-    "exit": Ad_Builtin_Object(exit_builtin),
-    "print": Ad_Builtin_Object(print_builtin),
-    "ref_count": Ad_Builtin_Object(ref_count_builtin),
-    "type": Ad_Builtin_Object(type_builtin),
-    "__append": Ad_Builtin_Object(append_builtin),
-    "__pop": Ad_Builtin_Object(pop_builtin),
-    "__remove": Ad_Builtin_Object(remove_builtin),
-    "__lower": Ad_Builtin_Object(lower_builtin),
-    "__upper": Ad_Builtin_Object(upper_builtin),
-    "context": Ad_Builtin_Object(context_builtin),
-    "__iofile": Ad_Builtin_Object(iofile_builtin),
-    "__syssystem": Ad_Builtin_Object(syssystem_builtin),
-    "__iosocket": Ad_Builtin_Object(iosocket_builtin),
-    "eval": Ad_Builtin_Object(eval_builtin),
-    "__first": Ad_Builtin_Object(first_builtin),
-    "__last": Ad_Builtin_Object(last_builtin),
-    "map": Ad_Builtin_Object(map_builtin),
-    "input": Ad_Builtin_Object(input_builtin),
-    "list": Ad_Builtin_Object(list_builtin),
-    "hash": Ad_Builtin_Object(hash_builtin),
-    "hasattr": Ad_Builtin_Object(hasattr_builtin),
-    "getattr": Ad_Builtin_Object(getattr_builtin),
-    "setattr": Ad_Builtin_Object(setattr_builtin),
-    "getattrs": Ad_Builtin_Object(getattrs_builtin),
-    "thread": Ad_Builtin_Object(thread_builtin),
+    "len": Ad_Builtin_Object(builtin_function=len_builtin),
+    "exit": Ad_Builtin_Object(builtin_function=exit_builtin),
+    "print": Ad_Builtin_Object(builtin_function=print_builtin),
+    "ref_count": Ad_Builtin_Object(builtin_function=ref_count_builtin),
+    "type": Ad_Builtin_Object(builtin_function=type_builtin),
+    "__append": Ad_Builtin_Object(builtin_function=append_builtin),
+    "__pop": Ad_Builtin_Object(builtin_function=pop_builtin),
+    "__remove": Ad_Builtin_Object(builtin_function=remove_builtin),
+    "__lower": Ad_Builtin_Object(builtin_function=lower_builtin),
+    "__upper": Ad_Builtin_Object(builtin_function=upper_builtin),
+    "context": Ad_Builtin_Object(builtin_function=context_builtin, accepted_parameters_size=[0]),
+    "__iofile": Ad_Builtin_Object(builtin_function=iofile_builtin),
+    "__syssystem": Ad_Builtin_Object(builtin_function=syssystem_builtin),
+    "__iosocket": Ad_Builtin_Object(builtin_function=iosocket_builtin),
+    "eval": Ad_Builtin_Object(builtin_function=eval_builtin),
+    "__first": Ad_Builtin_Object(builtin_function=first_builtin),
+    "__last": Ad_Builtin_Object(builtin_function=last_builtin),
+    "map": Ad_Builtin_Object(builtin_function=map_builtin),
+    "input": Ad_Builtin_Object(builtin_function=input_builtin),
+    "list": Ad_Builtin_Object(builtin_function=list_builtin),
+    "hash": Ad_Builtin_Object(builtin_function=hash_builtin),
+    "hasattr": Ad_Builtin_Object(builtin_function=hasattr_builtin),
+    "getattr": Ad_Builtin_Object(builtin_function=getattr_builtin),
+    "setattr": Ad_Builtin_Object(builtin_function=setattr_builtin),
+    "getattrs": Ad_Builtin_Object(builtin_function=getattrs_builtin),
+    "thread": Ad_Builtin_Object(builtin_function=thread_builtin),
     # https://www.w3schools.com/python/python_ref_keywords.asp
 	# https://www.w3schools.com/python/python_ref_functions.asp
 }

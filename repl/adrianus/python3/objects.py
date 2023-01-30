@@ -149,14 +149,19 @@ class Ad_Error_Object(Ad_Object):
 
 
 class Ad_Builtin_Object(Ad_Object):
+    # TODO: this needs to have a builtin_function which is actually a class
     type = ObjectType.BUILTIN
 
-    def __init__(self, builtin_function=None, env=None):
+    def __init__(self, builtin_function=None, env=None, accepted_parameters_size=None):
         """
         @param builtin_function: reference to a function
         """
         self.builtin_function = builtin_function
         self.env = env
+        if accepted_parameters_size:
+            self.accepted_parameters_size = accepted_parameters_size
+        else:
+            self.accepted_parameters_size = []
 
     def inspect(self):
         return str(self.builtin_function)

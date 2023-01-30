@@ -3,24 +3,36 @@ class Environment(object):
     def __init__(self):
         self.store = {}
         self.outer = None
+        self.bootstrap = None
         self.siblings = {}
 
     def check(self, key):
-        return key in self.store or (self.outer and key in self.outer.store)
+        return key in self.store or (self.outer and self.outer.check(key)) or (self.bootstrap and self.bootstrap.check(key))
 
     def get(self, key):
         if key in self.store:
             return self.store.get(key)
-        else:
-            if self.outer and key in self.outer.store:
-                return self.outer.store.get(key)
+        #else:
+        #    if self.outer and key in self.outer.store:
+        #        return self.outer.store.get(key)
+        if self.outer and self.outer.check(key):
+            return self.outer.get(key)
+        if self.bootstrap and self.bootstrap.check(key):
+            return self.bootstrap.get(key)
         return None
 
     def set(self, key, value):
-        if self.outer and key in self.outer.store:
-            self.outer.store[key] = value
-            return
-        self.store[key] = value
+        if key in self.store:
+            self.store[key] = value
+        else:
+            if self.outer and self.outer.check(key):
+                self.outer.set(key, value)
+            else:
+                self.store[key] = value
+        #if self.outer and key in self.outer.store:
+        #    self.outer.store[key] = value
+        #    return
+        #self.store[key] = value
 
     def set_local_param(self, key, value):
         self.store[key] = value

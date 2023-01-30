@@ -308,7 +308,8 @@ class Evaluator(object):
             evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
         if func.type == ObjectType.BUILTIN:
-            # TODO: add builting number of parameters validation
+            if func.accepted_parameters_size and (len(args_objs) not in func.accepted_parameters_size):
+                return Ad_Error_Object("builtin signature unrecognized, different number of params")
             return func.builtin_function(args_objs, env) # asta ar putea fi si func.builtin_function(*args_objs)
             # intrebarea e prefer sa pasez o lista de argumente catre bultin, sau argumente pozitionale, explodate in apelul functiei
         if func.type == ObjectType.CLASS:
@@ -317,19 +318,19 @@ class Evaluator(object):
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
             for attribute in func.attributes:
                 if attribute.type == StatementType.ASSIGN_STATEMENT:
-                    instance_environment.outer = store
+                    instance_environment.outer = env
                     evaluated = self.eval(attribute.value, klass_instance.instance_environment)
                     key = attribute.name.value
-                    klass_instance.instance_environment.set(key, evaluated)
+                    klass_instance.instance_environment.set_local_param(key, evaluated)
                 if attribute.type == StatementType.EXPRESSION_STATEMENT:
                     if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
                         instance_environment.outer = env
                         evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
                         key = attribute.expression.name.value
-                        klass_instance.instance_environment.set(key, evaluated)
+                        klass_instance.instance_environment.set_local_param(key, evaluated)
             for method in func.methods:
                 func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
-                klass_instance.instance_environment.set(method.name.value, func_obj)
+                klass_instance.instance_environment.set_local_param(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
             self.call_instance_constructor(klass_instance, args_objs, env)
             return klass_instance
@@ -361,12 +362,12 @@ class Evaluator(object):
     def extend_function_env(self, func, args_objs):
         extended = new_enclosed_environment(func.env)
         for i, param in enumerate(func.parameters):
-            extended.set(param.token_literal(), args_objs[i])
+            extended.set_local_param(param.token_literal(), args_objs[i])
         return extended
 
     def extend_method_env(self, func, args_objs, env):
         for i, param in enumerate(func.parameters):
-            env.set(param.token_literal(), args_objs[i])
+            env.set_local_param(param.token_literal(), args_objs[i])
 
     def eval_boolean_infix_expression(self, operator, left, right):
         left_val = left.value
