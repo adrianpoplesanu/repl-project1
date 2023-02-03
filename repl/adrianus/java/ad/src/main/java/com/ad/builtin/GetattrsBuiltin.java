@@ -23,7 +23,7 @@ public class GetattrsBuiltin extends AbstractBuiltin {
             if (target.getType() == ObjectTypeEnum.INSTANCE) {
                 AdClassInstance klassInstance = (AdClassInstance) target;
                 klassInstance.getEnvironment().populateGetattrs().stream().forEach(attrName -> elements.add(new AdStringObject(attrName)));
-                AdListObject result = new AdListObject(elements);
+                AdListObject result = new AdListObject(elements); // TODO: sort these
                 return result;
             }
             if (target.getType() == ObjectTypeEnum.CLASS) {
@@ -37,7 +37,7 @@ public class GetattrsBuiltin extends AbstractBuiltin {
                     String methodName = ((AstDefStatement) attrNode).getName().tokenLiteral();
                     elements.add(new AdStringObject(methodName));
                 });
-                AdListObject result = new AdListObject(elements);
+                AdListObject result = new AdListObject(elements); // TODO: sort these
                 return result;
             }
             return new AdErrorObject("getattrs can only be called on a class instance");
