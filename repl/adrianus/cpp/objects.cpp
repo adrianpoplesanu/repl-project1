@@ -269,6 +269,10 @@ std::string Ad_String_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Object* Ad_String_Object::copy() {
+    return new Ad_String_Object(value);
+}
+
 Ad_Error_Object::Ad_Error_Object() {
     type = OBJ_ERROR;
     ref_count = 0;
@@ -457,6 +461,20 @@ Ad_Object_Type Ad_Hash_Object::Type() {
 
 std::string Ad_Hash_Object::Hash() {
     return object_type_map[type] + Inspect();
+}
+
+Ad_Object* Ad_Hash_Object::copy() {
+    std::map<std::string, HashPair> newPairs;
+    for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+        std::string key = it->first;
+        Ad_Object* k = it->second.GetKey()->copy();
+        Ad_Object* v = it->second.GetValue()->copy();
+        HashPair hashPair(k, v);
+        newPairs.insert(std::make_pair(key, hashPair));
+    }
+
+    Ad_Hash_Object* new_object = new Ad_Hash_Object(newPairs);
+    return new_object;
 }
 
 Ad_Class_Object::Ad_Class_Object() {

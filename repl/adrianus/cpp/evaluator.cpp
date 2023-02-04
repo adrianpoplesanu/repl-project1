@@ -291,6 +291,9 @@ Ad_Object* Evaluator::EvalStringInfixExpression(std::string _operator, Ad_Object
     if (_operator == "==") {
         return NativeBoolToBooleanObject(left_val == right_val);
     }
+    if (_operator == "!=") {
+        return NativeBoolToBooleanObject(left_val != right_val);
+    }
     return NULL;
 }
 
