@@ -22,7 +22,8 @@ public class SysSystemBuiltin extends AbstractBuiltin {
             String bash_command = ((AdStringObject) command).getValue();
             ProcessBuilder processBuilder = new ProcessBuilder();
             if (isWindows) {
-                // TODO: implement this for windows
+                // TODO: test this on windows
+                processBuilder.command("cmd.exe", "/c", bash_command);
             } else {
                 processBuilder.command("bash", "-c", bash_command);
             }
