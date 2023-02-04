@@ -17,17 +17,20 @@ for test_file in test_files:
     proc.communicate()
 
     result_file = open('mem-results.log')
+    result_output = result_file.read()
 
-    if ' 0 leaks for 0 total leaked bytes.' not in result_file.read():
+    if ' 0 leaks for 0 total leaked bytes.' not in result_output:
         errors_detected = True
-        print ('\033[0;31mMEMORY ERROR!\033[0m')
-        print (test_file)
-    elif 'MEMORY ERROR!!!' in result_file.read():
+        print ('\033[0;31mMEMORY ERROR!\033[0m ### ' + test_file)
+        print (result_output)
+        print ("===============")
+    elif 'MEMORY ERROR!!!' in result_output:
         errors_detected = True
-        print ('\033[0;31mMEMORY ERROR!\033[0m')
-        print (test_file)
+        print ('\033[0;31mMEMORY ERROR!\033[0m @@@ ' + test_file)
+        print (result_output)
+        print ("===============")
     else:
-        print ('MEMORY OK!')
+        print ('MEMORY OK! ' + target)
 
     result_file.close()
 
