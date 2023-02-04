@@ -273,7 +273,7 @@ Ad_Object* getattrs_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return NULL;
 }
 
-Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environemtn *env) {
+Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return NULL;
 }
 
