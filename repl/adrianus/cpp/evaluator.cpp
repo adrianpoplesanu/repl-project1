@@ -940,21 +940,27 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
     if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
+            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            currentEnvironment->SetOuterEnvironment(old);
         }
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
+            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            currentEnvironment->SetOuterEnvironment(old);
         }
     }
 
     if (initialMemberAccess->type == ST_INDEX_EXPRESSION) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
+            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            currentEnvironment->SetOuterEnvironment(old);
         }
     }
     // end initialize env
@@ -972,7 +978,9 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
                     return obj2;
                 }
                 if (obj2->type == OBJ_INSTANCE) {
+                    Environment *old = currentEnvironment;
                     currentEnvironment = ((Ad_Class_Instance*) obj2)->instance_environment;
+                    currentEnvironment->SetOuterEnvironment(old);
                 }
             }
         } else {
@@ -984,7 +992,9 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
             }
 
             if (obj->type == OBJ_INSTANCE) {
+                Environment *old = currentEnvironment;
                 currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+                currentEnvironment->SetOuterEnvironment(old);
             }
         }
     }
@@ -1016,21 +1026,27 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
     if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
+            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            currentEnvironment->SetOuterEnvironment(old);
         }
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
+            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            currentEnvironment->SetOuterEnvironment(old);
         }
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
+            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+            currentEnvironment->SetOuterEnvironment(old);
         }
     }
     // end initialize env
@@ -1048,7 +1064,9 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
                     //return obj2;
                 }
                 if (obj2->type == OBJ_INSTANCE) {
+                    Environment *old = currentEnvironment;
                     currentEnvironment = ((Ad_Class_Instance*) obj2)->instance_environment;
+                    currentEnvironment->SetOuterEnvironment(old);
                 }
             }
         } else {
@@ -1060,7 +1078,9 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
             }
 
             if (obj->type == OBJ_INSTANCE) {
+                Environment *old = currentEnvironment;
                 currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
+                currentEnvironment->SetOuterEnvironment(old);
             }
         }
     }
