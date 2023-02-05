@@ -745,21 +745,27 @@ public class Evaluator {
 		if (initialMemberAccess.getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
 			AdObject obj = eval(initialMemberAccess, currentEnv);
 			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				Environment old = currentEnv;
 				currentEnv = ((AdClassInstance) obj).getEnvironment();
+				currentEnv.setOuter(old);
 			}
 		}
 
 		if (initialMemberAccess.getType() == AstNodeTypeEnum.IDENTIFIER) {
 			AdObject obj = eval(initialMemberAccess, currentEnv);
 			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				Environment old = currentEnv;
 				currentEnv = ((AdClassInstance) obj).getEnvironment();
+				currentEnv.setOuter(old);
 			}
 		}
 
 		if (initialMemberAccess.getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
 			AdObject obj = eval(initialMemberAccess, currentEnv);
 			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				Environment old = currentEnv;
 				currentEnv = ((AdClassInstance) obj).getEnvironment();
+				currentEnv.setOuter(old);
 			}
 		}
 		// end initialize env
@@ -778,7 +784,9 @@ public class Evaluator {
 						// maybe break here?
 					}
 					if (obj2.getType() == ObjectTypeEnum.INSTANCE) {
+						Environment old = currentEnv;
 						currentEnv = ((AdClassInstance) obj2).getEnvironment();
+						currentEnv.setOuter(old);
 					}
 				}
 			} else {
@@ -790,7 +798,9 @@ public class Evaluator {
 					// maybe break here?
 				}
 				if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+					Environment old = currentEnv;
 					currentEnv = ((AdClassInstance) obj).getEnvironment();
+					currentEnv.setOuter(old);
 				}
 			}
 		}
@@ -1021,21 +1031,27 @@ public class Evaluator {
 		if (initialMemberAccess.getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
 			AdObject obj = eval(initialMemberAccess, currentEnv);
 			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				Environment old = currentEnv;
 				currentEnv = ((AdClassInstance) obj).getEnvironment();
+				currentEnv.setOuter(old);
 			}
 		}
 
 		if (initialMemberAccess.getType() == AstNodeTypeEnum.IDENTIFIER) {
 			AdObject obj = eval(initialMemberAccess, currentEnv);
 			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				Environment old = currentEnv;
 				currentEnv = ((AdClassInstance) obj).getEnvironment();
+				currentEnv.setOuter(old);
 			}
 		}
 
 		if (initialMemberAccess.getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
 			AdObject obj = eval(initialMemberAccess, currentEnv);
 			if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+				Environment old = currentEnv;
 				currentEnv = ((AdClassInstance) obj).getEnvironment();
+				currentEnv.setOuter(old);
 			}
 		}
 		// end initialize env
@@ -1053,7 +1069,9 @@ public class Evaluator {
 						return obj2;
 					}
 					if (obj2.getType() == ObjectTypeEnum.INSTANCE) {
+						Environment old = currentEnv;
 						currentEnv = ((AdClassInstance) obj2).getEnvironment();
+						currentEnv.setOuter(old);
 					}
 				}
 			} else {
@@ -1064,7 +1082,9 @@ public class Evaluator {
 					return obj;
 				}
 				if (obj.getType() == ObjectTypeEnum.INSTANCE) {
+					Environment old = currentEnv;
 					currentEnv = ((AdClassInstance) obj).getEnvironment();
+					currentEnv.setOuter(old);
 				}
 			}
 		}
