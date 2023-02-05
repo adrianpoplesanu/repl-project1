@@ -3,6 +3,7 @@
 GarbageCollector::GarbageCollector() {
     head = NULL;
     tail = NULL;
+    mainEnv = NULL;
 }
 
 GarbageCollector::~GarbageCollector() {
@@ -85,17 +86,12 @@ void GarbageCollector::markObjects() {
     }
 
     if (mainEnv != NULL) {
-        std::cout << "aaa\n";
         for (std::map<std::string, Ad_Object*>::iterator it = mainEnv->store.begin(); it != mainEnv->store.end(); ++it) {
-            std::cout << "bbb\n";
-            std::cout << it->first << "\n";
-            //markObject(it->second);
+            markObject(it->second);
         }
     } else {
-        std::cout << "oops!!! nu am environment principal\n";
+        //std::cout << "oops!!! nu am environment principal\n";
     }
-
-    std::cout << "ccc\n";
     
     // for each entry in all environment visit all the objects and mark them
     for (Environment *env : gc_environments) {
@@ -226,6 +222,7 @@ void GarbageCollector::sweepObjects() {
         if (target) {
             // free the object
             std::cout << "ar trebui sa sterg un obiect " << object_type_map[target->type] << "\n";
+            //std::cout << target->Inspect() << "\n"; // asta merge daca nu fac free inainte cu metoda veche
         }
     }
 }
