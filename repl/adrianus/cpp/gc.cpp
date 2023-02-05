@@ -1,7 +1,8 @@
 #include "gc.h"
 
 GarbageCollector::GarbageCollector() {
-    //...
+    head = NULL;
+    tail = NULL;
 }
 
 GarbageCollector::~GarbageCollector() {
@@ -61,4 +62,170 @@ void GarbageCollector::consumeScheduledDECREFEnvironments() {
         Ad_DECREF(env);
     }
     scheduled_to_DECREF_environments.clear();
+}
+
+void GarbageCollector::addObject(Ad_Object* obj) {
+    if (head == NULL) {
+        head = tail = obj;
+        obj->prev = NULL;
+        obj->next = NULL;
+    } else {
+        tail->next = obj;
+        obj->prev = tail;
+        obj->next = NULL;
+        tail = obj;
+    }
+}
+
+void GarbageCollector::markObjects() {
+    Ad_Object* iter = head;
+    while (iter != NULL) {
+        iter->marked = false;
+        iter = iter->next;
+    }
+
+    if (mainEnv != NULL) {
+        std::cout << "aaa\n";
+        for (std::map<std::string, Ad_Object*>::iterator it = mainEnv->store.begin(); it != mainEnv->store.end(); ++it) {
+            std::cout << "bbb\n";
+            std::cout << it->first << "\n";
+            //markObject(it->second);
+        }
+    } else {
+        std::cout << "oops!!! nu am environment principal\n";
+    }
+
+    std::cout << "ccc\n";
+    
+    // for each entry in all environment visit all the objects and mark them
+    for (Environment *env : gc_environments) {
+        for(std::map<std::string, Ad_Object*>::iterator it = env->store.begin(); it != env->store.end(); ++it) {
+            markObject(it->second);
+        }
+    }
+}
+
+void GarbageCollector::markObject(Ad_Object* obj) {
+    if (obj->marked) return;
+    switch (obj->type) {
+        case OBJ_NULL: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_INT: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_FLOAT: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_BOOL: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_STRING: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_RETURN_VALUE: {
+            obj->marked = true;
+            markObject(((Ad_ReturnValue_Object*)obj)->value);
+            break;
+        }
+        case OBJ_FUNCTION: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_ERROR: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_BUILTIN: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_SIGNAL: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_LIST: {
+            obj->marked = true;
+            Ad_List_Object *listObject = (Ad_List_Object*) obj;
+            for (std::vector<Ad_Object*>::iterator it = listObject->elements.begin() ; it != listObject->elements.end(); ++it) {
+                markObject(*it);
+            }
+            break;
+        }
+        case OBJ_HASH: {
+            obj->marked = true;
+            Ad_Hash_Object *hashObject = (Ad_Hash_Object*) obj;
+            for(std::map<std::string, HashPair>::iterator it = hashObject->pairs.begin(); it != hashObject->pairs.end(); it++) {
+                markObject(it->second.GetKey());
+                markObject(it->second.GetValue());
+            }
+            break;
+        }
+        case OBJ_CLASS: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_INSTANCE: {
+            obj->marked = true;
+            Ad_Class_Instance *instanceObject = (Ad_Class_Instance*) obj;
+            markObject(instanceObject->klass_object);
+            break;
+        }
+        case OBJ_FILE: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_SOCKET: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_BREAK: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_CONTINUE: {
+            obj->marked = true;
+            break;
+        }
+
+        default: {
+            std::cout << "MEMORY ERROR!!! garbage collection inconsistency!\n";
+            break;
+        }
+    }
+}
+
+void GarbageCollector::sweepObjects() {
+    Ad_Object* iter = head;
+    while(iter != NULL) {
+        Ad_Object *target = NULL;
+        if (!iter->marked) {
+            if (iter == head && iter == tail) {
+                head = NULL;
+                tail = NULL;
+            } else if (iter == head) {
+                head = iter->next;
+                head->prev = NULL;
+            } else if (iter == tail) {
+                tail = tail->prev;
+                tail->next = NULL;
+            } else {
+                Ad_Object *p = iter->prev;
+                Ad_Object *n = iter->next;
+                p->next = n;
+                n->prev = p;
+            }
+            target = iter;
+        }
+        iter = iter->next;
+        if (target) {
+            // free the object
+            std::cout << "ar trebui sa sterg un obiect " << object_type_map[target->type] << "\n";
+        }
+    }
 }

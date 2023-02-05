@@ -32,6 +32,7 @@ Ad_Object* Ad_Object::copy() {
 Ad_Null_Object::Ad_Null_Object() {
     type = OBJ_NULL;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Null_Object::~Ad_Null_Object() {
@@ -57,11 +58,13 @@ std::string Ad_Null_Object::Hash() {
 Ad_Integer_Object::Ad_Integer_Object() {
     type = OBJ_INT;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Integer_Object::Ad_Integer_Object(int v) {
     type = OBJ_INT;
     ref_count = 0;
+    marked = false;
     value = v;
 }
 
@@ -131,6 +134,7 @@ Ad_Object* Ad_Float_Object::copy() {
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {
     type = OBJ_RETURN_VALUE;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_ReturnValue_Object::~Ad_ReturnValue_Object() {
@@ -160,11 +164,13 @@ std::string Ad_ReturnValue_Object::Hash() {
 Ad_Boolean_Object::Ad_Boolean_Object() {
     type = OBJ_BOOL;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Boolean_Object::Ad_Boolean_Object(bool v) {
     type = OBJ_BOOL;
     ref_count = 0;
+    marked = false;
     value = v;
 }
 
@@ -193,11 +199,13 @@ std::string Ad_Boolean_Object::Hash() {
 Ad_Function_Object::Ad_Function_Object() {
     type = OBJ_FUNCTION;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, Ad_AST_Node* b, Environment* e) {
     type = OBJ_FUNCTION;
     ref_count = 0;
+    marked = false;
     params = p;
     body = b;
     env = e;
@@ -245,11 +253,13 @@ std::string Ad_Function_Object::Hash() {
 Ad_String_Object::Ad_String_Object() {
     type = OBJ_STRING;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_String_Object::Ad_String_Object(std::string val) {
     type = OBJ_STRING;
     ref_count = 0;
+    marked = false;
     value = val;
 }
 
@@ -276,11 +286,13 @@ Ad_Object* Ad_String_Object::copy() {
 Ad_Error_Object::Ad_Error_Object() {
     type = OBJ_ERROR;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Error_Object::Ad_Error_Object(std::string m) {
     type = OBJ_ERROR;
     ref_count = 0;
+    marked = false;
     message = m;
 }
 
@@ -305,17 +317,20 @@ std::string Ad_Error_Object::Hash() {
 Ad_Builtin_Object::Ad_Builtin_Object() {
     type = OBJ_BUILTIN;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Builtin_Object::Ad_Builtin_Object(BuiltinFunction bf) {
     type = OBJ_BUILTIN;
     ref_count = 0;
+    marked = false;
     builtin_function = bf;
 }
 
 Ad_Builtin_Object::Ad_Builtin_Object(BuiltinFunction bf, std::vector<int> anoa) {
     type = OBJ_BUILTIN;
     ref_count = 0;
+    marked = false;
     builtin_function = bf;
     acceptedNumbersOfArguments = anoa;
 }
@@ -343,6 +358,7 @@ std::string Ad_Builtin_Object::Hash() {
 Ad_Signal_Object::Ad_Signal_Object() {
     type = OBJ_SIGNAL;
     ref_count = 0;
+    marked = false;
 }
 
 std::string Ad_Signal_Object::Inspect() {
@@ -364,12 +380,14 @@ std::string Ad_Signal_Object::Hash() {
 Ad_List_Object::Ad_List_Object() {
     type = OBJ_LIST;
     ref_count = 0;
+    marked = false;
     //elements = new Ad_List();
 }
 
 Ad_List_Object::Ad_List_Object(std::vector<Ad_Object*> e) {
     type = OBJ_LIST;
     ref_count = 0;
+    marked = false;
     elements = e;
     // this is not efficient
     for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
@@ -422,11 +440,13 @@ Ad_Object* Ad_List_Object::copy() {
 Ad_Hash_Object::Ad_Hash_Object() {
     type = OBJ_HASH;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, HashPair> p) {
     type = OBJ_HASH;
     ref_count = 0;
+    marked = false;
     pairs = p;
 }
 
@@ -480,12 +500,14 @@ Ad_Object* Ad_Hash_Object::copy() {
 Ad_Class_Object::Ad_Class_Object() {
     type = OBJ_CLASS;
     ref_count = 0;
+    marked = false;
     attemptASTNodesDeletion = false;
 }
 
 Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
     type = OBJ_CLASS;
     ref_count = 0;
+    marked = false;
     attemptASTNodesDeletion = false;
     methods = m;
     for (std::vector<Ad_AST_Node*>::iterator it = methods.begin() ; it != methods.end(); ++it) {
@@ -502,6 +524,7 @@ Ad_Class_Object::Ad_Class_Object(std::vector<Ad_AST_Node*> m, std::vector<Ad_AST
 Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*> a) {
     type = OBJ_CLASS;
     ref_count = 0;
+    marked = false;
     attemptASTNodesDeletion = false;
     name = n;
     Ad_INCREF(name);
@@ -520,6 +543,7 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
 Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, std::vector<Ad_AST_Node*>a, Ad_AST_Node* c) {
     type = OBJ_CLASS;
     ref_count = 0;
+    marked = false;
     attemptASTNodesDeletion = false;
     class_ast_node = c;
     Ad_INCREF(class_ast_node);
@@ -604,11 +628,13 @@ std::string Ad_Class_Object::Hash() {
 Ad_Class_Instance::Ad_Class_Instance() {
     type = OBJ_INSTANCE;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Class_Instance::Ad_Class_Instance(Ad_Object* ko, Environment* env) {
     type = OBJ_INSTANCE;
     ref_count = 0;
+    marked = false;
     klass_object = ko;
     instance_environment = env;
 }
@@ -616,6 +642,7 @@ Ad_Class_Instance::Ad_Class_Instance(Ad_Object* ko, Environment* env) {
 Ad_Class_Instance::Ad_Class_Instance(std::string n, Ad_Object* ko, Environment* env) {
     type = OBJ_INSTANCE;
     ref_count = 0;
+    marked = false;
     name = n;
     klass_object = ko;
     instance_environment = env;
@@ -648,11 +675,13 @@ std::string Ad_Class_Instance::Hash() {
 Ad_File_Object::Ad_File_Object() {
     type = OBJ_FILE;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_File_Object::Ad_File_Object(std::string f, std::string o) {
     type = OBJ_FILE;
     ref_count = 0;
+    marked = false;
     filename = f;
     _operator = o;
 }
@@ -682,6 +711,7 @@ std::string Ad_File_Object::Hash() {
 Ad_Break_Object::Ad_Break_Object() {
     type = OBJ_BREAK;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Break_Object::~Ad_Break_Object() {
@@ -707,6 +737,7 @@ std::string Ad_Break_Object::Hash() {
 Ad_Continue_Object::Ad_Continue_Object() {
     type = OBJ_CONTINUE;
     ref_count = 0;
+    marked = false;
 }
 
 Ad_Continue_Object::~Ad_Continue_Object() {
@@ -732,17 +763,20 @@ std::string Ad_Continue_Object::Hash() {
 Ad_Socket_Object::Ad_Socket_Object() {
     type = OBJ_SOCKET;
     ref_count = 0;
+    marked = false;
 }
 
 /*Ad_Socket_Object::Ad_Socket_Object(std::string n) {
     type = OBJ_SOCKET;
     ref_count = 0;
+    marked = false;
     name = n;
 }
 
 Ad_Socket_Object::Ad_Socket_Object(std::string n, int p) {
     type = OBJ_SOCKET;
     ref_count = 0;
+    marked = false;
     name = n;
     port = p;
 }*/
@@ -750,6 +784,7 @@ Ad_Socket_Object::Ad_Socket_Object(std::string n, int p) {
 Ad_Socket_Object::Ad_Socket_Object(std::string n, int p, bool a, bool f, bool c, bool s) {
     type = OBJ_SOCKET;
     ref_count = 0;
+    marked = false;
     name = n;
     port = p;
     isActive = a;

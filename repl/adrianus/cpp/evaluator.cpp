@@ -43,6 +43,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_INTEGER: {
             Ad_Integer_Object* obj = new Ad_Integer_Object();
             obj->value = ((Ad_AST_Integer*)node)->value;
+            garbageCollector.addObject(obj);
             return obj;
         }
         break;
@@ -179,6 +180,8 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         // OBJ_BUILTINS get destroyed on termination by free_builtin_map
         //std::cout << statement_type_map[obj->type] << "\n";
         GarbageCollectEnvironments(); // commented this because garbage collecting after each statement might clear the environment before all the statements in the block got evaluated
+        garbageCollector.markObjects();
+        garbageCollector.sweepObjects();
     }
     return NULL;
 }

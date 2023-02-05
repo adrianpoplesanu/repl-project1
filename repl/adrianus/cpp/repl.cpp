@@ -33,6 +33,7 @@ void Repl::Loop() {
     env2 = newEnvironment();
     env2->SetBootstrapEnvironment(bootstrap);
     env2->isGlobalEnvironment = true;
+    evaluator.garbageCollector.mainEnv = env2;
 
     IS_CONSOLE_RUN = true;
 
@@ -59,6 +60,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
     env2 = newEnvironment();
     env2->SetBootstrapEnvironment(bootstrap);
     env2->isGlobalEnvironment = true;
+    evaluator.garbageCollector.mainEnv = env2;
     if (target.is_open()) {
         std::string line;
         std::string text;

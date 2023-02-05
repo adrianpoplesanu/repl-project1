@@ -58,6 +58,9 @@ public:
 	Ad_Object_Type type;
 	unsigned int num_octets;
 	unsigned int ref_count;
+	bool marked;
+	Ad_Object* next;
+	Ad_Object* prev;
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();

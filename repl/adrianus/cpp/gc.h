@@ -12,6 +12,10 @@ public:
     std::vector<Ad_Object*> gc_objects;
     std::vector<Ad_AST_Node*> gc_ast_nodes;
 
+    Environment* mainEnv;
+    Ad_Object* head;
+    Ad_Object* tail;
+
     GarbageCollector();
     ~GarbageCollector();
     void addEnvironment(Environment*);
@@ -21,6 +25,8 @@ public:
     void clearObjects();
     void clearAstNodes();
     void sweepEnvironments();
+    void markObjects();
+    void markObject(Ad_Object*);
     void sweepObjects();
     void sweepAstNodes();
     void forceFreeEnvironments();
