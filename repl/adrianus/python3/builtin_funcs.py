@@ -40,8 +40,10 @@ def append_builtin(args, env):
         list_obj.elements.append(obj)
 
 def context_builtin(args, env):
-    result = Ad_String_Object(str(env))
-    return result
+    print (env.print_store(0))
+    #result = Ad_String_Object(str(env))
+    #return result
+    return None
 
 def pop_builtin(args, env):
     result = None

@@ -52,8 +52,29 @@ class Environment(object):
         return self.store["constructor"]
 
     def print_store(self, level):
-        # TODO: implement this
-        pass
+        out = ""
+        if level != 0:
+            out += "\n"
+        k = 0
+        offset = ''
+        while k < level:
+            offset += ' '
+            k += 1
+        out += offset
+        out = "store: {"
+        size = len(self.store)
+        for i, key in enumerate(self.store.keys()):
+            if i < size - 1:
+                out += key + ": " + self.store[key].inspect() + ", "
+            else:
+                out += key + ": " + self.store[key].inspect()
+        out += "}\n"
+        out += offset
+        out += "outer: {"
+        if self.outer:
+            out += self.outer.print_store(self.outer, level + 4)
+        out += "}"
+        return out
 
     def __str__(self):
         out = "[Env] store: " + str(self.store) + "\n"
