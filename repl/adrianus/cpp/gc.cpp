@@ -131,6 +131,7 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
         case OBJ_FUNCTION: {
             obj->marked = true;
+            // TODO: need to figure out what to do with the body AST Node and params AST Nodes
             break;
         }
         case OBJ_ERROR: {
@@ -164,10 +165,12 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
         case OBJ_CLASS: {
             obj->marked = true;
+            // TODO: i need to determine what to do with the ASTNodes contained in class object
             break;
         }
         case OBJ_INSTANCE: {
             obj->marked = true;
+            // TODO: i need to determine what to do with the contained Environment* object
             Ad_Class_Instance *instanceObject = (Ad_Class_Instance*) obj;
             markObject(instanceObject->klass_object);
             break;
@@ -196,6 +199,14 @@ void GarbageCollector::markObject(Ad_Object* obj) {
     }
 }
 
+void GarbageCollector::unmarkAllObjects() {
+    Ad_Object* iter = head;
+    while (iter != NULL) {
+        iter->marked = false;
+        iter = iter->next;
+    }
+}
+
 void GarbageCollector::sweepObjects() {
     Ad_Object* iter = head;
     while(iter != NULL) {
@@ -221,8 +232,14 @@ void GarbageCollector::sweepObjects() {
         iter = iter->next;
         if (target) {
             // free the object
-            std::cout << "ar trebui sa sterg un obiect " << object_type_map[target->type] << "\n";
+            //std::cout << "ar trebui sa sterg un obiect " << object_type_map[target->type] << "\n";
+            free_Ad_Object_memory(target);
             //std::cout << target->Inspect() << "\n"; // asta merge daca nu fac free inainte cu metoda veche
         }
     }
+}
+
+void GarbageCollector::forceFreeObjects() {
+    unmarkAllObjects();
+    sweepObjects();
 }

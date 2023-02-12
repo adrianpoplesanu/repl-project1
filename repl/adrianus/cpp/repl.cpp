@@ -47,6 +47,7 @@ void Repl::Loop() {
         }
     }
     evaluator.GarbageCollectEnvironments();
+    evaluator.garbageCollector.forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();
 }
 
@@ -81,6 +82,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
     }
     target.close();
     evaluator.GarbageCollectEnvironments();
+    evaluator.garbageCollector.forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();
 }
 

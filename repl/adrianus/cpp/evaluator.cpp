@@ -43,7 +43,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_INTEGER: {
             Ad_Integer_Object* obj = new Ad_Integer_Object();
             obj->value = ((Ad_AST_Integer*)node)->value;
-            garbageCollector.addObject(obj);
+            //garbageCollector.addObject(obj); // this needs to be added everywhere new Ad_Object is declared
             return obj;
         }
         break;
@@ -174,6 +174,8 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         if (result != NULL && result->Type() == OBJ_ERROR) {
             free_Ad_Object_memory(result);
+            garbageCollector.markObjects();
+            garbageCollector.sweepObjects();
             return NULL;
         }
         if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result); // TODO: remove OBJ_BUILTIN check and use ref_count

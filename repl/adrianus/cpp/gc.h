@@ -27,6 +27,7 @@ public:
     void sweepEnvironments();
     void markObjects();
     void markObject(Ad_Object*);
+    void unmarkAllObjects();
     void sweepObjects();
     void sweepAstNodes();
     void forceFreeEnvironments();
