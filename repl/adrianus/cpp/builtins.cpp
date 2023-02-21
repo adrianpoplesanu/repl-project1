@@ -2,43 +2,53 @@
 #include "signal.h"
 #include "environment.h"
 #include <stdio.h>
+#include "gc.h"
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
 //Ad_Null_Object NULLOBJECT;
 
-Ad_Object* len_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* len_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     // toate builtinurile cred ca ar trebui sa primeasca o lista de argumente, ca sa fie unitate in antet
     Ad_Object* obj = args[0];
     if (obj->Type() == OBJ_STRING) {
         Ad_String_Object* string_obj = (Ad_String_Object*) obj;
         int length = string_obj->value.length();
         free_builtin_arguments(args);
-        return new Ad_Integer_Object(length);
+        Ad_Object* result = new Ad_Integer_Object(length);
+        gc->addObject(result);
+        return result;
     }
     if (obj->Type() == OBJ_LIST) {
         Ad_List_Object* list_obj = (Ad_List_Object*) obj;
         int length = list_obj->elements.size();
         free_builtin_arguments(args);
-        return new Ad_Integer_Object(length);
+        Ad_Object* result = new Ad_Integer_Object(length);
+        gc->addObject(result);
+        return result;
     }
     if (obj->Type() == OBJ_HASH) {
         free_builtin_arguments(args);
-        return new Ad_Integer_Object(0);
+        Ad_Object* result = new Ad_Integer_Object(0);
+        gc->addObject(result);
+        return result;
     }
     free_builtin_arguments(args);
-    return new Ad_Integer_Object(0);
+    Ad_Object* result = new Ad_Integer_Object(0);
+    gc->addObject(result);
+    return result;
 }
 
-Ad_Object* exit_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* exit_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     // TODO: i need to free all args, cred ca toate builtin-urile care primesc args, ar trebui sa faca un free pe ele
     free_builtin_arguments(args);
     Ad_Signal_Object* signal = new Ad_Signal_Object();
+    gc->addObject(signal);
     signal->signal_type = SIGNAL_EXIT;
     return signal;
 }
 
-Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_Object* obj = args[0];
     if (obj == NULL) {
         // this should print null, but maybe the upstream should return an Ad_Null_Objject
@@ -50,13 +60,14 @@ Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return NULL;
 }
 
-Ad_Object* ref_count(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* ref_count(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_Object* target = args[0];
     Ad_Integer_Object* obj = new Ad_Integer_Object(target->ref_count);
+    gc->addObject(obj);
     return obj;
 }
 
-Ad_Object* type_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* type_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_Object* target = args[0];
     std::string type;
     switch (target->Type()) {
@@ -104,10 +115,11 @@ Ad_Object* type_builtin(std::vector<Ad_Object*> args, Environment* env) {
         break;
     }
     Ad_String_Object* obj = new Ad_String_Object(type);
+    gc->addObject(obj);
     return obj; // TODO: check for potential memory leak
 }
 
-Ad_Object* append_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* append_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_List_Object* target = (Ad_List_Object*)args[0];
     Ad_Object* obj = args[1];
     //Ad_INCREF(obj); // in EvalExpressions din List Object evaluator asta nu e apelat, pentru ca atata timp cat nu se dezaloca ListObject nu se apeleaza free_Ad_Object_memory
@@ -115,42 +127,44 @@ Ad_Object* append_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return NULL;
 }
 
-Ad_Object* pop_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* pop_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* remove_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* remove_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* upper_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* upper_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* lower_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* lower_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     env->PrintStore(0);
     return NULL;
 }
 
-Ad_Object* __iofile_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* __iofile_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_String_Object* filename1 = (Ad_String_Object*) args[0];
     Ad_String_Object* _operator1 = (Ad_String_Object*) args[1];
     Ad_File_Object* obj = new Ad_File_Object(filename1->value, _operator1->value);
+    gc->addObject(obj);
     return obj;
 }
 
-Ad_Object* system_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* system_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_String_Object* command_argument = (Ad_String_Object*) args[0];
     system(command_argument->value.c_str());
     Ad_String_Object* obj = new Ad_String_Object("bla bla bli");
+    gc->addObject(obj);
     return obj;
 }
 
-Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     Ad_String_Object* command_argument = (Ad_String_Object*) args[0];
     std::string result = "";
 
@@ -170,11 +184,13 @@ Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env) {
 
     pclose(fpipe);
     Ad_String_Object* obj = new Ad_String_Object(result);
+    gc->addObject(obj);
     return obj;
 }
 
-Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_Socket_Object* socketObject = new Ad_Socket_Object();
+    // TODO: add socketObject to gc
     Ad_String_Object* nameObject = (Ad_String_Object*) args[0];
     Ad_Integer_Object* portObject = (Ad_Integer_Object*) args[1];
     Ad_Boolean_Object* isActiveObject = (Ad_Boolean_Object*) args[2];
@@ -191,37 +207,41 @@ Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env) {
     return socketObject;
 }
 
-Ad_Object* eval_builtin(std::vector<Ad_Object*> args, Environment* env) {
+Ad_Object* eval_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* first_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* first_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* last_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* last_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* map_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* map_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* input_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* input_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     // TODO: add params to input function for printing something before inputting, if no params just silently wait
     std::string line;
     std::getline(std::cin, line);
     Ad_String_Object* obj = new Ad_String_Object(line);
+    gc->addObject(obj);
     return obj;
 }
 
-Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     //std::cout << args.size() << "\n";
     if (args.size() == 0) {
-        return new Ad_List_Object();
+        Ad_Object* result = new Ad_List_Object();
+        gc->addObject(result);
+        return result;
     }
     if (args.size() == 1) {
         Ad_List_Object* list_object = new Ad_List_Object();
+        // TODO: add list_object to gc
         int size = ((Ad_Integer_Object*) args[0])->value;
         //std::cout << size << "\n";
         for (int i = 0; i < size; i++) {
@@ -232,10 +252,12 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
     }
     if (args.size() == 2) {
         Ad_List_Object* list_object = new Ad_List_Object();
+        gc->addObject(list_object);
         int size = ((Ad_Integer_Object*) args[0])->value;
         Ad_Object* default_object = args[1];
         for (int i = 0; i < size; i++) {
             Ad_Object* new_object = default_object->copy();
+            gc->addObject(new_object);
             Ad_INCREF(new_object);
             list_object->elements.push_back(new_object);
         }
@@ -245,7 +267,7 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return &NULLOBJECT;
 }
 
-Ad_Object* mat_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* mat_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     // no arg: [[]]
     // one arg: [[], [], ... , []]
     // two arg: [[null, ... null], ... , [null, ... null]]
@@ -253,27 +275,27 @@ Ad_Object* mat_builtin(std::vector<Ad_Object*> args, Environment *env) {
     return &NULLOBJECT;
 }
 
-Ad_Object* hash_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* hash_builtin(std::vector<Ad_Object*> args, Environment *en, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* hasattr_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* hasattr_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* getattr_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* getattr_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* setattr_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* setattr_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* getattrs_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* getattrs_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
-Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environment *env) {
+Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     return NULL;
 }
 
@@ -316,12 +338,14 @@ std::map<std::string, Ad_Object*> builtins_map = {
 void free_builtin_arguments(std::vector<Ad_Object*> args) {
     for (std::vector<Ad_Object*>::iterator it = args.begin() ; it != args.end(); ++it) {
         Ad_Object *obj = *it;
-        free_Ad_Object_memory(obj);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(obj);
     }
 }
 
 void free_builtin_map() {
     for (std::map<std::string, Ad_Object*>::iterator it = builtins_map.begin(); it != builtins_map.end(); ++it) {
-        free_Ad_Object_memory(it->second);
+        // TODO: mark and sweep cleanup
+        free_Ad_Object_memory(it->second); // i need to find a way to do this with gc
     }
 }

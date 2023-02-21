@@ -24,11 +24,13 @@ void test_simple_list_object() {
     std::cout << list->Size() << " " << list->Capacity() << "\n";
 
     Ad_Object *res = list->Remove(0);
+    // TODO: figure this deallocation outside of gc
     free_Ad_Object_memory(res);
 
     list->Print();
 
     res = list->Remove(0);
+    // TODO: figure this deallocation outside of gc
     free_Ad_Object_memory(res);
 
     list->Print();

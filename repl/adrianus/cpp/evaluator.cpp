@@ -27,6 +27,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_RETURN_STATEMENT: {
             Ad_Object* val = Eval(((Ad_AST_ReturnStatement*)node)->value, env);
             Ad_ReturnValue_Object* obj = new Ad_ReturnValue_Object();
+            garbageCollector.addObject(obj);
             obj->value = val;
             return obj;
         }
@@ -42,6 +43,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_INTEGER: {
             Ad_Integer_Object* obj = new Ad_Integer_Object();
+            garbageCollector.addObject(obj);
+            std::cout << "adding an integer to gc\n";
             obj->value = ((Ad_AST_Integer*)node)->value;
             //garbageCollector.addObject(obj); // this needs to be added everywhere new Ad_Object is declared
             return obj;
@@ -58,8 +61,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             Ad_Object* left = Eval(((Ad_AST_InfixExpression*)node)->left, env);
             Ad_Object* right = Eval(((Ad_AST_InfixExpression*)node)->right, env);
             Ad_Object* result = EvalInfixExpression(((Ad_AST_InfixExpression*)node)->_operator, left, right);
-            free_Ad_Object_memory(right);
-            free_Ad_Object_memory(left);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(right);
+            //free_Ad_Object_memory(left);
             return result;
         }
         break;
@@ -80,6 +84,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_FUNCTION_LITERAL: {
             Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->body, &env);
+            garbageCollector.addObject(obj);
+            // TODP: add obj to gc
             return obj;
         }
         break;
@@ -98,6 +104,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_LIST_LITERAL: {
             std::vector<Ad_Object*> elements = EvalExpressions(((Ad_AST_ListLiteral*)node)->elements, env);
             Ad_List_Object* obj = new Ad_List_Object(elements);
+            std::cout << "adding a list to gc\n";
+            garbageCollector.addObject(obj);
             return obj;
         }
         break;
@@ -173,12 +181,14 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         }
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         if (result != NULL && result->Type() == OBJ_ERROR) {
-            free_Ad_Object_memory(result);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(result);
             garbageCollector.markObjects();
             garbageCollector.sweepObjects();
             return NULL;
         }
-        if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result); // TODO: remove OBJ_BUILTIN check and use ref_count
+        // TODO: mark and sweep cleanup
+        //if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result); // TODO: remove OBJ_BUILTIN check and use ref_count
         // OBJ_BUILTINS get destroyed on termination by free_builtin_map
         //std::cout << statement_type_map[obj->type] << "\n";
         GarbageCollectEnvironments(); // commented this because garbage collecting after each statement might clear the environment before all the statements in the block got evaluated
@@ -205,11 +215,15 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
     }
     if (left->Type() == OBJ_ERROR) {
         Ad_Error_Object* error_obj = (Ad_Error_Object*) left;
-        return new Ad_Error_Object(error_obj->message);
+        Ad_Error_Object *obj = new Ad_Error_Object(error_obj->message);
+        garbageCollector.addObject(obj);
+        return obj;
     }
     if (right->Type() == OBJ_ERROR) {
         Ad_Error_Object* error_obj = (Ad_Error_Object*) right;
-        return new Ad_Error_Object(error_obj->message);
+        Ad_Error_Object *obj = new Ad_Error_Object(error_obj->message);
+        garbageCollector.addObject(obj);
+        return obj;
     }
     if (left->Type() == OBJ_NULL || right->Type() == OBJ_NULL) {
         //return new Ad_Null_Object();
@@ -238,18 +252,22 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
     int right_val = ((Ad_Integer_Object*)right)->value;
     if (_operator == "+") {
         Ad_Integer_Object* obj = new Ad_Integer_Object(left_val + right_val);
+        garbageCollector.addObject(obj);
         return obj;
     }
     if (_operator == "-") {
         Ad_Integer_Object* obj = new Ad_Integer_Object(left_val - right_val);
+        garbageCollector.addObject(obj);
         return obj;
     }
     if (_operator == "*") {
         Ad_Integer_Object* obj = new Ad_Integer_Object(left_val * right_val);
+        garbageCollector.addObject(obj);
         return obj;
     }
     if (_operator == "/") {
         Ad_Integer_Object* obj = new Ad_Integer_Object(left_val / right_val);
+        garbageCollector.addObject(obj);
         return obj;
     }
     if (_operator == "<") {
@@ -291,6 +309,7 @@ Ad_Object* Evaluator::EvalStringInfixExpression(std::string _operator, Ad_Object
     std::string right_val = ((Ad_String_Object*)right)->value;
     if (_operator == "+") {
         Ad_String_Object* obj = new Ad_String_Object(left_val + right_val);
+        garbageCollector.addObject(obj);
         return obj;
     }
     if (_operator == "==") {
@@ -331,6 +350,7 @@ Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
     }
     int value = ((Ad_Integer_Object*)right)->value;
     Ad_Integer_Object* obj = new Ad_Integer_Object(-value);
+    garbageCollector.addObject(obj);
     return obj;
 }
 
@@ -346,6 +366,7 @@ Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
         //return NULL;
     }
     obj = new Ad_Error_Object("variable " + ((Ad_AST_Identifier*)node)->token.literal + " undefined.");
+    garbageCollector.addObject(obj);
     //obj = &NULLOBJECT;
     //obj = new Ad_Null_Object();
     return obj;
@@ -386,7 +407,8 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
             if (result) {
                 //result->Print();
                 //std::cout << result->Inspect() << "\n"; // maybe have this on for command line flow and disabled for file execution
-                free_Ad_Object_memory(result);
+                // TODO: mark and sweep cleanup
+                //free_Ad_Object_memory(result);
             }
         }
         // TODO: fix this, this is an important memory leak, test55.ad ran with valgrind has this issue, when doint i++ in a while block
@@ -419,8 +441,11 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
         if (func_obj->params.size() != args.size()) {
-            for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
-            return new Ad_Error_Object("function signature unrecognized, different number of params");
+            // TODO: mark and sweep cleanup
+            //for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
+            Ad_Error_Object *obj = new Ad_Error_Object("function signature unrecognized, different number of params");
+            garbageCollector.addObject(obj);
+            return obj;
         }
         Environment* extendedEnv = extendFunctionEnv(func, args);
         Ad_INCREF(extendedEnv);
@@ -433,9 +458,11 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         Ad_Builtin_Object* builtinObject = (Ad_Builtin_Object*) func;
         if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
                 !validateNumberOfArguments(builtinObject->acceptedNumbersOfArguments, args.size())) {
-            return new Ad_Error_Object("builtin signature unrecognized, different number of params");
+            Ad_Error_Object *obj = new Ad_Error_Object("builtin signature unrecognized, different number of params");
+            garbageCollector.addObject(obj);
+            return obj;
         }
-        Ad_Object* result = builtinObject->builtin_function(args, &env);
+        Ad_Object* result = builtinObject->builtin_function(args, &env, &garbageCollector);
         return result;
     }
     if (func->type == OBJ_CLASS) {
@@ -443,6 +470,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
         Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*) klass_object->name;
         Ad_Class_Instance* klass_instance = new Ad_Class_Instance(klass_ident->value, klass_object, instance_environment);
+        garbageCollector.addObject(klass_instance);
         std::vector<Ad_AST_Node*> attributes = klass_object->attributes;
         updateInstanceWithInheritedClasses(klass_instance, env);
         for (std::vector<Ad_AST_Node*>::iterator it = attributes.begin(); it != attributes.end(); ++it) {
@@ -474,20 +502,24 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         for (std::vector<Ad_AST_Node*>::iterator it = methods.begin(); it != methods.end(); ++it) {
             Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
             Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, klass_instance->instance_environment);
+            garbageCollector.addObject(method_obj);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             //std::cout << def_ident->value << "\n";
             klass_instance->instance_environment->Set(def_ident->value, method_obj);
         }
         Ad_Object* constructorReturn = CallInstanceConstructor(klass_instance, args, env);
         if (IsError(constructorReturn)) {
-            free_Ad_Object_memory(klass_instance);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(klass_instance);
             return constructorReturn;
         }
         return klass_instance;
     }
     if (func->type == OBJ_NULL) {
-        for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
+        // TODO: mark and sweep cleanup
+        //for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
         Ad_Object *result = new Ad_Error_Object("function not found");
+        garbageCollector.addObject(result);
         return result;
     }
     return NULL;
@@ -511,7 +543,9 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
         if (func_obj->params.size() != args.size()) {
-            return new Ad_Error_Object("some error message here");
+            Ad_Error_Object *obj = new Ad_Error_Object("some error message here");
+            garbageCollector.addObject(obj);
+            return obj;
         }
         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
@@ -536,7 +570,8 @@ Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj, Environment *env) {
     if (obj == NULL) return obj; // found when doing the Java implementation
     if (obj->Type() == OBJ_RETURN_VALUE) {
         Ad_Object* returned_obj = ((Ad_ReturnValue_Object*)obj)->value;
-        free_Ad_Object_memory(obj);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(obj);
         if (returned_obj->type == OBJ_FUNCTION) {
             if (!env->isGlobalEnvironment) {
                 /* function objects have a reference to their enclosing environment, so i need to make sure that environment is not garbage collected */
@@ -581,11 +616,13 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result; // exit() builtin was used in order to trigger the stopping of the process
         if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result; // if a return is encountered in the block statement then that's the object the eval block must return
         if (result != NULL && result->Type() == OBJ_BREAK) {
-            free_Ad_Object_memory(result);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(result);
             return NULL;
         }
         if (result != NULL && result->Type() == OBJ_CONTINUE) {
-            free_Ad_Object_memory(result);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(result);
         }
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
@@ -609,8 +646,9 @@ Ad_Object* Evaluator::evalIndexExpression(Ad_AST_Node* node, Environment* env) {
         return evalStringIndexExpression(left, index);
     }
     // addig free calls here for freeing temp objects(like the index int) were allocated for evaluating an index expression
-    free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
-    free_Ad_Object_memory(index);
+    // TODO: mark and sweep cleanup
+    //free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
+    //free_Ad_Object_memory(index);
 
     // this should return an Ad_Error_Object
     return NULL;
@@ -620,8 +658,9 @@ Ad_Object* Evaluator::EvalListIndexExpression(Ad_Object* left, Ad_Object* index)
     int max = ((Ad_List_Object*)left)->elements.size();
     int idx = ((Ad_Integer_Object*)index)->value;
     if (idx < 0 || idx >= max) return NULL;
-    free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
-    free_Ad_Object_memory(index);
+    // TODO: mark and sweep cleanup
+    //free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
+    //free_Ad_Object_memory(index);
     return ((Ad_List_Object*)left)->elements.at(idx);
 }
 
@@ -643,6 +682,7 @@ Ad_Object* Evaluator::EvalHashLiteral(Ad_AST_Node* node, Environment &env) {
         pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair)); // value needs to be a HashPair
     }
     Ad_Hash_Object* hash = new Ad_Hash_Object(pairs);
+    garbageCollector.addObject(hash);
     return hash;
 }
 
@@ -650,8 +690,9 @@ Ad_Object* Evaluator::EvalHashIndexExpression(Ad_Object* left, Ad_Object* index)
     std::hash<std::string> hash_string;
     Ad_Object* result = ((Ad_Hash_Object*)left)->pairs[std::to_string(hash_string(index->Hash()))].value;
 
-    free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
-    free_Ad_Object_memory(index);
+    // TODO: mark and sweep cleanup
+    //free_Ad_Object_memory(left); // this should have ref_count > 0 if store in a context variable
+    //free_Ad_Object_memory(index);
     return result;
 }
 
@@ -660,8 +701,10 @@ Ad_Object* Evaluator::evalStringIndexExpression(Ad_Object* left, Ad_Object* inde
     int idx = ((Ad_Integer_Object*)index)->value;
     if (idx < 0 || idx >= obj->value.size()) return &NULLOBJECT;
     Ad_Object* result = new Ad_String_Object(obj->value.substr(idx, 1));
-    free_Ad_Object_memory(left);
-    free_Ad_Object_memory(index);
+    garbageCollector.addObject(result);
+    // TODO: mark and sweep cleanup
+    //free_Ad_Object_memory(left);
+    //free_Ad_Object_memory(index);
     return result;
 }
 
@@ -720,9 +763,11 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         Ad_Object* old_obj = list_obj->elements[idx];
         Ad_INCREF(value);
         list_obj->elements[idx] = value;
-        free_Ad_Object_memory(index);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(index);
         Ad_DECREF(old_obj);
-        free_Ad_Object_memory(old_obj);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(old_obj);
     }
     if (obj->Type() == OBJ_HASH) {
         std::hash<std::string> hash_string;
@@ -741,8 +786,9 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
             HashPair old_hash_pair = it->second;
             Ad_DECREF(old_hash_pair.key);
             Ad_DECREF(old_hash_pair.value);
-            free_Ad_Object_memory(old_hash_pair.key);
-            free_Ad_Object_memory(old_hash_pair.value);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(old_hash_pair.key);
+            //free_Ad_Object_memory(old_hash_pair.value);
             it->second = hash_pair;
         }
     }
@@ -757,6 +803,7 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
 
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) def_statement->name;
     Ad_Function_Object* func = new Ad_Function_Object(parameters, body, &env);
+    garbageCollector.addObject(func);
     env.Set(ident->value, func);
     return NULL; // this is correct, i don't want to print the function memory address on its definition statement
 }
@@ -764,6 +811,7 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
 Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_Class* class_node = (Ad_AST_Class*) node;
     Ad_Class_Object* klass_object = new Ad_Class_Object(class_node->name, class_node->methods, class_node->attributes, class_node);
+    garbageCollector.addObject(klass_object);
     klass_object->inheritFrom = class_node->inheritFrom;
     Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*)(class_node->name);
     if (IS_CONSOLE_RUN && env.isGlobalEnvironment) {
@@ -820,6 +868,7 @@ void Evaluator::updateInstanceWithInheritedClasses(Ad_Object* obj, Environment& 
             // this adds everything to main class
             Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
             Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, adClassInstance->instance_environment);
+            garbageCollector.addObject(method_obj);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             adClassInstance->instance_environment->Set(def_ident->value, method_obj);
 
@@ -891,7 +940,9 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
             if (klass_method == NULL) {
                 //return &NULLOBJECT;
-                return new Ad_Error_Object(" method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
+                Ad_Error_Object *obj = new Ad_Error_Object(" method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
+                garbageCollector.addObject(obj);
+                return obj;
             }
             std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
@@ -1113,6 +1164,7 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST
             if (owner->_operator == "r") {
                 std::string data = read_file_content(owner->filename);
                 Ad_String_Object* result = new Ad_String_Object(data);
+                garbageCollector.addObject(result);
                 return result;
             }
         }
@@ -1154,8 +1206,10 @@ Ad_Object* Evaluator::EvalPrefixExpression(Ad_AST_Node* node, Environment& env) 
     if (old_obj->Type() == OBJ_INT) {
         int value = ((Ad_Integer_Object*) old_obj)->value;
         Ad_Integer_Object* new_obj = new Ad_Integer_Object(value + 1);
+        garbageCollector.addObject(new_obj);
         env.Set(ident->value, new_obj);
         Ad_Integer_Object* result = new Ad_Integer_Object(value + 1);
+        garbageCollector.addObject(result);
         return result;
     }
     return &NULLOBJECT;
@@ -1168,8 +1222,10 @@ Ad_Object* Evaluator::EvalPostfixExpression(Ad_AST_Node* node, Environment& env)
     if (old_obj->Type() == OBJ_INT) {
         int value = ((Ad_Integer_Object*) old_obj)->value;
         Ad_Integer_Object* new_obj = new Ad_Integer_Object(value + 1);
+        garbageCollector.addObject(new_obj);
         env.Set(ident->value, new_obj);
         Ad_Integer_Object* result = new Ad_Integer_Object(value);
+        garbageCollector.addObject(result);
         return result;
     }
     return &NULLOBJECT;
@@ -1184,25 +1240,32 @@ Ad_Object* Evaluator::EvalForExpression(Ad_AST_Node* node, Environment& env) {
         if (result != NULL && result->Type() == OBJ_SIGNAL) return result;
         if (result != NULL && result->Type() == OBJ_RETURN_VALUE) return result;
         if (result != NULL && result->Type() == OBJ_BREAK) {
-            free_Ad_Object_memory(result);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(result);
             return NULL;
         }
         if (result != NULL && result->Type() == OBJ_CONTINUE) {
-            free_Ad_Object_memory(result);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(result);
         }
         Ad_Object* step = Eval(expr->step, env);
-        free_Ad_Object_memory(step);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(step);
         condition = Eval(expr->condition, env);
     }
     return NULL;
 }
 
 Ad_Object* Evaluator::EvalBreakStatement(Ad_AST_Node* node, Environment& env) {
-    return new Ad_Break_Object();
+    Ad_Break_Object *result = new Ad_Break_Object();
+    garbageCollector.addObject(result);
+    return result;
 }
 
 Ad_Object* Evaluator::EvalContinueStatement(Ad_AST_Node* node, Environment& env) {
-    return new Ad_Continue_Object();
+    Ad_Continue_Object *result = new Ad_Continue_Object();
+    garbageCollector.addObject(result);
+    return result;
 }
 
 Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
@@ -1211,7 +1274,9 @@ Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
     if (IsError(func)) return func;
     if (func->type == OBJ_NULL) {
         // function was not found
-        return new Ad_Error_Object("function " + ((Ad_AST_Identifier*)callExpression->function)->value + " not found.");
+        Ad_Error_Object *result = new Ad_Error_Object("function " + ((Ad_AST_Identifier*)callExpression->function)->value + " not found.");
+        garbageCollector.addObject(result);
+        return result;
     }
     std::vector<Ad_Object*> args_objs = EvalExpressions(callExpression->arguments, *env);
     if (args_objs.size() == 1 && IsError(args_objs[0])) {
@@ -1230,6 +1295,7 @@ Ad_Object* Evaluator::EvalNullExpression(Ad_AST_Node* node, Environment& env) {
 
 Ad_Object* Evaluator::EvalFloatExpression(Ad_AST_Node* node, Environment& env) {
     Ad_Float_Object* obj = new Ad_Float_Object();
+    garbageCollector.addObject(obj);
     obj->value = ((Ad_AST_Float*) node)->value;
     return obj;
 }
@@ -1254,11 +1320,13 @@ Ad_Object* Evaluator::NativeBoolToBooleanObject(bool value) {
 
 Ad_Object* Evaluator::EvalString(Ad_AST_Node* node, Environment &env) {
     Ad_String_Object* obj = new Ad_String_Object(((Ad_AST_String*)node)->value);
+    garbageCollector.addObject(obj);
     return obj;
 }
 
 Ad_Object* Evaluator::NewError(std::string message) {
     Ad_Error_Object* obj = new Ad_Error_Object(message);
+    garbageCollector.addObject(obj);
     return obj;
 }
 
