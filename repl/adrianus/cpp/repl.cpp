@@ -27,8 +27,9 @@ void Repl::Loop() {
         }
     }
     free_builtin_map();*/
-    Environment* bootstrap = load_bootstrap(program, parser, evaluator);
-    bootstrap->isBootstrapEnvironment = true;
+    //Environment* bootstrap = load_bootstrap(program, parser, evaluator);
+    //bootstrap->isBootstrapEnvironment = true;
+    Environment *bootstrap = NULL; // until gc is 100% up and running
 
     env2 = newEnvironment();
     env2->SetBootstrapEnvironment(bootstrap);
@@ -53,8 +54,9 @@ void Repl::Loop() {
 
 void Repl::ExecuteFile(std::ifstream &target) {
     //load_bootstrap(program, parser, evaluator, env);
-    Environment* bootstrap = load_bootstrap(program, parser, evaluator);
-    bootstrap->isBootstrapEnvironment = true;
+    //Environment* bootstrap = load_bootstrap(program, parser, evaluator);
+    //bootstrap->isBootstrapEnvironment = true;
+    Environment *bootstrap = NULL; // until gc is 100% up and running
     //env = NewEnvironment();
     //env.SetBootstrapEnvironment(bootstrap);
 
@@ -74,7 +76,8 @@ void Repl::ExecuteFile(std::ifstream &target) {
         Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2); // TODO: asta cicleaza in momentul executiei fisierului la while
         // in python nu cicleaza pentru ca fac .read() care ia tot continutul fisierului o data, poate la fel ar trebui sa fac si aici
         if (res && res->Type() == OBJ_SIGNAL) {
-            free_Ad_Object_memory(res);
+            // TODO: mark and sweep cleanup
+            //free_Ad_Object_memory(res);
         }
     } else {
         std::cout << "empty or missing ad source file\n";
@@ -94,7 +97,8 @@ bool Repl::ParseLine(std::string line) {
     Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2);
     if (res && res->Type() == OBJ_SIGNAL) {
         // if res->signal_type == SIGNAL_EXIT, else it's a different signal
-        free_Ad_Object_memory(res);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(res);
         return true;
     }
     return false;

@@ -11,6 +11,8 @@
 #include "hashpair.h"
 #include "settings.h"
 
+class GarbageCollector;
+
 enum Ad_Object_Type {
 	OBJ_NULL,
 	OBJ_INT,
@@ -207,7 +209,7 @@ public:
 
 class Ad_Builtin_Object : public Ad_Object {
 public:
-	typedef Ad_Object* (*BuiltinFunction)(std::vector<Ad_Object*>, Environment*);
+	typedef Ad_Object* (*BuiltinFunction)(std::vector<Ad_Object*>, Environment*, GarbageCollector*);
 
 	std::vector<int> acceptedNumbersOfArguments;
 	BuiltinFunction builtin_function;

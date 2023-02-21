@@ -7,6 +7,7 @@ Ad_List::Ad_List() {
 }
 
 Ad_List::~Ad_List() {
+    // TODO: figure this deallocation outside gc
     for (int i = 0; i < size; i++) free_Ad_Object_memory(data[i]);
     delete[] data;
 }

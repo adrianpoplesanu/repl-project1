@@ -21,6 +21,7 @@ Environment::~Environment() {
                 klass_object->attemptASTNodesDeletion = true;
             }
         }
+        // TODO: mark and sweep cleanup, this will free the same object twice when not in a nested env and not in main env
         free_Ad_Object_memory(it->second);
     }
     for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
@@ -134,7 +135,8 @@ void Environment::SetBootstrapEnvironment(Environment *b) {
 
 void Environment::FreeObjectForKey(std::string key) {
     Ad_DECREF(store[key]);
-    free_Ad_Object_memory(store[key]);
+    // TODO: mark and sweep cleanup
+    //free_Ad_Object_memory(store[key]);
 }
 
 void Environment::PrintStore(int level) {

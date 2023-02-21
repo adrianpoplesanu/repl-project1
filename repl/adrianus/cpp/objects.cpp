@@ -92,6 +92,7 @@ std::string Ad_Integer_Object::Hash() {
 
 Ad_Object* Ad_Integer_Object::copy() {
     Ad_Integer_Object* new_object = new Ad_Integer_Object(value);
+    // TODO: add new_object to gc
     return new_object;
 }
 
@@ -280,7 +281,9 @@ std::string Ad_String_Object::Hash() {
 }
 
 Ad_Object* Ad_String_Object::copy() {
-    return new Ad_String_Object(value);
+    Ad_String_Object* result = new Ad_String_Object(value);
+    // TODO: add result to gc
+    return result;
 }
 
 Ad_Error_Object::Ad_Error_Object() {
@@ -399,7 +402,8 @@ Ad_List_Object::~Ad_List_Object() {
     for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
         Ad_Object* obj = *it;
         Ad_DECREF(obj);
-        free_Ad_Object_memory(obj);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(obj);
     }
 }
 
@@ -434,6 +438,7 @@ Ad_Object* Ad_List_Object::copy() {
     }
 
     Ad_List_Object* new_object = new Ad_List_Object(newElements);
+    // TODO: add new_object to gc
     return new_object;
 }
 
@@ -454,8 +459,9 @@ Ad_Hash_Object::~Ad_Hash_Object() {
     for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         Ad_DECREF(it->second.key);
         Ad_DECREF(it->second.value);
-        free_Ad_Object_memory(it->second.key);
-        free_Ad_Object_memory(it->second.value);
+        // TODO: mark and sweep cleanup
+        //free_Ad_Object_memory(it->second.key);
+        //free_Ad_Object_memory(it->second.value);
     }
 }
 
@@ -494,6 +500,7 @@ Ad_Object* Ad_Hash_Object::copy() {
     }
 
     Ad_Hash_Object* new_object = new Ad_Hash_Object(newPairs);
+    // TODO: add new_object to gc
     return new_object;
 }
 
@@ -834,7 +841,7 @@ void Ad_DECREF(Ad_Object* obj) {
 void free_Ad_Object_memory(Ad_Object* obj) {
     //return; // cu asta am testat ca se marcheaza corect obiectele care trebuie sweep-uite
     if (obj == NULL) return;
-    if (obj->ref_count > 0) return;
+    //if (obj->ref_count > 0) return; // no more of this nonsense
     if (VERBOSE_MEMORY_CLEANUP) {
         std::cout << "freeing up some memory\n";
     }
@@ -846,6 +853,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 }
             break;
             case OBJ_INT:
+                std::cout << "freeing an int\n";
                 delete ((Ad_Integer_Object*)obj);
             break;
             case OBJ_BOOL:
@@ -872,6 +880,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete ((Ad_Signal_Object*)obj);
             break;
             case OBJ_LIST:
+                std::cout << "freeing a list\n";
                 delete ((Ad_List_Object*)obj);
             break;
             case OBJ_HASH:
