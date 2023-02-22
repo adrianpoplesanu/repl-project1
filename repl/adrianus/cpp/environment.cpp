@@ -11,7 +11,7 @@ Environment::Environment() {
 Environment::~Environment() {
     //std::cout << "cleaning up an env\n";
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        Ad_DECREF(it->second); // asta merge
+        //Ad_DECREF(it->second); // asta merge
         //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
         //std::cout << mesaj << "\n";
         if (isBootstrapEnvironment) {
@@ -22,7 +22,7 @@ Environment::~Environment() {
             }
         }
         // TODO: mark and sweep cleanup, this will free the same object twice when not in a nested env and not in main env
-        free_Ad_Object_memory(it->second);
+        //free_Ad_Object_memory(it->second);
     }
     for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
         // TODO: do this proper, maybe mark the env for seeping unsing the gc?
