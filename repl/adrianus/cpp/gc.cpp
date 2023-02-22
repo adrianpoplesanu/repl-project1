@@ -112,7 +112,7 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             break;
         }
         case OBJ_INT: {
-            std::cout << "marking an int\n";
+            //std::cout << "marking an int\n";
             obj->marked = true;
             break;
         }
@@ -214,7 +214,7 @@ void GarbageCollector::unmarkAllObjects() {
         iter = iter->next;
         count++;
     }
-    std::cout << "unmarking " << count << " objects\n";
+    //std::cout << "unmarking " << count << " objects\n";
 }
 
 void GarbageCollector::sweepObjects() {
@@ -241,9 +241,9 @@ void GarbageCollector::sweepObjects() {
         }
         iter = iter->next;
         if (target) {
-            std::cout << "targeting an object\n";
+            //std::cout << "targeting an object\n";
             // free the object
-            std::cout << "ar trebui sa sterg un obiect " << object_type_map[target->type] << "\n";
+            //std::cout << "ar trebui sa sterg un obiect " << object_type_map[target->type] << "\n";
             free_Ad_Object_memory(target);
             //std::cout << target->Inspect() << "\n"; // asta merge daca nu fac free inainte cu metoda veche
         }

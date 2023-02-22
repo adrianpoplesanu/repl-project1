@@ -401,7 +401,7 @@ Ad_List_Object::Ad_List_Object(std::vector<Ad_Object*> e) {
 Ad_List_Object::~Ad_List_Object() {
     for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
         Ad_Object* obj = *it;
-        Ad_DECREF(obj);
+        //Ad_DECREF(obj);
         // TODO: mark and sweep cleanup
         //free_Ad_Object_memory(obj);
     }
@@ -457,8 +457,8 @@ Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, HashPair> p) {
 
 Ad_Hash_Object::~Ad_Hash_Object() {
     for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
-        Ad_DECREF(it->second.key);
-        Ad_DECREF(it->second.value);
+        //Ad_DECREF(it->second.key);
+        //Ad_DECREF(it->second.value);
         // TODO: mark and sweep cleanup
         //free_Ad_Object_memory(it->second.key);
         //free_Ad_Object_memory(it->second.value);
