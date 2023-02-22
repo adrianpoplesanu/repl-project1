@@ -14,13 +14,13 @@ Environment::~Environment() {
         //Ad_DECREF(it->second); // asta merge
         //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
         //std::cout << mesaj << "\n";
-        if (isBootstrapEnvironment) {
+        /*if (isBootstrapEnvironment) {
             Ad_Object* obj = it->second;
             if (obj->type == OBJ_CLASS) {
                 Ad_Class_Object* klass_object = (Ad_Class_Object*) obj;
                 klass_object->attemptASTNodesDeletion = true;
             }
-        }
+        }*/
         // TODO: mark and sweep cleanup, this will free the same object twice when not in a nested env and not in main env
         //free_Ad_Object_memory(it->second);
     }
@@ -29,9 +29,9 @@ Environment::~Environment() {
         Ad_DECREF(it->second);
         delete it->second;
     }
-    if (bootstrap) {
-        delete bootstrap;
-    }
+    //if (bootstrap) {
+    //    delete bootstrap;
+    //}
 }
 
 bool Environment::Check(std::string key) {
