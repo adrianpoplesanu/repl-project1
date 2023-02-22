@@ -10,20 +10,21 @@ std::vector<std::string> bootstrap_files {
     "bootstrap/mat.ad",
     "bootstrap/string_utils.ad",
     "bootstrap/sys.ad"
+    "bootstrap/test2.ad"
 };
 
-void add_bootstrap_code(Ad_AST_Program &program, Parser parser, Evaluator evaluator, Environment& env, std::string source) {
+void add_bootstrap_code(Ad_AST_Program &program, Parser parser, Evaluator *evaluator, Environment& env, std::string source) {
     parser.Load(source);
     program.reset();
     parser.ParseProgram(program);
-    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, env);
+    Ad_Object* res = evaluator->Eval((Ad_AST_Node *)&program, env);
     if (res && res->Type() == OBJ_SIGNAL) {
         // TODO: mark and sweep cleanup
         //free_Ad_Object_memory(res);
     }
 }
 
-void load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator evaluator, Environment& env) {
+void load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator *evaluator, Environment& env) {
     for (std::vector<std::string>::iterator it = bootstrap_files.begin() ; it != bootstrap_files.end(); ++it) {
         std::ifstream in;
         in.open(*it);
@@ -38,9 +39,10 @@ void load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator evaluator,
     }
 }
 
-Environment* load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator evaluator) {
+Environment* load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator *evaluator) {
     Environment *bootstrap = new Environment();
-    //evaluator.garbageCollector.addEnvironment(bootstrap);
+    bootstrap->ref_count = 1;
+    evaluator->garbageCollector.addEnvironment(bootstrap);
     for (std::vector<std::string>::iterator it = bootstrap_files.begin() ; it != bootstrap_files.end(); ++it) {
         std::ifstream in;
         in.open(*it);

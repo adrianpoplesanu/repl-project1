@@ -66,6 +66,7 @@ void GarbageCollector::consumeScheduledDECREFEnvironments() {
 }
 
 void GarbageCollector::addObject(Ad_Object* obj) {
+    if (obj == NULL) return;
     if (head == NULL) {
         head = tail = obj;
         obj->prev = NULL;

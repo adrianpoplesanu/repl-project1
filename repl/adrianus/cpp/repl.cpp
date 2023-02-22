@@ -27,9 +27,9 @@ void Repl::Loop() {
         }
     }
     free_builtin_map();*/
-    //Environment* bootstrap = load_bootstrap(program, parser, evaluator);
-    //bootstrap->isBootstrapEnvironment = true;
-    Environment *bootstrap = NULL; // until gc is 100% up and running
+    Environment* bootstrap = load_bootstrap(program, parser, &evaluator);
+    bootstrap->isBootstrapEnvironment = true;
+    //Environment *bootstrap = NULL; // until gc is 100% up and running
 
     env2 = newEnvironment();
     env2->SetBootstrapEnvironment(bootstrap);
@@ -54,9 +54,9 @@ void Repl::Loop() {
 
 void Repl::ExecuteFile(std::ifstream &target) {
     //load_bootstrap(program, parser, evaluator, env);
-    //Environment* bootstrap = load_bootstrap(program, parser, evaluator);
-    //bootstrap->isBootstrapEnvironment = true;
-    Environment *bootstrap = NULL; // until gc is 100% up and running
+    Environment* bootstrap = load_bootstrap(program, parser, &evaluator);
+    bootstrap->isBootstrapEnvironment = true;
+    //Environment *bootstrap = NULL; // until gc is 100% up and running
     //env = NewEnvironment();
     //env.SetBootstrapEnvironment(bootstrap);
 
