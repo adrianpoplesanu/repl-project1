@@ -817,6 +817,9 @@ Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     if (IS_CONSOLE_RUN && env.isGlobalEnvironment) {
         klass_object->attemptASTNodesDeletion = true;
     }
+    if (env.isBootstrapEnvironment) {
+        klass_object->attemptASTNodesDeletion = true;
+    }
     std::string klass_name = klass_ident->value;
     env.Set(klass_name, klass_object);
     return NULL;

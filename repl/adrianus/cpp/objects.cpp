@@ -572,7 +572,7 @@ Ad_Class_Object::Ad_Class_Object(Ad_AST_Node* n, std::vector<Ad_AST_Node*> m, st
 Ad_Class_Object::~Ad_Class_Object() {
     //std::cout << "deleting class" << ((Ad_AST_Identifier*)name)->value << "\n";
     //std::cout << is_console_run << "\n";
-    attemptASTNodesDeletion = true;
+    //attemptASTNodesDeletion = true;
     Ad_DECREF(class_ast_node);
     if (attemptASTNodesDeletion) {
         free_Ad_AST_Node_memory(class_ast_node);
