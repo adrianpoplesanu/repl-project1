@@ -42,6 +42,7 @@ void load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator *evaluator
 Environment* load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator *evaluator) {
     Environment *bootstrap = new Environment();
     bootstrap->ref_count = 1;
+    bootstrap->isBootstrapEnvironment = true;
     evaluator->garbageCollector.addEnvironment(bootstrap);
     for (std::vector<std::string>::iterator it = bootstrap_files.begin() ; it != bootstrap_files.end(); ++it) {
         std::ifstream in;
