@@ -190,7 +190,7 @@ Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env, G
 
 Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_Socket_Object* socketObject = new Ad_Socket_Object();
-    // TODO: add socketObject to gc
+    gc->addObject(socketObject);
     Ad_String_Object* nameObject = (Ad_String_Object*) args[0];
     Ad_Integer_Object* portObject = (Ad_Integer_Object*) args[1];
     Ad_Boolean_Object* isActiveObject = (Ad_Boolean_Object*) args[2];
@@ -241,7 +241,7 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageC
     }
     if (args.size() == 1) {
         Ad_List_Object* list_object = new Ad_List_Object();
-        // TODO: add list_object to gc
+        gc->addObject(list_object);
         int size = ((Ad_Integer_Object*) args[0])->value;
         //std::cout << size << "\n";
         for (int i = 0; i < size; i++) {
@@ -256,7 +256,7 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageC
         int size = ((Ad_Integer_Object*) args[0])->value;
         Ad_Object* default_object = args[1];
         for (int i = 0; i < size; i++) {
-            Ad_Object* new_object = default_object->copy();
+            Ad_Object* new_object = default_object->copy(gc);
             gc->addObject(new_object);
             Ad_INCREF(new_object);
             list_object->elements.push_back(new_object);

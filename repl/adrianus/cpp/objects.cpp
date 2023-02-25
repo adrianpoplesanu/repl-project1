@@ -24,7 +24,7 @@ std::string Ad_Object::Hash() {
     return "not implementd Hash() in subclass";
 }
 
-Ad_Object* Ad_Object::copy() {
+Ad_Object* Ad_Object::copy(GarbageCollector *gc) {
     std::cout << "ERROR: copy() not implementend for this type of object\n";
     return NULL;
 }
@@ -90,9 +90,9 @@ std::string Ad_Integer_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
-Ad_Object* Ad_Integer_Object::copy() {
+Ad_Object* Ad_Integer_Object::copy(GarbageCollector *gc) {
     Ad_Integer_Object* new_object = new Ad_Integer_Object(value);
-    // TODO: add new_object to gc
+    gc->addObject(new_object);
     return new_object;
 }
 
@@ -127,7 +127,7 @@ std::string Ad_Float_Object::Hash() {
     return "todo: implement this";
 }
 
-Ad_Object* Ad_Float_Object::copy() {
+Ad_Object* Ad_Float_Object::copy(GarbageCollector *gc) {
     // TODO: implement this
     return NULL;
 }
@@ -280,9 +280,9 @@ std::string Ad_String_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
-Ad_Object* Ad_String_Object::copy() {
+Ad_Object* Ad_String_Object::copy(GarbageCollector *gc) {
     Ad_String_Object* result = new Ad_String_Object(value);
-    // TODO: add result to gc
+    gc->addObject(result);
     return result;
 }
 
@@ -431,14 +431,16 @@ std::string Ad_List_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
-Ad_Object* Ad_List_Object::copy() {
+Ad_Object* Ad_List_Object::copy(GarbageCollector *gc) {
     std::vector<Ad_Object*> newElements;
     for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
-        newElements.push_back((*it)->copy());
+        Ad_Object *result = (*it)->copy(gc);
+        gc->addObject(result);
+        newElements.push_back(result);
     }
 
     Ad_List_Object* new_object = new Ad_List_Object(newElements);
-    // TODO: add new_object to gc
+    gc->addObject(new_object);
     return new_object;
 }
 
@@ -489,18 +491,20 @@ std::string Ad_Hash_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
-Ad_Object* Ad_Hash_Object::copy() {
+Ad_Object* Ad_Hash_Object::copy(GarbageCollector *gc) {
     std::map<std::string, HashPair> newPairs;
     for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         std::string key = it->first;
-        Ad_Object* k = it->second.GetKey()->copy();
-        Ad_Object* v = it->second.GetValue()->copy();
+        Ad_Object* k = it->second.GetKey()->copy(gc);
+        Ad_Object* v = it->second.GetValue()->copy(gc);
+        gc->addObject(k);
+        gc->addObject(v);
         HashPair hashPair(k, v);
         newPairs.insert(std::make_pair(key, hashPair));
     }
 
     Ad_Hash_Object* new_object = new Ad_Hash_Object(newPairs);
-    // TODO: add new_object to gc
+    gc->addObject(new_object);
     return new_object;
 }
 
@@ -802,7 +806,7 @@ Ad_Socket_Object::Ad_Socket_Object(std::string n, int p, bool a, bool f, bool c,
 }
 
 Ad_Socket_Object::~Ad_Socket_Object() {
-    // TODO: implement this
+    // nothing to free apart the object itself
 }
 
 std::string Ad_Socket_Object::Inspect() {
@@ -881,7 +885,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete ((Ad_Signal_Object*)obj);
             break;
             case OBJ_LIST:
-                std::cout << "freeing a list\n";
+                //std::cout << "freeing a list\n";
                 delete ((Ad_List_Object*)obj);
             break;
             case OBJ_HASH:
@@ -902,6 +906,12 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_CONTINUE:
                 delete (Ad_Continue_Object*) obj;
+            break;
+            case OBJ_SOCKET:
+                delete (Ad_Socket_Object*) obj;
+            break;
+            case OBJ_FLOAT:
+                delete (Ad_Float_Object*) obj;
             break;
             default:
                 std::cout << obj->type << "\n";
