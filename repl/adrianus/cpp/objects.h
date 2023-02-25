@@ -10,8 +10,9 @@
 #include "signal.h"
 #include "hashpair.h"
 #include "settings.h"
+#include "gc.h"
 
-class GarbageCollector;
+//class GarbageCollector;
 
 enum Ad_Object_Type {
 	OBJ_NULL,
@@ -67,7 +68,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	virtual Ad_Object* copy();
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 class Ad_Null_Object : public Ad_Object {
@@ -80,7 +81,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_Integer_Object : public Ad_Object {
@@ -94,7 +95,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	virtual Ad_Object* copy();
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 class Ad_Float_Object : public Ad_Object {
@@ -108,7 +109,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	virtual Ad_Object* copy();
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 class Ad_Boolean_Object : public Ad_Object {
@@ -122,7 +123,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_String_Object : public Ad_Object {
@@ -135,7 +136,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	virtual Ad_Object* copy();
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 class Ad_ReturnValue_Object : public Ad_Object {
@@ -150,7 +151,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_Break_Object : public Ad_Object {
@@ -191,7 +192,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_Error_Object : public Ad_Object {
@@ -204,7 +205,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_Builtin_Object : public Ad_Object {
@@ -251,7 +252,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	virtual Ad_Object* copy();
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 class Ad_Hash_Object : public Ad_Object {
@@ -265,7 +266,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	virtual Ad_Object* copy();
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 class Ad_Class_Object : public Ad_Object {
@@ -287,7 +288,7 @@ public:
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
 	void deleteASTNodeFromBootstrapEnvironment(); // maybe use a gc pool here for ast nodes? - the method name si so specific, i don't like it
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_Class_Instance : public Ad_Object {
@@ -305,7 +306,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_File_Object : public Ad_Object {
@@ -323,7 +324,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_Socket_Object : public Ad_Object {
@@ -342,7 +343,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(); // TODO: implement this
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 void Ad_INCREF(Ad_Object*);

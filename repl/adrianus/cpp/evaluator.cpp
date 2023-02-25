@@ -104,7 +104,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_LIST_LITERAL: {
             std::vector<Ad_Object*> elements = EvalExpressions(((Ad_AST_ListLiteral*)node)->elements, env);
             Ad_List_Object* obj = new Ad_List_Object(elements);
-            std::cout << "adding a list to gc\n";
+            //std::cout << "adding a list to gc\n";
             garbageCollector.addObject(obj);
             return obj;
         }
