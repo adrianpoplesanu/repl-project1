@@ -435,7 +435,7 @@ Ad_Object* Ad_List_Object::copy(GarbageCollector *gc) {
     std::vector<Ad_Object*> newElements;
     for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
         Ad_Object *result = (*it)->copy(gc);
-        gc->addObject(result);
+        //gc->addObject(result);
         newElements.push_back(result);
     }
 
@@ -497,8 +497,8 @@ Ad_Object* Ad_Hash_Object::copy(GarbageCollector *gc) {
         std::string key = it->first;
         Ad_Object* k = it->second.GetKey()->copy(gc);
         Ad_Object* v = it->second.GetValue()->copy(gc);
-        gc->addObject(k);
-        gc->addObject(v);
+        //gc->addObject(k);
+        //gc->addObject(v);
         HashPair hashPair(k, v);
         newPairs.insert(std::make_pair(key, hashPair));
     }

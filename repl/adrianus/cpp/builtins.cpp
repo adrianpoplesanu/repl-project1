@@ -257,7 +257,7 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageC
         Ad_Object* default_object = args[1];
         for (int i = 0; i < size; i++) {
             Ad_Object* new_object = default_object->copy(gc);
-            gc->addObject(new_object);
+            //gc->addObject(new_object);
             Ad_INCREF(new_object);
             list_object->elements.push_back(new_object);
         }
