@@ -9,6 +9,7 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
+    // TODO: clean this up
     //std::cout << "cleaning up an env\n";
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
         //Ad_DECREF(it->second); // asta merge
@@ -25,7 +26,7 @@ Environment::~Environment() {
         //free_Ad_Object_memory(it->second);
     }
     for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
-        // TODO: do this proper, maybe mark the env for seeping unsing the gc?
+        // TODO: do this proper, maybe mark the env for sweeping using the gc?
         Ad_DECREF(it->second);
         delete it->second;
     }
@@ -134,6 +135,7 @@ void Environment::SetBootstrapEnvironment(Environment *b) {
 }
 
 void Environment::FreeObjectForKey(std::string key) {
+    // TODO: this method does nothig now, remove this
     Ad_DECREF(store[key]);
     // TODO: mark and sweep cleanup
     //free_Ad_Object_memory(store[key]);
