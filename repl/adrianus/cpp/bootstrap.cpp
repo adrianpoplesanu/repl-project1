@@ -9,7 +9,7 @@ std::vector<std::string> bootstrap_files {
     "bootstrap/test.ad",
     "bootstrap/mat.ad",
     "bootstrap/string_utils.ad",
-    "bootstrap/sys.ad"
+    "bootstrap/sys.ad",
     "bootstrap/test2.ad"
 };
 
