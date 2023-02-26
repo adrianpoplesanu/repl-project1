@@ -497,8 +497,6 @@ Ad_Object* Ad_Hash_Object::copy(GarbageCollector *gc) {
         std::string key = it->first;
         Ad_Object* k = it->second.GetKey()->copy(gc);
         Ad_Object* v = it->second.GetValue()->copy(gc);
-        //gc->addObject(k);
-        //gc->addObject(v);
         HashPair hashPair(k, v);
         newPairs.insert(std::make_pair(key, hashPair));
     }
@@ -858,7 +856,6 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 }
             break;
             case OBJ_INT:
-                //std::cout << "freeing an int\n";
                 delete ((Ad_Integer_Object*)obj);
             break;
             case OBJ_BOOL:
@@ -885,14 +882,12 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete ((Ad_Signal_Object*)obj);
             break;
             case OBJ_LIST:
-                //std::cout << "freeing a list\n";
                 delete ((Ad_List_Object*)obj);
             break;
             case OBJ_HASH:
                 delete ((Ad_Hash_Object*)obj);
             break;
             case OBJ_CLASS:
-                //std::cout << "deleting a class object " << obj << "\n";
                 delete (Ad_Class_Object*) obj;
             break;
             case OBJ_INSTANCE:

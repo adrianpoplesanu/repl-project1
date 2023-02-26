@@ -1,0 +1,14 @@
+class Dog {
+    text = "ham ham ham"
+
+    def bark() {
+        print (text)
+    }
+}
+
+class Dex : Dog {
+    
+}
+
+dex = Dex()
+dex.bark()

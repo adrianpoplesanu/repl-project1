@@ -12,8 +12,6 @@
 #include "settings.h"
 #include "gc.h"
 
-//class GarbageCollector;
-
 enum Ad_Object_Type {
 	OBJ_NULL,
 	OBJ_INT,

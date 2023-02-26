@@ -44,9 +44,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_INTEGER: {
             Ad_Integer_Object* obj = new Ad_Integer_Object();
             garbageCollector.addObject(obj);
-            //std::cout << "adding an integer to gc\n";
             obj->value = ((Ad_AST_Integer*)node)->value;
-            //garbageCollector.addObject(obj); // this needs to be added everywhere new Ad_Object is declared
             return obj;
         }
         break;
