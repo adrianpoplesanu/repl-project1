@@ -121,3 +121,8 @@ examples/test122.ad
 examples/test123.ad
 examples/test124.ad
 examples/test125.ad
+examples/test126.ad
+examples/test127.ad
+examples/test128.ad
+examples/test129.ad
+examples/test130.ad
