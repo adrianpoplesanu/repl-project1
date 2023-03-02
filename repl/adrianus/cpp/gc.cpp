@@ -102,6 +102,12 @@ void GarbageCollector::markObjects() {
         for(std::map<std::string, Ad_Object*>::iterator it = env->store.begin(); it != env->store.end(); ++it) {
             markObject(it->second);
         }
+
+        for(std::map<std::string, Environment* >::const_iterator it = env->siblings.begin(); it != env->siblings.end(); ++it) {
+            for(std::map<std::string, Ad_Object*>::iterator j = it->second->store.begin(); j != it->second->store.end(); ++j) {
+                markObject(j->second);
+            }
+        }
     }
 }
 

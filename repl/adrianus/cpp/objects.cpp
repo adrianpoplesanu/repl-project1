@@ -660,7 +660,8 @@ Ad_Class_Instance::Ad_Class_Instance(std::string n, Ad_Object* ko, Environment* 
 
 Ad_Class_Instance::~Ad_Class_Instance() {
     if (instance_environment) {
-        delete instance_environment;
+        //delete instance_environment;
+        Ad_DECREF(instance_environment);
     }
 }
 

@@ -465,6 +465,8 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
     }
     if (func->type == OBJ_CLASS) {
         Environment* instance_environment = new Environment();
+        instance_environment->ref_count = 1;
+        garbageCollector.addEnvironment(instance_environment);
         Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
         Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*) klass_object->name;
         Ad_Class_Instance* klass_instance = new Ad_Class_Instance(klass_ident->value, klass_object, instance_environment);
