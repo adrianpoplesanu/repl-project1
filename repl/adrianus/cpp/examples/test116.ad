@@ -15,5 +15,5 @@ class Dex : Dog {
 }
 
 dex = Dex()
-print (dex.test())
-print (dex.test2())
+dex.test()
+dex.test2()
