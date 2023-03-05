@@ -1,0 +1,4 @@
+import("examples/test103.ad")
+
+calculator = Calculator()
+print (calculator.fibonacci(5))

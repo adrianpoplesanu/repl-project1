@@ -10,6 +10,12 @@ import com.ad.parser.Parser;
 import java.util.List;
 
 public class EvalBuiltin extends AbstractBuiltin {
+
+    public EvalBuiltin() {
+        super();
+        acceptedParameterSize.add(1);
+    }
+
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
         String unescapedSource = ((AdStringObject) args.get(0)).getValue();
