@@ -42,7 +42,8 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.ELSE, "ELSE");
 			put(TokenTypeEnum.TRUE, "TRUE");
 			put(TokenTypeEnum.FALSE, "FALSE");
-			put(TokenTypeEnum.STRING, "STRING");
+			put(TokenTypeEnum.DOUBLE_QUOTES, "DOUBLE_QUOTES");
+			put(TokenTypeEnum.SINGLE_QUOTES, "SINGLE_QUOTES");
 			put(TokenTypeEnum.AND, "AND");
 			put(TokenTypeEnum.OR, "OR");
 			put(TokenTypeEnum.LBRACKET, "LBRACKET");

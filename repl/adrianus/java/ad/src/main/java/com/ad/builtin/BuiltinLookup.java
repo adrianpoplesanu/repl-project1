@@ -22,7 +22,7 @@ public class BuiltinLookup {
 			put("__iofile", new AdBuiltinObject(new IOFileBuiltin())); // TODO: update this
 			put("__syssystem", new AdBuiltinObject(new SysSystemBuiltin())); // TODO: update this
 			put("__iosocket", new AdBuiltinObject(new IOSocketBuiltin())); // TODO: update this
-			put("eval", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("eval", new AdBuiltinObject(new EvalBuiltin())); // TODO: update this
 			put("__first", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("__last", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("map", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
@@ -35,6 +35,7 @@ public class BuiltinLookup {
 			put("setattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("getattrs", new AdBuiltinObject(new GetattrsBuiltin()));
 			put("thread", new AdBuiltinObject(new ContextBuiltin())); // TODO: reasearch this
+			put("import", new AdBuiltinObject(new ImportBuiltin()));
 			// https://www.w3schools.com/python/python_ref_keywords.asp
 			// https://www.w3schools.com/python/python_ref_functions.asp
 		}

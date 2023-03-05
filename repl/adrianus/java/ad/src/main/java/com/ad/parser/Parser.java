@@ -36,7 +36,8 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
         prefixParseFns.put(TokenTypeEnum.LBRACKET, this::parseListLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACE, this::parseHashLiteral);
-        prefixParseFns.put(TokenTypeEnum.STRING, this::parseStringLiteral);
+        prefixParseFns.put(TokenTypeEnum.DOUBLE_QUOTES, this::parseStringLiteral);
+        prefixParseFns.put(TokenTypeEnum.SINGLE_QUOTES, this::parseStringLiteral);
         prefixParseFns.put(TokenTypeEnum.CLASS, this::parseClassStatement);
         prefixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePrefixPlusPlus);
         prefixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePrefixMinusMinus);

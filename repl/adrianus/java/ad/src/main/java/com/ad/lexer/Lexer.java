@@ -115,8 +115,12 @@ public class Lexer {
 			token.setLiteral("]");
 		break;
 		case '"':
-			token.setType(TokenTypeEnum.STRING);
-			token.setLiteral(readString());
+			token.setType(TokenTypeEnum.DOUBLE_QUOTES);
+			token.setLiteral(readDoubleQuotesString());
+			break;
+		case '\'':
+			token.setType(TokenTypeEnum.SINGLE_QUOTES);
+			token.setLiteral(readSingleQuotesString());
 			break;
 		case ':':
 			token.setType(TokenTypeEnum.COLON);
@@ -231,10 +235,25 @@ public class Lexer {
 		return source.substring(start, position);
 	}
 	
-	private String readString() {
+	private String readDoubleQuotesString() {
 		readChar();
 		int start = position;
 		while(currentChar != '"') {
+			if (currentChar == '\\' && peekChar() == '"') { // escaping \"
+				readChar();
+			}
+			readChar();
+		}
+		return source.substring(start, position);
+	}
+
+	private String readSingleQuotesString() {
+		readChar();
+		int start = position;
+		while(currentChar != '\'') {
+			if (currentChar == '\\' && peekChar() == '\'') { // escaping \'
+				readChar();
+			}
 			readChar();
 		}
 		return source.substring(start, position);
