@@ -298,6 +298,10 @@ Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environment *env, Garbag
     return NULL;
 }
 
+Ad_Object* import_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    return NULL;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -326,7 +330,8 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"getattr", new Ad_Builtin_Object(&getattr_builtin)},
     {"setattr", new Ad_Builtin_Object(&setattr_builtin)},
     {"getattrs", new Ad_Builtin_Object(&getattrs_builtin)},
-    {"thread", new Ad_Builtin_Object(&thread_builtin)}
+    {"thread", new Ad_Builtin_Object(&thread_builtin)},
+    {"import", new Ad_Builtin_Object(&import_builtin)}
     // eval
     // first
     // input

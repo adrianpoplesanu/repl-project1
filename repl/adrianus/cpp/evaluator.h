@@ -67,6 +67,7 @@ public:
     void Init();
     void GarbageCollectEnvironments();
     void addEnvironmentGarbageCollectorListener(Environment *);
+    void setGarbageCollector(GarbageCollector); // TODO: use this in eval builtin, should the gc be a pointer in evaluator?
 
 private:
     bool validateNumberOfArguments(std::vector<int>, int);
