@@ -1,0 +1,3 @@
+5
+function at memory address (.*)
+"Test bultin method"
