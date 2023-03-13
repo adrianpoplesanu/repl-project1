@@ -1,0 +1,2 @@
+"inainte de apelul lui t\(\)"
+"dupa apelul lui t\(\)"

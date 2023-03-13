@@ -1,0 +1,6 @@
+function at memory address (.*)
+function at memory address (.*)
+"life"
+"life"
+"life"
+"bad"

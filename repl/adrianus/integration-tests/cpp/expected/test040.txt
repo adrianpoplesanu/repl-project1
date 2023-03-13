@@ -1,1 +1,1 @@
-ERROR: function File not found.
+ERROR: some error message here

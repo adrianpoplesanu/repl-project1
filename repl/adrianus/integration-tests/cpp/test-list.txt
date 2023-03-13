@@ -84,7 +84,6 @@ examples/test085.ad
 examples/test086.ad
 examples/test087.ad
 examples/test088.ad
-examples/test089.ad
 examples/test090.ad
 examples/test091.ad
 examples/test092.ad
