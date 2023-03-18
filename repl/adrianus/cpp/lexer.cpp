@@ -70,10 +70,25 @@ TokenType Lexer::LookupIdent(std::string ident) {
     return TT_IDENT;
 }
 
-std::string Lexer::ReadString() {
+std::string Lexer::ReadDoubleQuotesString() {
     ReadChar();
     int start = position;
     while (current_char != '"') {
+        if (current_char == '\\' && PeekChar() == '"') {  // escaping \"
+            ReadChar();
+        }
+        ReadChar();
+    }
+    return source.substr(start, position - start);
+}
+
+std::string Lexer::ReadSingleQuotesString() {
+    ReadChar();
+    int start = position;
+    while (current_char != '\'') {
+        if (current_char == '\\' && PeekChar() == '\'') {  // escaping \'
+            ReadChar();
+        }
         ReadChar();
     }
     return source.substr(start, position - start);
@@ -182,8 +197,12 @@ Token Lexer::NextToken() {
             token.literal = current_char;
         break;
         case '"':
-            token.type = TT_STRING;
-            token.literal = ReadString();
+            token.type = TT_DOUBLE_QUOTES;
+            token.literal = ReadDoubleQuotesString();
+        break;
+        case '\'':
+            token.type = TT_SINGLE_QUOTES;
+            token.literal = ReadSingleQuotesString();
         break;
         case '[':
             token.type = TT_LBRACKET;

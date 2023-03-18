@@ -21,7 +21,8 @@ public:
 	std::string ReadIdentifier();
 	std::string ReadNumber();
 	TokenType LookupIdent(std::string); // (std::string ident)
-	std::string ReadString();
+	std::string ReadDoubleQuotesString();
+	std::string ReadSingleQuotesString();
 	char PeekChar();
 	Token NextToken();
 	bool IsEOF();
