@@ -1,0 +1,6 @@
+"radu paraschivescu"
+"mircea cartarescu"
+\[1, 2, 3\]
+\[1, 5, 3\]
+11
+11
