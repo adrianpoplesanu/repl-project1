@@ -11,25 +11,12 @@ Repl::Repl() {
 }
 
 Repl::~Repl() {
-    //env->PrintStore(0);
     delete env2; // this could be a regular env that gets deleted by the garbage collector mechanism
 }
 
 void Repl::Loop() {
-    /*load_bootstrap(program, parser, evaluator, env);
-    while (1) {
-        std::string line;
-        std::cout << ">> ";
-        std::getline(std::cin, line);
-        bool end_singal = ParseLine(line);
-        if (end_singal) {
-            break;
-        }
-    }
-    free_builtin_map();*/
     Environment* bootstrap = load_bootstrap(program, parser, &evaluator);
     bootstrap->isBootstrapEnvironment = true;
-    //Environment *bootstrap = NULL; // until gc is 100% up and running
 
     env2 = newEnvironment();
     env2->SetBootstrapEnvironment(bootstrap);
@@ -53,12 +40,8 @@ void Repl::Loop() {
 }
 
 void Repl::ExecuteFile(std::ifstream &target) {
-    //load_bootstrap(program, parser, evaluator, env);
     Environment* bootstrap = load_bootstrap(program, parser, &evaluator);
     bootstrap->isBootstrapEnvironment = true;
-    //Environment *bootstrap = NULL; // until gc is 100% up and running
-    //env = NewEnvironment();
-    //env.SetBootstrapEnvironment(bootstrap);
 
     env2 = newEnvironment();
     env2->SetBootstrapEnvironment(bootstrap);

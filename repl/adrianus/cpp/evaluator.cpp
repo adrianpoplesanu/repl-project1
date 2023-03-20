@@ -3,6 +3,7 @@
 #include "hashpair.cpp" // nu-mi place importul asta, as fi preferat sa import doar headerul
 #include "builtins.cpp"
 #include "gc.cpp"
+#include "eval_utils.cpp"
 
 
 //Ad_Null_Object NULLOBJECT;
@@ -505,7 +506,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             garbageCollector.addObject(method_obj);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             //std::cout << def_ident->value << "\n";
-            klass_instance->instance_environment->Set(def_ident->value, method_obj);
+            klass_instance->instance_environment->setLocalParam(def_ident->value, method_obj);
         }
         Ad_Object* constructorReturn = CallInstanceConstructor(klass_instance, args, env);
         if (IsError(constructorReturn)) {

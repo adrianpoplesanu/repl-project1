@@ -3,6 +3,7 @@
 #include "environment.h"
 #include <stdio.h>
 #include "gc.h"
+#include "eval_utils.h"
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
@@ -208,6 +209,8 @@ Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env, Ga
 }
 
 Ad_Object* eval_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    Ad_String_Object* unescapedSource = (Ad_String_Object*) args[0];
+    evalSource(unescapedSource->value, env, gc);
     return NULL;
 }
 
