@@ -1,0 +1,40 @@
+class Socket {
+    socket = null
+
+    def constructor(p_name, p_host, p_port, p_is_active, p_is_forever, p_is_client, p_is_server) {
+        socket = __iosocket(p_name, p_host, p_port, p_is_active, p_is_forever, p_is_client, p_is_server)
+    }
+
+    def listen(callback) {
+        /* when a connection is established run callback() */
+        socket.listen()
+    }
+
+    def send(message, callback) {
+        /* use this to send a message on the opened connection */
+    }
+
+    def close() {
+        /* close the connection */
+    }
+
+    def is_client() {
+
+    }
+
+    def is_server() {
+
+    }
+
+    def is_active() {
+
+    }
+
+    def get_port() {
+
+    }
+
+    def get_name() {
+
+    }
+}

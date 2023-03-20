@@ -451,7 +451,7 @@ public class Evaluator {
 				AstDefStatement astDefStatement = (AstDefStatement) method;
 				AdFunctionObject adFunctionObject = new AdFunctionObject(astDefStatement.getParameters(), astDefStatement.getBody(), adClassInstance.getEnvironment());
 				AstIdentifier astIdentifier = (AstIdentifier) astDefStatement.getName();
-				adClassInstance.getEnvironment().set(astIdentifier.getValue(), adFunctionObject);
+				adClassInstance.getEnvironment().setLocalParam(astIdentifier.getValue(), adFunctionObject);
 			});
 			//updateInstanceWithInheritedClasses(adClassInstance, env);
 			// call class instance constructor here
@@ -1129,7 +1129,6 @@ public class Evaluator {
 	}
 
 	private AdObject evalSocketObjectMethod(AstNode node, List<AstNode> args, Environment env) {
-		//System.out.println("evaluating a socket instance member access");
 		AstMemberAccess memberAccess = (AstMemberAccess) node;
 		if (memberAccess.getOwner().getType() != AstNodeTypeEnum.IDENTIFIER) {
 			return null;
@@ -1138,6 +1137,13 @@ public class Evaluator {
 		AstIdentifier memberIdentifier = (AstIdentifier) memberAccess.getMember();
 		AdObject rawObject = env.get(ownerIdentifier.getValue());
 		if (rawObject.getType() == ObjectTypeEnum.SOCKET) {
+			if (memberAccess.isMethod()) {
+				if (memberAccess.getMember().tokenLiteral().equals("listen")) {
+					System.out.println("listening on socket");
+				}
+			} else {
+
+			}
 			return NULLOBJECT;
 		}
 		return null;

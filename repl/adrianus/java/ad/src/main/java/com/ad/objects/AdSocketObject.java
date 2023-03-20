@@ -2,15 +2,17 @@ package com.ad.objects;
 
 public class AdSocketObject extends AdObject {
     private String name;
+    private String host;
     private int port;
     private boolean isActive;
     private boolean isForever;
     private boolean isClient;
     private boolean isServer;
 
-    public AdSocketObject(String name, int port, boolean isActive, boolean isForever, boolean isClient, boolean isServer) {
+    public AdSocketObject(String name, String host, int port, boolean isActive, boolean isForever, boolean isClient, boolean isServer) {
         type = ObjectTypeEnum.SOCKET;
         this.name = name;
+        this.host = host;
         this.port = port;
         this.isActive = isActive;
         this.isForever = isForever;
@@ -64,6 +66,14 @@ public class AdSocketObject extends AdObject {
 
     public void setServer(boolean server) {
         isServer = server;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
     }
 
     @Override
