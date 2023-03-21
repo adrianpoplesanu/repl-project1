@@ -7,21 +7,23 @@
 #include "bootstrap.cpp"
 
 Repl::Repl() {
-
+    garbageCollector = new GarbageCollector();
+    evaluator.setGarbageCollector(garbageCollector);
 }
 
 Repl::~Repl() {
-    delete env2; // this could be a regular env that gets deleted by the garbage collector mechanism
+    delete env; // this could be a regular env that gets deleted by the garbage collector mechanism
+    delete garbageCollector;
 }
 
 void Repl::Loop() {
     Environment* bootstrap = load_bootstrap(program, parser, &evaluator);
     bootstrap->isBootstrapEnvironment = true;
 
-    env2 = newEnvironment();
-    env2->SetBootstrapEnvironment(bootstrap);
-    env2->isGlobalEnvironment = true;
-    evaluator.garbageCollector.mainEnv = env2;
+    env = newEnvironment();
+    env->SetBootstrapEnvironment(bootstrap);
+    env->isGlobalEnvironment = true;
+    evaluator.garbageCollector->mainEnv = env;
 
     IS_CONSOLE_RUN = true;
 
@@ -35,7 +37,7 @@ void Repl::Loop() {
         }
     }
     evaluator.GarbageCollectEnvironments();
-    evaluator.garbageCollector.forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
+    evaluator.garbageCollector->forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();
 }
 
@@ -43,10 +45,10 @@ void Repl::ExecuteFile(std::ifstream &target) {
     Environment* bootstrap = load_bootstrap(program, parser, &evaluator);
     bootstrap->isBootstrapEnvironment = true;
 
-    env2 = newEnvironment();
-    env2->SetBootstrapEnvironment(bootstrap);
-    env2->isGlobalEnvironment = true;
-    evaluator.garbageCollector.mainEnv = env2;
+    env = newEnvironment();
+    env->SetBootstrapEnvironment(bootstrap);
+    env->isGlobalEnvironment = true;
+    evaluator.garbageCollector->mainEnv = env;
     if (target.is_open()) {
         std::string line;
         std::string text;
@@ -56,11 +58,10 @@ void Repl::ExecuteFile(std::ifstream &target) {
         parser.Load(text);
         program.reset();
         parser.ParseProgram(program);
-        Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2); // TODO: asta cicleaza in momentul executiei fisierului la while
+        Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env); // TODO: asta cicleaza in momentul executiei fisierului la while
         // in python nu cicleaza pentru ca fac .read() care ia tot continutul fisierului o data, poate la fel ar trebui sa fac si aici
         if (res && res->Type() == OBJ_SIGNAL) {
-            // TODO: mark and sweep cleanup
-            //free_Ad_Object_memory(res);
+            // no need to do anything because of mark and sweep, here i used to clear up memory
         }
     } else {
         std::cout << "empty or missing ad source file\n";
@@ -68,7 +69,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
     }
     target.close();
     evaluator.GarbageCollectEnvironments();
-    evaluator.garbageCollector.forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
+    evaluator.garbageCollector->forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();
 }
 
@@ -77,11 +78,8 @@ bool Repl::ParseLine(std::string line) {
     program.reset();
     parser.ParseProgram(program);
 
-    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env2);
+    Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env);
     if (res && res->Type() == OBJ_SIGNAL) {
-        // if res->signal_type == SIGNAL_EXIT, else it's a different signal
-        // TODO: mark and sweep cleanup
-        //free_Ad_Object_memory(res);
         return true;
     }
     return false;

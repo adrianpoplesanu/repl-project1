@@ -10,7 +10,7 @@
 class Evaluator {
 public:
     std::vector<Environment*> environment_garbage_collection;
-    GarbageCollector garbageCollector;
+    GarbageCollector *garbageCollector;
 
     Ad_Object* Eval(Ad_AST_Node*, Environment&);
     Ad_Object* EvalProgram(Ad_AST_Node*, Environment&);
@@ -67,7 +67,7 @@ public:
     void Init();
     void GarbageCollectEnvironments();
     void addEnvironmentGarbageCollectorListener(Environment *);
-    void setGarbageCollector(GarbageCollector); // TODO: use this in eval builtin, should the gc be a pointer in evaluator?
+    void setGarbageCollector(GarbageCollector*); // using this in eval builtin
 
 private:
     bool validateNumberOfArguments(std::vector<int>, int);

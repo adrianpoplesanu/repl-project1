@@ -6,6 +6,7 @@
 #include "environment.h"
 #include "objects.h"
 #include "settings.h"
+#include "gc.h"
 
 class Repl {
 private:
@@ -13,8 +14,8 @@ private:
 public:
     Parser parser;
     Evaluator evaluator;
-    //Environment env;
-    Environment *env2;
+    GarbageCollector *garbageCollector;
+    Environment *env;
     Ad_AST_Program program;
 
     Repl();
