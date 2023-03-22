@@ -7,7 +7,15 @@ class Socket {
 
     def listen(callback) {
         /* when a connection is established run callback() */
-        socket.listen()
+        print ("waiting on a connection")
+        client = socket.listen()
+        if (client != null) {
+            print(client)
+        }
+
+        if (callback != null) {
+            callback(client)
+        }
     }
 
     def send(message, callback) {

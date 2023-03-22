@@ -1,0 +1,2 @@
+client = Socket("client", "localhost", 5002, true, false, true, false)
+client.send("buna dimineata", null)

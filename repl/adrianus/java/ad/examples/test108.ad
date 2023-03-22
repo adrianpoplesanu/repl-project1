@@ -1,2 +1,2 @@
-s = Socket("server", "localhost", 5002, true, false, false, true)
-s.listen(null)
+server = Socket("server", "localhost", 5002, true, false, false, true)
+server.listen(null)

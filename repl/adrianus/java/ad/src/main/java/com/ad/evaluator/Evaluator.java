@@ -1,7 +1,7 @@
 package com.ad.evaluator;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +13,7 @@ import com.ad.environment.EnvironmentUtils;
 import com.ad.hash.HashPair;
 import com.ad.objects.*;
 import com.ad.utils.FileUtils;
+import com.ad.utils.SocketUtils;
 
 import static com.ad.ast.AstNodeTypeConverter.astNodeTypeMap;
 import static com.ad.environment.EnvironmentUtils.newEnvironment;
@@ -1139,7 +1140,20 @@ public class Evaluator {
 		if (rawObject.getType() == ObjectTypeEnum.SOCKET) {
 			if (memberAccess.isMethod()) {
 				if (memberAccess.getMember().tokenLiteral().equals("listen")) {
-					System.out.println("listening on socket");
+					//System.out.println("listening on socket");
+					try {
+						AdObject request = SocketUtils.listen(5002, true, false);
+						return request;
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberAccess.getMember().tokenLiteral().equals("send")) {
+					try {
+						SocketUtils.send("localhost", 5002, true, false);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			} else {
 
