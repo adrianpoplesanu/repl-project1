@@ -53,7 +53,7 @@ public class SocketUtils {
         //AdSocketObject socketObject = new AdSocketObject("server", "localhost", 5002, true, false, false, true);
         //socketObject.setServerSocket(serverSocket);
         //return socketObject;
-        return new AdStringObject(message);
+        return new AdStringObject(message); // i should return the client socket object as a new AdSocketObject
         //return Evaluator.NULLOBJECT;
     }
 
@@ -73,7 +73,15 @@ public class SocketUtils {
         return Evaluator.NULLOBJECT;
     }
 
-    public static void close() {
+    public static AdObject read() {
+        return Evaluator.NULLOBJECT;
+    }
+
+    public static void close(AdSocketObject socketObject) throws IOException {
         // aici inchid un server sau un client care are isForever true
+        socketObject.getPrintWriter().close();
+        socketObject.getBufferedReader().close();
+        //socketObject.getServerSocket().close();
+        //socketObject.getClientSocket().close(); // TODO: this is called for server socket?
     }
 }

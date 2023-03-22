@@ -203,10 +203,18 @@ public class Evaluator {
     	}
 		if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.NULL ||
 				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.STRING) {
-			return new AdBooleanObject(true);
+			return nativeBoolToBoolean(true);
+		}
+		if (left.getType() == ObjectTypeEnum.FUNCTION && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.FUNCTION) {
+			return nativeBoolToBoolean(true);
+		}
+		if (left.getType() == ObjectTypeEnum.BUILTIN && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.BUILTIN) {
+			return nativeBoolToBoolean(true);
 		}
 		if (left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.NULL) {
-			return new AdBooleanObject(false);
+			return nativeBoolToBoolean(false);
 		}
     	return null;
     }
