@@ -5,10 +5,18 @@ class Socket {
         socket = __iosocket(p_name, p_host, p_port, p_is_active, p_is_forever, p_is_client, p_is_server)
     }
 
+    def create_server() {
+        socket.create_server()
+    }
+
+    def create_client() {
+        socket.create_client()
+    }
+
     def listen(callback) {
         /* when a connection is established run callback() */
-        print ("waiting on a connection")
-        client = socket.listen()
+        /* server listens */
+        client = socket.accept()
         if (client != null) {
             print(client)
         }
@@ -20,6 +28,10 @@ class Socket {
 
     def send(message, callback) {
         /* use this to send a message on the opened connection */
+    }
+
+    def read(callback) {
+       /* use this to read messages from an opened connection */
     }
 
     def close() {

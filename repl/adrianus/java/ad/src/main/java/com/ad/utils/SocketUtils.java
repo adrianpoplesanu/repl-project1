@@ -2,7 +2,9 @@ package com.ad.utils;
 
 import com.ad.evaluator.Evaluator;
 import com.ad.objects.AdObject;
+import com.ad.objects.AdSocketObject;
 import com.ad.objects.AdStringObject;
+import com.sun.security.ntlm.Server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,13 +14,23 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SocketUtils {
-    public static AdObject listen(int port, boolean isActive, boolean isForever) throws IOException {
-        ServerSocket serverSocket = null;
-        serverSocket = new ServerSocket(port);
+
+    public static AdObject createServer(AdSocketObject socketObject) throws IOException {
+        socketObject.setServerSocket(new ServerSocket(5003));
+        return Evaluator.NULLOBJECT;
+    }
+
+    public static AdObject createClient(AdSocketObject socketObject) throws IOException {
+        socketObject.setClientSocket(new Socket("localhost", 5003));
+        return Evaluator.NULLOBJECT;
+    }
+
+    public static AdObject accept(AdSocketObject socketObject) throws IOException {
+        ServerSocket serverSocket = socketObject.getServerSocket();
 
         String message = "aaa";
 
-        if (isForever) {
+        if (socketObject.isForever()) {
             while (true) {
                 //... always, isForever trebuie verificat dupa ce s-a stabilit conexiunea si pastrata, sau prins in socket.ad
             }
@@ -38,6 +50,9 @@ public class SocketUtils {
                     "\r\n" +
                     "this is an http response");
         }
+        //AdSocketObject socketObject = new AdSocketObject("server", "localhost", 5002, true, false, false, true);
+        //socketObject.setServerSocket(serverSocket);
+        //return socketObject;
         return new AdStringObject(message);
         //return Evaluator.NULLOBJECT;
     }

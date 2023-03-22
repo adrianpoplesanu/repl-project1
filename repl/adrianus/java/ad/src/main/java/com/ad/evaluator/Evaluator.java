@@ -201,6 +201,13 @@ public class Evaluator {
     	if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.STRING) {
     		return evalStringInfixExpression(operator, left, right);
     	}
+		if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.STRING) {
+			return new AdBooleanObject(true);
+		}
+		if (left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.NULL) {
+			return new AdBooleanObject(false);
+		}
     	return null;
     }
 
@@ -1139,11 +1146,26 @@ public class Evaluator {
 		AdObject rawObject = env.get(ownerIdentifier.getValue());
 		if (rawObject.getType() == ObjectTypeEnum.SOCKET) {
 			if (memberAccess.isMethod()) {
-				if (memberAccess.getMember().tokenLiteral().equals("listen")) {
+				if (memberAccess.getMember().tokenLiteral().equals("create_server")) {
+					try {
+						SocketUtils.createServer((AdSocketObject) rawObject);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberAccess.getMember().tokenLiteral().equals("create_client")) {
+					try {
+						SocketUtils.createClient((AdSocketObject) rawObject);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberAccess.getMember().tokenLiteral().equals("accept")) {
 					//System.out.println("listening on socket");
 					try {
-						AdObject request = SocketUtils.listen(5002, true, false);
-						return request;
+						//AdSocketObject socketObject = (AdSocketObject) args.get(0);
+						AdObject result = SocketUtils.accept((AdSocketObject) rawObject);
+						return result;
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
