@@ -9,5 +9,6 @@
 
 void evalSource(std::string, Environment*, GarbageCollector*);
 void unescapeSource(std::string&);
+void importSource(std::string);
 
 #endif

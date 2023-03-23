@@ -37,3 +37,7 @@ void unescapeSource(std::string &source) {
     //source = std::regex_replace(source, std::regex("\\\'"), "\'");
     source = replaceAll(source, R"(\\([\"\']))", 1);
 }
+
+void importSource(std::string path) {
+    // TODO: read contents of file and evalSource said contents
+}
