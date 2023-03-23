@@ -12,9 +12,6 @@ class Environment(object):
     def get(self, key):
         if key in self.store:
             return self.store.get(key)
-        #else:
-        #    if self.outer and key in self.outer.store:
-        #        return self.outer.store.get(key)
         if self.outer and self.outer.check(key):
             return self.outer.get(key)
         if self.bootstrap and self.bootstrap.check(key):
@@ -72,7 +69,7 @@ class Environment(object):
         out += offset
         out += "outer: {"
         if self.outer:
-            out += self.outer.print_store(self.outer, level + 4)
+            out += self.outer.print_store(level + 4)
         out += "}"
         return out
 

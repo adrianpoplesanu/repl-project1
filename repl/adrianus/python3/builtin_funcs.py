@@ -132,6 +132,9 @@ def getattrs_builtin(args, env):
 def thread_builtin(args, env):
     pass
 
+def import_builtin(args, env):
+    pass
+
 builtins_map = {
     "len": Ad_Builtin_Object(builtin_function=len_builtin),
     "exit": Ad_Builtin_Object(builtin_function=exit_builtin),
@@ -159,6 +162,7 @@ builtins_map = {
     "setattr": Ad_Builtin_Object(builtin_function=setattr_builtin),
     "getattrs": Ad_Builtin_Object(builtin_function=getattrs_builtin),
     "thread": Ad_Builtin_Object(builtin_function=thread_builtin),
+    "import": Ad_Builtin_Object(builtin_function=import_builtin),
     # https://www.w3schools.com/python/python_ref_keywords.asp
 	# https://www.w3schools.com/python/python_ref_functions.asp
 }
