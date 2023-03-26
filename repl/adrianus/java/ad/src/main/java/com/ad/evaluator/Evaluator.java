@@ -213,6 +213,10 @@ public class Evaluator {
 				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.BUILTIN) {
 			return nativeBoolToBoolean(true);
 		}
+		if (left.getType() == ObjectTypeEnum.SOCKET && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.SOCKET) {
+			return nativeBoolToBoolean(true);
+		}
 		if (left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.NULL) {
 			return nativeBoolToBoolean(false);
 		}
@@ -1154,33 +1158,49 @@ public class Evaluator {
 		AdObject rawObject = env.get(ownerIdentifier.getValue());
 		if (rawObject.getType() == ObjectTypeEnum.SOCKET) {
 			if (memberAccess.isMethod()) {
-				if (memberAccess.getMember().tokenLiteral().equals("create_server")) {
+				if (memberIdentifier.getValue().equals("create_server")) {
 					try {
 						SocketUtils.createServer((AdSocketObject) rawObject);
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 				}
-				if (memberAccess.getMember().tokenLiteral().equals("create_client")) {
+				if (memberIdentifier.getValue().equals("create_client")) {
 					try {
 						SocketUtils.createClient((AdSocketObject) rawObject);
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 				}
-				if (memberAccess.getMember().tokenLiteral().equals("accept")) {
-					//System.out.println("listening on socket");
+				if (memberIdentifier.getValue().equals("accept")) {
 					try {
-						//AdSocketObject socketObject = (AdSocketObject) args.get(0);
 						AdObject result = SocketUtils.accept((AdSocketObject) rawObject);
 						return result;
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 				}
-				if (memberAccess.getMember().tokenLiteral().equals("send")) {
+				if (memberIdentifier.getValue().equals("send")) {
 					try {
-						SocketUtils.send("localhost", 5002, true, false);
+						List<AdObject> argObjs = evalExpressions(args, env);
+						AdObject result = SocketUtils.send((AdSocketObject) rawObject, argObjs.get(0));
+						return result;
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberIdentifier.getValue().equals("read")) {
+					AdObject result = null;
+					try {
+						result = SocketUtils.read((AdSocketObject) rawObject);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+					return result;
+				}
+				if (memberIdentifier.getValue().equals("close")) {
+					try {
+						SocketUtils.close((AdSocketObject) rawObject);
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}

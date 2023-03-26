@@ -1,5 +1,6 @@
 class Socket {
     socket = null
+    clients = []
 
     def constructor(p_name, p_host, p_port, p_is_active, p_is_forever, p_is_client, p_is_server) {
         socket = __iosocket(p_name, p_host, p_port, p_is_active, p_is_forever, p_is_client, p_is_server)
@@ -18,7 +19,7 @@ class Socket {
         /* server listens */
         client = socket.accept()
         if (client != null) {
-            print(client)
+
         }
 
         if (callback != null) {
@@ -26,16 +27,31 @@ class Socket {
         }
     }
 
-    def send(message, callback) {
+    def send(client, message, callback) {
         /* use this to send a message on the opened connection */
+        response = client.send(message)
+
+        if (callback != null) {
+            callback(response)
+        }
+
+        return response
     }
 
-    def read(callback) {
-       /* use this to read messages from an opened connection */
+    def read(client, callback) {
+        /* use this to read messages from an opened connection */
+        response = client.read()
+
+        if (callback != null) {
+            callback(response)
+        }
+
+        return response
     }
 
     def close() {
         /* close the connection */
+        socket.close()
     }
 
     def is_client() {

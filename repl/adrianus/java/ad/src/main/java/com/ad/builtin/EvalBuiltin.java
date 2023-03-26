@@ -6,6 +6,7 @@ import com.ad.evaluator.Evaluator;
 import com.ad.objects.AdObject;
 import com.ad.objects.AdStringObject;
 import com.ad.parser.Parser;
+import com.ad.utils.AdStringsUtils;
 import com.ad.utils.EvalUtils;
 
 import java.util.List;
@@ -19,8 +20,8 @@ public class EvalBuiltin extends AbstractBuiltin {
 
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
-        String unescapedSource = ((AdStringObject) args.get(0)).getValue();
-        String source = unescapedSource.replace("\\\"", "\"").replace("\\\'","\'");
+        String rawSource = ((AdStringObject) args.get(0)).getValue();
+        String source = AdStringsUtils.unescapeString(rawSource);
         EvalUtils.evalSource(source, env);
         return null;
     }
