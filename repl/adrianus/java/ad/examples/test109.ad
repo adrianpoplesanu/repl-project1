@@ -1,0 +1,14 @@
+client = Socket("client", "localhost", 5003, true, false, true, false)
+client.create_client()
+
+/*print (client.socket)*/
+response = client.send(client.socket, "buna dimineata", null)
+/*response = client.socket.send("buna dimineata")*/
+
+/*print(response)*/
+
+response2 = client.read(client.socket, null)
+/*response2 = client.socket.read()*/
+
+print(response2)
+client.close()

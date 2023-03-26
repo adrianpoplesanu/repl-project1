@@ -1,0 +1,40 @@
+class ServerSocket {
+    socket = null
+    clients = []
+
+    def constructor(port) {
+        socket = Socket("server", "localhost", port, true, false, false, true)
+    }
+
+    def accept() {
+
+    }
+
+    def read(client) {
+
+    }
+
+    def send(client, message) {
+
+    }
+
+    def send_all(message) {
+
+    }
+}
+
+class ClientSocket {
+    socket = null
+
+    def constructor(host, port) {
+        socket = Socket("client", host, port, true, false, true, false)
+    }
+
+    def read() {
+
+    }
+
+    def send(message) {
+
+    }
+}

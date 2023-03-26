@@ -1,7 +1,7 @@
 package com.ad.evaluator;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +13,7 @@ import com.ad.environment.EnvironmentUtils;
 import com.ad.hash.HashPair;
 import com.ad.objects.*;
 import com.ad.utils.FileUtils;
+import com.ad.utils.SocketUtils;
 
 import static com.ad.ast.AstNodeTypeConverter.astNodeTypeMap;
 import static com.ad.environment.EnvironmentUtils.newEnvironment;
@@ -200,6 +201,25 @@ public class Evaluator {
     	if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.STRING) {
     		return evalStringInfixExpression(operator, left, right);
     	}
+		if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.STRING) {
+			return nativeBoolToBoolean(true);
+		}
+		if (left.getType() == ObjectTypeEnum.FUNCTION && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.FUNCTION) {
+			return nativeBoolToBoolean(true);
+		}
+		if (left.getType() == ObjectTypeEnum.BUILTIN && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.BUILTIN) {
+			return nativeBoolToBoolean(true);
+		}
+		if (left.getType() == ObjectTypeEnum.SOCKET && right.getType() == ObjectTypeEnum.NULL ||
+				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.SOCKET) {
+			return nativeBoolToBoolean(true);
+		}
+		if (left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.NULL) {
+			return nativeBoolToBoolean(false);
+		}
     	return null;
     }
 
@@ -1138,8 +1158,52 @@ public class Evaluator {
 		AdObject rawObject = env.get(ownerIdentifier.getValue());
 		if (rawObject.getType() == ObjectTypeEnum.SOCKET) {
 			if (memberAccess.isMethod()) {
-				if (memberAccess.getMember().tokenLiteral().equals("listen")) {
-					System.out.println("listening on socket");
+				if (memberIdentifier.getValue().equals("create_server")) {
+					try {
+						SocketUtils.createServer((AdSocketObject) rawObject);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberIdentifier.getValue().equals("create_client")) {
+					try {
+						SocketUtils.createClient((AdSocketObject) rawObject);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberIdentifier.getValue().equals("accept")) {
+					try {
+						AdObject result = SocketUtils.accept((AdSocketObject) rawObject);
+						return result;
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberIdentifier.getValue().equals("send")) {
+					try {
+						List<AdObject> argObjs = evalExpressions(args, env);
+						AdObject result = SocketUtils.send((AdSocketObject) rawObject, argObjs.get(0));
+						return result;
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				if (memberIdentifier.getValue().equals("read")) {
+					AdObject result = null;
+					try {
+						result = SocketUtils.read((AdSocketObject) rawObject);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+					return result;
+				}
+				if (memberIdentifier.getValue().equals("close")) {
+					try {
+						SocketUtils.close((AdSocketObject) rawObject);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			} else {
 

@@ -1,2 +1,21 @@
-s = Socket("server", "localhost", 5002, true, false, false, true)
-s.listen(null)
+server = Socket("server", "localhost", 5003, true, false, false, true)
+server.create_server()
+
+client = null
+
+def connection_handler(response) {
+    client = response
+}
+
+server.listen(connection_handler)
+
+request = server.read(client, null)
+/*request = client.read(client, null)*/
+print (request)
+
+response = "HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 87\r\nConnection: close\r\n\r\n<html>this is a <b>http bebe dex</b> response from Ad Server with better reading</html>"
+status = server.send(client, response, null)
+/*client.send(response, null)*/
+
+status = client.close()
+server.close()
