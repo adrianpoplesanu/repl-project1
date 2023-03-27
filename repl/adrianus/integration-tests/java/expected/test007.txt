@@ -1,0 +1,6 @@
+1
+'aaa'
+2
+'bbb'
+3
+'{a: 3, b: <funtion at memory address: (.*)>}'
