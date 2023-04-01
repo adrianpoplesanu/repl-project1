@@ -1,0 +1,9 @@
+import("examples/test137.ad")
+
+doggy = Doggy()
+print (doggy.name)
+
+/*system = SystemCommand()
+
+path = system.execute("pwd")
+print(path)*/

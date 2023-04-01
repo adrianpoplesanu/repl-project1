@@ -38,6 +38,21 @@ void unescapeSource(std::string &source) {
     source = replaceAll(source, R"(\\([\"\']))", 1);
 }
 
-void importSource(std::string path) {
-    // TODO: read contents of file and evalSource said contents
+std::string readFileContent(std::string path) {
+    std::ifstream in(path);
+    std::string text = "";
+    if (in.is_open() ) {
+        char mychar;
+        while ( in ) {
+            mychar = in.get();
+            text += mychar;
+        }
+    }
+    return text;
+}
+
+void importSource(std::string path, Environment *env, GarbageCollector* gc) {
+    std::string sourceFromFile = readFileContent(path);
+
+    evalSource(sourceFromFile, env, gc);
 }

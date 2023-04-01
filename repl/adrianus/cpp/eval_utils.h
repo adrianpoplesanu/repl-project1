@@ -8,6 +8,7 @@
 #include "gc.h"
 
 void evalSource(std::string, Environment*, GarbageCollector*);
+void importSource(std::string, Environment*, GarbageCollector*);
 void unescapeSource(std::string&);
 void importSource(std::string);
 

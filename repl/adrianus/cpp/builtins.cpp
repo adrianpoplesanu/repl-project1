@@ -302,6 +302,8 @@ Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environment *env, Garbag
 }
 
 Ad_Object* import_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    Ad_String_Object* path = (Ad_String_Object*) args[0];
+    importSource(path->value, env, gc);
     return NULL;
 }
 
