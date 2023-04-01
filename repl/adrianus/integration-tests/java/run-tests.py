@@ -15,6 +15,7 @@ failure_actual = []
 
 for test_file in test_files:
     target = test_file.strip()
+    print ('running test: ' + target)
     proc = subprocess.Popen(["java", "-jar", jar_path + jar_name, target], stdout=subprocess.PIPE)
     proc.wait()
     output = proc.communicate()[0]
