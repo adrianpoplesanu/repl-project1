@@ -31,6 +31,12 @@ public class AdStringObject extends AdObject {
 		return ObjectTypeConverter.convertToString(type) + inspect();
 	}
 
+	@Override
+	public AdObject copy() {
+		AdStringObject newObject = new AdStringObject(value);
+		return newObject;
+	}
+
 	public String getValue() {
 		return value;
 	}

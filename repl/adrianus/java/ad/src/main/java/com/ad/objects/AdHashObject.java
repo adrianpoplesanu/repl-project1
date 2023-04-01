@@ -40,6 +40,19 @@ public class AdHashObject extends AdObject {
         return ObjectTypeConverter.convertToString(type) + inspect();
     }
 
+    @Override
+    public AdObject copy() {
+        HashMap<String, HashPair<AdObject>> newElements = new HashMap<>();
+        for (Map.Entry<String, HashPair<AdObject>> element : elements.entrySet()) {
+            newElements.put(element.getKey(),
+                    new HashPair<>(
+                            element.getValue().getKey().copy(),
+                            element.getValue().getValue().copy()));
+        }
+        AdHashObject newObject = new AdHashObject(newElements);
+        return newObject;
+    }
+
     public HashMap<String, HashPair<AdObject>> getElements() {
         return elements;
     }
