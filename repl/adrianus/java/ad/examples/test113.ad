@@ -1,0 +1,30 @@
+th1 = __thread("thread 1")
+th2 = __thread("thread 2")
+th3 = __thread("thread 3")
+
+class Task {
+    def runner() {
+        for(i = 0; i < 100; i++) {
+            print (i)
+        }
+    }
+}
+
+task1 = Task()
+th1.execute(task1.runner)
+
+task2 = Task()
+th2.execute(task2.runner)
+
+task3 = Task()
+th3.execute(task3.runner)
+
+th1.start()
+th2.start()
+th3.start()
+
+th1.join()
+th2.join()
+th3.join()
+
+print("after threads")

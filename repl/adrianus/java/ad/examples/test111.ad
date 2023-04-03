@@ -1,0 +1,17 @@
+th1 = __thread("thread 1")
+th2 = __thread("thread 2")
+th3 = __thread("thread 3")
+
+def runner() {
+    for(i = 0; i < 100; i++) {
+        print (i)
+    }
+}
+
+th1.execute(runner)
+th2.execute(runner)
+th3.execute(runner)
+
+th1.start()
+th2.start()
+th3.start()

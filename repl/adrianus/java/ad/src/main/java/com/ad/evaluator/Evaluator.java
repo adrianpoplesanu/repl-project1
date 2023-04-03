@@ -14,6 +14,7 @@ import com.ad.hash.HashPair;
 import com.ad.objects.*;
 import com.ad.utils.FileUtils;
 import com.ad.utils.SocketUtils;
+import com.ad.utils.ThreadUtils;
 
 import static com.ad.ast.AstNodeTypeConverter.astNodeTypeMap;
 import static com.ad.environment.EnvironmentUtils.newEnvironment;
@@ -421,7 +422,7 @@ public class Evaluator {
 		return objects;
     }
 
-    private AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments, Environment env) {
+    public AdObject applyFunction(AdObject function, ArrayList<AdObject> arguments, Environment env) {
     	if (function.getType() == ObjectTypeEnum.FUNCTION) {
 			AdFunctionObject functionObj = (AdFunctionObject) function;
 			int parametersSize =  functionObj.getParameters().size();
@@ -951,6 +952,11 @@ public class Evaluator {
 			return evaluated;
 		}
 
+		evaluated = evalThreadObjectMethod(node, stmt.getArguments(), env);
+		if (evaluated != null) {
+			return evaluated;
+		}
+
 		if (stmt.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
 			if (stmt.isMethod()) {
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
@@ -1204,6 +1210,45 @@ public class Evaluator {
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
+				}
+			} else {
+
+			}
+			return NULLOBJECT;
+		}
+		return null;
+	}
+
+	private AdObject evalThreadObjectMethod(AstNode node, List<AstNode> args, Environment env) {
+		AstMemberAccess memberAccess = (AstMemberAccess) node;
+		if (memberAccess.getOwner().getType() != AstNodeTypeEnum.IDENTIFIER) {
+			return null;
+		}
+		AstIdentifier ownerIdentifier = (AstIdentifier) memberAccess.getOwner();
+		AstIdentifier memberIdentifier = (AstIdentifier) memberAccess.getMember();
+		AdObject rawObject = env.get(ownerIdentifier.getValue());
+		if (rawObject.getType() == ObjectTypeEnum.THREAD) {
+			if (memberAccess.isMethod()) {
+				if (memberIdentifier.getValue().equals("execute")) {
+					List<AdObject> argObjs = evalExpressions(args, env);
+					AdThreadObject threadObject = (AdThreadObject) rawObject;
+					threadObject.setCallback(argObjs.get(0));
+					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env));
+					threadObject.setThread(ThreadUtils.generateThread(threadObject.getWorker()));
+				}
+				if (memberIdentifier.getValue().equals("start")) {
+					AdThreadObject threadObject = (AdThreadObject) rawObject;
+					threadObject.getThread().start();
+					// thread pool needs to add this object
+				}
+				if (memberIdentifier.getValue().equals("join")) {
+					AdThreadObject threadObject = (AdThreadObject) rawObject;
+					try {
+						threadObject.getThread().join();
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
+					// thread pool needs to stop this object
 				}
 			} else {
 

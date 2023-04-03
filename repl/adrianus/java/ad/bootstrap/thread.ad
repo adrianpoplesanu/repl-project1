@@ -1,0 +1,7 @@
+class Thread {
+    thread = null
+
+    def constructor() {
+        thread = __thread("thread")
+    }
+}

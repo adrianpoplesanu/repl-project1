@@ -1,0 +1,8 @@
+th = __thread("thread name")
+
+def runner() {
+    print ("running")
+}
+
+th.execute(runner)
+th.start()

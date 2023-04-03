@@ -17,5 +17,6 @@ public enum ObjectTypeEnum {
     CLASS,
     INSTANCE,
     FILE,
-    SOCKET
+    SOCKET,
+    THREAD
 }

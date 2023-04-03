@@ -21,7 +21,7 @@ public class BuiltinLookup {
 			put("context", new AdBuiltinObject(new ContextBuiltin()));
 			put("__iofile", new AdBuiltinObject(new IOFileBuiltin())); // TODO: update this
 			put("__syssystem", new AdBuiltinObject(new SysSystemBuiltin())); // TODO: update this
-			put("__iosocket", new AdBuiltinObject(new IOSocketBuiltin())); // TODO: update this
+			put("__iosocket", new AdBuiltinObject(new IOSocketBuiltin()));
 			put("eval", new AdBuiltinObject(new EvalBuiltin())); // TODO: update this
 			put("__first", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("__last", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
@@ -34,7 +34,7 @@ public class BuiltinLookup {
 			put("getattr", new AdBuiltinObject(new GetattrBuiltin()));
 			put("setattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("getattrs", new AdBuiltinObject(new GetattrsBuiltin()));
-			put("thread", new AdBuiltinObject(new ContextBuiltin())); // TODO: reasearch this
+			put("__thread", new AdBuiltinObject(new ThreadBuiltin()));
 			put("import", new AdBuiltinObject(new ImportBuiltin()));
 			// https://www.w3schools.com/python/python_ref_keywords.asp
 			// https://www.w3schools.com/python/python_ref_functions.asp
