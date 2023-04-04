@@ -8,6 +8,7 @@
 #include "repl.h"
 #include "repl.cpp"
 #include "settings.h"
+#include "socket_utils.cpp"
 
 // 0 - no test is being run ar startinme, 1 - all tests are run at startime
 #define RUN_TESTS 0

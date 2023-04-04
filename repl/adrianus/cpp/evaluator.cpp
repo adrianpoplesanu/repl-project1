@@ -4,6 +4,7 @@
 #include "builtins.cpp"
 #include "gc.cpp"
 #include "eval_utils.cpp"
+#include "socket_utils.h"
 
 
 //Ad_Null_Object NULLOBJECT;
@@ -1190,14 +1191,36 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST
 }
 
 Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST_Node*> args, Environment& env) {
-    //std::cout << "evaluating a socket object member access\n"; // commenting this out for tests to pass
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
     if (member_access->owner->type != ST_IDENTIFIER) {
         return NULL;
     }
     Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
+    Ad_AST_Identifier* member_ident = (Ad_AST_Identifier*) member_access->member;
     Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
     if (owner_obj_raw->type == OBJ_SOCKET) {
+        if (member_access->is_method) {
+            if (member_ident->value == "create_server") {
+                std::cout << "create_server\n";
+            }
+            if (member_ident->value == "create_client") {
+                std::cout << "create_client\n";
+            }
+            if (member_ident->value == "accept") {
+                std::cout << "accept\n";
+            }
+            if (member_ident->value == "send") {
+                std::cout << "send\n";
+            }
+            if (member_ident->value == "read") {
+                std::cout << "read\n";
+            }
+            if (member_ident->value == "close") {
+                std::cout << "close\n";
+            }
+        } else {
+            //...
+        }
         return &NULLOBJECT;
     }
     return NULL;
