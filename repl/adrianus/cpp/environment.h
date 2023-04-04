@@ -13,6 +13,7 @@ public:
     int ref_count;
     bool isBootstrapEnvironment;
     bool isGlobalEnvironment;
+    bool isRunningImportCommand;
 
     Environment();
     ~Environment();

@@ -29,7 +29,9 @@ void evalSource(std::string source, Environment *env, GarbageCollector* gc) {
     parser.Load(source);
     program.reset();
     parser.ParseProgram(program);
+    env->isRunningImportCommand = true;
     Ad_Object* res = evaluator.Eval((Ad_AST_Node *)&program, *env);
+    env->isRunningImportCommand = false;
 }
 
 void unescapeSource(std::string &source) {

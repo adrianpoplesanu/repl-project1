@@ -1,0 +1,3 @@
+import("examples/test139.ad")
+
+print(var1)

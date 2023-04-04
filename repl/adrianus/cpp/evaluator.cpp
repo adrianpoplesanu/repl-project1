@@ -815,7 +815,7 @@ Ad_Object* Evaluator::EvalClassStatement(Ad_AST_Node* node, Environment& env) {
     garbageCollector->addObject(klass_object);
     klass_object->inheritFrom = class_node->inheritFrom;
     Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*)(class_node->name);
-    if (IS_CONSOLE_RUN && env.isGlobalEnvironment) {
+    if ((IS_CONSOLE_RUN && env.isGlobalEnvironment) || env.isRunningImportCommand) {
         klass_object->attemptASTNodesDeletion = true;
     }
     if (env.isBootstrapEnvironment) {

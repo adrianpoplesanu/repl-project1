@@ -5,6 +5,7 @@ Environment::Environment() {
     bootstrap = NULL;
     isBootstrapEnvironment = false;
     isGlobalEnvironment = false;
+    isRunningImportCommand = false;
     ref_count = 0;
 }
 
