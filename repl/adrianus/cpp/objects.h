@@ -333,6 +333,8 @@ public:
 	bool isForever;
 	bool isClient;
 	bool isServer;
+	int listenfd; // listen file descriptor
+	int connfd; // connection file descriptor
 
 	Ad_Socket_Object();
 	Ad_Socket_Object(std::string, int, bool, bool, bool, bool);
