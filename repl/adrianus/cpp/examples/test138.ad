@@ -1,4 +1,5 @@
 import("examples/test137.ad")
+import("../../cpp/examples/test137.ad")
 
 doggy = Doggy()
 print (doggy.name)
