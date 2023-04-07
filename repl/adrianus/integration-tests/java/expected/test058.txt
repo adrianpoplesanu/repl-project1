@@ -1,1 +1,2 @@
-ala bala portocala
+10
+'USA'

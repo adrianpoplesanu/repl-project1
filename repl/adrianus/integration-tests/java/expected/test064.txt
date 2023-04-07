@@ -1,1 +1,4 @@
-ala bala portocala
+5
+<class instance at memory address: (.*)>
+6
+<class instance at memory address: (.*)>

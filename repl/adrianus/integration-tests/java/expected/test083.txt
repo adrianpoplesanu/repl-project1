@@ -1,1 +1,1 @@
-ala bala portocala
+\[{'aaa': 5}, {'aaa': 5}\]
