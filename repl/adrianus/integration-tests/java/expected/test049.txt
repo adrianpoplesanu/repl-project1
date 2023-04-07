@@ -1,1 +1,2 @@
-ala bala portocala
+'USA'
+\['red', 'white', 'blue'\]

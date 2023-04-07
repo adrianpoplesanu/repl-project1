@@ -1,1 +1,1 @@
-ala bala portocala
+'in constructor'

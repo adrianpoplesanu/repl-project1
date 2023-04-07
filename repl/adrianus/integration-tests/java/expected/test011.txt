@@ -1,1 +1,1 @@
-ala bala portocala
+'{t: <class instance at memory address: (.*)>, Test: <class at memory address: (.*)>}'

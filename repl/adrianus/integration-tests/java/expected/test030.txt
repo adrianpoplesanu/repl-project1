@@ -1,1 +1,6 @@
-ala bala portocala
+<funtion at memory address: (.*)>
+<funtion at memory address: (.*)>
+'life'
+'life'
+'life'
+'bad'
