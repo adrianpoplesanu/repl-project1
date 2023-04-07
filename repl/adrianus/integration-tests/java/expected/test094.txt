@@ -1,1 +1,8 @@
-ala bala portocala
+\['a', 'b', 'c', 'd', 'e'\]
+\['a', 'c', 'e', 'b', 'd'\]
+5
+<funtion at memory address: (.*)>
+6
+6
+20
+200

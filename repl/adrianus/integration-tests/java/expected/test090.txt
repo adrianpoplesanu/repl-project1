@@ -1,1 +1,9 @@
-ala bala portocala
+\['red', 'green', 'blue'\]
+\['yellow', 'red', 'black'\]
+\['ros', 'galb', 'albas'\]
+\['cyan', 'green', 'blue'\]
+\['yellow', 'cyanish', 'black'\]
+\['ros', 'galb', 'cyaner'\]
+\['cyan', 'green', 'blue'\]
+\['yellow', 'cyanish', 'black'\]
+\['ros', 'galb', 'cyaner'\]

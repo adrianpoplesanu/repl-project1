@@ -1,1 +1,1 @@
-ala bala portocala
+ERROR: method b not found in class Test
