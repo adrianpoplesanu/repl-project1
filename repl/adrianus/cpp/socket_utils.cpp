@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 std::string cleanupUnescapedCharaters(std::string text) {
     std::string result;
@@ -33,7 +34,16 @@ void create_server(Ad_Object* rawSocket) {
 void create_client(Ad_Object* rawSocket) {
     Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
 
-    // TODO: create a client connfd, right?
+    struct sockaddr_in serv_addr;
+
+    memset(socketObject->recvBuff, '0', sizeof(socketObject->recvBuff));
+    socketObject->connfd = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&serv_addr, '0', sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(5003);
+    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
+
+    connect(socketObject->connfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 }
 
 Ad_Object* accept(Ad_Object* rawSocket) {
@@ -49,8 +59,28 @@ void send(Ad_Object* rawSocket, Ad_Object* rawString) {
     Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
     Ad_String_Object* stringObject = (Ad_String_Object*) rawString;
 
-    //snprintf(socketObject->sendBuff, sizeof(socketObject->sendBuff), "HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 91\r\nConnection: close\r\n\r\n<html>this is a <b>http bebe dex</b> response from Ad Server cpp with better reading</html>");
     std::string escapedText = cleanupUnescapedCharaters(stringObject->value);
     snprintf(socketObject->sendBuff, sizeof(socketObject->sendBuff), "%s", escapedText.c_str());
     write(socketObject->connfd, socketObject->sendBuff, strlen(socketObject->sendBuff));
+}
+
+Ad_Object* read(Ad_Object* rawSocket) {
+    Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
+
+    std::string message = "";
+    int n;
+
+    while ((n = read(socketObject->connfd, socketObject->recvBuff, sizeof(socketObject->recvBuff) - 1)) > 0) {
+        socketObject->recvBuff[n] = 0;
+        message += socketObject->recvBuff;
+    }
+
+    Ad_String_Object* result = new Ad_String_Object(message);
+    return result;
+}
+
+void close(Ad_Object* rawSocket) {
+    Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
+
+    close(socketObject->connfd);
 }

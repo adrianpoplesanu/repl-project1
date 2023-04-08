@@ -337,6 +337,7 @@ public:
 	int listenfd; // listen file descriptor
 	int connfd; // connection file descriptor
 	char sendBuff[1024];
+	char recvBuff[1024];
 
 	Ad_Socket_Object();
 	Ad_Socket_Object(std::string, std::string, int, bool, bool, bool, bool);

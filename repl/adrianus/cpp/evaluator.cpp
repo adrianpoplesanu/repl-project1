@@ -1204,7 +1204,7 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
                 create_server(owner_obj_raw);
             }
             if (member_ident->value == "create_client") {
-                std::cout << "create_client\n";
+                create_client(owner_obj_raw);
             }
             if (member_ident->value == "accept") {
                 Ad_Object* result = accept(owner_obj_raw);
@@ -1215,10 +1215,11 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
                 send(owner_obj_raw, args_obj.at(0));
             }
             if (member_ident->value == "read") {
-                std::cout << "read\n";
+                Ad_Object* result = read(owner_obj_raw);
+                return result;
             }
             if (member_ident->value == "close") {
-                std::cout << "close\n";
+                close(owner_obj_raw);
             }
         } else {
             //...
