@@ -328,6 +328,7 @@ public:
 class Ad_Socket_Object : public Ad_Object {
 public:
 	std::string name;
+	std::string host;
 	int port;
 	bool isActive;
 	bool isForever;
@@ -335,9 +336,10 @@ public:
 	bool isServer;
 	int listenfd; // listen file descriptor
 	int connfd; // connection file descriptor
+	char sendBuff[1024];
 
 	Ad_Socket_Object();
-	Ad_Socket_Object(std::string, int, bool, bool, bool, bool);
+	Ad_Socket_Object(std::string, std::string, int, bool, bool, bool, bool);
 	~Ad_Socket_Object();
 	virtual std::string Inspect();
 	virtual void Print();

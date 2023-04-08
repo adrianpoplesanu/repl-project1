@@ -792,11 +792,12 @@ Ad_Socket_Object::Ad_Socket_Object(std::string n, int p) {
     port = p;
 }*/
 
-Ad_Socket_Object::Ad_Socket_Object(std::string n, int p, bool a, bool f, bool c, bool s) {
+Ad_Socket_Object::Ad_Socket_Object(std::string n, std::string h, int p, bool a, bool f, bool c, bool s) {
     type = OBJ_SOCKET;
     ref_count = 0;
     marked = false;
     name = n;
+    host = h;
     port = p;
     isActive = a;
     isForever = f;

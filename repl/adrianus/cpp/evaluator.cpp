@@ -1201,16 +1201,18 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
     if (owner_obj_raw->type == OBJ_SOCKET) {
         if (member_access->is_method) {
             if (member_ident->value == "create_server") {
-                std::cout << "create_server\n";
+                create_server(owner_obj_raw);
             }
             if (member_ident->value == "create_client") {
                 std::cout << "create_client\n";
             }
             if (member_ident->value == "accept") {
-                std::cout << "accept\n";
+                Ad_Object* result = accept(owner_obj_raw);
+                return result;
             }
             if (member_ident->value == "send") {
-                std::cout << "send\n";
+                std::vector<Ad_Object*> args_obj = EvalExpressions(args, env);
+                send(owner_obj_raw, args_obj.at(0));
             }
             if (member_ident->value == "read") {
                 std::cout << "read\n";
