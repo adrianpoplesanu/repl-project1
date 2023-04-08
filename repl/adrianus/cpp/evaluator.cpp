@@ -1208,6 +1208,7 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
             }
             if (member_ident->value == "accept") {
                 Ad_Object* result = accept(owner_obj_raw);
+                garbageCollector->addObject(result);
                 return result;
             }
             if (member_ident->value == "send") {
@@ -1216,6 +1217,7 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
             }
             if (member_ident->value == "read") {
                 Ad_Object* result = read(owner_obj_raw);
+                garbageCollector->addObject(result);
                 return result;
             }
             if (member_ident->value == "close") {
