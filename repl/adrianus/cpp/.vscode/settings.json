@@ -78,7 +78,8 @@
         "__functional_base_03": "cpp",
         "*.tcc": "cpp",
         "numeric": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "regex": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
