@@ -1229,21 +1229,22 @@ public class Evaluator {
 		AdObject rawObject = env.get(ownerIdentifier.getValue());
 		if (rawObject.getType() == ObjectTypeEnum.THREAD) {
 			if (memberAccess.isMethod()) {
-				if (memberIdentifier.getValue().equals("execute")) {
+				if (memberIdentifier.getValue().equals("callback") || memberIdentifier.getValue().equals("execute")) {
 					List<AdObject> argObjs = evalExpressions(args, env);
 					AdThreadObject threadObject = (AdThreadObject) rawObject;
 					threadObject.setCallback(argObjs.get(0));
 					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env));
 					threadObject.setThread(ThreadUtils.generateThread(threadObject.getWorker()));
 				}
-				if (memberIdentifier.getValue().equals("start")) {
+				if (memberIdentifier.getValue().equals("runAsync") || memberIdentifier.getValue().equals("start")) {
 					AdThreadObject threadObject = (AdThreadObject) rawObject;
 					threadObject.getThread().start();
 					// thread pool needs to add this object
 				}
-				if (memberIdentifier.getValue().equals("join")) {
+				if (memberIdentifier.getValue().equals("runBlocking") || memberIdentifier.getValue().equals("join")) {
 					AdThreadObject threadObject = (AdThreadObject) rawObject;
 					try {
+						threadObject.getThread().start();
 						threadObject.getThread().join();
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
