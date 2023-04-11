@@ -29,6 +29,7 @@ enum Ad_Object_Type {
 	OBJ_INSTANCE,
 	OBJ_FILE,
 	OBJ_SOCKET,
+	OBJ_THREAD,
 	OBJ_BREAK,
 	OBJ_CONTINUE
 };
@@ -50,6 +51,7 @@ std::map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_INSTANCE, "INSTANCE"},
 	{OBJ_FILE, "FILE"},
 	{OBJ_SOCKET, "SOCKET"},
+	{OBJ_THREAD, "THREAD"},
 	{OBJ_BREAK, "BREAK"},
 	{OBJ_CONTINUE, "CONTINUE"}
 };
@@ -342,6 +344,20 @@ public:
 	Ad_Socket_Object();
 	Ad_Socket_Object(std::string, std::string, int, bool, bool, bool, bool);
 	~Ad_Socket_Object();
+	virtual std::string Inspect();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
+	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
+};
+
+class Ad_Thread_Object : public Ad_Object {
+public:
+	std::string name;
+	Ad_Object* callback;
+
+	Ad_Thread_Object();
+	~Ad_Thread_Object();
 	virtual std::string Inspect();
 	virtual void Print();
 	virtual Ad_Object_Type Type();

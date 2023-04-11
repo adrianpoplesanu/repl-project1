@@ -831,6 +831,30 @@ std::string Ad_Socket_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Thread_Object::Ad_Thread_Object() {
+    type = OBJ_SOCKET;
+    ref_count = 0;
+    marked = false;
+}
+
+std::string Ad_Thread_Object::Inspect() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<thread instance at memory address " + ss.str() + ">";
+}
+
+void Ad_Thread_Object::Print() {
+    std::cout << "ThreadObject\n";
+}
+
+Ad_Object_Type Ad_Thread_Object::Type() {
+    return type;
+}
+
+std::string Ad_Thread_Object::Hash() {
+    return object_type_map[type] + Inspect();
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
