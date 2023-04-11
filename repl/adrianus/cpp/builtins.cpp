@@ -298,7 +298,10 @@ Ad_Object* getattrs_builtin(std::vector<Ad_Object*> args, Environment *env, Garb
 }
 
 Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
-    return NULL;
+    Ad_Thread_Object* threadObject = new Ad_Thread_Object();
+    gc->addObject(threadObject);
+
+    return threadObject;
 }
 
 Ad_Object* import_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
@@ -335,7 +338,7 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"getattr", new Ad_Builtin_Object(&getattr_builtin)},
     {"setattr", new Ad_Builtin_Object(&setattr_builtin)},
     {"getattrs", new Ad_Builtin_Object(&getattrs_builtin)},
-    {"thread", new Ad_Builtin_Object(&thread_builtin)},
+    {"__thread", new Ad_Builtin_Object(&thread_builtin)},
     {"import", new Ad_Builtin_Object(&import_builtin)}
     // eval
     // first
