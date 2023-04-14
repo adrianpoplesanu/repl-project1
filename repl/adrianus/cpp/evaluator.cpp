@@ -1252,11 +1252,11 @@ Ad_Object* Evaluator::evalThreadObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
             }
             if (member_ident->value == "runAsync" || member_ident->value == "start") {
                 // create socket and detach
-                thread_async_run(owner_obj_raw);
+                thread_async_run(owner_obj_raw, garbageCollector, env);
             }
             if (member_ident->value == "runBlocking" || member_ident->value == "join") {
                 // create socket and join
-                thread_blocking_run(owner_obj_raw);
+                thread_blocking_run(owner_obj_raw, garbageCollector, env);
             }
         } else {
 
