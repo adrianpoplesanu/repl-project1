@@ -5,6 +5,7 @@
 #include "gc.cpp"
 #include "eval_utils.cpp"
 #include "socket_utils.h"
+#include "thread_utils.h"
 
 
 //Ad_Null_Object NULLOBJECT;
@@ -894,6 +895,9 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
     evaluated = evalSocketObjectMethod(node, member_access->arguments, env);
     if (evaluated != NULL) return evaluated;
 
+    evaluated = evalThreadObjectMethod(node, member_access->arguments, env);
+    if (evaluated != NULL) return evaluated;
+
     if (member_access->owner->type == ST_THIS_EXPRESSION) {
         if (member_access->is_method) {
             Ad_Object* klass_method = env.Get(((Ad_AST_Identifier*)member_access->member)->value);
@@ -1225,6 +1229,37 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
             }
         } else {
             //...
+        }
+        return &NULLOBJECT;
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::evalThreadObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST_Node*> args, Environment& env) {
+    Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
+    if (member_access->owner->type != ST_IDENTIFIER) {
+        return NULL;
+    }
+    Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
+    Ad_AST_Identifier* member_ident = (Ad_AST_Identifier*) member_access->member;
+    Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
+    if (owner_obj_raw->type == OBJ_THREAD) {
+        if (member_access->is_method) {
+            if (member_ident->value == "callback" || member_ident->value == "execute") {
+                // add reference to function object
+                std::vector<Ad_Object*> args_obj = EvalExpressions(args, env);
+                thread_callback(owner_obj_raw, args_obj);
+            }
+            if (member_ident->value == "runAsync" || member_ident->value == "start") {
+                // create socket and detach
+                thread_async_run(owner_obj_raw);
+            }
+            if (member_ident->value == "runBlocking" || member_ident->value == "join") {
+                // create socket and join
+                thread_blocking_run(owner_obj_raw);
+            }
+        } else {
+
         }
         return &NULLOBJECT;
     }

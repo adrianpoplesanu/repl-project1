@@ -196,6 +196,14 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             obj->marked = true;
             break;
         }
+        case OBJ_THREAD: {
+            obj->marked = true;
+            Ad_Thread_Object* threadObject = (Ad_Thread_Object*) obj;
+            if (threadObject->callback != NULL) {
+                markObject(threadObject->callback);
+            }
+            break;
+        }
         case OBJ_BREAK: {
             obj->marked = true;
             break;

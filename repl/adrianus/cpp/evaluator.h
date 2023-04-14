@@ -54,6 +54,7 @@ public:
     Ad_Object* recursiveMemberAccessAssign(Ad_AST_Node*, Environment*);
     Ad_Object* EvalFileObjectMethod(Ad_AST_Node*, std::vector<Ad_AST_Node*>, Environment&);
     Ad_Object* evalSocketObjectMethod(Ad_AST_Node*, std::vector<Ad_AST_Node*>, Environment&);
+    Ad_Object* evalThreadObjectMethod(Ad_AST_Node*, std::vector<Ad_AST_Node*>, Environment&);
     Ad_Object* ApplyMethod(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     Ad_Object* EvalPrefixExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalPostfixExpression(Ad_AST_Node*, Environment&);
