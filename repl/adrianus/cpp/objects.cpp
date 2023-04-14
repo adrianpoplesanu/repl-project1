@@ -832,9 +832,13 @@ std::string Ad_Socket_Object::Hash() {
 }
 
 Ad_Thread_Object::Ad_Thread_Object() {
-    type = OBJ_SOCKET;
+    type = OBJ_THREAD;
     ref_count = 0;
     marked = false;
+}
+
+Ad_Thread_Object::~Ad_Thread_Object() {
+    // hmm, nothing to do here?
 }
 
 std::string Ad_Thread_Object::Inspect() {
@@ -930,6 +934,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_SOCKET:
                 delete (Ad_Socket_Object*) obj;
+            break;
+            case OBJ_THREAD:
+                delete (Ad_Thread_Object*) obj;
             break;
             case OBJ_FLOAT:
                 delete (Ad_Float_Object*) obj;
