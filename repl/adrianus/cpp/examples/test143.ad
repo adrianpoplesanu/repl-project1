@@ -2,7 +2,7 @@ th1 = __thread("thread 1")
 th2 = __thread("thread 2")
 th3 = __thread("thread 3")
 
-def runner() {
+def runner1() {
     print ("starting thread")
     for(i = 0; i < 100; i++) {
         print (i)
@@ -10,9 +10,26 @@ def runner() {
     print ("finishing thread")
 }
 
-th1.callback(runner)
-th2.callback(runner)
-th3.callback(runner)
+def runner2() {
+    print ("starting thread")
+    for(i = 0; i < 100; i++) {
+        print (i)
+    }
+    print ("finishing thread")
+}
+
+def runner3() {
+    print ("starting thread")
+    for(i = 0; i < 100; i++) {
+        print (i)
+    }
+    print ("finishing thread")
+}
+
+
+th1.callback(runner1)
+th2.callback(runner2)
+th3.callback(runner3)
 
 th1.runAsync()
 th2.runAsync()

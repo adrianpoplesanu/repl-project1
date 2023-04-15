@@ -11,6 +11,7 @@
 #include "hashpair.h"
 #include "settings.h"
 #include "gc.h"
+#include <thread>
 
 enum Ad_Object_Type {
 	OBJ_NULL,
@@ -192,7 +193,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 class Ad_Error_Object : public Ad_Object {
@@ -355,6 +356,7 @@ class Ad_Thread_Object : public Ad_Object {
 public:
 	std::string name;
 	Ad_Object* callback;
+	std::thread *internal;
 
 	Ad_Thread_Object();
 	~Ad_Thread_Object();

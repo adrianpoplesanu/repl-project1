@@ -3,6 +3,9 @@
 
 #include <map>
 #include "objects.h"
+#include "gc.h"
+
+class GarbageCollector; // forward declaration for GarbageCollector
 
 class Environment {
 public:
@@ -29,6 +32,7 @@ public:
     Ad_Object* lookupConstructor();
     void FreeObjectForKey(std::string);
     void PrintStore(int);
+    Environment* copy(GarbageCollector*);
 };
 
 Environment NewEnvironment();

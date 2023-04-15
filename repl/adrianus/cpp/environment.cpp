@@ -173,6 +173,25 @@ void Environment::PrintStore(int level) {
     std::cout << "}\n";
 }
 
+Environment* Environment::copy(GarbageCollector *gc) {
+    // TODO: asta strica tot, se face un loop infinit aici
+    Environment *result = new Environment();
+    if (outer != NULL) {
+        //result->outer = outer->copy(gc);
+        result->outer = NULL;
+    }
+    if (result != NULL) {
+        result->bootstrap = bootstrap; // asta n-ar trebui sa se schimbe
+    }
+    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
+        //result->store[it->first] = it->second->copy(gc);
+    }
+    for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
+        //result->siblings[it->first] = it->second->copy(gc);
+    }
+    return result;
+}
+
 Environment NewEnvironment() {
     Environment env;
     return env;

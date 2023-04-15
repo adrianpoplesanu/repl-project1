@@ -82,6 +82,7 @@ public:
     int ref_count;
     virtual std::string TokenLiteral();
     virtual std::string ToString();
+    virtual Ad_AST_Node* copy();
 };
 
 class Ad_AST_Program : public Ad_AST_Node {
@@ -104,6 +105,7 @@ public:
     Ad_AST_Identifier(Token, std::string);
     virtual std::string TokenLiteral();
     virtual std::string ToString();
+    virtual Ad_AST_Node* copy();
 };
 
 class Ad_AST_LetStatement : public Ad_AST_Node {
@@ -154,6 +156,7 @@ public:
     ~Ad_AST_ExpressionStatement();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
+    virtual Ad_AST_Node* copy();
 };
 
 class Ad_AST_Integer : public Ad_AST_Node {
@@ -224,6 +227,7 @@ public:
     Ad_AST_CallExpression(Token, Ad_AST_Node*);
     ~Ad_AST_CallExpression();
     virtual std::string ToString();
+    virtual Ad_AST_Node* copy();
 };
 
 class Ad_AST_IfExpression : public Ad_AST_Node {
@@ -248,6 +252,7 @@ public:
     Ad_AST_BlockStatement(Token);
     ~Ad_AST_BlockStatement();
     virtual std::string ToString();
+    virtual Ad_AST_Node* copy();
 };
 
 class Ad_AST_FunctionLiteral : public Ad_AST_Node {
@@ -285,6 +290,7 @@ public:
     ~Ad_AST_String();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
+    virtual Ad_AST_Node* copy();
 };
 
 class Ad_AST_ListLiteral : public Ad_AST_Node {
@@ -349,6 +355,7 @@ public:
     ~Ad_AST_Comment();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
+    virtual Ad_AST_Node* copy();
 };
 
 class Ad_AST_Class : public Ad_AST_Node {
