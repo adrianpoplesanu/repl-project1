@@ -5,6 +5,8 @@
 #include "evaluator.cpp"
 #include "environment.cpp"
 #include "bootstrap.cpp"
+#include "thread_workers.h"
+#include <thread>
 
 Repl::Repl() {
     garbageCollector = new GarbageCollector();
@@ -68,6 +70,15 @@ void Repl::ExecuteFile(std::ifstream &target) {
         program.reset();
     }
     target.close();
+    /*while (TOTAL_THREADS_RUNNING > 0) { // i don't like this
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }*/
+    for (int i = 0; i < threadPool.size(); i++) {
+        std::cout << "JOINING\n";
+        Ad_Thread_Object *target = (Ad_Thread_Object*) (threadPool.at(i));
+        target->internal->join();
+    }
+    std::cout << "Finished joining!!!!!\n";
     evaluator.GarbageCollectEnvironments();
     evaluator.garbageCollector->forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();

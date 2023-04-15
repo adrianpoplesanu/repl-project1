@@ -25,7 +25,7 @@ std::string Ad_Object::Hash() {
 }
 
 Ad_Object* Ad_Object::copy(GarbageCollector *gc) {
-    std::cout << "ERROR: copy() not implementend for this type of object\n";
+    std::cout << "ERROR: copy() not implementend for this type of object: " << object_type_map[type] << "\n";
     return NULL;
 }
 
@@ -249,6 +249,20 @@ Ad_Object_Type Ad_Function_Object::Type() {
 
 std::string Ad_Function_Object::Hash() {
     return object_type_map[type] + Inspect();;
+}
+
+Ad_Object* Ad_Function_Object::copy(GarbageCollector *gc) {
+    std::cout << "copiez o functie\n";
+    std::vector<Ad_AST_Node*> copied_params;
+    for (std::vector<Ad_AST_Node*>::iterator it = params.begin() ; it != params.end(); ++it) {
+        Ad_AST_Node *new_ast_node = (*it)->copy();
+        copied_params.push_back(new_ast_node);
+    }
+    //Ad_Function_Object *result = new Ad_Function_Object(copied_params, body->copy(), env->copy(gc));
+    Ad_Function_Object *result = new Ad_Function_Object(copied_params, body->copy(), env);
+    gc->addObject(result);
+    return result;
+    //return NULL;
 }
 
 Ad_String_Object::Ad_String_Object() {
@@ -872,6 +886,7 @@ void Ad_DECREF(Ad_Object* obj) {
 }
 
 void free_Ad_Object_memory(Ad_Object* obj) {
+    return;
     //return; // cu asta am testat ca se marcheaza corect obiectele care trebuie sweep-uite
     if (obj == NULL) return;
     //if (obj->ref_count > 0) return; // no more of this nonsense

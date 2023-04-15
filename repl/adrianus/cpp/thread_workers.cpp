@@ -4,7 +4,10 @@
 #include "environment.h"
 
 void ad_worker_async(Ad_Object* rawCallback, GarbageCollector *gc, Environment* env) {
+    std::cout << "ad_worker_async()\n";
     if (rawCallback->type == OBJ_FUNCTION) {
+        std::cout << "evaluating function\n";
+        std::cout << rawCallback->Inspect() << "\n";
         Evaluator evaluator;
         evaluator.setGarbageCollector(gc);
         std::vector<Ad_Object*> arg_objs;

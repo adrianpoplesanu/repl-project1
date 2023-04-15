@@ -9,6 +9,12 @@ std::string Ad_AST_Node::ToString() {
     return "node string repr - implement in subclass";
 }
 
+Ad_AST_Node* Ad_AST_Node::copy() {
+    std::cout << "ERROR: copy() not implementend for this type of ast node: " << statement_type_map[type] << "\n";
+    //std::cout << ToString() << "\n";
+    return NULL;
+}
+
 Ad_AST_Program::Ad_AST_Program() {
     type = ST_PROGRAM;
     ref_count = 0;
@@ -183,6 +189,13 @@ std::string Ad_AST_ExpressionStatement::ToString() {
     return out;
 }
 
+Ad_AST_Node* Ad_AST_ExpressionStatement::copy() {
+    std::cout << "copying: " + statement_type_map[type] + "\n";
+    Ad_AST_ExpressionStatement *result = new Ad_AST_ExpressionStatement();
+    result->expression = expression->copy();
+    return result;
+}
+
 Ad_AST_Identifier::Ad_AST_Identifier() {
     type = ST_IDENTIFIER;
     ref_count = 0;
@@ -201,6 +214,13 @@ std::string Ad_AST_Identifier::TokenLiteral() {
 
 std::string Ad_AST_Identifier::ToString() {
     return value;
+}
+
+Ad_AST_Node* Ad_AST_Identifier::copy() {
+    std::cout << "copying: " + statement_type_map[type] + "\n";
+    Ad_AST_Identifier *result = new Ad_AST_Identifier();
+    result->value = value;
+    return result;
 }
 
 Ad_AST_Integer::Ad_AST_Integer() {
@@ -345,6 +365,16 @@ std::string Ad_AST_CallExpression::ToString() {
     return out;
 }
 
+Ad_AST_Node* Ad_AST_CallExpression::copy() {
+    std::cout << "copying: " + statement_type_map[type] + "\n";
+    Ad_AST_CallExpression *result = new Ad_AST_CallExpression();
+    result->function = function->copy();
+    for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
+        result->arguments.push_back((*it)->copy());
+    }
+    return result;
+}
+
 Ad_AST_IfExpression::Ad_AST_IfExpression() {
     type = ST_IF_EXPRESSION;
     ref_count = 0;
@@ -427,6 +457,16 @@ std::string Ad_AST_BlockStatement::ToString() {
         out += node->ToString();
     }
     return out;
+}
+
+Ad_AST_Node* Ad_AST_BlockStatement::copy() {
+    std::cout << "copying: " + statement_type_map[type] + "\n";
+    Ad_AST_BlockStatement *result = new Ad_AST_BlockStatement();
+    //result->statements.clear();
+    for (int i = 0; i < statements.size(); i++) {
+        result->statements.push_back(statements.at(i)->copy());
+    }
+    return result;
 }
 
 Ad_AST_FunctionLiteral::Ad_AST_FunctionLiteral() {
@@ -516,6 +556,13 @@ std::string Ad_AST_String::TokenLiteral() {
 std::string Ad_AST_String::ToString() {
     std::string out = "";
     return out;
+}
+
+Ad_AST_Node* Ad_AST_String::copy() {
+    std::cout << "copying: " + statement_type_map[type] + "\n";
+    Ad_AST_String *result = new Ad_AST_String();
+    result->value = value;
+    return result;
 }
 
 Ad_AST_ListLiteral::Ad_AST_ListLiteral() {
@@ -673,6 +720,12 @@ std::string Ad_AST_Comment::TokenLiteral() {
 
 std::string Ad_AST_Comment::ToString() {
     return "todo: implement Ad_AST_Comment ToString()";
+}
+
+Ad_AST_Node* Ad_AST_Comment::copy() {
+    std::cout << "copying: " + statement_type_map[type] + "\n";
+    Ad_AST_Comment *result = new Ad_AST_Comment();
+    return result;
 }
 
 Ad_AST_Class::Ad_AST_Class() {
@@ -982,6 +1035,7 @@ void Ad_DECREF(Ad_AST_Node* node){
 }
 
 void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
+    return;
     if (node == NULL) return;
     if (node->ref_count > 0) return;
     switch(node->type) {
