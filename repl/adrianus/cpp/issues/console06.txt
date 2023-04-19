@@ -1,0 +1,28 @@
+[21:43:07] adrianpoplesanu:cpp git:(cpp_threading1*) $ lldb --file ./main examples/test145.ad 
+(lldb) target create "./main"
+Current executable set to '/Users/adrianpoplesanu/Documents/git-projects/repl-project1/repl/adrianus/cpp/main' (arm64).
+(lldb) settings set -- target.run-args  "examples/test145.ad"
+(lldb) r
+Process 21662 launched: '/Users/adrianpoplesanu/Documents/git-projects/repl-project1/repl/adrianus/cpp/main' (arm64)
+Process 21662 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x30)
+    frame #0: 0x000000010001db34 main`GarbageCollector::markObject(this=0x0000000101007d40, obj=0x000000000000001c) at gc.cpp:115:14
+   112 	}
+   113 	
+   114 	void GarbageCollector::markObject(Ad_Object* obj) {
+-> 115 	    if (obj->marked) return;
+   116 	    switch (obj->type) {
+   117 	        case OBJ_NULL: {
+   118 	            obj->marked = true;
+Target 0: (main) stopped.
+(lldb) bt
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x30)
+  * frame #0: 0x000000010001db34 main`GarbageCollector::markObject(this=0x0000000101007d40, obj=0x000000000000001c) at gc.cpp:115:14
+    frame #1: 0x000000010001de30 main`GarbageCollector::markObject(this=0x0000000101007d40, obj=0x0000000101105d90) at gc.cpp:203:17
+    frame #2: 0x000000010001d974 main`GarbageCollector::markObjects(this=0x0000000101007d40) at gc.cpp:91:13
+    frame #3: 0x000000010001f5d0 main`Evaluator::EvalProgram(this=0x000000016fdff0f0, node=0x000000016fdff120, env=0x0000000101104d40) at evaluator.cpp:196:27
+    frame #4: 0x000000010001e88c main`Evaluator::Eval(this=0x000000016fdff0f0, node=0x000000016fdff120, env=0x0000000101104d40) at evaluator.cpp:18:20
+    frame #5: 0x0000000100029810 main`Repl::ExecuteFile(this=0x000000016fdff028, target=0x000000016fdff158) at repl.cpp:63:36
+    frame #6: 0x000000010002a03c main`main(argc=2, argv=0x000000016fdff520) at main.cpp:49:9
+    frame #7: 0x00000001002310f4 dyld`start + 520
+(lldb) 

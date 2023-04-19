@@ -1,0 +1,151 @@
+[22:48:09] adrianpoplesanu:cpp git:(cpp_threading1*) $ lldb --file ./main examples/test143.ad
+(lldb) target create "./main"
+Current executable set to '/Users/adrianpoplesanu/Documents/git-projects/repl-project1/repl/adrianus/cpp/main' (arm64).
+(lldb) settings set -- target.run-args  "examples/test143.ad"
+(lldb) r
+Process 94371 launched: '/Users/adrianpoplesanu/Documents/git-projects/repl-project1/repl/adrianus/cpp/main' (arm64)
+null
+null
+null
+null
+ad_worker_async()
+evaluating function
+function at memory address 0x10070ba00
+null
+"starting thread"
+ad_worker_async()
+evaluating function
+null
+0
+JOINING
+function at memory address 0x10070ba90
+ad_worker_async()
+Process 94371 stopped
+* thread #2, stop reason = EXC_BAD_ACCESS (code=1, address=0x0)
+    frame #0: 0x000000010002276c main`Evaluator::EvalPostfixExpression(this=0x000000016fe86eb0, node=0x0000000100706df0, env=0x00000001020040b0) at evaluator.cpp:1289:18
+   1286	    Ad_AST_PostfixIncrement* postfix_increment = (Ad_AST_PostfixIncrement*) node;
+   1287	    Ad_AST_Identifier* ident = (Ad_AST_Identifier*) postfix_increment->name;
+   1288	    Ad_Object* old_obj = env.Get(ident->value);
+-> 1289	    if (old_obj->Type() == OBJ_INT) {
+   1290	        int value = ((Ad_Integer_Object*) old_obj)->value;
+   1291	        Ad_Integer_Object* new_obj = new Ad_Integer_Object(value + 1);
+   1292	        garbageCollector->addObject(new_obj);
+Target 0: (main) stopped.
+(lldb) bt
+* thread #2, stop reason = EXC_BAD_ACCESS (code=1, address=0x0)
+  * frame #0: 0x000000010002276c main`Evaluator::EvalPostfixExpression(this=0x000000016fe86eb0, node=0x0000000100706df0, env=0x00000001020040b0) at evaluator.cpp:1289:18
+    frame #1: 0x000000010001f0f0 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x0000000100706df0, env=0x00000001020040b0) at evaluator.cpp:142:20
+    frame #2: 0x00000001000229e8 main`Evaluator::EvalForExpression(this=0x000000016fe86eb0, node=0x00000001007098f0, env=0x00000001020040b0) at evaluator.cpp:1318:27
+    frame #3: 0x000000010001f110 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x00000001007098f0, env=0x00000001020040b0) at evaluator.cpp:145:20
+    frame #4: 0x000000010001eb48 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x00000001007098b0, env=0x00000001020040b0) at evaluator.cpp:40:24
+    frame #5: 0x0000000100020880 main`Evaluator::EvalBlockStatement(this=0x000000016fe86eb0, node=0x0000000100705620, env=0x00000001020040b0) at evaluator.cpp:397:18
+    frame #6: 0x000000010001ed70 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x0000000100705620, env=0x00000001020040b0) at evaluator.cpp:81:33
+    frame #7: 0x0000000100024008 main`Evaluator::ApplyFunction(this=0x000000016fe86eb0, func=0x000000010070ba00, args=size=0, env=0x0000000100704b70) at evaluator.cpp:455:32
+    frame #8: 0x0000000100029edc main`ad_worker_async(rawCallback=0x000000010070ba00, gc=0x0000000100509de0, env=0x0000000100704b70) at thread_workers.cpp:14:19
+    frame #9: 0x0000000100076304 main`decltype(__f=0x000000010070bbe8, __args=0x000000010070bbf0, __args=0x000000010070bbf8, __args=0x000000010070bc00)(static_cast<Ad_Object*>(fp0), static_cast<GarbageCollector*>(fp0), static_cast<Environment*>(fp0))) std::__1::__invoke<void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*>(void (*&&)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*&&, GarbageCollector*&&, Environment*&&) at type_traits:3918:1
+    frame #10: 0x0000000100076278 main`void std::__1::__thread_execute<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*, 2ul, 3ul, 4ul>(__t=size=5, (null)=__tuple_indices<2, 3, 4> @ 0x000000016fe86f7f)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*>&, std::__1::__tuple_indices<2ul, 3ul, 4ul>) at thread:287:5
+    frame #11: 0x000000010007587c main`void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*> >(__vp=0x000000010070bbe0) at thread:298:5
+    frame #12: 0x00000001af4b94ec libsystem_pthread.dylib`_pthread_start + 148
+(lldb) print old_obj
+(Ad_Object *) $0 = nullptr
+(lldb) print env
+(Environment) $1 = {
+  store = size=5 {}
+  outer = 0x0000000100704b70
+  bootstrap = nullptr
+  siblings = size=0 {}
+  ref_count = 0
+  isBootstrapEnvironment = false
+  isGlobalEnvironment = false
+  isRunningImportCommand = false
+}
+(lldb) print env->store
+(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, Ad_Object *> > >) $2 = size=5 {}
+  Fix-it applied, fixed expression was: 
+    env.store
+(lldb) print env->store->keys()
+error: expression failed to parse:
+error: <user expression 4>:1:4: member reference type 'Environment' is not a pointer; did you mean to use '.'?
+env->store->keys()
+~~~^~
+   .
+error: <user expression 4>:1:11: member reference type 'std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *>>>' is not a pointer; did you mean to use '.'?
+env->store->keys()
+~~~~~~~~~~^~
+          .
+error: <user expression 4>:1:13: no member named 'keys' in 'std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *>>>'
+env->store->keys()
+~~~~~~~~~~  ^
+(lldb) print env->store[0]
+error: expression failed to parse:
+error: <user expression 6>:1:4: member reference type 'Environment' is not a pointer; did you mean to use '.'?
+env->store[0]
+~~~^~
+   .
+error: <user expression 6>:1:11: no viable overloaded operator[] for type 'std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *>>>'
+env->store[0]
+~~~~~~~~~~^~
+note: candidate function not viable: no known conversion from 'int' to 'std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *>>>::key_type' (aka 'std::basic_string<char, std::char_traits<char>, std::allocator<char>>') for 1st argument
+
+note: candidate function not viable: no known conversion from 'int' to 'const std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char>>, Ad_Object *>>>::key_type' (aka 'const std::basic_string<char, std::char_traits<char>, std::allocator<char>>') for 1st argument
+
+(lldb) print env->store
+(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, Ad_Object *> > >) $3 = size=5 {}
+  Fix-it applied, fixed expression was: 
+    env.store
+(lldb) info threads
+error: 'info' is not a valid command.
+(lldb) bt
+* thread #2, stop reason = EXC_BAD_ACCESS (code=1, address=0x0)
+  * frame #0: 0x000000010002276c main`Evaluator::EvalPostfixExpression(this=0x000000016fe86eb0, node=0x0000000100706df0, env=0x00000001020040b0) at evaluator.cpp:1289:18
+    frame #1: 0x000000010001f0f0 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x0000000100706df0, env=0x00000001020040b0) at evaluator.cpp:142:20
+    frame #2: 0x00000001000229e8 main`Evaluator::EvalForExpression(this=0x000000016fe86eb0, node=0x00000001007098f0, env=0x00000001020040b0) at evaluator.cpp:1318:27
+    frame #3: 0x000000010001f110 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x00000001007098f0, env=0x00000001020040b0) at evaluator.cpp:145:20
+    frame #4: 0x000000010001eb48 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x00000001007098b0, env=0x00000001020040b0) at evaluator.cpp:40:24
+    frame #5: 0x0000000100020880 main`Evaluator::EvalBlockStatement(this=0x000000016fe86eb0, node=0x0000000100705620, env=0x00000001020040b0) at evaluator.cpp:397:18
+    frame #6: 0x000000010001ed70 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x0000000100705620, env=0x00000001020040b0) at evaluator.cpp:81:33
+    frame #7: 0x0000000100024008 main`Evaluator::ApplyFunction(this=0x000000016fe86eb0, func=0x000000010070ba00, args=size=0, env=0x0000000100704b70) at evaluator.cpp:455:32
+    frame #8: 0x0000000100029edc main`ad_worker_async(rawCallback=0x000000010070ba00, gc=0x0000000100509de0, env=0x0000000100704b70) at thread_workers.cpp:14:19
+    frame #9: 0x0000000100076304 main`decltype(__f=0x000000010070bbe8, __args=0x000000010070bbf0, __args=0x000000010070bbf8, __args=0x000000010070bc00)(static_cast<Ad_Object*>(fp0), static_cast<GarbageCollector*>(fp0), static_cast<Environment*>(fp0))) std::__1::__invoke<void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*>(void (*&&)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*&&, GarbageCollector*&&, Environment*&&) at type_traits:3918:1
+    frame #10: 0x0000000100076278 main`void std::__1::__thread_execute<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*, 2ul, 3ul, 4ul>(__t=size=5, (null)=__tuple_indices<2, 3, 4> @ 0x000000016fe86f7f)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*>&, std::__1::__tuple_indices<2ul, 3ul, 4ul>) at thread:287:5
+    frame #11: 0x000000010007587c main`void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*> >(__vp=0x000000010070bbe0) at thread:298:5
+    frame #12: 0x00000001af4b94ec libsystem_pthread.dylib`_pthread_start + 148
+(lldb) 
+* thread #2, stop reason = EXC_BAD_ACCESS (code=1, address=0x0)
+  * frame #0: 0x000000010002276c main`Evaluator::EvalPostfixExpression(this=0x000000016fe86eb0, node=0x0000000100706df0, env=0x00000001020040b0) at evaluator.cpp:1289:18
+    frame #1: 0x000000010001f0f0 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x0000000100706df0, env=0x00000001020040b0) at evaluator.cpp:142:20
+    frame #2: 0x00000001000229e8 main`Evaluator::EvalForExpression(this=0x000000016fe86eb0, node=0x00000001007098f0, env=0x00000001020040b0) at evaluator.cpp:1318:27
+    frame #3: 0x000000010001f110 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x00000001007098f0, env=0x00000001020040b0) at evaluator.cpp:145:20
+    frame #4: 0x000000010001eb48 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x00000001007098b0, env=0x00000001020040b0) at evaluator.cpp:40:24
+    frame #5: 0x0000000100020880 main`Evaluator::EvalBlockStatement(this=0x000000016fe86eb0, node=0x0000000100705620, env=0x00000001020040b0) at evaluator.cpp:397:18
+    frame #6: 0x000000010001ed70 main`Evaluator::Eval(this=0x000000016fe86eb0, node=0x0000000100705620, env=0x00000001020040b0) at evaluator.cpp:81:33
+    frame #7: 0x0000000100024008 main`Evaluator::ApplyFunction(this=0x000000016fe86eb0, func=0x000000010070ba00, args=size=0, env=0x0000000100704b70) at evaluator.cpp:455:32
+    frame #8: 0x0000000100029edc main`ad_worker_async(rawCallback=0x000000010070ba00, gc=0x0000000100509de0, env=0x0000000100704b70) at thread_workers.cpp:14:19
+    frame #9: 0x0000000100076304 main`decltype(__f=0x000000010070bbe8, __args=0x000000010070bbf0, __args=0x000000010070bbf8, __args=0x000000010070bc00)(static_cast<Ad_Object*>(fp0), static_cast<GarbageCollector*>(fp0), static_cast<Environment*>(fp0))) std::__1::__invoke<void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*>(void (*&&)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*&&, GarbageCollector*&&, Environment*&&) at type_traits:3918:1
+    frame #10: 0x0000000100076278 main`void std::__1::__thread_execute<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*, 2ul, 3ul, 4ul>(__t=size=5, (null)=__tuple_indices<2, 3, 4> @ 0x000000016fe86f7f)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*>&, std::__1::__tuple_indices<2ul, 3ul, 4ul>) at thread:287:5
+    frame #11: 0x000000010007587c main`void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(Ad_Object*, GarbageCollector*, Environment*), Ad_Object*, GarbageCollector*, Environment*> >(__vp=0x000000010070bbe0) at thread:298:5
+    frame #12: 0x00000001af4b94ec libsystem_pthread.dylib`_pthread_start + 148
+(lldb) print old_obj
+(Ad_Object *) $4 = nullptr
+(lldb) print ident
+(Ad_AST_Identifier *) $5 = 0x0000000100706da0
+(lldb) print ident->value
+(std::string) $6 = "i"
+(lldb) print env
+(Environment) $7 = {
+  store = size=5 {}
+  outer = 0x0000000100704b70
+  bootstrap = nullptr
+  siblings = size=0 {}
+  ref_count = 0
+  isBootstrapEnvironment = false
+  isGlobalEnvironment = false
+  isRunningImportCommand = false
+}
+(lldb) print env->store
+(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, Ad_Object *, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, Ad_Object *> > >) $8 = size=5 {}
+  Fix-it applied, fixed expression was: 
+    env.store
+(lldb) exit
+Quitting LLDB will kill one or more processes. Do you really want to proceed: [Y/n] y
+[11:40:35] adrianpoplesanu:cpp git:(cpp_threading1*) $ 
