@@ -4,24 +4,24 @@ th3 = __thread("thread 3")
 
 def runner1() {
     print ("starting thread")
-    for(i = 0; i < 100; i++) {
-        print (i)
+    for(i1 = 0; i1 < 100; i1++) {
+        print (i1)
     }
     print ("finishing thread")
 }
 
 def runner2() {
     print ("starting thread")
-    for(i = 0; i < 100; i++) {
-        print (i)
+    for(i2 = 0; i2 < 100; i2++) {
+        print (i2)
     }
     print ("finishing thread")
 }
 
 def runner3() {
     print ("starting thread")
-    for(i = 0; i < 100; i++) {
-        print (i)
+    for(i3 = 0; i3 < 100; i3++) {
+        print (i3)
     }
     print ("finishing thread")
 }

@@ -1035,7 +1035,7 @@ void Ad_DECREF(Ad_AST_Node* node){
 }
 
 void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
-    return;
+    //return;
     if (node == NULL) return;
     if (node->ref_count > 0) return;
     switch(node->type) {

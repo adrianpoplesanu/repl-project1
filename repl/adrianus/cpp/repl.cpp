@@ -74,11 +74,14 @@ void Repl::ExecuteFile(std::ifstream &target) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }*/
     for (int i = 0; i < threadPool.size(); i++) {
-        std::cout << "JOINING\n";
+        std::cout << "try JOINING\n";
         Ad_Thread_Object *target = (Ad_Thread_Object*) (threadPool.at(i));
-        target->internal->join();
+        if (target->internal->joinable()) {
+            target->internal->join();
+            std::cout << "joined!\n";
+        }
     }
-    std::cout << "Finished joining!!!!!\n";
+    //std::cout << "Finished joining!!!!!\n";
     evaluator.GarbageCollectEnvironments();
     evaluator.garbageCollector->forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();

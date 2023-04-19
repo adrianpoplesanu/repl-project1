@@ -32,7 +32,11 @@ void thread_async_run(Ad_Object* rawObject, GarbageCollector *gc, Environment &e
     //std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback->copy(gc), gc, (&env)->copy(gc)); // TODO: asta nu merge
     //std::cout << "pe aici\n";
     //std::thread *th1 = new std::thread(ad_worker_async, ((Ad_Function_Object*)threadObject->callback)->copy(gc), gc, &env);
-    std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, gc, &env);
+    //std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, gc, &env);
+
+    //Environment *env2 = newEnvironment();
+    GarbageCollector *gc2 = new GarbageCollector();
+    std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, gc2, &env);
     threadObject->internal = th1;
     threadPool.push_back(threadObject);
 }
