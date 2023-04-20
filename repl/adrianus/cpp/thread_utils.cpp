@@ -37,7 +37,8 @@ void thread_async_run(Ad_Object* rawObject, GarbageCollector *gc, Environment &e
     //Environment *env2 = newEnvironment();
     GarbageCollector *gc2 = new GarbageCollector();
     std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, gc2, &env);
-    threadObject->internal = th1;
+    threadObject->internal_thread = th1;
+    threadObject->internal_gc = gc2;
     threadPool.push_back(threadObject);
 }
 
