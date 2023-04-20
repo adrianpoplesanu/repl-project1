@@ -80,6 +80,7 @@ void GarbageCollector::addObject(Ad_Object* obj) {
 }
 
 void GarbageCollector::markObjects() {
+    //return;
     Ad_Object* iter = head;
     while (iter != NULL) {
         iter->marked = false;
@@ -232,6 +233,7 @@ void GarbageCollector::unmarkAllObjects() {
 }
 
 void GarbageCollector::sweepObjects() {
+    //return;
     Ad_Object* iter = head;
     while(iter != NULL) {
         Ad_Object *target = NULL;

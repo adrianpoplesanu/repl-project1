@@ -356,7 +356,8 @@ class Ad_Thread_Object : public Ad_Object {
 public:
 	std::string name;
 	Ad_Object* callback;
-	std::thread *internal;
+	std::thread *internal_thread;
+	GarbageCollector *internal_gc;
 
 	Ad_Thread_Object();
 	~Ad_Thread_Object();

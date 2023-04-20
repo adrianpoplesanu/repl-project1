@@ -76,10 +76,13 @@ void Repl::ExecuteFile(std::ifstream &target) {
     for (int i = 0; i < threadPool.size(); i++) {
         std::cout << "try JOINING\n";
         Ad_Thread_Object *target = (Ad_Thread_Object*) (threadPool.at(i));
-        if (target->internal->joinable()) {
-            target->internal->join();
+        if (target->internal_thread->joinable()) {
+            target->internal_thread->join();
             std::cout << "joined!\n";
         }
+        target->internal_gc->forceFreeObjects();
+        delete target->internal_gc;
+        delete target->internal_thread;
     }
     //std::cout << "Finished joining!!!!!\n";
     evaluator.GarbageCollectEnvironments();

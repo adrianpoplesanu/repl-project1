@@ -849,6 +849,7 @@ Ad_Thread_Object::Ad_Thread_Object() {
     type = OBJ_THREAD;
     ref_count = 0;
     marked = false;
+    callback = NULL;
 }
 
 Ad_Thread_Object::~Ad_Thread_Object() {
