@@ -11,7 +11,6 @@ std::string Ad_AST_Node::ToString() {
 
 Ad_AST_Node* Ad_AST_Node::copy() {
     std::cout << "ERROR: copy() not implementend for this type of ast node: " << statement_type_map[type] << "\n";
-    //std::cout << ToString() << "\n";
     return NULL;
 }
 
@@ -190,7 +189,6 @@ std::string Ad_AST_ExpressionStatement::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_ExpressionStatement::copy() {
-    std::cout << "copying: " + statement_type_map[type] + "\n";
     Ad_AST_ExpressionStatement *result = new Ad_AST_ExpressionStatement();
     result->expression = expression->copy();
     return result;
@@ -217,7 +215,6 @@ std::string Ad_AST_Identifier::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_Identifier::copy() {
-    std::cout << "copying: " + statement_type_map[type] + "\n";
     Ad_AST_Identifier *result = new Ad_AST_Identifier();
     result->value = value;
     return result;
@@ -366,7 +363,6 @@ std::string Ad_AST_CallExpression::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_CallExpression::copy() {
-    std::cout << "copying: " + statement_type_map[type] + "\n";
     Ad_AST_CallExpression *result = new Ad_AST_CallExpression();
     result->function = function->copy();
     for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
@@ -460,9 +456,7 @@ std::string Ad_AST_BlockStatement::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_BlockStatement::copy() {
-    std::cout << "copying: " + statement_type_map[type] + "\n";
     Ad_AST_BlockStatement *result = new Ad_AST_BlockStatement();
-    //result->statements.clear();
     for (int i = 0; i < statements.size(); i++) {
         result->statements.push_back(statements.at(i)->copy());
     }
@@ -559,7 +553,6 @@ std::string Ad_AST_String::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_String::copy() {
-    std::cout << "copying: " + statement_type_map[type] + "\n";
     Ad_AST_String *result = new Ad_AST_String();
     result->value = value;
     return result;
@@ -723,7 +716,6 @@ std::string Ad_AST_Comment::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_Comment::copy() {
-    std::cout << "copying: " + statement_type_map[type] + "\n";
     Ad_AST_Comment *result = new Ad_AST_Comment();
     return result;
 }
