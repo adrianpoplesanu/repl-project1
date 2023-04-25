@@ -1,0 +1,19 @@
+th1 = __thread("thread 1")
+th2 = __thread("thread 2")
+th3 = __thread("thread 3")
+
+def runner(max) {
+    print ("starting thread")
+    for(i = 0; i < max; i++) {
+        print (i)
+    }
+    print ("finishing thread")
+}
+
+th1.callback(runner, 100)
+th2.callback(runner, 200)
+th3.callback(runner, 300)
+
+th1.runAsync()
+th2.runAsync()
+th3.runAsync()

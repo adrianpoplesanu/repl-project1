@@ -1233,6 +1233,7 @@ public class Evaluator {
 					List<AdObject> argObjs = evalExpressions(args, env);
 					AdThreadObject threadObject = (AdThreadObject) rawObject;
 					threadObject.setCallback(argObjs.get(0));
+					threadObject.setParams(argObjs.subList(1, argObjs.size()));
 					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env));
 					threadObject.setThread(ThreadUtils.generateThread(threadObject.getWorker()));
 				}

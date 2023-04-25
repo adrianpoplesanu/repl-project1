@@ -2,12 +2,15 @@ package com.ad.objects;
 
 import com.ad.threading.AdWorker;
 
+import java.util.List;
+
 public class AdThreadObject extends AdObject {
 
     private String name;
     private AdObject callback;
     private Thread thread;
     private AdWorker worker;
+    private List<AdObject> params;
 
     public AdThreadObject() {
         type = ObjectTypeEnum.THREAD;
@@ -48,6 +51,14 @@ public class AdThreadObject extends AdObject {
 
     public void setWorker(AdWorker worker) {
         this.worker = worker;
+    }
+
+    public List<AdObject> getParams() {
+        return params;
+    }
+
+    public void setParams(List<AdObject> params) {
+        this.params = params;
     }
 
     @Override
