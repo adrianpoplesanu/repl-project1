@@ -2,6 +2,7 @@ package com.ad.objects;
 
 import com.ad.threading.AdWorker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdThreadObject extends AdObject {
@@ -10,7 +11,7 @@ public class AdThreadObject extends AdObject {
     private AdObject callback;
     private Thread thread;
     private AdWorker worker;
-    private List<AdObject> params;
+    private ArrayList<AdObject> params;
 
     public AdThreadObject() {
         type = ObjectTypeEnum.THREAD;
@@ -53,11 +54,11 @@ public class AdThreadObject extends AdObject {
         this.worker = worker;
     }
 
-    public List<AdObject> getParams() {
+    public ArrayList<AdObject> getParams() {
         return params;
     }
 
-    public void setParams(List<AdObject> params) {
+    public void setParams(ArrayList<AdObject> params) {
         this.params = params;
     }
 

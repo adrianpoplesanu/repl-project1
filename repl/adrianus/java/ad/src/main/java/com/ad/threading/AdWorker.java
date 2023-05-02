@@ -11,17 +11,21 @@ public class AdWorker implements Runnable {
     private AdObject target;
     private Environment environment;
 
-    public AdWorker(AdObject target, Environment environment) {
+    private ArrayList<AdObject> params;
+
+    public AdWorker(AdObject target, Environment environment, ArrayList<AdObject> params) {
         this.target = target;
         this.environment = environment;
+        this.params = params;
     }
 
     @Override
     public void run() {
         if (target.getType() == ObjectTypeEnum.FUNCTION) {
             Evaluator evaluator = new Evaluator();
-            ArrayList<AdObject> arguments = new ArrayList<>();
-            evaluator.applyFunction(target, arguments, environment);
+            //ArrayList<AdObject> arguments = new ArrayList<>();
+            //evaluator.applyFunction(target, arguments, environment);
+            evaluator.applyFunction(target, (ArrayList<AdObject>) params, environment);
         }
     }
 }

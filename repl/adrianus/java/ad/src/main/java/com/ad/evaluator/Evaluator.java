@@ -1233,8 +1233,12 @@ public class Evaluator {
 					List<AdObject> argObjs = evalExpressions(args, env);
 					AdThreadObject threadObject = (AdThreadObject) rawObject;
 					threadObject.setCallback(argObjs.get(0));
-					threadObject.setParams(argObjs.subList(1, argObjs.size()));
-					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env));
+					ArrayList<AdObject> params = new ArrayList<>();
+					for (AdObject obj : argObjs.subList(1, argObjs.size())) {
+						params.add(obj);
+					}
+					threadObject.setParams(params);
+					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env, threadObject.getParams()));
 					threadObject.setThread(ThreadUtils.generateThread(threadObject.getWorker()));
 				}
 				if (memberIdentifier.getValue().equals("runAsync") || memberIdentifier.getValue().equals("start")) {
