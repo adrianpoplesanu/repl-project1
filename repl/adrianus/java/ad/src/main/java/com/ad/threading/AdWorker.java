@@ -23,9 +23,7 @@ public class AdWorker implements Runnable {
     public void run() {
         if (target.getType() == ObjectTypeEnum.FUNCTION) {
             Evaluator evaluator = new Evaluator();
-            //ArrayList<AdObject> arguments = new ArrayList<>();
-            //evaluator.applyFunction(target, arguments, environment);
-            evaluator.applyFunction(target, (ArrayList<AdObject>) params, environment);
+            evaluator.applyFunction(target, params, environment);
         }
     }
 }

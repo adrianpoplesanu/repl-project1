@@ -1234,9 +1234,7 @@ public class Evaluator {
 					AdThreadObject threadObject = (AdThreadObject) rawObject;
 					threadObject.setCallback(argObjs.get(0));
 					ArrayList<AdObject> params = new ArrayList<>();
-					for (AdObject obj : argObjs.subList(1, argObjs.size())) {
-						params.add(obj);
-					}
+					params.addAll(argObjs.subList(1, argObjs.size()));
 					threadObject.setParams(params);
 					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env, threadObject.getParams()));
 					threadObject.setThread(ThreadUtils.generateThread(threadObject.getWorker()));
