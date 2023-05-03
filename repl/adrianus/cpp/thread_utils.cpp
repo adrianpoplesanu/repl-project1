@@ -19,7 +19,16 @@ void test() {
 
 void thread_callback(Ad_Object* rawObject, std::vector<Ad_Object*> arg_objs) {
     Ad_Thread_Object *threadObject = (Ad_Thread_Object*) rawObject;
+
+    GarbageCollector *gc2 = new GarbageCollector();
+    threadObject->internal_gc = gc2;
+
     threadObject->callback = arg_objs.at(0);
+    std::vector<Ad_Object*> params;
+    for (int i = 1; i < arg_objs.size(); i++) {
+        params.push_back(arg_objs.at(i)->copy(threadObject->internal_gc));
+    }
+    threadObject->params = params;
 }
 
 void thread_async_run(Ad_Object* rawObject, GarbageCollector *gc, Environment &env) {
@@ -35,10 +44,10 @@ void thread_async_run(Ad_Object* rawObject, GarbageCollector *gc, Environment &e
     //std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, gc, &env);
 
     //Environment *env2 = newEnvironment();
-    GarbageCollector *gc2 = new GarbageCollector();
-    std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, gc2, &env);
+    //GarbageCollector *gc2 = new GarbageCollector();
+    std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, threadObject->params, threadObject->internal_gc, &env);
     threadObject->internal_thread = th1;
-    threadObject->internal_gc = gc2;
+    //threadObject->internal_gc = gc2;
     threadPool.push_back(threadObject);
 }
 

@@ -74,11 +74,11 @@ void Repl::ExecuteFile(std::ifstream &target) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }*/
     for (int i = 0; i < threadPool.size(); i++) {
-        std::cout << "try JOINING\n";
+        //std::cout << "try JOINING\n";
         Ad_Thread_Object *target = (Ad_Thread_Object*) (threadPool.at(i));
         if (target->internal_thread->joinable()) {
             target->internal_thread->join();
-            std::cout << "joined!\n";
+            //std::cout << "joined!\n";
         }
         target->internal_gc->forceFreeObjects();
         delete target->internal_gc;
