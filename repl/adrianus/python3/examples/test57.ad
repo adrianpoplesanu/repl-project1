@@ -1,0 +1,7 @@
+def test() {
+   f = File("README.md", "r")
+   context()
+   print (f.read())
+}
+
+test()

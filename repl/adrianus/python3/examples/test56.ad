@@ -1,0 +1,2 @@
+f = File("README.md", "r")
+f.read()
