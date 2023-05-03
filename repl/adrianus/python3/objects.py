@@ -259,3 +259,23 @@ class Ad_File_Object(Ad_Object):
 
     def inspect(self):
         out = "File [" + self.filename + ", " + self.operator + "]"
+
+
+class Ad_Socket_Object(Ad_Object):
+    type = ObjectType.SOCKET
+
+    def __init__(self):
+        pass
+
+    def inspect(self):
+        pass
+
+
+class Ad_Thread_Object(Ad_Object):
+    type = ObjectType.THREAD
+
+    def __init__(self):
+        pass
+
+    def inspect(self):
+        pass

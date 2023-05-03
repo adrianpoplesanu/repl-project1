@@ -2,6 +2,7 @@ import sys
 
 from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object
 from object_type import ObjectType
+#from evaluator import NULLOBJECT # TODO: circular import, i need to fix this
 
 def len_builtin(args, env):
     obj = args[0]
@@ -18,6 +19,7 @@ def first_builtin(args, env):
     if obj.type == ObjectType.LIST:
         return obj.elements[0]
     return Ad_Null_Object()
+    #return NULLOBJECT
 
 def print_builtin(args, env):
     for obj in args:
@@ -101,6 +103,7 @@ def list_builtin(args, env):
             listObject.elements = []
             for i in range(number_elements):
                 listObject.elements.append(Ad_Null_Object())
+                #listObject.elements.append(NULLOBJECT)
             return listObject
     elif len(args) == 2:
         if args[0].type == ObjectType.INTEGER:
@@ -111,6 +114,10 @@ def list_builtin(args, env):
             for i in range(number_elements):
                 list_object.elements.append(default_object)
             return list_object
+
+def mat_builtin(args, env):
+    #return NULLOBJECT
+    return Ad_Null_Object()
 
 def hash_builtin(args, env):
     if len(args) == 0:
@@ -156,12 +163,13 @@ builtins_map = {
     "map": Ad_Builtin_Object(builtin_function=map_builtin),
     "input": Ad_Builtin_Object(builtin_function=input_builtin),
     "list": Ad_Builtin_Object(builtin_function=list_builtin),
+    "mat": Ad_Builtin_Object(builtin_function=mat_builtin),
     "hash": Ad_Builtin_Object(builtin_function=hash_builtin),
     "hasattr": Ad_Builtin_Object(builtin_function=hasattr_builtin),
     "getattr": Ad_Builtin_Object(builtin_function=getattr_builtin),
     "setattr": Ad_Builtin_Object(builtin_function=setattr_builtin),
     "getattrs": Ad_Builtin_Object(builtin_function=getattrs_builtin),
-    "thread": Ad_Builtin_Object(builtin_function=thread_builtin),
+    "__thread": Ad_Builtin_Object(builtin_function=thread_builtin),
     "import": Ad_Builtin_Object(builtin_function=import_builtin),
     # https://www.w3schools.com/python/python_ref_keywords.asp
 	# https://www.w3schools.com/python/python_ref_functions.asp

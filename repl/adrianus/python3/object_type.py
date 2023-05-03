@@ -16,3 +16,4 @@ class ObjectType(object):
     INSTANCE = "INSTANCE"
     FILE = "FILE"
     SOCKET = "SOCKET"
+    THREAD = "THREAD"
