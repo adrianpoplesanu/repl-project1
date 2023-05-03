@@ -39,8 +39,6 @@ examples/test38.ad
 examples/test39.ad
 examples/test40.ad
 examples/test41.ad
-examples/test42.ad
-examples/test43.ad
 examples/test44.ad
 examples/test45.ad
 examples/test46.ad
@@ -53,3 +51,5 @@ examples/test52.ad
 examples/test53.ad
 examples/test54.ad
 examples/test55.ad
+examples/test56.ad
+examples/test57.ad
