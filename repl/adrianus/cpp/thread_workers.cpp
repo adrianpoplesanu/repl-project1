@@ -17,11 +17,12 @@ void ad_worker_async(Ad_Object* rawCallback, std::vector<Ad_Object*> params, Gar
     }
 }
 
-void ad_worker_blocking(Ad_Object* rawCallback, GarbageCollector *gc, Environment* env) {
+void ad_worker_blocking(Ad_Object* rawCallback, std::vector<Ad_Object*> params, GarbageCollector *gc, Environment* env) {
     if (rawCallback->type == OBJ_FUNCTION) {
         Evaluator evaluator;
         evaluator.setGarbageCollector(gc);
-        std::vector<Ad_Object*> arg_objs;
-        evaluator.ApplyFunction(rawCallback, arg_objs, *env);
+        //std::vector<Ad_Object*> arg_objs;
+        evaluator.ApplyFunction(rawCallback, params, *env);
+        TOTAL_THREADS_RUNNING--;
     }
 }

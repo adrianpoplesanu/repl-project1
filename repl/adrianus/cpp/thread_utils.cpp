@@ -53,6 +53,10 @@ void thread_async_run(Ad_Object* rawObject, GarbageCollector *gc, Environment &e
 
 void thread_blocking_run(Ad_Object* rawObject, GarbageCollector *gc, Environment &env) {
     Ad_Thread_Object* threadObject = (Ad_Thread_Object*) rawObject;
-    std::thread th1(ad_worker_blocking, threadObject->callback, gc, &env);
-    th1.join();
+    // TODO: better structure for this
+    TOTAL_THREADS_RUNNING++;
+    std::thread *th1 = new std::thread(ad_worker_blocking, threadObject->callback, threadObject->params, threadObject->internal_gc, &env);
+    threadObject->internal_thread = th1;
+    threadPool.push_back(threadObject);
+    th1->join();
 }

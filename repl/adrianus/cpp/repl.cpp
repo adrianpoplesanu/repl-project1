@@ -73,7 +73,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
     /*while (TOTAL_THREADS_RUNNING > 0) { // i don't like this
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }*/
-    for (int i = 0; i < threadPool.size(); i++) {
+    for (int i = 0; i < threadPool.size(); i++) { // TODO: these checks should be done after every evaluated statement
         //std::cout << "try JOINING\n";
         Ad_Thread_Object *target = (Ad_Thread_Object*) (threadPool.at(i));
         if (target->internal_thread->joinable()) {
