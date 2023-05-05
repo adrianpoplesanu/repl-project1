@@ -499,6 +499,10 @@ class Evaluator(object):
         if evaluated:
             return evaluated
 
+        evaluated = self.eval_thread_object_method(node, env)
+        if evaluated:
+            return evaluated
+
         if node.owner.type == StatementType.THIS_EXPRESSION:
             if node.is_method:
                 # should this be env or env.store?
@@ -513,9 +517,19 @@ class Evaluator(object):
                 evaluated = self.eval(node.member, env)
             return evaluated
         elif node.owner.type == StatementType.SUPER_EXPRESSION:
-            pass
+            if node.is_method:
+                # TODO: implement this
+                pass
+            else:
+                # TODO: implement this
+                pass
         else:
             if node.is_method:
+                if node.owner.type == StatementType.MEMBER_ACCESS:
+                    return self.eval_recursive_member_access_call(node, env)
+                if node.owner.type == StatementType.CALL_EXPRESSION:
+                    return self.eval_recursive_member_access_call(node, env)
+
                 klass_instance = env.get(node.owner.value)
                 klass_method = klass_instance.instance_environment.get(node.member.value)
                 args_objs = self.eval_expressions(node.arguments, env)
@@ -525,16 +539,29 @@ class Evaluator(object):
                 klass_environment.outer = env
                 return self.apply_method(klass_method, args_objs, klass_environment)
             else:
-                klass_instance = env.get(node.owner.value)
-                klass_environment = klass_instance.instance_environment
-                klass_environment.outer = env
-                evaluated = self.eval(node.member, klass_environment)
-        return evaluated
+                if node.owner.type == StatementType.IDENTIFIER:
+                    klass_instance = env.get(node.owner.value)
+                    klass_environment = klass_instance.instance_environment
+                    klass_environment.outer = env
+                    evaluated = self.eval(node.member, klass_environment)
+                    return evaluated
+
+                if node.owner.type == StatementType.MEMBER_ACCESS:
+                    return self.eval_recursive_member_access_call(node, env)
+                if node.owner.type == StatementType.CALL_EXPRESSION:
+                    return self.eval_recursive_member_access_call(node, env)
+
+        return None
 
     def eval_recursive_member_access_call(self, node ,env):
-        pass
+        # TODO: implement this
+        chained_member_accesses = []
+        while node.type == MEMBER_ACCESS:
+            chained_member_accesses.append(node)
+            node = node.owner
 
     def eval_recursive_member_access_assign(self, node ,env):
+        # TODO: implement this
         pass
 
     def eval_file_object_method(self, node, env):
@@ -563,6 +590,16 @@ class Evaluator(object):
             return None
         owner = env.get(node.owner.value)
         if owner.type == ObjectType.SOCKET:
+            return NULLOBJECT
+        else:
+            return None
+
+    def eval_thread_object_method(self, node, env):
+        # TODO: check and fix this
+        if node.owner.type != StatementType.IDENTIFIER:
+            return None
+        owner = env.get(node.owner.value)
+        if owner.type == ObjectType.THREAD:
             return NULLOBJECT
         else:
             return None
