@@ -23,7 +23,8 @@ def first_builtin(args, env):
 
 def print_builtin(args, env):
     for obj in args:
-        print (obj.inspect())
+        if obj:
+            print (obj.inspect())
 
 def exit_builtin(args, env):
     sys.exit(0)

@@ -43,10 +43,12 @@ class Environment(object):
         return None
 
     def lookup_only_in_store(self, key):
-        return self.store[key]
+        if key in self.store:
+            return self.store[key]
+        return None
 
     def lookup_constructor(self):
-        return self.store["constructor"]
+        return self.lookup_only_in_store('constructor')
 
     def print_store(self, level):
         out = ""

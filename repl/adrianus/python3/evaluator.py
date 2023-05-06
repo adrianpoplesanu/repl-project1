@@ -337,7 +337,8 @@ class Evaluator(object):
         return None
 
     def call_instance_constructor(self, klass_instance, args_objs, env):
-        klass_method = klass_instance.instance_environment.get("constructor")
+        #klass_method = klass_instance.instance_environment.get("constructor")
+        klass_method = klass_instance.instance_environment.lookup_constructor()
         if klass_method:
             if len(args_objs) == 1 and self.is_error(args_objs[0]):
                 return args_objs[0]
@@ -393,7 +394,9 @@ class Evaluator(object):
         return Ad_Error_Object(message=msg)
 
     def is_error(self, obj):
-        return obj.type == ObjectType.ERROR
+        if obj:
+            return obj.type == ObjectType.ERROR
+        return False
 
     def eval_index_expression(self, left, index):
         if left.type == ObjectType.LIST and index.type == ObjectType.INTEGER:
@@ -556,9 +559,63 @@ class Evaluator(object):
     def eval_recursive_member_access_call(self, node ,env):
         # TODO: implement this
         chained_member_accesses = []
-        while node.type == MEMBER_ACCESS:
+        while node.type == StatementType.MEMBER_ACCESS:
             chained_member_accesses.append(node)
             node = node.owner
+
+        current_environment = env
+        initial_member_access = chained_member_accesses[0]
+        while initial_member_access.type == StatementType.MEMBER_ACCESS:
+            initial_member_access = initial_member_access.owner
+
+        if initial_member_access.type == StatementType.CALL_EXPRESSION:
+            obj = self.eval(initial_member_access, current_environment)
+            if obj.type == ObjectType.INSTANCE:
+                old = current_environment
+                current_environment = obj.instance_environment
+                current_environment.outer = old
+
+        if initial_member_access.type == StatementType.IDENTIFIER:
+            obj = self.eval(initial_member_access, current_environment)
+            if obj.type == ObjectType.INSTANCE:
+                old = current_environment
+                current_environment = obj.instance_environment
+                current_environment.outer = old
+
+        if initial_member_access.type == StatementType.INDEX_EXPRESSION:
+            obj = self.eval(initial_member_access, current_environment)
+            if obj.type == ObjectType.INSTANCE:
+                old = current_environment
+                current_environment = obj.instance_environment
+                current_environment.outer = old
+
+        i = len(chained_member_accesses) - 1
+        while i >= 0:
+            current_member_acccess = chained_member_accesses[i]
+            if current_member_acccess.is_method:
+                obj = self.eval(current_member_acccess.member, current_environment)
+                if obj.type == ObjectType.FUNCTION:
+                    args_objs = self.eval_expressions(current_member_acccess.arguments, env)
+                    obj2 = self.apply_method(obj, args_objs, obj.env)
+                    if i == 0:
+                        return obj2
+                    if obj2.type == ObjectType.INSTANCE:
+                        old = current_environment
+                        current_environment = obj2.instance_environment
+                        current_environment.outer = old
+            else:
+                obj = self.eval(current_member_acccess.member, current_environment)
+                if i == 0:
+                    return obj
+                if obj.type == ObjectType.INSTANCE:
+                    old = current_environment
+                    current_environment = obj.instance_environment
+                    current_environment.outer = old
+            i -= 1
+
+        # daca am ajuns aici atunci nu cred ca e ok
+        return None
+
 
     def eval_recursive_member_access_assign(self, node ,env):
         # TODO: implement this
