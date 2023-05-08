@@ -92,11 +92,11 @@ function test_logic() {
     reference_structure[folder_structure[0].absolute_path] = folder_structure[0];
     openFolder(folder_structure[0].children[13]);
     reference_structure[folder_structure[0].children[13].absolute_path] = folder_structure[0].children[13];
-    openFolder(folder_structure[0].children[13].children[3]);
-    reference_structure[folder_structure[0].children[13].children[3].absolute_path] = folder_structure[0].children[13].children[3];
+    //openFolder(folder_structure[0].children[13].children[3]);
+    //reference_structure[folder_structure[0].children[13].children[3].absolute_path] = folder_structure[0].children[13].children[3];
 
-    openFolder(reference_structure['/Users/adrianpoplesanu'].children[5]);
-    reference_structure[reference_structure['/Users/adrianpoplesanu'].children[5].absolute_path] = reference_structure['/Users/adrianpoplesanu'].children[5];
+    //openFolder(reference_structure['/Users/adrianpoplesanu'].children[5]);
+    //reference_structure[reference_structure['/Users/adrianpoplesanu'].children[5].absolute_path] = reference_structure['/Users/adrianpoplesanu'].children[5];
 }
 
 function walk_folder(folder, level) {
