@@ -34,20 +34,8 @@ void thread_callback(Ad_Object* rawObject, std::vector<Ad_Object*> arg_objs) {
 void thread_async_run(Ad_Object* rawObject, GarbageCollector *gc, Environment &env) {
     Ad_Thread_Object* threadObject = (Ad_Thread_Object*) rawObject;
     TOTAL_THREADS_RUNNING++;
-    //std::thread th1(ad_worker_async, threadObject->callback, gc, &env);
-    //std::thread th1(test);
-    //th1.detach();
-    //std::thread* th1 = new std::thread(test);
-    //std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback->copy(gc), gc, (&env)->copy(gc)); // TODO: asta nu merge
-    //std::cout << "pe aici\n";
-    //std::thread *th1 = new std::thread(ad_worker_async, ((Ad_Function_Object*)threadObject->callback)->copy(gc), gc, &env);
-    //std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, gc, &env);
-
-    //Environment *env2 = newEnvironment();
-    //GarbageCollector *gc2 = new GarbageCollector();
     std::thread *th1 = new std::thread(ad_worker_async, threadObject->callback, threadObject->params, threadObject->internal_gc, &env);
     threadObject->internal_thread = th1;
-    //threadObject->internal_gc = gc2;
     threadPool.push_back(threadObject);
 }
 
