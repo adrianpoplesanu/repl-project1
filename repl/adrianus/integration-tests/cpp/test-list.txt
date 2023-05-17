@@ -132,9 +132,7 @@ examples/test134.ad
 examples/test136.ad
 examples/test138.ad
 examples/test140.ad
-examples/test143.ad
 examples/test144.ad
 examples/test145.ad
 examples/test146.ad
-examples/test147.ad
 examples/test148.ad
