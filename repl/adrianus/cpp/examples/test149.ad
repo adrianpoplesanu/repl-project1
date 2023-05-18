@@ -1,0 +1,27 @@
+a = [0, 0, 0]
+n = 3
+
+def validate(k) {
+    for (i = 0; i < k; i++) {
+        if (a[i] == a[k]) {
+            return false
+        }
+    }
+    return true
+}
+
+def back(k) {
+    if (k == n) {
+        print (a)
+    } else {
+        a[k] = 0
+        while (a[k] < n) {
+            if (validate(k)) {
+                back(k + 1)
+            }
+            a[k] = a[k] + 1
+        }
+    }
+}
+
+back(0)
