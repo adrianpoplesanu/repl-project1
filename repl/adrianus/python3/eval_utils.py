@@ -1,10 +1,11 @@
 from parser import Parser
 from ast import ASTProgram
 import evaluator as Evaluator
+import re
 
 def get_unescaped_source(source):
-    # TODO: unescape the string
-    #print (source)
+    source = re.sub(r"\\\"", "\"", source)
+    source = re.sub(r"\\\'", "\'", source)
     return source
 
 def eval_source(source, env):

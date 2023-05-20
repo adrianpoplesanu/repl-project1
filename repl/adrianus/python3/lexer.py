@@ -87,7 +87,10 @@ class Lexer(object):
             token.literal = self.ch
         elif self.ch == '"':
             token.type = TokenType.STRING
-            token.literal = self.read_string()
+            token.literal = self.read_double_quotes_string()
+        elif self.ch == "'":
+            token.type = TokenType.STRING
+            token.literal = self.read_single_quotes_string()
         elif self.ch == '[':
             token.type = TokenType.LBRACKET
             token.literal = self.ch
@@ -186,9 +189,22 @@ class Lexer(object):
                 self.read_char()
         return self.source[start:self.position]
 
-    def read_string(self):
+    def read_double_quotes_string(self):
         self.read_char()
         start = self.position
         while self.ch != '"':
+            if self.ch == '\\' and self.peek_char() == '\"':
+                # escaping \"
+                self.read_char()
+            self.read_char()
+        return self.source[start:self.position]
+
+    def read_single_quotes_string(self):
+        self.read_char()
+        start = self.position
+        while self.ch != "'":
+            if self.ch == '\\' and self.peek_char() == "\'":
+                # escaping \'
+                self.read_char()
             self.read_char()
         return self.source[start:self.position]
