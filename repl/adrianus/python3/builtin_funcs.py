@@ -2,6 +2,7 @@ import sys
 
 from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object
 from object_type import ObjectType
+from eval_utils import eval_source
 #from evaluator import NULLOBJECT # TODO: circular import, i need to fix this
 
 def len_builtin(args, env):
@@ -81,7 +82,9 @@ def iosocket_builtin(args, env):
     pass
 
 def eval_builtin(args, env):
-    pass
+    unescaped_source = args[0]
+    eval_source(unescaped_source.value, env)
+    return None
 
 def last_builtin(args, env):
     pass
