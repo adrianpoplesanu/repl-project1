@@ -11,6 +11,7 @@ class TokenType(object):
     FOREACH = "FOREACH"
     FUNCTION = "FUNCTION"
     DEF = "DEF"
+    FUN = "FUN"
     IDENT = "IDENT"
     INT = "INT"
     FLOAT = "FLOAT"

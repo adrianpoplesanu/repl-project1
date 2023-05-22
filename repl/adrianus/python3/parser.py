@@ -30,6 +30,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
         self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
         self.prefix_parse_functions[TokenType.DEF] = self.parse_def_expression
+        self.prefix_parse_functions[TokenType.FUN] = self.parse_fun_expression
         self.prefix_parse_functions[TokenType.CLASS] = self.parse_class_statement
         self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
         self.prefix_parse_functions[TokenType.FOR] = self.parse_for_expression
@@ -198,6 +199,21 @@ class Parser(object):
         return block
 
     def parse_def_expression(self):
+        stmt = ASTDefStatement(token=self.current_token)
+        self.next_token()
+        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        stmt.name = name
+        if not self.expect_peek(TokenType.LPAREN):
+            # this should return an error object
+            return None
+        stmt.parameters = self.parse_function_parameters()
+        if not self.expect_peek(TokenType.LBRACE):
+            return None
+        stmt.body = self.parse_block_statement()
+        return stmt
+
+    def parse_fun_expression(self):
+        # this is exactly like def
         stmt = ASTDefStatement(token=self.current_token)
         self.next_token()
         name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
