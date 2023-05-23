@@ -54,6 +54,7 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.THIS, "THIS");
 			put(TokenTypeEnum.START_COMMENT, "START_COMMENT");
 			put(TokenTypeEnum.END_COMMENT, "END_COMMENT");
+			put(TokenTypeEnum.MULTI_COMMENT, "MULTI_COMMENT");
 			put(TokenTypeEnum.PLUSPLUS, "INCREMENT_OPERATOR");
 			put(TokenTypeEnum.MINUSMINUS, "DECREMENT_OPERATOR");
 			put(TokenTypeEnum.NULL, "NULL");

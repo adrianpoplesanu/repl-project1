@@ -63,19 +63,19 @@ public class Lexer {
 			}
 		break;
 		case '*':
-			if (peekChar() == '/') {
-				token.setType(TokenTypeEnum.END_COMMENT);
-				token.setLiteral("*/");
-				readChar();
-			} else {
-				token.setType(TokenTypeEnum.ASTERISK);
-				token.setLiteral("*");
-			}
+			token.setType(TokenTypeEnum.ASTERISK);
+			token.setLiteral("*");
 		break;
 		case '/':
 			if (peekChar() == '*') {
-				token.setType(TokenTypeEnum.START_COMMENT);
+				token.setType(TokenTypeEnum.MULTI_COMMENT);
 				token.setLiteral("/*");
+				readChar();
+				readChar();
+				while (!(currentChar == '*' && peekChar() == '/')) {
+					readChar();
+				}
+				readChar();
 				readChar();
 			} else {
 				token.setType(TokenTypeEnum.SLASH);
