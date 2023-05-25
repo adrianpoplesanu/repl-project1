@@ -350,8 +350,8 @@ class Evaluator(object):
 
     def apply_method(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:
-            self.extend_method_env(func, args_objs, env)
-            evaluated = self.eval(func.body, env)
+            extended_env = self.extend_method_env(func, args_objs, env)
+            evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
         return None
 
@@ -367,8 +367,10 @@ class Evaluator(object):
         return extended
 
     def extend_method_env(self, func, args_objs, env):
+        extended = new_enclosed_environment(env)
         for i, param in enumerate(func.parameters):
-            env.set_local_param(param.token_literal(), args_objs[i])
+            extended.set_local_param(param.token_literal(), args_objs[i])
+        return extended
 
     def eval_boolean_infix_expression(self, operator, left, right):
         left_val = left.value
@@ -544,8 +546,11 @@ class Evaluator(object):
                 if len(args_objs) == 1 and self.is_error(args_objs[0]):
                     return args_objs[0]
                 klass_environment = klass_instance.instance_environment
+                old = klass_environment.outer
                 klass_environment.outer = env
-                return self.apply_method(klass_method, args_objs, klass_environment)
+                result = self.apply_method(klass_method, args_objs, klass_environment)
+                klass_environment.outer = old
+                return result
             else:
                 if node.owner.type == StatementType.IDENTIFIER:
                     klass_instance = env.get(node.owner.value)
