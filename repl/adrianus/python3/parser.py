@@ -110,6 +110,8 @@ class Parser(object):
             return self.parse_return_statement()
         elif self.current_token.type == TokenType.START_COMMENT:
             return self.parse_comment()
+        elif self.current_token.type == TokenType.MULTI_COMMENT:
+            return self.parse_multi_comment()
         return self.parse_expression_statement()
 
     def parse_let_statement(self):
@@ -372,6 +374,10 @@ class Parser(object):
         comment = ASTComment(token=self.current_token)
         while not self.current_token_is(TokenType.EOF) and not self.current_token_is(TokenType.END_COMMENT):
             self.next_token()
+        return comment
+
+    def parse_multi_comment(self):
+        comment = ASTComment(token=self.current_token)
         return comment
 
     def parse_class_statement(self):
