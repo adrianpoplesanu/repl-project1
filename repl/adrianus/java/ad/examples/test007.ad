@@ -1,5 +1,5 @@
 let a = 1
-let b = function(x) {
+let b = func(x) {
     if (x > 10) {
         let a = 2
         print("aaa")

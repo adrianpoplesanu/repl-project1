@@ -1,6 +1,6 @@
 let a = 2
 
-let b = function() {
+let b = func() {
     let a = 5
 }
 

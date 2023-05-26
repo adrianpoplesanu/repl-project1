@@ -1,15 +1,15 @@
-let a = function() {
+let a = func() {
     print ("aaa")
 }
 
 a()
 print (a)
 
-let b = function(n) {
+let b = func(n) {
     while (n > 0) {
         print (n * 2)
         n = n - 1
-        function(n)
+        func(n)
     }
 }
 

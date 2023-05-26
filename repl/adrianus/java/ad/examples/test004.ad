@@ -1,4 +1,4 @@
-let b = function(x) {
+let b = func(x) {
     print("buna dimineata")
 }
 

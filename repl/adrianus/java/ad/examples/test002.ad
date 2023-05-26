@@ -1,6 +1,6 @@
 print("aaa")
 
-let fib = function(x) {
+let fib = func(x) {
     if (x == 0) {
         return 0;
     }
