@@ -8,13 +8,15 @@ public class TokenKeywordConverter {
 	    {
 		    put("let", TokenTypeEnum.LET);
 		    put("return", TokenTypeEnum.RETURN);
-		    put("function", TokenTypeEnum.FUNCTION);
+		    put("func", TokenTypeEnum.FUNC);
 		    put("if", TokenTypeEnum.IF);
 		    put("else", TokenTypeEnum.ELSE);
 		    put("true", TokenTypeEnum.TRUE);
 		    put("false", TokenTypeEnum.FALSE);
 		    put("while", TokenTypeEnum.WHILE);
 		    put("def", TokenTypeEnum.DEF);
+			put("fun", TokenTypeEnum.FUN);
+			put("function", TokenTypeEnum.FUNCTION);
 		    put("null", TokenTypeEnum.NULL);
 		    put("class", TokenTypeEnum.CLASS);
 		    put("this", TokenTypeEnum.THIS);

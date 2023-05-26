@@ -30,10 +30,12 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.FALSE, this::parseBoolean);
         prefixParseFns.put(TokenTypeEnum.LPAREN, this::parseGroupedExpression);
         prefixParseFns.put(TokenTypeEnum.IF, this::parseIfExpression);
-        prefixParseFns.put(TokenTypeEnum.FUNCTION, this::parseFunctionLiteral);
+        prefixParseFns.put(TokenTypeEnum.FUNCTION, this::parseFunctionStatement);
         prefixParseFns.put(TokenTypeEnum.WHILE, this::parseWhileExpression);
         prefixParseFns.put(TokenTypeEnum.FOR, this::parseForExpression);
         prefixParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
+        prefixParseFns.put(TokenTypeEnum.FUN, this::parseFunStatement);
+        prefixParseFns.put(TokenTypeEnum.FUNC, this::parseFunctionLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACKET, this::parseListLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACE, this::parseHashLiteral);
         prefixParseFns.put(TokenTypeEnum.DOUBLE_QUOTES, this::parseStringLiteral);
@@ -339,6 +341,46 @@ public class Parser {
     }
 
     private AstNode parseDefStatement() {
+        AstDefStatement stmt = new AstDefStatement(currentToken);
+        nextToken();
+        AstNode name = new AstIdentifier(currentToken, currentToken.getLiteral());
+        stmt.setName(name);
+        if (!expectPeek(TokenTypeEnum.LPAREN)) {
+            // TODO: return an Error AST node
+            return null;
+        }
+        ArrayList<AstNode> parameters = parseFunctionParameters();
+        stmt.setParameters(parameters);
+        if (!expectPeek(TokenTypeEnum.LBRACE)) {
+            // TODO: return an Error AST node
+            return null;
+        }
+        AstNode body = parseBlockStatement();
+        stmt.setBody(body);
+        return stmt;
+    }
+
+    private AstNode parseFunStatement() {
+        AstDefStatement stmt = new AstDefStatement(currentToken);
+        nextToken();
+        AstNode name = new AstIdentifier(currentToken, currentToken.getLiteral());
+        stmt.setName(name);
+        if (!expectPeek(TokenTypeEnum.LPAREN)) {
+            // TODO: return an Error AST node
+            return null;
+        }
+        ArrayList<AstNode> parameters = parseFunctionParameters();
+        stmt.setParameters(parameters);
+        if (!expectPeek(TokenTypeEnum.LBRACE)) {
+            // TODO: return an Error AST node
+            return null;
+        }
+        AstNode body = parseBlockStatement();
+        stmt.setBody(body);
+        return stmt;
+    }
+
+    private AstNode parseFunctionStatement() {
         AstDefStatement stmt = new AstDefStatement(currentToken);
         nextToken();
         AstNode name = new AstIdentifier(currentToken, currentToken.getLiteral());

@@ -18,6 +18,8 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.FOREACH, "FOREACH");
 			put(TokenTypeEnum.FUNCTION, "FUNCTION");
 			put(TokenTypeEnum.DEF, "DEF");
+			put(TokenTypeEnum.FUNC, "FUNC");
+			put(TokenTypeEnum.FUN, "FUN");
 			put(TokenTypeEnum.IDENT, "IDENT");
 			put(TokenTypeEnum.INT, "INT");
 			put(TokenTypeEnum.FLOAT, "FLOAT");

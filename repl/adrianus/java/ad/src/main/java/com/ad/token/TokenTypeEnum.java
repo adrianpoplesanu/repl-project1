@@ -13,6 +13,8 @@ public enum TokenTypeEnum {
 	FOREACH, // asta poate fi si builtin, in functie de type
 	FUNCTION,
 	DEF,
+	FUNC,
+	FUN,
 	IDENT,
 	INT,
 	FLOAT,
