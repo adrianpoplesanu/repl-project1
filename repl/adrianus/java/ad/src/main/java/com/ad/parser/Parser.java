@@ -537,6 +537,10 @@ public class Parser {
                 AstNode stmt = parseDefStatement();
                 expr.getMethods().add(stmt);
             }
+            if (currentTokenIs(TokenTypeEnum.FUN)) {
+                AstNode stmt = parseDefStatement();
+                expr.getMethods().add(stmt);
+            }
             if (currentTokenIs(TokenTypeEnum.IDENT)) {
                 AstNode stmt = parseExpressionStatement();
                 expr.getAttributes().add(stmt);
