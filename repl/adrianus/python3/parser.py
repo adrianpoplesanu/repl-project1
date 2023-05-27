@@ -401,6 +401,9 @@ class Parser(object):
             if self.current_token_is(TokenType.DEF):
                 stmt = self.parse_def_expression()
                 expr.methods.append(stmt)
+            if self.current_token_is(TokenType.FUN):
+                stmt = self.parse_def_expression()
+                expr.methods.append(stmt)
             elif self.current_token_is(TokenType.IDENT):
                 stmt = self.parse_expression_statement()
                 expr.attributes.append(stmt)
