@@ -446,7 +446,7 @@ class Evaluator(object):
             if node.name.owner.type == StatementType.THIS_EXPRESSION:
                 klass_member = node.name.member
                 obj = self.eval(node.value, env)
-                env.set(klass_member.value, obj)
+                env.outer.set(klass_member.value, obj)
             elif node.name.owner.type == StatementType.SUPER_EXPRESSION:
                 # TODO: implement this
                 pass
@@ -515,15 +515,12 @@ class Evaluator(object):
 
         if node.owner.type == StatementType.THIS_EXPRESSION:
             if node.is_method:
-                # should this be env or env.store?
                 klass_method = env.get(node.member.value)
                 args_objs = self.eval_expressions(node.arguments, env)
                 if len(args_objs) == 1 and self.is_error(args_objs[0]):
                     return args_objs[0]
                 return self.apply_method(klass_method, args_objs, env)
             else:
-                #klass_environment = env.store; # maybe ???
-                # should this be env or env.store ?
                 evaluated = self.eval(node.member, env)
             return evaluated
         elif node.owner.type == StatementType.SUPER_EXPRESSION:
