@@ -211,13 +211,17 @@ class Ad_Hash_Object(Ad_Object):
 class Ad_Class_Object(Ad_Object):
     type = ObjectType.CLASS
 
-    def __init__(self, name=None, attributes=None, methods=None):
+    def __init__(self, name=None, attributes=None, methods=None, inherit_from=None):
         """
-        todo: write this
+        @param: name
+        @param: attributes - after parsing
+        @param: methods - after parsing
+        @param: inherit_from - classes inherited after parsing
         """
         self.name = name
         self.attributes = attributes
         self.methods = methods
+        self.inherit_from = inherit_from
 
     def inspect(self):
         out = "class object"

@@ -316,6 +316,7 @@ class Evaluator(object):
             # TODO: update this with java version
             instance_environment = new_environment()
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
+            self.update_instance_with_inherited_classes(klass_instance, env)
             for attribute in func.attributes:
                 if attribute.type == StatementType.ASSIGN_STATEMENT:
                     instance_environment.outer = env
@@ -347,6 +348,9 @@ class Evaluator(object):
             return self.apply_method(klass_method, args_objs, klass_environment)
         else:
             return None
+
+    def update_instance_with_inherited_classes(self, klass_instance, env):
+        pass
 
     def apply_method(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:
@@ -486,7 +490,7 @@ class Evaluator(object):
         return None
 
     def eval_class_statement(self, node, env):
-        obj = Ad_Class_Object(name=node.name, attributes=node.attributes, methods=node.methods)
+        obj = Ad_Class_Object(name=node.name, attributes=node.attributes, methods=node.methods, inherit_from=node.inherit_from)
         env.set(node.name.value, obj)
         return None
 
