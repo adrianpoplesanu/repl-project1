@@ -1,5 +1,10 @@
 class Dog {
     age = 12
+
+    def printInfo() {
+        print (name)
+        print (age)
+    }
 }
 
 class Dex : Dog {
@@ -9,3 +14,4 @@ class Dex : Dog {
 dex = Dex()
 print (dex.name)
 print (dex.age)
+dex.printInfo()

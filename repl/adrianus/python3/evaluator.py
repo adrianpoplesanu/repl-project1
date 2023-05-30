@@ -350,7 +350,41 @@ class Evaluator(object):
             return None
 
     def update_instance_with_inherited_classes(self, klass_instance, env):
-        pass
+        super_klasses = klass_instance.class_object.inherit_from
+        #print ('inheriting from: ' + str(super_klasses))
+        for super_klass in super_klasses:
+            ident = super_klass.token_literal()
+            klass_instance.inherit_from = []
+            klass_instance.inherit_from.append(ident)
+            klass_env = new_environment()
+            target_klass = env.get(ident)
+            for attribute in target_klass.attributes:
+                if attribute.type == StatementType.ASSIGN_STATEMENT:
+                    print (attribute)
+                    klass_instance.environment.outer = env
+                    evaluated = self.eval(attribute.value, klass_instance.instance_environment)
+                    attribute_name = attribute.name.value
+                    klass_instance.instance_environment.set_local_param(attribute_name, evaluated)
+
+                    klass_env.set_local_param(attribute_name, evaluated)
+                    klass_instance.instance_environment.add_sibling(super_klass.token_literal(), klass_env)
+                if attribute.type == StatementType.EXPRESSION_STATEMENT:
+                    if attribute.expression.type == StatementType.ASSIGN_STATEMENT:
+                        klass_instance.instance_environment.outer = env
+                        evaluated = self.eval(attribute.expression.value, klass_instance.instance_environment)
+                        attribute_name = attribute.expression.name.value
+                        klass_instance.instance_environment.set_local_param(attribute_name, evaluated)
+
+                        klass_env.set_local_param(attribute_name, evaluated)
+                        klass_instance.instance_environment.add_sibling(super_klass.token_literal(), klass_env)
+
+            for method in target_klass.methods:
+                func_object = Ad_Function_Object(method.parameters, method.body, klass_instance.instance_environment)
+                ident = method.name
+                klass_instance.instance_environment.set(ident.value, func_object)
+
+                klass_env.set_local_param(ident.value, func_object)
+                klass_instance.instance_environment.add_sibling(super_klass.token_literal(), klass_env)
 
     def apply_method(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:

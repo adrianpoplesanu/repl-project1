@@ -35,12 +35,10 @@ class Environment(object):
         self.store[key] = value
 
     def add_sibling(self, key, env):
-        # TODO: implement this
-        pass
+        self.siblings[key] = env
 
     def get_sibling(self, key):
-        # TODO: implement this
-        return None
+        return self.siblings[key]
 
     def lookup_only_in_store(self, key):
         if key in self.store:
