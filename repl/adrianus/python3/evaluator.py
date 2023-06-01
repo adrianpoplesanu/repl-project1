@@ -487,7 +487,9 @@ class Evaluator(object):
                 env.outer.set(klass_member.value, obj)
             elif node.name.owner.type == StatementType.SUPER_EXPRESSION:
                 # TODO: implement this
-                pass
+                parent_klass_env = env.outer.get_sibling(node.name.owner.target.token_literal())
+                obj = self.eval(node.value, env)
+                parent_klass_env.set(node.name.member.value, obj)
             elif node.name.owner.type == StatementType.MEMBER_ACCESS:
                 return self.recursive_member_access_assign(node, env)
             else:
@@ -563,11 +565,17 @@ class Evaluator(object):
             return evaluated
         elif node.owner.type == StatementType.SUPER_EXPRESSION:
             if node.is_method:
-                # TODO: implement this
-                pass
+                args_objs = self.eval_expressions(node.arguments, env)
+                if len(args_objs) == 1 and self.is_error(args_objs[0]):
+                    return args_objs[0]
+                parent_klass_env = env.outer.get_sibling(node.owner.target.token_literal())
+                parent_method = parent_klass_env.get(node.member.value)
+                result = self.apply_method(parent_method, args_objs, env.outer)
+                return result
             else:
-                # TODO: implement this
-                pass
+                parent_klass_env = env.outer.get_sibling(node.owner.target.token_literal())
+                result = self.eval(node.member, parent_klass_env)
+                return result
         else:
             if node.is_method:
                 if node.owner.type == StatementType.MEMBER_ACCESS:

@@ -1,0 +1,29 @@
+class Dog {
+    age = 0
+
+    def constructor(age) {
+        this.age = age
+    }
+}
+
+class Dex : Dog {
+    name = "cezar"
+
+    def constructor(name, age) {
+        this.name = name
+        super(Dog).constructor(age)
+    }
+
+    def printInfo() {
+        print (name)
+        print (age)
+    }
+}
+
+dex = Dex("bebe dex", 12)
+dex.printInfo()
+
+/* expected output:
+bebe dex
+12
+*/

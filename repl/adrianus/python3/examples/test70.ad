@@ -1,0 +1,33 @@
+class Dog {
+    age = 0
+}
+
+class Dex : Dog {
+    age = 12
+
+    def setSuperAge() {
+        super(Dog).age = 17
+    }
+
+    def printAge() {
+        print (age)
+    }
+
+    def printSuperAge() {
+        print (super(Dog).age)
+    }
+}
+
+dex = Dex()
+dex.printAge()
+dex.printSuperAge()
+dex.setSuperAge()
+dex.printAge()
+dex.printSuperAge()
+
+/* expected output:
+12
+0
+12
+17
+*/

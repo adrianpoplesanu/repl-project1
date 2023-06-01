@@ -479,13 +479,14 @@ class Parser(object):
         expr = ASTSuperExpression(self.current_token)
         self.next_token()
 
-        if not self.current_token_is(TokenType.LRAREN):
+        if not self.current_token_is(TokenType.LPAREN):
             return None
+        self.next_token()
 
         target = self.parse_identifier()
         expr.target = target
 
-        if not self.peek_token_is(TokenType.RPAREN):
+        if not self.expect_peek(TokenType.RPAREN):
             return None
 
         return expr

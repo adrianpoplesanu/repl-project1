@@ -1,0 +1,20 @@
+class Dog {
+    def constructor() {
+        this.age = 12
+    }
+
+    def ham_ham_ham() {
+        print ("wooof")
+    }
+}
+
+class Dex : Dog {
+    def constructor() {
+        super(Dog).constructor()
+        super(Dog).ham_ham_ham()
+        name = "dex"
+    }
+}
+
+dex = Dex()
+dex.ham_ham_ham()
