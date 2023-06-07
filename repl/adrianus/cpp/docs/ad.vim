@@ -12,9 +12,9 @@ syntax match adComment "\v\/\*.*\*\/$"
 highlight link adComment Comment
 syntax region potionString start=/\v"/ skip=/\v\\./ end=/\v"/
 
-syntax keyword adFunction function len print
-syntax keyword adKeyword if else return while class
-syntax keyword adLet let, def
+syntax keyword adFunction len print func
+syntax keyword adKeyword if else return while class for
+syntax keyword adLet let def function fun
 syntax keyword adBoolean true false potionString
 
 highlight link adKeyword Keyword
