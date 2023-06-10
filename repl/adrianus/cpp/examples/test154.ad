@@ -1,0 +1,16 @@
+class Flag {
+    color = "blue"
+
+    def print_color() {
+        print (color)
+    }
+}
+
+class Country {
+    def constructor() {
+        this.flag = Flag()
+        this.flag.print_color()
+    }
+}
+
+c = Country()
