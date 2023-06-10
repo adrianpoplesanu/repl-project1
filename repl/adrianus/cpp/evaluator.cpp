@@ -239,6 +239,12 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
     if (left->Type() == OBJ_STRING && right->Type() == OBJ_STRING) {
         return EvalStringInfixExpression(_operator, left, right);
     }
+    if (left->Type() == OBJ_STRING && right->Type() == OBJ_INT) {
+        return EvalStringAndIntInfixExpression(_operator, left, right);
+    }
+    if (left->Type() == OBJ_INT && right->Type() == OBJ_STRING) {
+        return EvalIntAndStringInfixExpression(_operator, left, right);
+    }
     std::cout << "eval infix expression will return NULL\n";
     return NULL;
 }
@@ -318,6 +324,28 @@ Ad_Object* Evaluator::EvalStringInfixExpression(std::string _operator, Ad_Object
     }
     if (_operator == "!=") {
         return NativeBoolToBooleanObject(left_val != right_val);
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalStringAndIntInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    std::string left_val = ((Ad_String_Object*)left)->value;
+    int right_val = ((Ad_Integer_Object*)right)->value;
+    if (_operator == "+") {
+        Ad_String_Object* obj = new Ad_String_Object(left_val +  std::to_string(right_val));
+        garbageCollector->addObject(obj);
+        return obj;
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalIntAndStringInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    int left_val = ((Ad_Integer_Object*)left)->value;
+    std::string right_val = ((Ad_String_Object*)right)->value;
+    if (_operator == "+") {
+        Ad_String_Object* obj = new Ad_String_Object(std::to_string(left_val) +  right_val);
+        garbageCollector->addObject(obj);
+        return obj;
     }
     return NULL;
 }
