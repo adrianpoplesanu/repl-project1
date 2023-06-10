@@ -39,7 +39,7 @@ class ForeverEchoServer {
         while(true) {
             server.accept()
 
-            server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 47\r\nConnection: close\r\n\r\n" + message)
+            server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
 
             server.close()
         }
