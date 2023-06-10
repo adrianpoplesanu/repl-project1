@@ -1,0 +1,12 @@
+/* testing callback */
+
+def thread_work(callback, arguments) {
+    callback(arguments)
+}
+
+def analyze(arguments) {
+    print (len(arguments))
+    print (arguments)
+}
+
+thread_work(analyze, [1, "aaa", true])
