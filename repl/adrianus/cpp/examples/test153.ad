@@ -1,0 +1,37 @@
+class Flag {
+    color = "blue"
+
+    def printColor() {
+        print (color)
+    }
+
+    def setColor(c) {
+        color = c
+    }
+}
+
+flag = Flag()
+flag.printColor()
+flag.setColor("red")
+flag.printColor()
+
+class Country {
+    flag = null
+
+    def constructor() {
+        flag = Flag()
+    }
+
+    def changeColor(c) {
+        this.flag.setColor(c)
+    }
+
+    def getColor() {
+        print (this.flag.color)
+    }
+}
+
+country = Country()
+country.getColor()
+country.changeColor("yellow")
+country.getColor()
