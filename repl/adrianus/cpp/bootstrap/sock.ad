@@ -22,3 +22,26 @@ class ServerSocket {
         sock.close()
     }
 }
+
+class ForeverEchoServer {
+
+    port = null
+    server = null
+    message = ""
+
+    def constructor(_port, _message) {
+        port = _port
+        message = _message
+        server = ServerSocket(port)
+    }
+
+    def start() {
+        while(true) {
+            server.accept()
+
+            server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 47\r\nConnection: close\r\n\r\n" + message)
+
+            server.close()
+        }
+    }
+}
