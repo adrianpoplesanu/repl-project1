@@ -1,0 +1,24 @@
+class ServerSocket {
+    sock = null
+    port = null
+    client = null
+
+    def constructor(_port) {
+        port = _port
+        sock = __iosocket("server", "localhost", port, true, false, false, true)
+        sock.create_server()
+    }
+
+    def accept() {
+        client = sock.accept()
+    }
+
+    def send(message) {
+        client.send(message)
+    }
+
+    def close() {
+        client.close()
+        sock.close()
+    }
+}

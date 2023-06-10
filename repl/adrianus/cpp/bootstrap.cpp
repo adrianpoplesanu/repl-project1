@@ -10,7 +10,8 @@ std::vector<std::string> bootstrap_files {
     "bootstrap/mat.ad",
     "bootstrap/string_utils.ad",
     "bootstrap/sys.ad",
-    "bootstrap/test2.ad"
+    "bootstrap/test2.ad",
+    "bootstrap/sock.ad"
 };
 
 void add_bootstrap_code(Ad_AST_Program &program, Parser parser, Evaluator *evaluator, Environment& env, std::string source) {
