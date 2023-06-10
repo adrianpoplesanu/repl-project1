@@ -97,39 +97,44 @@ Ad_Object* Ad_Integer_Object::copy(GarbageCollector *gc) {
 }
 
 Ad_Float_Object::Ad_Float_Object() {
-    // TODO: implement this
+    type = OBJ_FLOAT;
+    ref_count = 0;
+    marked = false;
 }
 
 Ad_Float_Object::Ad_Float_Object(float v) {
-    // TODO: implement this
+    type = OBJ_FLOAT;
+    ref_count = 0;
+    marked = false;
+    value = v;
 }
 
 Ad_Float_Object::~Ad_Float_Object() {
-    // TODO: implement this
+    // nothing to free here: type, ref_count and value are not pointers
 }
 
 std::string Ad_Float_Object::Inspect() {
-    // TODO: implement this
-    return "todo: implement this";
+    std::string out = "";
+    out = std::to_string(value);
+    return out;
 }
 
 void Ad_Float_Object::Print() {
-    // TODO: implement this
+    std::cout << value;
 }
 
 Ad_Object_Type Ad_Float_Object::Type() {
-    // TODO: implement this
     return type;
 }
 
 std::string Ad_Float_Object::Hash() {
-    // TODO: implement this
-    return "todo: implement this";
+    return object_type_map[type] + Inspect();
 }
 
 Ad_Object* Ad_Float_Object::copy(GarbageCollector *gc) {
-    // TODO: implement this
-    return NULL;
+    Ad_Float_Object* new_object = new Ad_Float_Object(value);
+    gc->addObject(new_object);
+    return new_object;
 }
 
 Ad_ReturnValue_Object::Ad_ReturnValue_Object() {

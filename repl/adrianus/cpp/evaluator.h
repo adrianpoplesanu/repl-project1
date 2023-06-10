@@ -19,6 +19,7 @@ public:
     Ad_Object* EvalBooleanInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalStringAndIntInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalIntAndStringInfixExpression(std::string, Ad_Object*, Ad_Object*);
+    Ad_Object* EvalFloatInfixExpression(std::string, Ad_Object*, Ad_Object*);
     Ad_Object* EvalPrefixExpression(std::string, Ad_Object*);
     Ad_Object* NewError(std::string);
     Ad_Object* EvalBangOperatorExpression(Ad_Object*);

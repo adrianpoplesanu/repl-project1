@@ -245,6 +245,9 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
     if (left->Type() == OBJ_INT && right->Type() == OBJ_STRING) {
         return EvalIntAndStringInfixExpression(_operator, left, right);
     }
+    if (left->Type() == OBJ_FLOAT && right->Type() == OBJ_FLOAT) {
+        return EvalFloatInfixExpression(_operator, left, right);
+    }
     std::cout << "eval infix expression will return NULL\n";
     return NULL;
 }
@@ -344,6 +347,32 @@ Ad_Object* Evaluator::EvalIntAndStringInfixExpression(std::string _operator, Ad_
     std::string right_val = ((Ad_String_Object*)right)->value;
     if (_operator == "+") {
         Ad_String_Object* obj = new Ad_String_Object(std::to_string(left_val) +  right_val);
+        garbageCollector->addObject(obj);
+        return obj;
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::EvalFloatInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    float left_val = ((Ad_Float_Object*)left)->value;
+    float right_val = ((Ad_Float_Object*)right)->value;
+    if (_operator == "+") {
+        Ad_Float_Object* obj = new Ad_Float_Object(left_val + right_val);
+        garbageCollector->addObject(obj);
+        return obj;
+    }
+    if (_operator == "-") {
+        Ad_Float_Object* obj = new Ad_Float_Object(left_val - right_val);
+        garbageCollector->addObject(obj);
+        return obj;
+    }
+    if (_operator == "*") {
+        Ad_Float_Object* obj = new Ad_Float_Object(left_val * right_val);
+        garbageCollector->addObject(obj);
+        return obj;
+    }
+    if (_operator == "/") {
+        Ad_Float_Object* obj = new Ad_Float_Object(left_val / right_val);
         garbageCollector->addObject(obj);
         return obj;
     }
