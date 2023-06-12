@@ -1,0 +1,8 @@
+print (12 + "aaa")
+print ("bbb" + 23)
+
+a = 12 + "aaa"
+print (type(a))
+
+b = "aaa" + 34
+print (type(b))

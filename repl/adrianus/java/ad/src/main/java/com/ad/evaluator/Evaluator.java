@@ -206,6 +206,12 @@ public class Evaluator {
 				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.STRING) {
 			return nativeBoolToBoolean(true);
 		}
+		if (left.getType() == ObjectTypeEnum.STRING && right.getType() == ObjectTypeEnum.INT) {
+			return evalStringAndIntInfixExpression(operator, left, right);
+		}
+		if (left.getType() == ObjectTypeEnum.INT && right.getType() == ObjectTypeEnum.STRING) {
+			return evalIntAndStringInfixExpression(operator, left, right);
+		}
 		if (left.getType() == ObjectTypeEnum.FUNCTION && right.getType() == ObjectTypeEnum.NULL ||
 				left.getType() == ObjectTypeEnum.NULL && right.getType() == ObjectTypeEnum.FUNCTION) {
 			return nativeBoolToBoolean(true);
@@ -307,7 +313,27 @@ public class Evaluator {
     	return null;
     }
 
-    private AdObject evalIfExpression(AstNode node, Environment env) {
+	private AdObject evalStringAndIntInfixExpression(String operator, AdObject left, AdObject right) {
+		String left_val = ((AdStringObject)left).getValue();
+		int right_val = ((AdIntegerObject)right).getValue();
+		switch (operator) {
+			case "+":
+				return new AdStringObject(left_val + right_val);
+		}
+		return null;
+	}
+
+	private AdObject evalIntAndStringInfixExpression(String operator, AdObject left, AdObject right) {
+		int left_val = ((AdIntegerObject)left).getValue();
+		String right_val = ((AdStringObject)right).getValue();
+		switch (operator) {
+			case "+":
+				return new AdStringObject(left_val + right_val);
+		}
+		return null;
+	}
+
+	private AdObject evalIfExpression(AstNode node, Environment env) {
     	AstIfExpression expr = (AstIfExpression)node;
     	AstNode condition = expr.getCondition();
     	AstNode consequence = expr.getConsequence();
