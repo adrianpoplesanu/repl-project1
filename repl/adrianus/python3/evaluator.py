@@ -155,6 +155,10 @@ class Evaluator(object):
             return self.eval_string_infix_expression(operator, left, right)
         if left.type == ObjectType.BOOLEAN and right.type == ObjectType.BOOLEAN:
             return self.eval_boolean_infix_expression(operator, left, right)
+        if left.type == ObjectType.STRING and right.type == ObjectType.INTEGER:
+            return self.eval_string_and_int_infix_expression(operator, left, right)
+        if left.type == ObjectType.INTEGER and right.type == ObjectType.STRING:
+            return self.eval_int_and_string_infix_expression(operator, left, right)
         if left.type == ObjectType.NULL or right.type == ObjectType.NULL:
             return NULLOBJECT
         #if operator == '==':
@@ -429,6 +433,18 @@ class Evaluator(object):
         if operator == "==":
             val = left.value == right.value
             return self.native_bool_to_boolean_object(val)
+
+    def eval_string_and_int_infix_expression(self, operator, left, right):
+        left_val = left.value
+        right_val = right.value
+        if operator == '+':
+            return Ad_String_Object(value=left_val+str(right_val))
+
+    def eval_int_and_string_infix_expression(self, operator, left, right):
+        left_val = left.value
+        right_val = right.value
+        if operator == '+':
+            return Ad_String_Object(value=str(left_val)+right_val)
 
     def new_error(self, msg):
         return Ad_Error_Object(message=msg)
