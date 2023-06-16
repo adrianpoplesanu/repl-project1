@@ -20,6 +20,8 @@ public class AdClassInstance extends AdObject {
         this.name = name;
         this.adClassObject = adClassObject;
         this.environment = environment;
+        this.environment.setOwningInstanceEnvironment(this); // this is some wicked programming right here
+        this.environment.setInstanceEnvironment(true);
         inheritFrom = new ArrayList<>();
     }
 

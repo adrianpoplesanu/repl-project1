@@ -12,12 +12,16 @@ public class Environment {
 	private Environment outer;
 	public HashMap<String, AdObject> store;
 	public HashMap<String, Environment> siblings;
-	
+	private boolean isInstanceEnvironment;
+	private AdObject owningInstanceEnvironment;
+
 	public Environment() {
 		store = new HashMap<>();
 		siblings = new HashMap<>();
 		outer = null;
 		bootstrap = null;
+		isInstanceEnvironment = false;
+		owningInstanceEnvironment = null;
 	}
 	
 	public Environment(Environment outer) {
@@ -100,6 +104,22 @@ public class Environment {
 
 	public void setBootstrap(Environment bootstrap) {
 		this.bootstrap = bootstrap;
+	}
+
+	public boolean isInstanceEnvironment() {
+		return isInstanceEnvironment;
+	}
+
+	public void setInstanceEnvironment(boolean instanceEnvironment) {
+		isInstanceEnvironment = instanceEnvironment;
+	}
+
+	public AdObject getOwningInstanceEnvironment() {
+		return owningInstanceEnvironment;
+	}
+
+	public void setOwningInstanceEnvironment(AdObject owningInstanceEnvironment) {
+		this.owningInstanceEnvironment = owningInstanceEnvironment;
 	}
 
 	public List<String> populateGetattrs() {
