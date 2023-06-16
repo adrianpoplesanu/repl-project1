@@ -86,6 +86,8 @@ public class Evaluator {
 			return evalForExpression(node, env);
 		case POSTFIX_INCREMENT:
 			return evalPostfixIncrement(node, env);
+		case THIS_EXPRESSION:
+			return evalThisExpression(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
@@ -733,6 +735,17 @@ public class Evaluator {
 		return null;
 	}
 
+	private AdObject evalThisExpression(AstNode node, Environment env) {
+		System.out.println("evaluating a this expression");
+		if (env.isInstanceEnvironment()) {
+			return env.getOwningInstanceEnvironment();
+		}
+		if (env.getOuter().isInstanceEnvironment()) {
+			return env.getOuter().getOwningInstanceEnvironment();
+		}
+		return null;
+	}
+
 	private AdObject evalAssignStatement(AstNode node, Environment env) {
     	AstAssignStatement assignStatement = (AstAssignStatement) node;
     	if (assignStatement.getName().getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
@@ -742,7 +755,15 @@ public class Evaluator {
 			if (memberAccess.getOwner().getType() == AstNodeTypeEnum.THIS_EXPRESSION) {
 				AstIdentifier klassMember = (AstIdentifier) memberAccess.getMember();
 				AdObject obj = eval(assignStatement.getValue(), env);
-				env.getOuter().set(klassMember.getValue(), obj);
+				//env.getOuter().set(klassMember.getValue(), obj);
+				//env.getOuter().setLocalParam(klassMember.getValue(), obj);
+				// TODO: validate this with tests
+				if (env.isInstanceEnvironment()) {
+					env.setLocalParam(klassMember.getValue(), obj);
+				}
+				if (env.getOuter().isInstanceEnvironment()) {
+					env.getOuter().setLocalParam(klassMember.getValue(), obj);
+				}
 			} else if (memberAccess.getOwner().getType() == AstNodeTypeEnum.SUPER_EXPRESSION) { // maybe super() should be used only for methods?
 				AstMemberAccess stmt = (AstMemberAccess) assignStatement.getName();
 				AstSuperExpression superExpression = (AstSuperExpression) stmt.getOwner();
