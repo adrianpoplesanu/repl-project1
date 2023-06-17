@@ -66,6 +66,7 @@ public:
     Ad_Object* EvalContinueStatement(Ad_AST_Node*, Environment&);
     Ad_Object* EvalNullExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalFloatExpression(Ad_AST_Node*, Environment&);
+    Ad_Object* evalThisExpression(Ad_AST_Node*, Environment*);
     Environment* ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     //void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void Init();

@@ -153,6 +153,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         case ST_NULL_EXPRESSION:
             return EvalNullExpression(node, env);
         break;
+        case ST_THIS_EXPRESSION:
+            return evalThisExpression(node, &env);
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -530,6 +533,8 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         Ad_Class_Object* klass_object = (Ad_Class_Object*) func;
         Ad_AST_Identifier* klass_ident = (Ad_AST_Identifier*) klass_object->name;
         Ad_Class_Instance* klass_instance = new Ad_Class_Instance(klass_ident->value, klass_object, instance_environment);
+        klass_instance->instance_environment->isInstanceEnvironment = true;
+        klass_instance->instance_environment->owningInstanceEnvironment = klass_instance;
         garbageCollector->addObject(klass_instance);
         std::vector<Ad_AST_Node*> attributes = klass_object->attributes;
         updateInstanceWithInheritedClasses(klass_instance, env);
@@ -777,7 +782,13 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
             Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) assign_statement->name;
             Ad_AST_Node* klass_member = member_access->member;
             Ad_Object* obj = Eval(assign_statement->value, env);
-            env.outer->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
+            //env.outer->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
+            if (env.isInstanceEnvironment) {
+                env.setLocalParam(((Ad_AST_Identifier*)klass_member)->value, obj);
+            }
+            if (env.outer->isInstanceEnvironment) {
+                env.outer->setLocalParam(((Ad_AST_Identifier*)klass_member)->value, obj);
+            }
         } else if (((Ad_AST_MemberAccess*)(assign_statement->name))->owner->type == ST_SUPER_EXPRESSION) {
             //std::cout << "evaluating an assign statement on a super() expression\n";
             Ad_AST_MemberAccess *member_access = (Ad_AST_MemberAccess*) assign_statement->name;
@@ -1422,6 +1433,16 @@ Ad_Object* Evaluator::EvalFloatExpression(Ad_AST_Node* node, Environment& env) {
     garbageCollector->addObject(obj);
     obj->value = ((Ad_AST_Float*) node)->value;
     return obj;
+}
+
+Ad_Object* Evaluator::evalThisExpression(Ad_AST_Node* node, Environment *env) {
+    if (env->isInstanceEnvironment) {
+        return env->owningInstanceEnvironment;
+    }
+    if (env->outer->isInstanceEnvironment) {
+        return env->outer->owningInstanceEnvironment;
+    }
+    return NULL;
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {
