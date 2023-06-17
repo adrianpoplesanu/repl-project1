@@ -1,0 +1,10 @@
+class A {
+    def put() {
+        this.b = 55
+    }
+}
+
+a = A()
+a.put()
+print (a)
+print (a.b)
