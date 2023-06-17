@@ -1,0 +1,13 @@
+class A {
+    b = 6
+
+    def get() {
+        return this
+    }
+}
+
+b = A()
+print (b.b)
+c = b.get()
+print (c)
+print (c.b)
