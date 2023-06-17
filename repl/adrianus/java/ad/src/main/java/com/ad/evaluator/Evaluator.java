@@ -736,7 +736,6 @@ public class Evaluator {
 	}
 
 	private AdObject evalThisExpression(AstNode node, Environment env) {
-		System.out.println("evaluating a this expression");
 		if (env.isInstanceEnvironment()) {
 			return env.getOwningInstanceEnvironment();
 		}
@@ -760,8 +759,7 @@ public class Evaluator {
 				// TODO: validate this with tests
 				if (env.isInstanceEnvironment()) {
 					env.setLocalParam(klassMember.getValue(), obj);
-				}
-				if (env.getOuter().isInstanceEnvironment()) {
+				} else if (env.getOuter().isInstanceEnvironment()) {
 					env.getOuter().setLocalParam(klassMember.getValue(), obj);
 				}
 			} else if (memberAccess.getOwner().getType() == AstNodeTypeEnum.SUPER_EXPRESSION) { // maybe super() should be used only for methods?
