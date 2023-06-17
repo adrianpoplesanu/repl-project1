@@ -785,8 +785,7 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
             //env.outer->Set(((Ad_AST_Identifier*)klass_member)->value, obj);
             if (env.isInstanceEnvironment) {
                 env.setLocalParam(((Ad_AST_Identifier*)klass_member)->value, obj);
-            }
-            if (env.outer->isInstanceEnvironment) {
+            } else if (env.outer->isInstanceEnvironment) {
                 env.outer->setLocalParam(((Ad_AST_Identifier*)klass_member)->value, obj);
             }
         } else if (((Ad_AST_MemberAccess*)(assign_statement->name))->owner->type == ST_SUPER_EXPRESSION) {
