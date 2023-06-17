@@ -17,6 +17,8 @@ public:
     bool isBootstrapEnvironment;
     bool isGlobalEnvironment;
     bool isRunningImportCommand;
+    bool isInstanceEnvironment;
+    Ad_Object* owningInstanceEnvironment;
 
     Environment();
     ~Environment();

@@ -7,6 +7,8 @@ Environment::Environment() {
     isGlobalEnvironment = false;
     isRunningImportCommand = false;
     ref_count = 0;
+    isInstanceEnvironment = false;
+    owningInstanceEnvironment = NULL;
 }
 
 Environment::~Environment() {
