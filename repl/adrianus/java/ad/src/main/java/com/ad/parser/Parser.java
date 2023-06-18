@@ -215,15 +215,17 @@ public class Parser {
             return null;
         }
         if (!expectPeek(TokenTypeEnum.LBRACE)) {
-            return null;
+            expr.setConsequence(parseSingleBlockStatement());
+        } else {
+            expr.setConsequence(parseBlockStatement());
         }
-        expr.setConsequence(parseBlockStatement());
         if (peekTokenIs(TokenTypeEnum.ELSE)) {
             nextToken();
             if (!expectPeek(TokenTypeEnum.LBRACE)) {
-                return null;
+                expr.setAlternative(parseSingleBlockStatement());
+            } else {
+                expr.setAlternative(parseBlockStatement());
             }
-            expr.setAlternative(parseBlockStatement());
         }
         return expr;
     }
@@ -237,6 +239,16 @@ public class Parser {
                 block.addStatement(statement);
             }
             nextToken();
+        }
+        return block;
+    }
+
+    private AstNode parseSingleBlockStatement() {
+        AstBlockStatement block = new AstBlockStatement(getCurrentToken());
+        nextToken();
+        AstNode statement = parseStatement();
+        if (statement != null) {
+            block.addStatement(statement);
         }
         return block;
     }
