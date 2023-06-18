@@ -1,4 +1,4 @@
-class ServerSocket {
+class ServerSocketOld {
     socket = null
     clients = []
 
@@ -23,7 +23,7 @@ class ServerSocket {
     }
 }
 
-class ClientSocket {
+class ClientSocketOld {
     socket = null
 
     def constructor(host, port) {
