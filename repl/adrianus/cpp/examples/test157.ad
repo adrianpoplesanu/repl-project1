@@ -1,0 +1,12 @@
+/* todo: fix this */
+
+class Portocala {
+    def insert() {
+        this.portocala = "aaa"
+    }
+}
+
+portocala = Portocala()
+portocala.insert()
+print (portocala)
+print (portocala.portocala)
