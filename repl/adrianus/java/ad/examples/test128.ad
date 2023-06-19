@@ -1,0 +1,2 @@
+server = ForeverEchoServer(5003, "<html><h1>http bebe dex</h1>type forever</html>")
+server.start()
