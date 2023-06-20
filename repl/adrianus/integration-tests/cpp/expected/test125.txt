@@ -1,0 +1,18 @@
+"total 96
+drwxr-xr-x   16 adrianpoplesanu  staff   512 (.*) (.*) (.*):(.*) \.
+drwxr-xr-x@   8 adrianpoplesanu  staff   256 Apr 17  2022 \.\.
+-rw-r--r--    1 adrianpoplesanu  staff     8 (.*) (.*) (.*):(.*) bbb\.txt
+drwxr-xr-x    9 adrianpoplesanu  staff   288 (.*) (.*) (.*):(.*) bootstrap
+-rwxr-xr-x    1 adrianpoplesanu  staff   167 May 17 09:30 build-binaries\.sh
+-rwxr-xr-x    1 adrianpoplesanu  staff   146 May 17 09:30 cleanup-tests\.sh
+drwxr-xr-x  143 adrianpoplesanu  staff  4576 (.*) (.*) (.*):(.*) expected
+-rwxr-xr-x    1 adrianpoplesanu  staff    82 Mar  4 13:22 memory-check-linux\.sh
+-rwxr--r--    1 adrianpoplesanu  staff    57 May 17 09:28 memory-check-macos\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  2400 Feb 26 23:40 run-memory-checks\.py
+-rwxr-xr-x    1 adrianpoplesanu  staff   267 May 17 09:30 run-memory-checks\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  1403 Apr  5 01:58 run-tests\.py
+-rwxr-xr-x    1 adrianpoplesanu  staff   407 May 17 09:36 run-tests\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  2779 May 19 01:26 test-list\.txt
+-rw-r--r--    1 adrianpoplesanu  staff  1717 Dec  4  2022 test_proc_run_leaks\.py
+-rw-r--r--    1 adrianpoplesanu  staff   280 Jan  4 17:32 test_pyton3_re_fullmatch\.py
+"
