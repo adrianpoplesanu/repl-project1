@@ -1,1 +1,16 @@
-ala bala portocala
+'constructor Executor'
+'#framework that checks example\/testXX\.ad output versus desired output
+
+##Requirements:
+###cpp
+```g\+\+
+make
+python3
+```
+
+###java
+```mvn
+python3
+```
+'
+'end constructor Executor'

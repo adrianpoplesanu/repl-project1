@@ -1,1 +1,12 @@
-ala bala portocala
+'total 40
+drwxr-xr-x   10 adrianpoplesanu  staff   320 (.*) (.*) (.*):(.*) \.
+drwxr-xr-x@   8 adrianpoplesanu  staff   256 Apr 17  2022 \.\.
+drwxr-xr-x   11 adrianpoplesanu  staff   352 (.*) (.*) (.*):(.*) bootstrap
+-rwxr-xr-x    1 adrianpoplesanu  staff   171 Aug 28  2022 build_project\.sh
+-rwxr-xr-x    1 adrianpoplesanu  staff   112 Aug 28  2022 cleanup\.sh
+drwxr-xr-x  134 adrianpoplesanu  staff  4288 (.*) (.*) (.*):(.*) examples
+drwxr-xr-x  108 adrianpoplesanu  staff  3456 (.*) (.*) (.*):(.*) expected
+-rw-r--r--    1 adrianpoplesanu  staff  1326 (.*) (.*) (.*):(.*) run-tests\.py
+-rwxr--r--    1 adrianpoplesanu  staff    93 Aug 28  2022 run-tests\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  2119 Apr  1 15:43 test-list\.txt
+'
