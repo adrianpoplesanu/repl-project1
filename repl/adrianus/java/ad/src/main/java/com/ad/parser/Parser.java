@@ -344,11 +344,11 @@ public class Parser {
         if (!expectPeek(TokenTypeEnum.RPAREN)) {
             return null;
         }
-        nextToken();
-        if (!currentTokenIs(TokenTypeEnum.LBRACE)) {
-            return null;
+        if (!expectPeek(TokenTypeEnum.LBRACE)) {
+            expr.setBody(parseSingleBlockStatement());
+        } else {
+            expr.setBody(parseBlockStatement());
         }
-        expr.setBody(parseBlockStatement());
         return expr;
     }
 
