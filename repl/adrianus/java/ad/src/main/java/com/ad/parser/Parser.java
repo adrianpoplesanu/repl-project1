@@ -307,9 +307,10 @@ public class Parser {
             return null; // see previous comment
         }
         if (!expectPeek(TokenTypeEnum.LBRACE)) {
-            return null; // see previous comment
+            expr.setBody(parseSingleBlockStatement());
+        } else {
+            expr.setBody(parseBlockStatement());
         }
-        expr.setBody(parseBlockStatement());
         return expr;
     }
 
