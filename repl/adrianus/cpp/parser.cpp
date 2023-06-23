@@ -282,32 +282,28 @@ Ad_AST_Node* Parser::ParseIndexExpression(Ad_AST_Node* left) {
 Ad_AST_Node* Parser::ParseIfExpression() {
     Ad_AST_IfExpression* expr = new Ad_AST_IfExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
-        //delete expr;
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     expr->condition = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
-        //delete expr;
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     if (!ExpectPeek(TT_LBRACE)) {
-        //delete expr;
-        free_Ad_AST_Node_memory(expr);
-        return NULL;
+        expr->consequence = ParseSingleBlockStatement();
+    } else {
+        expr->consequence = ParseBlockStatement();
     }
-    expr->consequence = ParseBlockStatement();
 
     if (PeekTokenIs(TT_ELSE)) {
         NextToken();
         if (!ExpectPeek(TT_LBRACE)) {
-            //delete expr;
-            free_Ad_AST_Node_memory(expr);
-            return NULL;
+            expr->alternative = ParseSingleBlockStatement();
+        } else {
+            expr->alternative = ParseBlockStatement();
         }
-        expr->alternative = ParseBlockStatement();
     }
     return expr;
 }
