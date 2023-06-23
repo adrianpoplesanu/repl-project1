@@ -367,6 +367,16 @@ Ad_AST_Node* Parser::ParseBlockStatement() {
     return block;
 }
 
+Ad_AST_Node* Parser::ParseSingleBlockStatement() {
+    Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(current_token);
+    NextToken();
+    Ad_AST_Node* stmt = (Ad_AST_Node*)ParseStatement();
+    if (stmt) {
+        block->statements.push_back(stmt);
+    }
+    return block;
+}
+
 Ad_AST_Node* Parser::ParseWhileExpression() {
     Ad_AST_WhileExpression* expr = new Ad_AST_WhileExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
