@@ -376,23 +376,20 @@ Ad_AST_Node* Parser::ParseSingleBlockStatement() {
 Ad_AST_Node* Parser::ParseWhileExpression() {
     Ad_AST_WhileExpression* expr = new Ad_AST_WhileExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
-        //delete expr;
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     NextToken();
     expr->condition = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RPAREN)) {
-        //delete expr;
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
     if (!ExpectPeek(TT_LBRACE)) {
-        //delete expr;
-        free_Ad_AST_Node_memory(expr);
-        return NULL;
+        expr->consequence = ParseSingleBlockStatement();
+    } else {
+        expr->consequence = ParseBlockStatement();
     }
-    expr->consequence = ParseBlockStatement();
     return expr;
 }
 
