@@ -603,13 +603,11 @@ Ad_AST_Node* Parser::ParseForExpression() {
         free_Ad_AST_Node_memory(expr);
         return NULL;
     }
-    NextToken();
-    if (!CurrentTokenIs(TT_LBRACE)) {
-        std::cout << "error parsing body for expression: LBRACE expectd\n";
-        free_Ad_AST_Node_memory(expr);
-        return NULL;
+    if (!ExpectPeek(TT_LBRACE)) {
+        expr->body = ParseSingleBlockStatement();
+    } else {
+        expr->body = ParseBlockStatement();
     }
-    expr->body = ParseBlockStatement();
     return expr;
 }
 
