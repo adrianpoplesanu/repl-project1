@@ -1,0 +1,4 @@
+a = 5
+
+if (a > 2) print ('e mai mare')
+else print ('e mai mic')

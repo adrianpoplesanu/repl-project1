@@ -182,13 +182,15 @@ class Parser(object):
         if not self.expect_peek(TokenType.RPAREN):
             return None
         if not self.expect_peek(TokenType.LBRACE):
-            return None
-        expr.consequence = self.parse_block_statement()
+            expr.consequence = self.parse_single_block_statement()
+        else:
+            expr.consequence = self.parse_block_statement()
         if self.peek_token_is(TokenType.ELSE):
             self.next_token()
             if not self.expect_peek(TokenType.LBRACE):
-                return None
-            expr.alternative = self.parse_block_statement()
+                expr.alternative = self.parse_single_block_statement()
+            else:
+                expr.alternative = self.parse_block_statement()
         return expr
 
     def parse_block_statement(self):
@@ -199,6 +201,13 @@ class Parser(object):
             if stmt:
                 block.statements.append(stmt)
             self.next_token()
+        return block
+
+    def parse_single_block_statement(self):
+        block = ASTBlockStatement(token=self.current_token)
+        self.next_token()
+        stmt = self.parse_statement()
+        block.statements.append(stmt)
         return block
 
     def parse_def_expression(self):
@@ -309,8 +318,9 @@ class Parser(object):
         if not self.expect_peek(TokenType.RPAREN):
             return None
         if not self.expect_peek(TokenType.LBRACE):
-            return None
-        expr.block = self.parse_block_statement()
+            expr.block = self.parse_single_block_statement()
+        else:
+            expr.block = self.parse_block_statement()
         return expr
 
     def parse_string_literal(self):
@@ -460,11 +470,10 @@ class Parser(object):
         if not self.expect_peek(TokenType.RPAREN):
             print ('error parsing for expression: RPRAREN not found')
             return None
-        self.next_token()
-        if not self.current_token_is(TokenType.LBRACE):
-            print ('error parsing for block statement')
-            return None
-        stmt.body =  self.parse_block_statement()
+        if not self.expect_peek(TokenType.LBRACE):
+            stmt.body =  self.parse_single_block_statement()
+        else:
+            stmt.body =  self.parse_block_statement()
         return stmt
 
     def parse_null_expression(self):
