@@ -1,0 +1,13 @@
+class Dog {
+    name = "dex"
+
+    def me() {
+        return this
+    }
+}
+
+dog = Dog()
+dog2 = dog.me()
+print (dog2.name)
+print (dog)
+print (dog2)
