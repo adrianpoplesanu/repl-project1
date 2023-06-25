@@ -242,9 +242,10 @@ class Ad_Class_Instance(Ad_Object):
         self.inherit_from = inherit_from
 
     def inspect(self):
-        out = "ClassInstance " + str(self.name) + " "
-        out += "attributes: " + str(self.class_object.attributes) + " "
-        out += "methods: " + str(self.class_object.methods)
+        #out = "ClassInstance " + str(self.name) + " "
+        #out += "attributes: " + str(self.class_object.attributes) + " "
+        #out += "methods: " + str(self.class_object.methods)
+        out = "class instance at memory address: " + str(hex(id(self)))
         return out
 
 
