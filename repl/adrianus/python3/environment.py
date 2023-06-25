@@ -5,6 +5,8 @@ class Environment(object):
         self.outer = None
         self.bootstrap = None
         self.siblings = {}
+        self.is_instance_environment = False
+        self.owning_instance_environment = None
 
     def check(self, key):
         return key in self.store or (self.outer and self.outer.check(key)) or (self.bootstrap and self.bootstrap.check(key))
