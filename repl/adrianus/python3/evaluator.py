@@ -109,6 +109,8 @@ class Evaluator(object):
             return self.eval_null_expression(node, env)
         elif node.type == StatementType.FLOAT:
             return self.eval_float(node, env)
+        elif node.type == StatementType.THIS_EXPRESSION:
+            return self.eval_this_expression(node, env)
         else:
             print ('unknown AST node: ' + node.type)
 
@@ -320,6 +322,8 @@ class Evaluator(object):
             # TODO: update this with java version
             instance_environment = new_environment()
             klass_instance = Ad_Class_Instance(name=func.name.value, class_object=func, instance_environment=instance_environment)
+            instance_environment.is_instance_environment = True
+            instance_environment.owning_instance_environment = klass_instance
             self.update_instance_with_inherited_classes(klass_instance, env)
             for attribute in func.attributes:
                 if attribute.type == StatementType.ASSIGN_STATEMENT:
@@ -819,6 +823,13 @@ class Evaluator(object):
                 return result
             step = self.eval(node.step, env)
             condition = self.eval(node.condition, env)
+        return None
+
+    def eval_this_expression(self, node, env):
+        if env.is_instance_environment:
+            return env.owning_instance_environment
+        if env.outer.is_instance_environment:
+            return env.outer.owning_instance_environment
         return None
 
     def eval_null_expression(self, node, env):
