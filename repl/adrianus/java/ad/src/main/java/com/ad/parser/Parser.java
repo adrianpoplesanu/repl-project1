@@ -129,6 +129,8 @@ public class Parser {
             return parseCommentStatement();
         } else if (currentToken.getType() == TokenTypeEnum.MULTI_COMMENT) {
             return parseMultiCommentStatement();
+        } else if (currentToken.getType() == TokenTypeEnum.SINGLE_COMMENT) {
+            return parseSingleCommentStatement();
         } else {
             return parseExpressionStatement();
         }
@@ -173,6 +175,11 @@ public class Parser {
     }
 
     private AstNode parseMultiCommentStatement() {
+        AstComment node = new AstComment(currentToken);
+        return node;
+    }
+
+    private AstNode parseSingleCommentStatement() {
         AstComment node = new AstComment(currentToken);
         return node;
     }
