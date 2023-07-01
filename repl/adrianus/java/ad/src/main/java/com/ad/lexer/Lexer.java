@@ -77,6 +77,13 @@ public class Lexer {
 				}
 				readChar();
 				readChar();
+			} else if (peekChar() == '/') {
+				token.setType(TokenTypeEnum.SINGLE_COMMENT);
+				token.setLiteral("//");
+				readChar();
+				while (currentChar != '\n' && currentChar != 0) {
+					readChar();
+				}
 			} else {
 				token.setType(TokenTypeEnum.SLASH);
 				token.setLiteral("/");
