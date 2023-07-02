@@ -52,6 +52,7 @@ enum TokenType {
     TT_CLASS,
     TT_THIS,
     TT_STARTCOMMENT,
+    TT_SINGLECOMMENT,
     TT_ENDCOMMENT,
     TT_PLUSPLUS,
     TT_NULL,
