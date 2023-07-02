@@ -138,6 +138,8 @@ Ad_AST_Node* Parser::ParseStatement() {
         return ParseContinueStatement();
     if (current_token.type == TT_STARTCOMMENT)
         return ParseComment();
+    if (current_token.type == TT_SINGLECOMMENT)
+        return ParseSingleLineComment();
     return ParseExpressionStatement();
 }
 
@@ -510,6 +512,11 @@ Ad_AST_Node* Parser::ParseComment() {
     while (!CurrentTokenIs(TT_EOF) && !(CurrentTokenIs(TT_ENDCOMMENT))) {
         NextToken();
     }
+    return comm;
+}
+
+Ad_AST_Node* Parser::ParseSingleLineComment() {
+    Ad_AST_Comment *comm = new Ad_AST_Comment(current_token);
     return comm;
 }
 

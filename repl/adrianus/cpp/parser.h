@@ -97,6 +97,7 @@ public:
     Ad_AST_Node* ParseAssignExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseDefExpression();
     Ad_AST_Node* ParseComment();
+    Ad_AST_Node* ParseSingleLineComment();
     Ad_AST_Node* ParseClassStatement();
     Ad_AST_Node* ParseMemberAccess(Ad_AST_Node*);
     Ad_AST_Node* ParsePrefixPlusPlus();
