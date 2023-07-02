@@ -144,6 +144,13 @@ Token Lexer::NextToken() {
                 ReadChar();
                 token.type = TT_STARTCOMMENT;
                 token.literal = "/*";
+            } else if (PeekChar() == '/') {
+                token.type = TT_SINGLECOMMENT;
+                token.literal = "//";
+                ReadChar();
+                while (current_char != '\n' && current_char != 0) {
+                    ReadChar();
+                }
             } else {
                 token.type = TT_SLASH;
                 token.literal = current_char;
