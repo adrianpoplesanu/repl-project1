@@ -51,9 +51,8 @@ enum TokenType {
     TT_DOT,
     TT_CLASS,
     TT_THIS,
-    TT_STARTCOMMENT,
+    TT_MULTICOMMENT,
     TT_SINGLECOMMENT,
-    TT_ENDCOMMENT,
     TT_PLUSPLUS,
     TT_NULL,
     TT_SUPER
@@ -106,8 +105,8 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_DOT, "DOT"},
     {TT_CLASS, "CLASS"},
     {TT_THIS, "THIS"},
-    {TT_STARTCOMMENT, "STARTCOMMENT"},
-    {TT_ENDCOMMENT, "ENDCOMMENT"},
+    {TT_MULTICOMMENT, "MULTICOMMENT"},
+    {TT_SINGLECOMMENT, "SINGLECOMMENT"},
     {TT_PLUSPLUS, "INCREMENT_OPERATOR"},
     {TT_NULL, "NULL"},
     {TT_SUPER, "SUPER"}

@@ -136,7 +136,7 @@ Ad_AST_Node* Parser::ParseStatement() {
         return ParseBreakStatement();
     if (current_token.type == TT_CONTINUE)
         return ParseContinueStatement();
-    if (current_token.type == TT_STARTCOMMENT)
+    if (current_token.type == TT_MULTICOMMENT)
         return ParseComment();
     if (current_token.type == TT_SINGLECOMMENT)
         return ParseSingleLineComment();
@@ -509,9 +509,6 @@ Ad_AST_Node* Parser::ParseDefExpression() {
 
 Ad_AST_Node* Parser::ParseComment() {
     Ad_AST_Comment *comm = new Ad_AST_Comment(current_token);
-    while (!CurrentTokenIs(TT_EOF) && !(CurrentTokenIs(TT_ENDCOMMENT))) {
-        NextToken();
-    }
     return comm;
 }
 

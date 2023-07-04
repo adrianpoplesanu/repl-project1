@@ -130,20 +130,19 @@ Token Lexer::NextToken() {
             token.literal = current_char;
         break;
         case '*':
-            if (PeekChar() == '/') {
-                ReadChar();
-                token.type = TT_ENDCOMMENT;
-                token.literal = "*/";
-            } else {
-                token.type = TT_ASTERISK;
-                token.literal = current_char;
-            }
+            token.type = TT_ASTERISK;
+            token.literal = current_char;
         break;
         case '/':
             if (PeekChar() == '*') {
                 ReadChar();
-                token.type = TT_STARTCOMMENT;
+                token.type = TT_MULTICOMMENT;
                 token.literal = "/*";
+                while (!(current_char == '*' && PeekChar() == '/')) {
+                    ReadChar();
+                }
+                ReadChar();
+                ReadChar();
             } else if (PeekChar() == '/') {
                 token.type = TT_SINGLECOMMENT;
                 token.literal = "//";
