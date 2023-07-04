@@ -160,9 +160,10 @@ public class Parser {
         if (peekTokenIs(TokenTypeEnum.SEMICOLON) || peekTokenIs(TokenTypeEnum.RBRACE) || peekTokenIs(TokenTypeEnum.EOF)) {
             return stmt;
         }
-        while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
-            nextToken();
-        }
+        //while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
+        //    nextToken();
+        //}
+        nextToken();
         return stmt;
     }
 
