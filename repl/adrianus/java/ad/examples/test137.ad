@@ -1,0 +1,20 @@
+def check() {
+    return true;
+}
+
+print (check())
+
+def check2() {
+    return true
+}
+
+print (check2())
+
+def check3() {
+    return 15
+    a = 6
+    b = "aaa"
+    print ("ccc")
+}
+
+print (check3())
