@@ -163,7 +163,7 @@ public class Parser {
         //while(!currentTokenIs(TokenTypeEnum.SEMICOLON) && !currentTokenIs(TokenTypeEnum.RBRACE) && !currentTokenIs(TokenTypeEnum.EOF)) {
         //    nextToken();
         //}
-        nextToken();
+        //nextToken();
         return stmt;
     }
 
