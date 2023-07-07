@@ -1,0 +1,12 @@
+a = [1, 2, 3]
+
+def test4(k) {
+    for (i = 0; i < 3; i++) if (a[i] == k) return true;
+    return false;
+}
+
+print (test4(0))
+print (test4(1))
+print (test4(2))
+print (test4(3))
+print (test4(4))
