@@ -178,7 +178,7 @@ Ad_AST_Node* Parser::ParseReturnStatement() {
     //while (!CurrentTokenIs(TT_SEMICOLON) && !CurrentTokenIs(TT_EOF)) {
     //    NextToken();
     //}
-    NextToken();
+    //NextToken();
     return stmt;
 }
 
