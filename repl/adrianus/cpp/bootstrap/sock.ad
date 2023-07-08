@@ -13,6 +13,11 @@ class ServerSocket {
         client = sock.accept()
     }
 
+    def read() {
+        response_message = client.read()
+        return response_message
+    }
+
     def send(message) {
         client.send(message)
     }
