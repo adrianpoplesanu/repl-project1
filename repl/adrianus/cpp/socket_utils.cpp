@@ -73,8 +73,13 @@ Ad_Object* read(Ad_Object* rawSocket) {
     while ((n = read(socketObject->connfd, socketObject->recvBuff, sizeof(socketObject->recvBuff) - 1)) > 0) {
         socketObject->recvBuff[n] = 0;
         message += socketObject->recvBuff;
+        if (n < sizeof(socketObject->recvBuff) - 1) break;
     }
 
+    //int valread = read( socketObject->connfd , socketObject->recvBuff, 1024);
+    //std::cout << socketObject->recvBuff << "\n";
+
+    //Ad_String_Object* result = new Ad_String_Object(socketObject->recvBuff);
     Ad_String_Object* result = new Ad_String_Object(message);
     return result;
 }
