@@ -14,5 +14,5 @@ drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) expected
 -rwxr-xr-x    1 adrianpoplesanu  staff   407 May 17 09:36 run-tests\.sh
 -rw-r--r--    1 adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) test-list\.txt
 -rw-r--r--    1 adrianpoplesanu  staff  1717 Dec  4  2022 test_proc_run_leaks\.py
--rw-r--r--    1 adrianpoplesanu  staff   280 Jan  4 17:32 test_pyton3_re_fullmatch\.py
+-rw-r--r--    1 adrianpoplesanu  staff   280 Jan  4  2023 test_pyton3_re_fullmatch\.py
 "
