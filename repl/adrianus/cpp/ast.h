@@ -393,6 +393,7 @@ class Ad_AST_PrefixIncrement : public Ad_AST_Node {
 public:
     Token token;
     Ad_AST_Node* name;
+    std::string _operator;
 
     Ad_AST_PrefixIncrement();
     Ad_AST_PrefixIncrement(Token);
@@ -406,6 +407,7 @@ class Ad_AST_PostfixIncrement : public Ad_AST_Node {
 public:
     Token token;
     Ad_AST_Node* name;
+    std::string _operator;
 
     Ad_AST_PostfixIncrement();
     Ad_AST_PostfixIncrement(Token);

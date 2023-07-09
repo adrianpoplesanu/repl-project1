@@ -136,10 +136,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_PREFIX_INCREMENT:
-            return EvalPrefixExpression(node, env);
+            return EvalPrefixIncrement(node, env);
         break;
         case ST_POSTFIX_INCREMENT:
-            return EvalPostfixExpression(node, env);
+            return EvalPostfixIncrement(node, env);
         break;
         case ST_FOR_EXPRESSION:
             return EvalForExpression(node, env);
@@ -1333,7 +1333,7 @@ Ad_Object* Evaluator::evalThreadObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
     return NULL;
 }
 
-Ad_Object* Evaluator::EvalPrefixExpression(Ad_AST_Node* node, Environment& env) {
+Ad_Object* Evaluator::EvalPrefixIncrement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_PrefixIncrement* prefix_increment = (Ad_AST_PrefixIncrement*) node;
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) prefix_increment->name;
     Ad_Object* old_obj = env.Get(ident->value);
@@ -1349,9 +1349,50 @@ Ad_Object* Evaluator::EvalPrefixExpression(Ad_AST_Node* node, Environment& env) 
     return &NULLOBJECT;
 }
 
-Ad_Object* Evaluator::EvalPostfixExpression(Ad_AST_Node* node, Environment& env) {
-    Ad_AST_PostfixIncrement* postfix_increment = (Ad_AST_PostfixIncrement*) node;
-    Ad_AST_Identifier* ident = (Ad_AST_Identifier*) postfix_increment->name;
+Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) {
+    Ad_AST_PostfixIncrement *expr = (Ad_AST_PostfixIncrement*) node;
+    if (expr->name->type == ST_INDEX_EXPRESSION) {
+        Ad_AST_IndexExpression *indexExpression = (Ad_AST_IndexExpression*) (expr->name);
+        Ad_Object *old_obj = evalIndexExpression(indexExpression, &env);
+        int value = ((Ad_Integer_Object*) old_obj)->value;
+        if ("++" == expr->_operator) {
+            Ad_Integer_Object *new_obj = new Ad_Integer_Object(value + 1);
+            garbageCollector->addObject(new_obj);
+            Ad_AST_Node *left = indexExpression->left;
+            Ad_AST_Node *index = indexExpression->index;
+            Ad_Object *left_obj = Eval(left, env);
+            Ad_Object *index_obj = Eval(index, env);
+            if (left_obj->type == OBJ_LIST) {
+                int i = ((Ad_Integer_Object*) index_obj)->value;
+                Ad_List_Object *target = (Ad_List_Object*) left_obj;
+                target->elements[i] = new_obj;
+                Ad_Integer_Object *returned_obj = new Ad_Integer_Object(value);
+                garbageCollector->addObject(returned_obj);
+                return returned_obj;
+            }
+            if (left_obj->type == OBJ_HASH) {
+                std::hash<std::string> hash_string;
+                Ad_Hash_Object *target = (Ad_Hash_Object*) left_obj;
+
+                HashPair hash_pair(index_obj, new_obj);
+                std::string hash = std::to_string(hash_string(index_obj->Hash()));
+
+                std::map<std::string, HashPair>::iterator it = target->pairs.find(hash);
+
+                if (it == target->pairs.end()) {
+                    target->pairs.insert(std::make_pair(hash, hash_pair));
+                } else {
+                    HashPair old_hash_pair = it->second;
+                    it->second = hash_pair;
+                }
+
+                Ad_Integer_Object *returned_obj = new Ad_Integer_Object(value);
+                garbageCollector->addObject(returned_obj);
+                return returned_obj;
+            }
+        }
+    }
+    Ad_AST_Identifier* ident = (Ad_AST_Identifier*) expr->name;
     Ad_Object* old_obj = env.Get(ident->value);
     if (old_obj->Type() == OBJ_INT) {
         int value = ((Ad_Integer_Object*) old_obj)->value;

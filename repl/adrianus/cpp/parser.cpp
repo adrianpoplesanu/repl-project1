@@ -576,6 +576,7 @@ Ad_AST_Node* Parser::ParsePrefixPlusPlus() {
 Ad_AST_Node* Parser::ParsePostfixPlusPlus(Ad_AST_Node* left) {
     Ad_AST_PostfixIncrement* expr = new Ad_AST_PostfixIncrement(current_token);
     expr->name = left;
+    expr->_operator = current_token.GetLiteral();
     return expr;
 }
 
