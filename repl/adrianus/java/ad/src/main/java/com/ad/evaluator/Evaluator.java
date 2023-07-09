@@ -86,6 +86,8 @@ public class Evaluator {
 			return evalForExpression(node, env);
 		case POSTFIX_INCREMENT:
 			return evalPostfixIncrement(node, env);
+		case PREFIX_INCREMENT:
+			return evalPrefixIncrement(node, env);
 		case THIS_EXPRESSION:
 			return evalThisExpression(node, env);
 		default:
@@ -707,12 +709,10 @@ public class Evaluator {
 					}
 				}
 				if (leftObj.getType() == ObjectTypeEnum.HASH) {
-					if (indexObj.getType() == ObjectTypeEnum.INT) {
-						System.out.println("doing a postfix ++ for a hash element");
-						AdHashObject target = (AdHashObject) leftObj;
-						//target.getElements().put("aaa", new HashPair(ceva, new_obj));
-						// return new AdIntegerObject(value);
-					}
+					String hash = indexObj.hash();
+					AdHashObject target = (AdHashObject) leftObj;
+					target.getElements().put(hash, new HashPair<>(indexObj, new_obj));
+					return new AdIntegerObject(value);
 				}
 			}
 			return null;
@@ -732,6 +732,10 @@ public class Evaluator {
 				return new AdIntegerObject(value);
 			}
 		}
+		return null;
+	}
+
+	private AdObject evalPrefixIncrement(AstNode node, Environment env) {
 		return null;
 	}
 
