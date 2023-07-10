@@ -1,0 +1,28 @@
+class AsyncEchoServer {
+
+    port = null
+    server = null
+    message = ""
+
+    def constructor(_port, _message) {
+        port = _port
+        message = _message
+        server = ServerSocket(port)
+    }
+
+    def start() {
+        while(true) {
+            server.accept()
+
+            request = server.read()
+            print (request)
+
+            server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+
+            server.close()
+        }
+    }
+}
+
+asyncEchoServer = AsyncEchoServer(5003, "<html>some message here9</html>")
+asyncEchoServer.start()
