@@ -1,0 +1,19 @@
+a = [0, 0, 0]
+
+def check(k) {
+    for (i = 0; i < k; i++) if (a[i] == a[k]) return false
+    return true
+}
+
+def back(k) {
+    if (k == len(a)) print (a)
+    else {
+        a[k] = 0
+        while (a[k] < 3) {
+            if (check (k)) back (k + 1)
+            a[k]++
+        }
+    }
+}
+
+back(0)
