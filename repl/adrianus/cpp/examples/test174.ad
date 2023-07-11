@@ -1,0 +1,3 @@
+a = { "aaa": 12 }
+a["aaa"]++
+print (a)
