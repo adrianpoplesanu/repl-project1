@@ -1,0 +1,51 @@
+a = [0, 0, 0]
+n = 3
+
+def check(k) {
+    for (i = 0; i < k; i++) if (a[i] == a[k]) return false
+    return true
+}
+
+def back(k) {
+    if (k == len(a)) print(a)
+    else {
+        a[k] = 0
+        while (a[k] < n) {
+            if (check(k)) back(k + 1)
+            a[k]++
+        }
+    }
+}
+
+back(0)
+
+/*class Permutations {
+    max = 0
+    a = []
+
+    def check(k) {
+        for (i = 0; i < k; i++) if (a[i] == a[k]) return false
+        return true
+    }
+
+    def back(k) {
+        if (k == len(a)) print(a)
+        else {
+            a[k] = 0
+            while (a[k] < max) {
+                if (check(k)) back(k + 1)
+                a[k]++
+            }
+        }
+    }
+
+    def calculate(n) {
+        a = list(n, 0)
+        max = n
+
+        back(0)
+    }
+}
+
+perm = Permutations()
+perm.calculate(4)*/
