@@ -2,6 +2,6 @@ server = ServerSocket(5003)
 
 server.accept()
 
-server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 35\r\nConnection: close\r\n\r\n<html><h1>http bebe dex</h1></html>")
+server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 40\r\nConnection: close\r\n\r\n<html><h1>http bebe dexiciut</h1></html>")
 
 server.close()
