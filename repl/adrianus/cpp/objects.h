@@ -349,7 +349,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
+	virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 class Ad_Thread_Object : public Ad_Object {

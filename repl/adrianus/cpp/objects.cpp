@@ -825,6 +825,7 @@ Ad_Socket_Object::Ad_Socket_Object(std::string n, std::string h, int p, bool a, 
 }
 
 Ad_Socket_Object::~Ad_Socket_Object() {
+    std::cout << "freeing a socket\n";
     // nothing to free apart the object itself
 }
 
@@ -848,6 +849,14 @@ Ad_Object_Type Ad_Socket_Object::Type() {
 
 std::string Ad_Socket_Object::Hash() {
     return object_type_map[type] + Inspect();
+}
+
+Ad_Object* Ad_Socket_Object::copy(GarbageCollector *gc) {
+    Ad_Socket_Object *new_obj = new Ad_Socket_Object(name, host, port, isActive, isForever, isClient, isServer);
+    new_obj->listenfd = listenfd;
+    new_obj->connfd = connfd;
+    gc->addObject(new_obj);
+    return new_obj;
 }
 
 Ad_Thread_Object::Ad_Thread_Object() {
