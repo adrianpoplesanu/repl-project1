@@ -14,6 +14,9 @@ class AsyncEchoServer {
         print ('handling request')
         print (client)
 
+        request_message = client.read()
+        print (request_message)
+
         client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
     }
 
@@ -29,5 +32,5 @@ class AsyncEchoServer {
     }
 }
 
-asyncEchoServer = AsyncEchoServer(5003, "<html>some message here9</html>")
+asyncEchoServer = AsyncEchoServer(5003, "<html><title>Some title here</title><body><h1>Bebe Dex</h1>catel frumos si scump</body></html>")
 asyncEchoServer.start()
