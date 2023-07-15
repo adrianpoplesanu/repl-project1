@@ -36,6 +36,7 @@ public class BuiltinLookup {
 			put("getattrs", new AdBuiltinObject(new GetattrsBuiltin()));
 			put("__thread", new AdBuiltinObject(new ThreadBuiltin()));
 			put("import", new AdBuiltinObject(new ImportBuiltin()));
+			put("sleep", new AdBuiltinObject(new SleepBuiltin()));
 			// https://www.w3schools.com/python/python_ref_keywords.asp
 			// https://www.w3schools.com/python/python_ref_functions.asp
 		}
