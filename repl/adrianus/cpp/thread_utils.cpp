@@ -48,3 +48,7 @@ void thread_blocking_run(Ad_Object* rawObject, GarbageCollector *gc, Environment
     threadPool.push_back(threadObject);
     th1->join();
 }
+
+void sleep_builtin_executor(int value) {
+    std::this_thread::sleep_for (std::chrono::milliseconds(value));
+}

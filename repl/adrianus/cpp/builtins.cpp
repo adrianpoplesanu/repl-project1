@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "gc.h"
 #include "eval_utils.h"
+#include "thread_utils.h"
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
@@ -310,6 +311,11 @@ Ad_Object* import_builtin(std::vector<Ad_Object*> args, Environment *env, Garbag
     return NULL;
 }
 
+Ad_Object* sleep_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    sleep_builtin_executor(((Ad_Integer_Object*) args[0])->value);
+    return NULL;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -339,7 +345,8 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"setattr", new Ad_Builtin_Object(&setattr_builtin)},
     {"getattrs", new Ad_Builtin_Object(&getattrs_builtin)},
     {"__thread", new Ad_Builtin_Object(&thread_builtin)},
-    {"import", new Ad_Builtin_Object(&import_builtin)}
+    {"import", new Ad_Builtin_Object(&import_builtin)},
+    {"sleep", new Ad_Builtin_Object(&sleep_builtin)}
     // eval
     // first
     // input
