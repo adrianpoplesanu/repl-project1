@@ -1,0 +1,5 @@
+print ("aaa")
+sleep(1000)
+print ("bbb")
+sleep(1000)
+print ("ccc")
