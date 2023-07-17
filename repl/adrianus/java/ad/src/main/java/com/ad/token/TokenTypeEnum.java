@@ -55,6 +55,8 @@ public enum TokenTypeEnum {
 	SINGLE_COMMENT,
 	PLUSPLUS,
 	MINUSMINUS,
+	PLUS_EQ,
+	MINUS_EQ,
 	NULL,
 	SUPER
 }
