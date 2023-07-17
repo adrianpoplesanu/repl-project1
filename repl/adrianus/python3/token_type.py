@@ -51,5 +51,8 @@ class TokenType(object):
     SINGLE_COMMENT = "SINGLE_COMMENT"
     END_COMMENT = "*/"
     PLUSPLUS = "++"
+    MINUSMINUS = "--"
+    PLUS_EQ = "+="
+    MINUS_EQ = "-="
     NULL = "NULL"
     SUPER = "SUPER"

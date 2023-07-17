@@ -51,6 +51,9 @@ token_type_map = {
 	TokenType.MULTI_COMMENT: "MULTI_COMMENT",
 	TokenType.END_COMMENT: "END_COMMENT",
 	TokenType.PLUSPLUS: 'INCREMENT_OPERATOR',
+	TokenType.MINUSMINUS: 'DECREMENT_OPERATOR',
+	TokenType.PLUS_EQ: 'PLUS_EQ',
+	TokenType.MINUS_EQ: 'MINUS_EQ',
 	TokenType.NULL: 'NULL',
 	TokenType.SUPER: 'SUPER'
 }
