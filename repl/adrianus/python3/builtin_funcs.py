@@ -1,4 +1,5 @@
 import sys
+import time
 
 from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object
 from object_type import ObjectType
@@ -146,6 +147,9 @@ def thread_builtin(args, env):
 def import_builtin(args, env):
     pass
 
+def sleep_builtin(args, env):
+    time.sleep(args[0].value / 1000)
+
 builtins_map = {
     "len": Ad_Builtin_Object(builtin_function=len_builtin),
     "exit": Ad_Builtin_Object(builtin_function=exit_builtin),
@@ -175,6 +179,7 @@ builtins_map = {
     "getattrs": Ad_Builtin_Object(builtin_function=getattrs_builtin),
     "__thread": Ad_Builtin_Object(builtin_function=thread_builtin),
     "import": Ad_Builtin_Object(builtin_function=import_builtin),
+    "sleep": Ad_Builtin_Object(builtin_function=sleep_builtin),
     # https://www.w3schools.com/python/python_ref_keywords.asp
 	# https://www.w3schools.com/python/python_ref_functions.asp
 }
