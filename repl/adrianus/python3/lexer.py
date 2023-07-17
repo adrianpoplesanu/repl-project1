@@ -45,7 +45,7 @@ class Lexer(object):
             elif self.peek_char() == '/':
                 token.type = TokenType.SINGLE_COMMENT
                 token.literal = '//'
-                while not self.ch == '\n' and not self.ch = 0:
+                while not self.ch == '\n' and not self.ch == 0:
                     self.read_char()
             else:
                 token.type = TokenType.SLASH
