@@ -47,6 +47,10 @@ public class Lexer {
 				token.setType(TokenTypeEnum.PLUSPLUS);
 				token.setLiteral("++");
 				readChar();
+			} else if (peekChar() == '=') {
+				token.setType(TokenTypeEnum.PLUS_EQ);
+				token.setLiteral("+=");
+				readChar();
 			} else {
 				token.setType(TokenTypeEnum.PLUS);
 				token.setLiteral("+");
@@ -56,6 +60,10 @@ public class Lexer {
 			if (peekChar() == '-') {
 				token.setType(TokenTypeEnum.MINUSMINUS);
 				token.setLiteral("--");
+				readChar();
+			} else if (peekChar() == '=') {
+				token.setType(TokenTypeEnum.MINUS_EQ);
+				token.setLiteral("-=");
 				readChar();
 			} else {
 				token.setType(TokenTypeEnum.MINUS);
