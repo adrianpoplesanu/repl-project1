@@ -137,6 +137,13 @@ examples/test145.ad
 examples/test146.ad
 examples/test148.ad
 examples/test149.ad
+examples/test150.ad
+examples/test153.ad
+examples/test154.ad
+examples/test156.ad
+examples/test157.ad
+examples/test158.ad
+examples/test159.ad
 examples/test160.ad
 examples/test161.ad
 examples/test162.ad
