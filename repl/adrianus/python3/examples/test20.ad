@@ -1,7 +1,7 @@
 port = 8080
 offset = 1
 
-let a = function(x) {
+let a = func(x) {
     return port + offset + x
 }
 
