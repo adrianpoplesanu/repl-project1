@@ -26,12 +26,25 @@ class Lexer(object):
                 self.read_char()
                 token.type = TokenType.PLUSPLUS
                 token.literal = '++'
+            elif self.peek_char() == '=':
+                self.read_char()
+                token.type = TokenType.PLUS_EQ
+                token.literal = '+='
             else:
                 token.type = TokenType.PLUS
                 token.literal = self.ch
         elif self.ch == '-':
-            token.type = TokenType.MINUS
-            token.literal = self.ch
+            if self.peek_char() == '-':
+                self.read_char()
+                token.type = TokenType.MINUSMINUS
+                token.literal = '--'
+            elif self.peek_char() == '=':
+                self.read_char()
+                token.type = TokenType.MINUS_EQ
+                token.literal = '-='
+            else:
+                token.type = TokenType.MINUS
+                token.literal = self.ch
         elif self.ch == '/':
             if self.peek_char() == '*':
                 token.type = TokenType.MULTI_COMMENT
