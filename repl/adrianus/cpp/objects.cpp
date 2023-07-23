@@ -825,8 +825,8 @@ Ad_Socket_Object::Ad_Socket_Object(std::string n, std::string h, int p, bool a, 
 }
 
 Ad_Socket_Object::~Ad_Socket_Object() {
-    std::cout << "freeing a socket\n";
     // nothing to free apart the object itself
+    //std::cout << "freeing a socket\n";
 }
 
 std::string Ad_Socket_Object::Inspect() {
