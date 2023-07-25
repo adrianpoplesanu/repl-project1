@@ -22,6 +22,7 @@ public enum TokenTypeEnum {
 	MINUS,
 	SLASH,
 	ASTERISK,
+	MODULUS,
 	BANG,
 	COMMA,
 	SEMICOLON,
