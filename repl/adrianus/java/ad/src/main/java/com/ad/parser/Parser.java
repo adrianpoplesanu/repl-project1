@@ -62,6 +62,7 @@ public class Parser {
         infixParseFns.put(TokenTypeEnum.DOT, this::parseMemberAccess);
         infixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePostfixExpression);
         infixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePostfixExpression);
+        infixParseFns.put(TokenTypeEnum.MODULUS, this::parseInfixExpression);
     }
 
     public void load(String s) {
