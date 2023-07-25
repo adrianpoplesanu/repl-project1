@@ -97,6 +97,10 @@ public class Lexer {
 				token.setLiteral("/");
 			}
 		break;
+		case '%':
+			token.setType(TokenTypeEnum.MODULUS);
+			token.setLiteral("%");
+		break;
 		case ';':
 			token.setType(TokenTypeEnum.SEMICOLON);
 			token.setLiteral(";");

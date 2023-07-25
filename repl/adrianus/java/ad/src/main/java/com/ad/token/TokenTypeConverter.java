@@ -27,6 +27,7 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.MINUS, "MINUS");
 			put(TokenTypeEnum.SLASH, "SLASH");
 			put(TokenTypeEnum.ASTERISK, "ASTERISK");
+			put(TokenTypeEnum.MODULUS, "MODULUS");
 			put(TokenTypeEnum.BANG, "BANG");
 			put(TokenTypeEnum.COMMA, "COMMA");
 			put(TokenTypeEnum.SEMICOLON, "SEMICOLON");

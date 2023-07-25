@@ -20,6 +20,7 @@ public class TokenPrecedenceConverter {
 			put(TokenTypeEnum.MINUS, PrecedenceTypeEnum.SUM);
 			put(TokenTypeEnum.ASTERISK, PrecedenceTypeEnum.PRODUCT);
 			put(TokenTypeEnum.SLASH, PrecedenceTypeEnum.PRODUCT);
+			put(TokenTypeEnum.MODULUS, PrecedenceTypeEnum.PRODUCT);
 			put(TokenTypeEnum.LPAREN, PrecedenceTypeEnum.CALL);
 			put(TokenTypeEnum.ASSIGN, PrecedenceTypeEnum.ASSIGN);
 			put(TokenTypeEnum.LBRACKET, PrecedenceTypeEnum.INDEX);
