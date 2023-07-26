@@ -246,6 +246,8 @@ public class Evaluator {
 				return new AdIntegerObject(left_val * right_val);
 			case "/":
 				return new AdIntegerObject(left_val / right_val);
+			case "%":
+				return new AdIntegerObject(left_val % right_val);
 			case "<":
 				return nativeBoolToBoolean(left_val < right_val);
 			case ">":
