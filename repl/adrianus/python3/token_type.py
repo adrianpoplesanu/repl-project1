@@ -20,6 +20,7 @@ class TokenType(object):
     MINUS = "-"
     SLASH = "/"
     ASTERISK = "*"
+    MODULUS = "%"
     BANG = "!"
     COMMA = ","
     SEMICOLON = ";"
