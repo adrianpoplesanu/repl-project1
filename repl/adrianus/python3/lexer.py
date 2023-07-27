@@ -64,12 +64,10 @@ class Lexer(object):
                 token.type = TokenType.SLASH
                 token.literal = self.ch
         elif self.ch == '*':
-            #if self.peek_char() == '/':
-            #    self.read_char()
-            #    token.type = TokenType.END_COMMENT
-            #    token.literal = '*/'
-            #else:
             token.type = TokenType.ASTERISK
+            token.literal = self.ch
+        elif self.ch == '%':
+            token.type = TokenType.MODULUS
             token.literal = self.ch
         elif self.ch == '>':
             if self.peek_char() == '=':
