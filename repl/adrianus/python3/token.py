@@ -21,6 +21,7 @@ token_type_map = {
 	TokenType.MINUS: "MINUS",
 	TokenType.SLASH: "SLASH",
 	TokenType.ASTERISK: "ASTERISK",
+	TokenType.MODULUS: "MODULUS",
 	TokenType.BANG: "BANG",
 	TokenType.COMMA: "COMMA",
 	TokenType.SEMICOLON: "SEMICOLON",
