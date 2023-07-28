@@ -28,6 +28,7 @@ precedences = {
     TokenType.MINUS: PrecedenceType.SUM,
     TokenType.SLASH: PrecedenceType.PRODUCT,
     TokenType.ASTERISK: PrecedenceType.PRODUCT,
+    TokenType.MODULUS: PrecedenceType.PRODUCT,
     TokenType.LPAREN: PrecedenceType.CALL,
     TokenType.LBRACKET: PrecedenceType.INDEX,
     TokenType.DOT: PrecedenceType.MEMBER_ACCESS,

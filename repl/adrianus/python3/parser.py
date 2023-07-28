@@ -47,6 +47,7 @@ class Parser(object):
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.ASTERISK] = self.parse_infix_expression
+        self.infix_parse_functions[TokenType.MODULUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.EQ] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.NOT_EQ] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.LT] = self.parse_infix_expression

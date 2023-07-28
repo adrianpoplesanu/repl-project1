@@ -179,6 +179,8 @@ class Evaluator(object):
             return Ad_Integer_Object(value=left_val * right_val)
         if operator == '/':
             return Ad_Integer_Object(value=left_val / right_val)
+        if operator == '%':
+            return Ad_Integer_Object(value=left_val % right_val)
         if operator == '<':
             return self.native_bool_to_boolean_object(left_val < right_val)
         if operator == '>':
