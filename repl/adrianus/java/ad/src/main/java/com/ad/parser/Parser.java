@@ -522,6 +522,16 @@ public class Parser {
         nextToken();
         AstNode index = parseExpression(PrecedenceTypeEnum.LOWEST);
         expr.setIndex(index);
+        if (expectPeek(TokenTypeEnum.COLON)) {
+            nextToken();
+            AstNode indexEnd = parseExpression(PrecedenceTypeEnum.LOWEST);
+            expr.setIndexEnd(indexEnd);
+            if (expectPeek(TokenTypeEnum.COLON)) {
+                nextToken();
+                AstNode step = parseExpression(PrecedenceTypeEnum.LOWEST);
+                expr.setStep(step);
+            }
+        }
         if (!expectPeek(TokenTypeEnum.RBRACKET)) {
             return null;
         }
