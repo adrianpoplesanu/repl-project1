@@ -928,6 +928,19 @@ public class Evaluator {
 		AstIndexExpression expr = (AstIndexExpression) node;
     	AdObject left = eval(expr.getLeft(), env);
     	AdObject index = eval(expr.getIndex(), env);
+		if (expr.getIndexEnd() != null) {
+			AdObject indexEnd = eval(expr.getIndexEnd(), env);
+			AdObject step = null;
+			if (expr.getStep() != null) {
+				step = eval(expr.getStep(), env);
+			}
+			if (left.getType() == ObjectTypeEnum.LIST
+					&& index.getType() == ObjectTypeEnum.INT
+					&& indexEnd.getType() == ObjectTypeEnum.INT
+					&& (step == null || step.getType() == ObjectTypeEnum.INT)) {
+				return evalSubListIndexExpression(left, index, indexEnd, step);
+			}
+		}
 
     	if (left.getType() == ObjectTypeEnum.LIST && index.getType() == ObjectTypeEnum.INT) {
     		return evalListIndexExpression(left, index);
@@ -946,6 +959,48 @@ public class Evaluator {
     	int idx = ((AdIntegerObject) index).getValue();
     	if (idx < 0 || idx >= max) return null; // this should be an error object
     	return ((AdListObject) left).getElements().get(idx);
+	}
+
+	private AdObject evalSubListIndexExpression(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
+		int max = ((AdListObject) left).getElements().size();
+		int idx = ((AdIntegerObject) index).getValue();
+		int idx_end = ((AdIntegerObject) indexEnd).getValue();
+		int idx_step = 1;
+		boolean isStep = false;
+
+		if (step != null) {
+			isStep = true;
+			idx_step = ((AdIntegerObject) step).getValue();
+		}
+
+		if (idx < -max) idx = -max;
+		if (idx < 0) idx += max;
+		if (idx >= max) idx = max;
+
+		if (idx_end < -max) idx_end = -max;
+		if (idx_end < 0) idx_end += max;
+		if (idx_end >= max) idx_end = max;
+
+		AdListObject result = new AdListObject(new ArrayList<>());
+		if (idx < idx_end) {
+			for (int i = idx; i < idx_end; ) {
+				result.getElements().add(((AdListObject) left).getElements().get(i));
+				i += idx_step;
+			}
+		} else {
+			if (idx_step >= 0) {
+				return result;
+			}
+			if (!isStep) {
+				return result;
+			}
+			for (int i = idx; i > idx_end; ) {
+				result.getElements().add(((AdListObject) left).getElements().get(i));
+				i += idx_step;
+			}
+		}
+
+		return result;
 	}
 
 	private AdObject evalHashIndexExpression(AdObject left, AdObject index) {
