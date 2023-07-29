@@ -7,9 +7,13 @@ public class AstIndexExpression extends AstNode {
     private Token token;
     private AstNode left;
     private AstNode index;
+    private AstNode indexEnd;
+    private AstNode step;
 
     public AstIndexExpression() {
         type = AstNodeTypeEnum.INDEX_EXPRESSION;
+        indexEnd = null;
+        step = null;
     }
 
     public AstIndexExpression(Token t) {
@@ -54,5 +58,21 @@ public class AstIndexExpression extends AstNode {
 
     public void setIndex(AstNode index) {
         this.index = index;
+    }
+
+    public AstNode getIndexEnd() {
+        return indexEnd;
+    }
+
+    public void setIndexEnd(AstNode indexEnd) {
+        this.indexEnd = indexEnd;
+    }
+
+    public AstNode getStep() {
+        return step;
+    }
+
+    public void setStep(AstNode step) {
+        this.step = step;
     }
 }
