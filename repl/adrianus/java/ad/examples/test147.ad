@@ -1,0 +1,7 @@
+a = ["bebe", "dex", "e", "un", "dragutz", "si", "un", "scumpec"]
+
+print (a)
+
+b = a[1:4]
+
+print (b)
