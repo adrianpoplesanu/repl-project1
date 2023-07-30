@@ -11,6 +11,7 @@ from environment import new_environment, new_enclosed_environment
 from builtin_funcs import builtins_map
 from utils import print_ast_nodes
 from handlers.file import read_file_content, write_file_content, append_file_content
+from thread_utils import thread_callback, thread_async_run, thread_blocking_run
 
 NULLOBJECT = Ad_Null_Object()
 TRUE = Ad_Boolean_Object(value=True)
@@ -795,6 +796,16 @@ class Evaluator(object):
             return None
         owner = env.get(node.owner.value)
         if owner.type == ObjectType.THREAD:
+            if node.is_method:
+                if node.member.value == 'callback' or node.member.value == 'execute':
+                    args_objs = self.eval_expressions(node.arguments, env)
+                    thread_callback(owner, args_objs)
+                elif node.member.value == 'runAsync' or node.member.value == 'start':
+                    thread_async_run(owner, env)
+                elif node.member.value == 'runBlocking' or node.member.value == 'join':
+                    thread_blocking_run(owner, env)
+            else:
+                pass
             return NULLOBJECT
         else:
             return None
