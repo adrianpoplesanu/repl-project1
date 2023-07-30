@@ -280,8 +280,16 @@ class Ad_Socket_Object(Ad_Object):
 class Ad_Thread_Object(Ad_Object):
     type = ObjectType.THREAD
 
-    def __init__(self):
-        pass
+    def __init__(self, name=None, callback=None, params=None):
+        """
+        @param: name - string, the name of the thread
+        @param: callback - function that gets executed when thread is running
+        @param: params - params for function that gets executed
+        """
+        self.name = name
+        self.callback = callback
+        self.params = params
 
     def inspect(self):
-        pass
+        out = "thread instance at memory address: " + str(hex(id(self)))
+        return out
