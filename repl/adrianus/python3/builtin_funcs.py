@@ -1,9 +1,10 @@
 import sys
 import time
 
-from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object
+from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Ad_Thread_Object
 from object_type import ObjectType
 from eval_utils import eval_source
+from thread_utils import sleep_builtin_executor
 #from evaluator import NULLOBJECT # TODO: circular import, i need to fix this
 
 def len_builtin(args, env):
@@ -142,13 +143,14 @@ def getattrs_builtin(args, env):
     pass
 
 def thread_builtin(args, env):
-    pass
+    thread_obj = Ad_Thread_Object()
+    return thread_obj
 
 def import_builtin(args, env):
     pass
 
 def sleep_builtin(args, env):
-    time.sleep(args[0].value / 1000)
+    sleep_builtin_executor(args[0].value)
 
 builtins_map = {
     "len": Ad_Builtin_Object(builtin_function=len_builtin),
