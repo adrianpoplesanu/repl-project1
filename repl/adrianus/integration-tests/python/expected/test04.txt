@@ -1,0 +1,7 @@
+\"start test\"
+\"end class declaration\"
+store: {offset2: 34}
+outer: {store: {varsta: 12, aaa: \"abc\", bbb: \"cde\", ccc: 57, construct: function at memory address: (.*), print_varsta: function at memory address: (.*)}
+    outer: {store: {File: class object, a: 12, Elev: class object, e: class instance at memory address: (.*)}
+        outer: {}}}
+46
