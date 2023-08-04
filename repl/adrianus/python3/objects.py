@@ -270,11 +270,37 @@ class Ad_File_Object(Ad_Object):
 class Ad_Socket_Object(Ad_Object):
     type = ObjectType.SOCKET
 
-    def __init__(self):
-        pass
+    def __init__(self, name=None, host=None, port=None, is_active=None,
+            is_forever=None, is_client=None, is_server=None, listenfd=None,
+            connfd=None, send_buff=None, recv_buff=None):
+        """
+        @param: name - string, the name of the socket
+        @param: host - string, the host if the socket
+        @param: port - int, the port of the socket
+        @param: is_active - boolean, wheter the socket is active or not
+        @param: is_forever - boolean, wheter the socket is forever or not
+        @param: is_client - boolean, wheter the socket is a client or not
+        @param: is_server - boolean, wheter the socket is a server or not
+        @param: listenfd - int, listen file descriptor
+        @param: connfd - int, connection file descriptor
+        @param: send_buff - array, buffer used to send
+        @param: recv_buff - array, buffer used to receive
+        """
+        self.name = name
+        self.host = host
+        self.port = port
+        self.is_active = is_active
+        self.is_forever = is_forever
+        self.is_client = is_client
+        self.is_server = is_server
+        self.listenfd = listenfd
+        self.connfd = connfd
+        self.send_buff = senf_buff
+        self.recv_buff = recv_buff
 
     def inspect(self):
-        pass
+        out = "socket instance at memory address: " + str(hex(id(self)))
+        return out
 
 
 class Ad_Thread_Object(Ad_Object):
