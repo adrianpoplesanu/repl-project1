@@ -12,6 +12,7 @@ from builtin_funcs import builtins_map
 from utils import print_ast_nodes
 from handlers.file import read_file_content, write_file_content, append_file_content
 from thread_utils import thread_callback, thread_async_run, thread_blocking_run
+from socket_utils import create_server, create_client, accept_socket, send_socket, read_socket, close_socket
 
 NULLOBJECT = Ad_Null_Object()
 TRUE = Ad_Boolean_Object(value=True)
@@ -786,6 +787,24 @@ class Evaluator(object):
             return None
         owner = env.get(node.owner.value)
         if owner.type == ObjectType.SOCKET:
+            if node.is_method:
+                if node.member.value == 'create_server':
+                    create_server(owner)
+                elif node.member.value == 'create_client':
+                    create_client(owner)
+                elif node.member.value == 'accept':
+                    result = accept_socket(owner)
+                    return result
+                elif node.member.value == 'send':
+                    args_objs = self.eval_expressions(node.arguments, env)
+                    send_socket(owner, args_objs[0])
+                elif node.member.value == 'read':
+                    result = read_socket(owner)
+                    return result
+                elif node.member.value == 'close':
+                    close_socket(owner)
+            else:
+                pass
             return NULLOBJECT
         else:
             return None
