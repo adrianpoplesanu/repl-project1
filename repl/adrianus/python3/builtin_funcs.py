@@ -1,7 +1,7 @@
 import sys
 import time
 
-from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Ad_Thread_Object
+from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Ad_Thread_Object, Ad_Socket_Object
 from object_type import ObjectType
 from eval_utils import eval_source
 from thread_utils import sleep_builtin_executor
@@ -81,7 +81,9 @@ def syssystem_builtin(args, env):
     pass
 
 def iosocket_builtin(args, env):
-    pass
+    socket_obj = Ad_Socket_Object(name=args[0], port=args[1], is_active=args[2],
+                                  is_forever=args[3], is_client=args[4], is_server=args[5])
+    return socket_obj
 
 def eval_builtin(args, env):
     unescaped_source = args[0]
