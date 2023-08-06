@@ -1,0 +1,3 @@
+8080
+store: {File: class object, a: 12, Server: class object, server: class instance at memory address: (.*)}
+outer: {}
