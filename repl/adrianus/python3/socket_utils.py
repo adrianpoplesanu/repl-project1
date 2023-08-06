@@ -21,7 +21,8 @@ def accept_socket(socket_obj):
 
 def send_socket(socket_obj, message):
     escaped_text = cleanup_unescaped_characters(message.value)
-    socket_obj.conn.sendall(escaped_text.encode())
+    if socket_obj.conn:
+        socket_obj.conn.sendall(escaped_text.encode())
 
 def read_socket(socket_obj):
     message = ""

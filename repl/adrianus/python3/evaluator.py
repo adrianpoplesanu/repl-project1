@@ -1,7 +1,7 @@
 from objects import Ad_Null_Object, Ad_Integer_Object, Ad_Boolean_Object, \
                     Ad_String_Object, Ad_ReturnValue_Object, Ad_Function_Object, \
                     Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Hash_Pair, \
-                    Ad_Class_Object, Ad_Class_Instance, Ad_Float_Object
+                    Ad_Class_Object, Ad_Class_Instance, Ad_Float_Object, Ad_Break_Object, Ad_Continue_Object
 from object_type import ObjectType
 from ast import StatementType
 from environment import new_environment, new_enclosed_environment
@@ -113,6 +113,10 @@ class Evaluator(object):
             return self.eval_float(node, env)
         elif node.type == StatementType.THIS_EXPRESSION:
             return self.eval_this_expression(node, env)
+        elif node.type == StatementType.BREAK_STATEMENT:
+            return self.eval_break_expression(node, env)
+        elif node.type == StatementType.CONTINUE_STATEMENT:
+            return self.eval_continue_expression(node, env)
         else:
             print ('unknown AST node: ' + node.type)
 
@@ -269,6 +273,10 @@ class Evaluator(object):
             result = self.eval(statement, env)
             if result and result.type == ObjectType.RETURN_VALUE:
                 return result
+            if result and result.type == ObjectType.BREAK:
+                return result
+            if result and result.type == ObjectType.CONTINUE:
+                return result
         return None
 
     def eval_while_expression(self, node, env):
@@ -279,6 +287,10 @@ class Evaluator(object):
             result = self.eval(node.block, env)
             if result and result.type == ObjectType.RETURN_VALUE:
                 return result
+            if result and result.type == ObjectType.BREAK:
+                return None
+            if result and result.type == ObjectType.CONTINUE:
+                pass
             condition = self.eval(node.condition, env)
 
     def is_truthy(self, obj):
@@ -447,6 +459,9 @@ class Evaluator(object):
             return Ad_String_Object(value=val)
         if operator == "==":
             val = left.value == right.value
+            return self.native_bool_to_boolean_object(val)
+        if operator == "!=":
+            val = left.value != right.value
             return self.native_bool_to_boolean_object(val)
 
     def eval_string_and_int_infix_expression(self, operator, left, right):
@@ -862,6 +877,10 @@ class Evaluator(object):
             result = self.eval(node.body, env)
             if result and result.type == ObjectType.RETURN_VALUE:
                 return result
+            if result and result.type == ObjectType.BREAK:
+                return None
+            if result and result.type == ObjectType.CONTINUE:
+                pass
             step = self.eval(node.step, env)
             condition = self.eval(node.condition, env)
         return None
@@ -872,6 +891,12 @@ class Evaluator(object):
         if env.outer.is_instance_environment:
             return env.outer.owning_instance_environment
         return None
+
+    def eval_break_expression(self, node, env):
+        return Ad_Break_Object()
+
+    def eval_continue_expression(self, node, env):
+        return Ad_Continue_Object()
 
     def eval_null_expression(self, node, env):
         return NULLOBJECT

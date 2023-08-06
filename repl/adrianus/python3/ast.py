@@ -29,6 +29,8 @@ class StatementType(object):
     NULL_EXPRESSION = 'NULL_EXPRESSION'
     THIS_EXPRESSION = 'THIS_EXPRESSION'
     SUPER_EXPRESSION = 'SUPER_EXPRESSION'
+    BREAK_STATEMENT = 'BREAK_STATEMENT'
+    CONTINUE_STATEMENT = 'CONTINUE_STATEMENT'
 
 
 statement_type_map = {
@@ -61,7 +63,9 @@ statement_type_map = {
     StatementType.FOR_EXPRESSION: 'FOR_EXPRESSION',
     StatementType.NULL_EXPRESSION: 'NULL_EXPRESSION',
     StatementType.THIS_EXPRESSION: 'THIS_EXPRESSION',
-    StatementType.SUPER_EXPRESSION: 'SUPER_EXPRESSION'
+    StatementType.SUPER_EXPRESSION: 'SUPER_EXPRESSION',
+    StatementType.BREAK_STATEMENT: 'BREAK_STATEMENT',
+    StatementType.CONTINUE_STATEMENT: 'CONTINUE_STATEMENT'
 }
 
 
@@ -624,6 +628,38 @@ class ASTThisExpression(ASTNode):
 
 class ASTSuperExpression(ASTNode):
     type = StatementType.SUPER_EXPRESSION
+
+    def __init__(self, token=None):
+        """
+        @param token: the node's token
+        """
+        self.token = token
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)
+
+
+class ASTBrakeStatement(ASTNode):
+    type = StatementType.BREAK_STATEMENT
+
+    def __init__(self, token=None):
+        """
+        @param token: the node's token
+        """
+        self.token = token
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'Token: ' + str(self.token)
+
+
+class ASTContinueStatement(ASTNode):
+    type = StatementType.CONTINUE_STATEMENT
 
     def __init__(self, token=None):
         """

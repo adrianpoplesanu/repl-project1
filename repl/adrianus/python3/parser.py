@@ -8,7 +8,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
                 ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
                 ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
-                ASTFloat, ASTSuperExpression
+                ASTFloat, ASTSuperExpression, ASTBrakeStatement, ASTContinueStatement
 
 
 class Parser(object):
@@ -109,6 +109,10 @@ class Parser(object):
             return self.parse_let_statement()
         elif self.current_token.type == TokenType.RETURN:
             return self.parse_return_statement()
+        elif self.current_token.type == TokenType.BREAK:
+            return self.parse_break_statement()
+        elif self.current_token.type == TokenType.CONTINUE:
+            return self.parse_continue_statement()
         elif self.current_token.type == TokenType.START_COMMENT:
             return self.parse_comment()
         elif self.current_token.type == TokenType.MULTI_COMMENT:
@@ -139,6 +143,12 @@ class Parser(object):
         while not self.current_token_is(TokenType.SEMICOLON) and not self.current_token_is(TokenType.RBRACE) and not self.current_token_is(TokenType.EOF):
             self.next_token()
         return stmt
+
+    def parse_break_statement(self):
+        return ASTBrakeStatement(self.current_token)
+
+    def parse_continue_statement(self):
+        return ASTContinueStatement(self.current_token)
 
     def parse_expression_statement(self):
         stmt = ASTExpressionStatement(token=self.current_token)
