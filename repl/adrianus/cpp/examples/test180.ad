@@ -1,0 +1,7 @@
+socket = __iosocket("server", "localhost", 5003, true, false, false, true)
+socket.create_server()
+client = socket.accept()
+client.send("bla bla bli")
+/*client.send("server: buna dimineata!")*/
+client.close()
+socket.close()
