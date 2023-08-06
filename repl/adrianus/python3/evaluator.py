@@ -121,6 +121,8 @@ class Evaluator(object):
             result = self.eval(statement, env)
             if result:
                 print (result.inspect())
+                if (result.type == ObjectType.ERROR):
+                    return None
 
     def eval_identifier(self, node, env):
         if env.check(node.token.literal):
@@ -345,7 +347,9 @@ class Evaluator(object):
                 func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
                 klass_instance.instance_environment.set_local_param(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
-            self.call_instance_constructor(klass_instance, args_objs, env)
+            constructor_return = self.call_instance_constructor(klass_instance, args_objs, env)
+            if self.is_error(constructor_return):
+                return constructor_return
             return klass_instance
         return None
 
@@ -400,6 +404,9 @@ class Evaluator(object):
 
     def apply_method(self, func, args_objs, env):
         if func.type == ObjectType.FUNCTION:
+            if len(func.parameters) != len(args_objs):
+                err = Ad_Error_Object("some error message here")
+                return err
             extended_env = self.extend_method_env(func, args_objs, env)
             evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
@@ -524,6 +531,8 @@ class Evaluator(object):
                 klass_environment.set(klass_member.value, obj)
         else:
             obj = self.eval(node.value, env)
+            if self.is_error(obj):
+                return obj
             env.set(node.name.value, obj)
         return None
 

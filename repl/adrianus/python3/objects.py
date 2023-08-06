@@ -82,6 +82,9 @@ class Ad_ReturnValue_Object(Ad_Object):
         """
         self.value = value
 
+    def inspect(self):
+        return self.value.inspect()
+
 
 class Ad_Break_Object(Ad_Object):
     type = ObjectType.BREAK
@@ -116,7 +119,7 @@ class Ad_Function_Object(Ad_Object):
         self.env = env
 
     def inspect(self):
-        return "function at memory address: " + str(hex(id(self)))
+        return "function at memory address " + str(hex(id(self)))
 
 
 class Ad_String_Object(Ad_Object):
@@ -145,7 +148,7 @@ class Ad_Error_Object(Ad_Object):
         self.message = message
 
     def inspect(self):
-        return self.message
+        return "ERROR: " + self.message
 
 
 class Ad_Builtin_Object(Ad_Object):
@@ -224,7 +227,7 @@ class Ad_Class_Object(Ad_Object):
         self.inherit_from = inherit_from
 
     def inspect(self):
-        out = "class object"
+        out = "class object at memory address " + str(hex(id(self)))
         return out
 
 
@@ -245,7 +248,7 @@ class Ad_Class_Instance(Ad_Object):
         #out = "ClassInstance " + str(self.name) + " "
         #out += "attributes: " + str(self.class_object.attributes) + " "
         #out += "methods: " + str(self.class_object.methods)
-        out = "class instance at memory address: " + str(hex(id(self)))
+        out = "class instance at memory address " + str(hex(id(self)))
         return out
 
 
@@ -298,7 +301,7 @@ class Ad_Socket_Object(Ad_Object):
         self.addr = addr
 
     def inspect(self):
-        out = "socket instance at memory address: " + str(hex(id(self)))
+        out = "socket instance at memory address " + str(hex(id(self)))
         return out
 
 
@@ -316,5 +319,5 @@ class Ad_Thread_Object(Ad_Object):
         self.params = params
 
     def inspect(self):
-        out = "thread instance at memory address: " + str(hex(id(self)))
+        out = "thread instance at memory address " + str(hex(id(self)))
         return out
