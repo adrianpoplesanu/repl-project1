@@ -530,7 +530,12 @@ class Evaluator(object):
             if node.name.owner.type == StatementType.THIS_EXPRESSION:
                 klass_member = node.name.member
                 obj = self.eval(node.value, env)
-                env.outer.set(klass_member.value, obj)
+                if env.is_instance_environment:
+                    env.set_local_param(klass_member.value, obj)
+                elif env.outer.is_instance_environment:
+                    env.outer.set_local_param(klass_member.value, obj)
+                #env.outer.set(klass_member.value, obj)
+                # aici trebuie cacata treaba
             elif node.name.owner.type == StatementType.SUPER_EXPRESSION:
                 # TODO: implement this
                 parent_klass_env = env.outer.get_sibling(node.name.owner.target.token_literal())

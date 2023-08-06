@@ -18,3 +18,10 @@ def eval_source(source, env):
     program.reset()
     parser.build_program_statements(program)
     result = evaluator.eval(program, env)
+
+def import_source(path, env):
+    try:
+        source = open(path, 'r').read()
+        eval_source(source, env)
+    except FileNotFoundError as err:
+        pass

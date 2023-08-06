@@ -3,7 +3,7 @@ import time
 
 from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Ad_Thread_Object, Ad_Socket_Object
 from object_type import ObjectType
-from eval_utils import eval_source
+from eval_utils import eval_source, import_source
 from thread_utils import sleep_builtin_executor
 #from evaluator import NULLOBJECT # TODO: circular import, i need to fix this
 
@@ -149,7 +149,8 @@ def thread_builtin(args, env):
     return thread_obj
 
 def import_builtin(args, env):
-    pass
+    path = args[0]
+    import_source(path.value, env)
 
 def sleep_builtin(args, env):
     sleep_builtin_executor(args[0].value)
