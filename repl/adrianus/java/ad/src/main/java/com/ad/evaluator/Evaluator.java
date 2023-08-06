@@ -526,7 +526,7 @@ public class Evaluator {
 		AdObject method = instanceEnv.lookupConstructor();
 		if (method != null) {
 			if (arguments.size() == 1 && arguments.get(0).getType() == ObjectTypeEnum.ERROR) {
-				// do nothing
+				return arguments.get(0);
 			}
 			instanceEnv.setOuter(env);
 			return applyMethod(method, arguments, instanceEnv);
