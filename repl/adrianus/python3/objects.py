@@ -265,6 +265,7 @@ class Ad_File_Object(Ad_Object):
 
     def inspect(self):
         out = "File [" + self.filename + ", " + self.operator + "]"
+        return out
 
 
 class Ad_Socket_Object(Ad_Object):

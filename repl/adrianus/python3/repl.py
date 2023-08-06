@@ -20,7 +20,8 @@ class Repl(object):
         signal.signal(signal.SIGINT, signal_ctrl_c_handler)
         print ("Ad interpreter [Python]... v3.0") # v2 - classes, v3 - bytecode
         env = new_environment()
-        load_bootstrap(self.program, self.parser, self.evaluator, env)
+        bootstrap_env = load_bootstrap(self.program, self.parser, self.evaluator)
+        env.bootstrap = bootstrap_env
         while True:
             line = input('>> ')
             self.parser.reset(source=line)
@@ -44,7 +45,8 @@ class Repl(object):
     def execute_file(self, source, use_vm=None):
         #print (source)
         env = new_environment()
-        load_bootstrap(self.program, self.parser, self.evaluator, env)
+        bootstrap_env = load_bootstrap(self.program, self.parser, self.evaluator)
+        env.bootstrap = bootstrap_env
         self.parser.reset(source=source)
         self.program.reset()
         self.parser.build_program_statements(self.program)

@@ -44,7 +44,10 @@ def main(args):
     vm = VM()
     repl = Repl(parser=parser, program=program, evaluator=evaluator, compiler=compiler, vm=vm)
     if filename:
-        data = open(filename, "r")
+        try:
+            data = open(filename, "r")
+        except FileNotFoundError as err:
+            sys.exit(0)
         source = data.read()
         repl.execute_file(source=source, use_vm=use_vm)
     else:
