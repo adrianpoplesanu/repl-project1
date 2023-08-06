@@ -1,0 +1,15 @@
+numbers = [1, 2, 3]
+
+def change(target) {
+    target[1] = 55
+}
+
+change(numbers)
+print (numbers)
+
+def change2(target) {
+    target = [55, 66, 77]
+}
+
+change2(numbers)
+print (numbers)
