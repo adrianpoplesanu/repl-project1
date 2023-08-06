@@ -15,14 +15,16 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_FALSE, &Parser::ParseBoolean));
     prefixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseGroupedExpression));
     prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
-    prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionLiteral));
+    prefixParseFns.insert(std::make_pair(TT_FUNC, &Parser::ParseFunctionLiteral));
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
     prefixParseFns.insert(std::make_pair(TT_FOR, &Parser::ParseForExpression));
     prefixParseFns.insert(std::make_pair(TT_DOUBLE_QUOTES, &Parser::ParseStringLiteral));
     prefixParseFns.insert(std::make_pair(TT_SINGLE_QUOTES, &Parser::ParseStringLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseListLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACE, &Parser::ParseHashLiteral));
+    prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionExpression));
     prefixParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefExpression));
+    prefixParseFns.insert(std::make_pair(TT_FUN, &Parser::ParseFunExpression));
     prefixParseFns.insert(std::make_pair(TT_CLASS, &Parser::ParseClassStatement));
     prefixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePrefixPlusPlus));
     prefixParseFns.insert(std::make_pair(TT_NULL, &Parser::ParseNullExpression));
@@ -507,6 +509,91 @@ Ad_AST_Node* Parser::ParseDefExpression() {
 
     return stmt;
 }
+
+Ad_AST_Node* Parser::ParseFunExpression() {
+    Ad_AST_Def_Statement* stmt = new Ad_AST_Def_Statement(current_token);
+    NextToken();
+    Ad_AST_Identifier* name = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
+    stmt->name = name;
+    if (!ExpectPeek(TT_LPAREN)) {
+        // free Ad_AST_Def_Statement
+        return NULL; // this should potentially return an error AST node
+    }
+    std::vector<Ad_AST_Node*> parameters = ParseFunctionParameters();
+    stmt->parameters = parameters;
+    if (!ExpectPeek(TT_LBRACE)) {
+        // free As_AST_Def_Statement
+        return NULL; // this hsould potentially return an error AST node
+    }
+    Ad_AST_Node* body = ParseBlockStatement();
+    stmt->body = body;
+    Ad_INCREF(stmt->body);
+
+    // ****
+    if (USE_FIX_FOR_CLASS_STATEMENT_AS_EXPRESSION_STATEMENT_IN_BLOCK) {
+        for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)body)->statements.begin() ; it != ((Ad_AST_BlockStatement*)body)->statements.end(); ++it) {
+            Ad_AST_Node *node = *it;
+            //free_Ad_AST_Node_memory(node);
+            //std::cout << statement_type_map[node->type] << "\n";
+            //Ad_INCREF(node);
+            if (node->type == ST_EXPRESSION_STATEMENT) {
+                Ad_AST_ExpressionStatement* expr = (Ad_AST_ExpressionStatement*) node;
+                if (expr->expression != NULL) {
+                    if (expr->expression->type == ST_CLASS_STATEMENT) {
+                        //std::cout << "aaa\n";
+                        Ad_INCREF(expr->expression);
+                    }
+                }
+            }
+        }
+    }
+    // ****
+
+    return stmt;
+}
+
+Ad_AST_Node* Parser::ParseFunctionExpression() {
+    Ad_AST_Def_Statement* stmt = new Ad_AST_Def_Statement(current_token);
+    NextToken();
+    Ad_AST_Identifier* name = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
+    stmt->name = name;
+    if (!ExpectPeek(TT_LPAREN)) {
+        // free Ad_AST_Def_Statement
+        return NULL; // this should potentially return an error AST node
+    }
+    std::vector<Ad_AST_Node*> parameters = ParseFunctionParameters();
+    stmt->parameters = parameters;
+    if (!ExpectPeek(TT_LBRACE)) {
+        // free As_AST_Def_Statement
+        return NULL; // this hsould potentially return an error AST node
+    }
+    Ad_AST_Node* body = ParseBlockStatement();
+    stmt->body = body;
+    Ad_INCREF(stmt->body);
+
+    // ****
+    if (USE_FIX_FOR_CLASS_STATEMENT_AS_EXPRESSION_STATEMENT_IN_BLOCK) {
+        for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)body)->statements.begin() ; it != ((Ad_AST_BlockStatement*)body)->statements.end(); ++it) {
+            Ad_AST_Node *node = *it;
+            //free_Ad_AST_Node_memory(node);
+            //std::cout << statement_type_map[node->type] << "\n";
+            //Ad_INCREF(node);
+            if (node->type == ST_EXPRESSION_STATEMENT) {
+                Ad_AST_ExpressionStatement* expr = (Ad_AST_ExpressionStatement*) node;
+                if (expr->expression != NULL) {
+                    if (expr->expression->type == ST_CLASS_STATEMENT) {
+                        //std::cout << "aaa\n";
+                        Ad_INCREF(expr->expression);
+                    }
+                }
+            }
+        }
+    }
+    // ****
+
+    return stmt;
+}
+
 
 Ad_AST_Node* Parser::ParseComment() {
     Ad_AST_Comment *comm = new Ad_AST_Comment(current_token);
