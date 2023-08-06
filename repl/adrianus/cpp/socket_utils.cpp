@@ -60,8 +60,10 @@ void send(Ad_Object* rawSocket, Ad_Object* rawString) {
     Ad_String_Object* stringObject = (Ad_String_Object*) rawString;
 
     std::string escapedText = cleanupUnescapedCharaters(stringObject->value);
-    snprintf(socketObject->sendBuff, sizeof(socketObject->sendBuff), "%s", escapedText.c_str()); // TODO: add if (socketObject->sendBuff is not null) something like that
-    write(socketObject->connfd, socketObject->sendBuff, strlen(socketObject->sendBuff));
+    if (socketObject->connfd) {
+        snprintf(socketObject->sendBuff, sizeof(socketObject->sendBuff), "%s", escapedText.c_str());
+        write(socketObject->connfd, socketObject->sendBuff, strlen(socketObject->sendBuff));
+    }
 }
 
 Ad_Object* read(Ad_Object* rawSocket) {
