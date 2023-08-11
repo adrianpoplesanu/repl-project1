@@ -38,9 +38,7 @@ public:
 };
 
 Environment* newEnvironment();
-Environment NewEnclosedEnvironment(Environment*);
 Environment* newEnclosedEnvironment(Environment*);
-//Environment NewEnclosedEnvironment(Environment*, Environment*);
 Environment* newEnclosedEnvironmentUnfreeable(Environment*);
 
 void free_Ad_environment_memory(Environment*);

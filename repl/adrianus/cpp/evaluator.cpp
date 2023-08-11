@@ -648,7 +648,7 @@ Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj, Environment *env) {
     return obj;
 }
 
-Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
+/*Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
     Environment extended = NewEnclosedEnvironment(func_obj->env);
     int i = 0;
@@ -656,7 +656,7 @@ Environment Evaluator::ExtendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*
         extended.setLocalParam((*it)->TokenLiteral(), args[i++]);
     }
     return extended;
-}
+}*/
 
 Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
