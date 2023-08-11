@@ -37,11 +37,10 @@ public:
     Environment* copy(GarbageCollector*);
 };
 
-Environment NewEnvironment();
 Environment* newEnvironment();
 Environment NewEnclosedEnvironment(Environment*);
 Environment* newEnclosedEnvironment(Environment*);
-Environment NewEnclosedEnvironment(Environment*, Environment*);
+//Environment NewEnclosedEnvironment(Environment*, Environment*);
 Environment* newEnclosedEnvironmentUnfreeable(Environment*);
 
 void free_Ad_environment_memory(Environment*);

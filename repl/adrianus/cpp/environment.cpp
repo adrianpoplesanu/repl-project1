@@ -12,36 +12,18 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
-    // TODO: clean this up
-    //std::cout << "cleaning up an env\n";
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        //Ad_DECREF(it->second); // asta merge
-        //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
-        //std::cout << mesaj << "\n";
-        /*if (isBootstrapEnvironment) {
-            Ad_Object* obj = it->second;
-            if (obj->type == OBJ_CLASS) {
-                Ad_Class_Object* klass_object = (Ad_Class_Object*) obj;
-                klass_object->attemptASTNodesDeletion = true;
-            }
-        }*/
-        // TODO: mark and sweep cleanup, this will free the same object twice when not in a nested env and not in main env
-        //free_Ad_Object_memory(it->second);
+        // ... do nothing, no need to DECREF objects in store, garbage collector will handle them
     }
     for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
         // TODO: do this proper, maybe mark the env for sweeping using the gc?
         Ad_DECREF(it->second);
         delete it->second;
     }
-    //if (bootstrap) {
-    //    delete bootstrap;
-    //}
 }
 
 bool Environment::Check(std::string key) {
-    //std::cout << "CAUT CHEIA: " << key << "\n";
     if (store.find(key) == store.end()) {
-        //if (outer && outer->store.find(key) != outer->store.end()) return true;
         if (outer && outer->Check(key)) return true;
         if (bootstrap && bootstrap->Check(key)) return true;
         return false;
@@ -51,9 +33,6 @@ bool Environment::Check(std::string key) {
 
 Ad_Object* Environment::Get(std::string key) {
     if (store.find(key) == store.end() ) {
-        //if (outer && outer->store.find(key) != outer->store.end()) {
-        //    return outer->store[key];
-        //}
         if (outer && outer->Check(key)) {
             return outer->Get(key);
         }
@@ -84,24 +63,14 @@ void Environment::Set(std::string key, Ad_Object* obj) {
         FreeObjectForKey(key);
         store[key] = obj;
         Ad_INCREF(obj); // this should be old_ref_count
-        //obj->ref_count = old_ref_count; // this does not work
         return;
     }
-    /*if (outer && outer->store.find(key) != outer->store.end()) {
-        int old_ref_count = outer->store[key]->ref_count;
-        outer->FreeObjectForKey(key);
-        outer->store[key] = obj;
-        //while (old_ref_count--) Ad_INCREF(obj); // this does not work
-        Ad_INCREF(obj);
-        return;
-    }*/
     if (outer && outer->Check(key)) {
-        //...
         outer->Set(key, obj);
         return;
     }
-    if (store.find(key) != store.end()) { // pe aici nu cred ca se mai intra
-        // sterge obiectul vechi daca e o suprascriere de element
+    if (store.find(key) != store.end()) {
+        // delete old object if this is an over write
         FreeObjectForKey(key);
     }
     store[key] = obj;
@@ -110,7 +79,7 @@ void Environment::Set(std::string key, Ad_Object* obj) {
 
 void Environment::setLocalParam(std::string key, Ad_Object* obj) {
     if (store.find(key) != store.end()) {
-        // sterge obiectul vechi daca e o suprascriere de element
+        // delete old object if this is an over write
         FreeObjectForKey(key);
     }
     store[key] = obj;
@@ -140,8 +109,6 @@ void Environment::SetBootstrapEnvironment(Environment *b) {
 void Environment::FreeObjectForKey(std::string key) {
     // TODO: this method does nothig now, remove this
     Ad_DECREF(store[key]);
-    // TODO: mark and sweep cleanup
-    //free_Ad_Object_memory(store[key]);
 }
 
 void Environment::PrintStore(int level) {
@@ -162,14 +129,6 @@ void Environment::PrintStore(int level) {
     while(k++ < level) std::cout << " ";
     std::cout << "outer: {";
     if (outer) {
-        /*size = outer->store.size();
-        total = 0;
-        for(std::map<std::string, Ad_Object* >::const_iterator it = outer->store.begin(); it != outer->store.end(); ++it) {
-            std::cout << it->first << ": ";
-            std::cout << it->second->Inspect();
-            total++;
-            if (total < size) std::cout << ", "; // hmmm, this needs to be fixed
-        }*/
         outer->PrintStore(level + 4);
     }
     std::cout << "}\n";
@@ -194,11 +153,6 @@ Environment* Environment::copy(GarbageCollector *gc) {
     return result;
 }
 
-Environment NewEnvironment() {
-    Environment env;
-    return env;
-}
-
 Environment* newEnvironment() {
     Environment *env = new Environment();
     return env;
@@ -213,13 +167,6 @@ Environment NewEnclosedEnvironment(Environment *o) {
 Environment* newEnclosedEnvironment(Environment *o) {
     Environment* env = new Environment();
     env->SetOuterEnvironment(o);
-    return env;
-}
-
-Environment NewEnclosedEnvironment(Environment *o, Environment *b) {
-    Environment env;
-    env.SetOuterEnvironment(o);
-    env.SetBootstrapEnvironment(b);
     return env;
 }
 
