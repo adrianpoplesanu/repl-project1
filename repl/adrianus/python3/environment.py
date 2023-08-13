@@ -60,9 +60,9 @@ class Environment(object):
             offset += ' '
             k += 1
         out += offset
-        out = "store: {"
+        out += "store: {"
         size = len(self.store)
-        for i, key in enumerate(self.store.keys()):
+        for i, key in enumerate(sorted(self.store.keys())):
             if i < size - 1:
                 out += key + ": " + self.store[key].inspect() + ", "
             else:
@@ -71,7 +71,7 @@ class Environment(object):
         out += offset
         out += "outer: {"
         if self.outer:
-            out += self.outer.print_store(level + 4)
+            out += self.outer.print_store(level + 4) + "\n"
         out += "}"
         return out
 
