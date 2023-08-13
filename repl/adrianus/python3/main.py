@@ -47,6 +47,7 @@ def main(args):
         try:
             data = open(filename, "r")
         except FileNotFoundError as err:
+            print ("empty or missing ad source file")
             sys.exit(0)
         source = data.read()
         repl.execute_file(source=source, use_vm=use_vm)

@@ -301,7 +301,7 @@ class Ad_Socket_Object(Ad_Object):
         self.addr = addr
 
     def inspect(self):
-        out = "socket instance at memory address " + str(hex(id(self)))
+        out = "<socket instance at memory address " + str(hex(id(self))) + ">"
         return out
 
 
