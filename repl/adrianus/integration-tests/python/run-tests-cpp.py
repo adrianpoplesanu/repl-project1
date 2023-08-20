@@ -6,7 +6,7 @@ expected_folder = "../cpp/expected/"
 script_path = "../../python3/"
 script_name = "main.py"
 tests_path = "../../cpp/"
-tests_data = open("test-list-cpp.txt", "r")
+tests_data = open("../cpp/test-list.txt", "r")
 test_files = tests_data.readlines()
 
 success = []
