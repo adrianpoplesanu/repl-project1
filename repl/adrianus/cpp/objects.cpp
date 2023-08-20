@@ -727,7 +727,7 @@ Ad_File_Object::~Ad_File_Object() {
 std::string Ad_File_Object::Inspect() {
     std::stringstream ss;
     ss << std::hex << this;
-    return "<file object at address: " + ss.str() + ">"
+    return "<file object at address: " + ss.str() + ">";
 }
 
 void Ad_File_Object::Print() {
