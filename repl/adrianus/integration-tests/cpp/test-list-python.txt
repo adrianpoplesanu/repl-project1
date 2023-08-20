@@ -1,3 +1,0 @@
-examples/test01.ad
-examples/test02.ad
-examples/test03.ad

@@ -6,7 +6,7 @@ binary_path = "../../cpp/"
 binary_excutable = "main"
 tests_path = "../../python/"
 
-tests_data = open("test-list-python.txt", "r")
+tests_data = open("../python/test-list.txt", "r")
 test_files = tests_data.readlines()
 
 errors_detected = False
