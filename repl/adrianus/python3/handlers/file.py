@@ -8,7 +8,8 @@ from objects import Ad_String_Object
 
 def read_file_content(filepath):
     resource = open(filepath, 'r')
-    return Ad_String_Object(resource.read())
+    # added .strip() for having same behaviour with cpp implementation, TODO: check if this is correct in the long run
+    return Ad_String_Object(resource.read().strip())
 
 def write_file_content(filepath, content):
     resource = open(filepath, 'w')
