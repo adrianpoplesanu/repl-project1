@@ -241,7 +241,7 @@ Ad_Function_Object::~Ad_Function_Object() {
 std::string Ad_Function_Object::Inspect() {
     std::stringstream ss;
     ss << std::hex << this;
-    return "function at memory address " + ss.str();
+    return "<function at memory address: " + ss.str() + ">";
 }
 
 void Ad_Function_Object::Print() {
@@ -284,7 +284,7 @@ Ad_String_Object::Ad_String_Object(std::string val) {
 }
 
 std::string Ad_String_Object::Inspect() {
-    return "\"" + value + "\"";
+    return "\'" + value + "\'";
 }
 
 void Ad_String_Object::Print() {
@@ -362,7 +362,9 @@ Ad_Builtin_Object::~Ad_Builtin_Object() {
 }
 
 std::string Ad_Builtin_Object::Inspect() {
-    return "todo: implement Ad_Builtin_Object::Inspect()";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<built-in at memory address: " + ss.str() + ">";
 }
 
 void Ad_Builtin_Object::Print() {
@@ -384,7 +386,9 @@ Ad_Signal_Object::Ad_Signal_Object() {
 }
 
 std::string Ad_Signal_Object::Inspect() {
-    return "todo: implement Inspect in Ad_Signal_Object";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<signal object at address: " + ss.str() + ">";
 }
 
 void Ad_Signal_Object::Print() {
@@ -637,7 +641,7 @@ void Ad_Class_Object::deleteASTNodeFromBootstrapEnvironment() { // this is unuse
 std::string Ad_Class_Object::Inspect() {
     std::stringstream ss;
     ss << std::hex << this;
-    return "class object at memory address " + ss.str();
+    return "<class object at memory address: " + ss.str() + ">";
 }
 
 void Ad_Class_Object::Print() {
@@ -687,7 +691,7 @@ Ad_Class_Instance::~Ad_Class_Instance() {
 std::string Ad_Class_Instance::Inspect() {
     std::stringstream ss;
     ss << std::hex << this;
-    return "class instance at memory address " + ss.str();
+    return "<class instance at memory address: " + ss.str() + ">";
 }
 
 void Ad_Class_Instance::Print() {
@@ -721,9 +725,9 @@ Ad_File_Object::~Ad_File_Object() {
 }
 
 std::string Ad_File_Object::Inspect() {
-    std::string out;
-    out = "File [" + filename + ", " + _operator + "]";
-    return out;
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<file object at address: " + ss.str() + ">"
 }
 
 void Ad_File_Object::Print() {
@@ -830,13 +834,9 @@ Ad_Socket_Object::~Ad_Socket_Object() {
 }
 
 std::string Ad_Socket_Object::Inspect() {
-    // return "<socket at address 0x0>"; // maybe this?
-    //std::stringstream ss;
-    //ss << "Socket [name=" << name << ", port=" << port << ", isActive=" << isActive << ", isForever" << isForever << ", isClient=" << isClient << ", isServer=" << isServer << "]";
-    //return ss.str();
     std::stringstream ss;
     ss << std::hex << this;
-    return "<socket instance at memory address " + ss.str() + ">";
+    return "<socket instance at memory address: " + ss.str() + ">";
 }
 
 void Ad_Socket_Object::Print() {
@@ -873,7 +873,7 @@ Ad_Thread_Object::~Ad_Thread_Object() {
 std::string Ad_Thread_Object::Inspect() {
     std::stringstream ss;
     ss << std::hex << this;
-    return "<thread instance at memory address " + ss.str() + ">";
+    return "<thread instance at memory address: " + ss.str() + ">";
 }
 
 void Ad_Thread_Object::Print() {
