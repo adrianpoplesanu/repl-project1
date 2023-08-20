@@ -1,1 +1,2 @@
-ala bala portocala
+class instance at memory address (.*)
+55
