@@ -1,6 +1,6 @@
-"start test"
-"end class declaration"
-store: {Elev: class object at memory address (.*), a: 12, e: class instance at memory address(.*)}
+'start test'
+'end class declaration'
+store: {Elev: <class object at memory address: (.*)>, a: 12, e: <class instance at memory address: (.*)>}
 outer: {}
-class instance at memory address (.*)
-"end class test"
+<class instance at memory address: (.*)>
+'end class test'

@@ -1,2 +1,2 @@
-store: {Server: class object at memory address (.*), server: class instance at memory address (.*)}
+store: {Server: <class object at memory address: (.*)>, server: <class instance at memory address: (.*)>}
 outer: {}
