@@ -1,4 +1,4 @@
 store: {a: 8}
 outer: {}
-store: {a: 8, test: function at memory address (.*)}
+store: {a: 8, test: <function at memory address: (.*)>}
 outer: {}

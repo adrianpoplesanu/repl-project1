@@ -1,4 +1,4 @@
-"blue"
-"red"
-"blue"
-"yellow"
+'blue'
+'red'
+'blue'
+'yellow'

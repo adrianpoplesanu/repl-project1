@@ -1,1 +1,1 @@
-\["red", "white", "purple"\]
+\['red', 'white', 'purple'\]

@@ -2,17 +2,17 @@
 4
 store: {x: 7}
 outer: {
-    store: {test: function at memory address (.*), x: 4}
+    store: {test: <function at memory address: (.*)>, x: 4}
     outer: {
-        store: {T: class object at memory address (.*), a: class instance at memory address (.*), x: 2}
+        store: {T: <class object at memory address: (.*)>, a: <class instance at memory address: (.*)>, x: 2}
         outer: {}
 }
 }
 store: {x: 7}
 outer: {
-    store: {test: function at memory address (.*), x: 7}
+    store: {test: <function at memory address: (.*)>, x: 7}
     outer: {
-        store: {T: class object at memory address (.*), a: class instance at memory address (.*), x: 2}
+        store: {T: <class object at memory address: (.*)>, a: <class instance at memory address: (.*)>, x: 2}
         outer: {}
 }
 }

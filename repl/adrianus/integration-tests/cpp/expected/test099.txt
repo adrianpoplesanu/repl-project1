@@ -1,2 +1,2 @@
-"USA"
-\["red", "white", "blue"\]
+'USA'
+\['red', 'white', 'blue'\]

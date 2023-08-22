@@ -1,3 +1,3 @@
-"white"
-"purple"
-\["brown", "yellow", "cyan"\]
+'white'
+'purple'
+\['brown', 'yellow', 'cyan'\]

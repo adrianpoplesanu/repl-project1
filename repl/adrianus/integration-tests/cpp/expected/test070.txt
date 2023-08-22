@@ -1,2 +1,2 @@
-"inainte de apelul lui t\(\)"
-"dupa apelul lui t\(\)"
+'inainte de apelul lui t\(\)'
+'dupa apelul lui t\(\)'

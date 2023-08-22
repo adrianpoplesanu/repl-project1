@@ -1,5 +1,5 @@
-"aaa"
-function at memory address (.*)
+'aaa'
+<function at memory address: (.*)>
 18
 16
 14
@@ -511,5 +511,5 @@ function at memory address (.*)
 4
 2
 2
-function at memory address (.*)
+<function at memory address: (.*)>
 9

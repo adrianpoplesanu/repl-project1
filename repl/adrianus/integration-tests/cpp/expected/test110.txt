@@ -1,5 +1,5 @@
-"radu paraschivescu"
-"mircea cartarescu"
+'radu paraschivescu'
+'mircea cartarescu'
 \[1, 2, 3\]
 \[1, 5, 3\]
 11

@@ -1,2 +1,2 @@
-store: {Elev: class object at memory address (.*)}
+store: {Elev: <class object at memory address: (.*)>}
 outer: {}

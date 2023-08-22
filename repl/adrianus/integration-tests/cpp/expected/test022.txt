@@ -1,11 +1,11 @@
-store: {a: function at memory address (.*), x: 11}
+store: {a: <function at memory address: (.*)>, x: 11}
 outer: {}
 store: {x: 100}
 outer: {
-    store: {a: function at memory address (.*), x: 11}
+    store: {a: <function at memory address: (.*)>, x: 11}
     outer: {}
 }
 1101
 11
-store: {a: function at memory address (.*), x: 11}
+store: {a: <function at memory address: (.*)>, x: 11}
 outer: {}

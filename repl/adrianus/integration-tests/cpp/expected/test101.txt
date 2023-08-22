@@ -1,14 +1,14 @@
-"North America"
-"USA"
-\["red", "white", "yellow"\]
-\["red", "white", "yellow"\]
-"Asia"
-"USA"
-\["red", "white", "yellow"\]
-\["red", "white", "yellow"\]
-"North America"
-"USA"
-\["red", "white", "yellow"\]
-\["red", "white", "yellow"\]
-\["red", "red", "wine"\]
-\["red", "red", "wine"\]
+'North America'
+'USA'
+\['red', 'white', 'yellow'\]
+\['red', 'white', 'yellow'\]
+'Asia'
+'USA'
+\['red', 'white', 'yellow'\]
+\['red', 'white', 'yellow'\]
+'North America'
+'USA'
+\['red', 'white', 'yellow'\]
+\['red', 'white', 'yellow'\]
+\['red', 'red', 'wine'\]
+\['red', 'red', 'wine'\]
