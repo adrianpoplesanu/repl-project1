@@ -4,9 +4,9 @@ echo "building project"
 
 cd ../../integration-tests/java ;
 cp -r ../../java/ad/bootstrap . ;
-cp -r ../../java/ad/examples . ;
+cp -r ../../cpp/examples . ;
 
-python3 run-tests.py
+python3 run-tests-cpp.py
 
 ./cleanup.sh
 
