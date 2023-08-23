@@ -129,7 +129,7 @@ public class AdSocketObject extends AdObject {
 
     @Override
     public String inspect() {
-        return "<socket object at address 0x" + Integer.toHexString(this.hashCode()) + ">";
+        return "<socket object at address: 0x" + Integer.toHexString(this.hashCode()) + ">";
     }
 
     @Override

@@ -16,7 +16,7 @@ public class AdFileObject extends AdObject {
 
     @Override
     public String inspect() {
-        return "<file object at address 0x" + Integer.toHexString(this.hashCode()) + ">";
+        return "<file object at address: 0x" + Integer.toHexString(this.hashCode()) + ">";
     }
 
     @Override

@@ -64,7 +64,7 @@ public class AdThreadObject extends AdObject {
 
     @Override
     public String inspect() {
-        return null;
+        return "<thread object at address: 0x" + Integer.toHexString(this.hashCode()) + ">";
     }
 
     @Override
