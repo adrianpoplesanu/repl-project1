@@ -1016,7 +1016,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
             if (klass_method == NULL) {
                 //return &NULLOBJECT;
-                Ad_Error_Object *obj = new Ad_Error_Object(" method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
+                Ad_Error_Object *obj = new Ad_Error_Object("method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
                 garbageCollector->addObject(obj);
                 return obj;
             }
