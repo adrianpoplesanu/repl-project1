@@ -3,4 +3,4 @@
 2
 'bbb'
 3
-'{a: 3, b: <funtion at memory address: (.*)>}'
+'{a: 3, b: <function at memory address: (.*)>}'

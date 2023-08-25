@@ -1,5 +1,5 @@
-<funtion at memory address: (.*)>
-<funtion at memory address: (.*)>
+<function at memory address: (.*)>
+<function at memory address: (.*)>
 'life'
 'life'
 'life'

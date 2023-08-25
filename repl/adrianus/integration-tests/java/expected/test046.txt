@@ -1,5 +1,5 @@
 'aaa'
-<funtion at memory address: (.*)>
+<function at memory address: (.*)>
 18
 16
 14
@@ -9,5 +9,5 @@
 6
 4
 2
-<funtion at memory address: (.*)>
+<function at memory address: (.*)>
 9

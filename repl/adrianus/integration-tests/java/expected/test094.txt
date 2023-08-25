@@ -1,7 +1,7 @@
 \['a', 'b', 'c', 'd', 'e'\]
 \['a', 'c', 'e', 'b', 'd'\]
 5
-<funtion at memory address: (.*)>
+<function at memory address: (.*)>
 6
 6
 20
