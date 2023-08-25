@@ -30,7 +30,7 @@ public class FileUtils {
             e.printStackTrace();
         }
 
-        return contentBuilder.toString();
+        return contentBuilder.toString().trim();
     }
 
     public static void writeToFile(String path, String content) {
