@@ -1,0 +1,26 @@
+def getName() {
+    sleep(1000)
+    return 'bebe dex'
+}
+
+def getAge() {
+    sleep(1000)
+    return 12
+}
+
+def getProfile() {
+    th1 = __thread("thread 1")
+    th1.callback(getName)
+    th1.runAsync()
+
+    th2 = __thread("thread 2")
+    th2.callback(getAge)
+    th2.runAsync()
+
+    name = th1.await()
+    age = th2.await()
+
+    print ('name: ' + name + ', age: ' + age)
+}
+
+getProfile()
