@@ -4,6 +4,7 @@
 void thread_callback(Ad_Object*, std::vector<Ad_Object*>);
 void thread_async_run(Ad_Object*, GarbageCollector*, Environment&);
 void thread_blocking_run(Ad_Object*, GarbageCollector*, Environment&);
+void thread_await(Ad_Object*, GarbageCollector*, Environment&);
 
 void sleep_builtin_executor(int);
 
