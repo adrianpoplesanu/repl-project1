@@ -11,7 +11,7 @@ from environment import new_environment, new_enclosed_environment
 from builtin_funcs import builtins_map
 from utils import print_ast_nodes
 from handlers.file import read_file_content, write_file_content, append_file_content
-from thread_utils import thread_callback, thread_async_run, thread_blocking_run
+from thread_utils import thread_callback, thread_async_run, thread_blocking_run, thread_await
 from socket_utils import create_server, create_client, accept_socket, send_socket, read_socket, close_socket
 
 NULLOBJECT = Ad_Null_Object()
@@ -852,6 +852,9 @@ class Evaluator(object):
                     thread_async_run(owner, env)
                 elif node.member.value == 'runBlocking' or node.member.value == 'join':
                     thread_blocking_run(owner, env)
+                elif node.member.value == 'await':
+                    result = thread_await(owner, env)
+                    return result
             else:
                 pass
             return NULLOBJECT

@@ -119,7 +119,7 @@ class Ad_Function_Object(Ad_Object):
         self.env = env
 
     def inspect(self):
-        return "function at memory address " + str(hex(id(self)))
+        return "<function at memory address: " + str(hex(id(self))) + ">"
 
 
 class Ad_String_Object(Ad_Object):
@@ -132,7 +132,7 @@ class Ad_String_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
-        return "\"" + self.value + "\""
+        return "\'" + self.value + "\'"
 
     def hash_key(self):
         return HashKey(type=type, value=hash(self.value))
@@ -227,7 +227,7 @@ class Ad_Class_Object(Ad_Object):
         self.inherit_from = inherit_from
 
     def inspect(self):
-        out = "class object at memory address " + str(hex(id(self)))
+        out = "<class object at memory address: " + str(hex(id(self))) + ">"
         return out
 
 
@@ -248,7 +248,7 @@ class Ad_Class_Instance(Ad_Object):
         #out = "ClassInstance " + str(self.name) + " "
         #out += "attributes: " + str(self.class_object.attributes) + " "
         #out += "methods: " + str(self.class_object.methods)
-        out = "class instance at memory address " + str(hex(id(self)))
+        out = "<class instance at memory address: " + str(hex(id(self))) + ">"
         return out
 
 
@@ -267,7 +267,7 @@ class Ad_File_Object(Ad_Object):
         self.file_descriptor = open(self.filename, self.operator)
 
     def inspect(self):
-        out = "File [" + self.filename + ", " + self.operator + "]"
+        out = "<file object at memory address: " + str(hex(id(self))) + ">"
         return out
 
 
@@ -301,23 +301,27 @@ class Ad_Socket_Object(Ad_Object):
         self.addr = addr
 
     def inspect(self):
-        out = "<socket instance at memory address " + str(hex(id(self))) + ">"
+        out = "<socket instance at memory address: " + str(hex(id(self))) + ">"
         return out
 
 
 class Ad_Thread_Object(Ad_Object):
     type = ObjectType.THREAD
 
-    def __init__(self, name=None, callback=None, params=None):
+    def __init__(self, name=None, callback=None, params=None, thread=None, result=None):
         """
         @param: name - string, the name of the thread
         @param: callback - function that gets executed when thread is running
         @param: params - params for function that gets executed
+        @param: thread - thread reference
+        @param: result - the return of the callback
         """
         self.name = name
         self.callback = callback
         self.params = params
+        self.thread = thread
+        self.result = result
 
     def inspect(self):
-        out = "thread instance at memory address " + str(hex(id(self)))
+        out = "<thread instance at memory address: " + str(hex(id(self))) + ">"
         return out
