@@ -7,8 +7,8 @@ import com.ad.threading.AdWorker;
 import java.util.ArrayList;
 
 public class ThreadUtils {
-    public static AdWorker generateAdWorker(AdObject object, Environment environment, ArrayList<AdObject> params) {
-        AdWorker adWorker = new AdWorker(object, environment, params);
+    public static AdWorker generateAdWorker(AdObject object, Environment environment, ArrayList<AdObject> params, AdObject rawThread) {
+        AdWorker adWorker = new AdWorker(object, environment, params, rawThread);
         return adWorker;
     }
 

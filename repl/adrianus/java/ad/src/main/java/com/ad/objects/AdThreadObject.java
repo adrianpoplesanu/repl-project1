@@ -12,6 +12,7 @@ public class AdThreadObject extends AdObject {
     private Thread thread;
     private AdWorker worker;
     private ArrayList<AdObject> params;
+    private AdObject result;
 
     public AdThreadObject() {
         type = ObjectTypeEnum.THREAD;
@@ -60,6 +61,14 @@ public class AdThreadObject extends AdObject {
 
     public void setParams(ArrayList<AdObject> params) {
         this.params = params;
+    }
+
+    public AdObject getResult() {
+        return result;
+    }
+
+    public void setResult(AdObject result) {
+        this.result = result;
     }
 
     @Override

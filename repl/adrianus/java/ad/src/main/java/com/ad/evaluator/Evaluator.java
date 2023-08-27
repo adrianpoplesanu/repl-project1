@@ -1342,7 +1342,7 @@ public class Evaluator {
 					ArrayList<AdObject> params = new ArrayList<>();
 					params.addAll(argObjs.subList(1, argObjs.size()));
 					threadObject.setParams(params);
-					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env, threadObject.getParams()));
+					threadObject.setWorker(ThreadUtils.generateAdWorker(argObjs.get(0), env, threadObject.getParams(), rawObject));
 					threadObject.setThread(ThreadUtils.generateThread(threadObject.getWorker()));
 				}
 				if (memberIdentifier.getValue().equals("runAsync") || memberIdentifier.getValue().equals("start")) {
@@ -1359,6 +1359,15 @@ public class Evaluator {
 						throw new RuntimeException(e);
 					}
 					// thread pool needs to stop this object
+				}
+				if (memberIdentifier.getValue().equals("await")) {
+					AdThreadObject threadObject = (AdThreadObject) rawObject;
+					try {
+						threadObject.getThread().join();
+						return threadObject.getResult();
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			} else {
 
