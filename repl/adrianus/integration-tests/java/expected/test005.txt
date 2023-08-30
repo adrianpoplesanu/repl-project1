@@ -1,2 +1,2 @@
-'{a: 5, b: <function at memory address: (.*)}'
+{'a': 5, 'b': <function at memory address: (.*)}
 7
