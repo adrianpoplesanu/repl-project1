@@ -15,7 +15,8 @@ public class ContextBuiltin extends AbstractBuiltin {
 
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
-        AdStringObject obj = new AdStringObject(env.toString());
+        //AdStringObject obj = new AdStringObject(env.toString());
+        AdObject obj = env.toAdHashObject();
         return obj;
     }
 }

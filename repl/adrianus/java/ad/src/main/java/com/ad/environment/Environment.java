@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ad.hash.HashPair;
+import com.ad.objects.AdHashObject;
 import com.ad.objects.AdObject;
+import com.ad.objects.AdStringObject;
 
 public class Environment {
 	private Environment bootstrap;
@@ -139,5 +142,21 @@ public class Environment {
 		}
 		out += "}";
 		return out;
+	}
+
+	public AdHashObject toAdHashObject() {
+		AdHashObject result = new AdHashObject();
+		HashMap<String, HashPair<AdObject>> newElements = new HashMap<>();
+		result.setElements(newElements);
+		/*store.keySet().stream().sorted().forEach(key -> { // a crude string sort for keys
+			AdObject value = store.get(key);
+			AdStringObject keyObj = new AdStringObject(key);
+			result.getElements().put(keyObj.hash(), new HashPair<>(keyObj, value));
+		});*/
+		for (Map.Entry<String, AdObject> entry : store.entrySet()) {
+			AdStringObject keyObj = new AdStringObject(entry.getKey());
+			result.getElements().put(keyObj.hash(), new HashPair<>(keyObj, entry.getValue()));
+		}
+		return result;
 	}
 }
