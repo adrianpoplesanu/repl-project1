@@ -141,6 +141,7 @@ Ad_Object* Environment::toHashObject(GarbageCollector *gc) {
         std::hash<std::string> hash_string;
 
         Ad_Object *key = new Ad_String_Object(it->first);
+        gc->addObject(key);
         Ad_Object *value = it->second;
 
         HashPair hash_pair(key, value);
