@@ -134,6 +134,24 @@ void Environment::PrintStore(int level) {
     std::cout << "}\n";
 }
 
+Ad_Object* Environment::toHashObject(GarbageCollector *gc) {
+    std::map<std::string, HashPair> pairs;
+
+    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
+        std::hash<std::string> hash_string;
+
+        Ad_Object *key = new Ad_String_Object(it->first);
+        Ad_Object *value = it->second;
+
+        HashPair hash_pair(key, value);
+        pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair)); // value needs to be a HashPair
+    }
+
+    Ad_Hash_Object *hashObject = new Ad_Hash_Object(pairs);
+    gc->addObject(hashObject);
+    return hashObject;
+}
+
 Environment* Environment::copy(GarbageCollector *gc) {
     // TODO: asta strica tot, se face un loop infinit aici
     Environment *result = new Environment();
