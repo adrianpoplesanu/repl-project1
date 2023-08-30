@@ -146,8 +146,7 @@ Ad_Object* lower_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
 }
 
 Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
-    env->PrintStore(0);
-    return NULL;
+    return env->toHashObject(gc);
 }
 
 Ad_Object* __iofile_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
