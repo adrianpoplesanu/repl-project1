@@ -1,0 +1,9 @@
+a = 5
+b = 7
+
+def aaa() {
+    print ('buna dimineata')
+}
+
+context()
+context()['aaa']()
