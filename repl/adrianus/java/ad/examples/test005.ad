@@ -4,6 +4,6 @@ let b = func() {
     return a + 2
 }
 
-context()
+__locals()
 
 b()

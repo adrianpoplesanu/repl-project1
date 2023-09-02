@@ -6,4 +6,4 @@ class Test {
 }
 
 t = Test()
-context()
+__locals()

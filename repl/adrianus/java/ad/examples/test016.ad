@@ -12,7 +12,7 @@ class Server {
     }
 
     def test() {
-        print(context())
+        print(__locals())
     }
 }
 
@@ -21,4 +21,4 @@ server.add_security_offset(1)
 server.listen()
 server.test()
 
-context()
+__locals()

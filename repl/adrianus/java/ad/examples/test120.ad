@@ -7,7 +7,7 @@ class Dexiciul {
         num = n
         /*print(num)*/
         /*print(b)*/
-        /*context()*/ /* this works, it's just not persisted after the method finishes execution */
+        /*__locals()*/ /* this works, it's just not persisted after the method finishes execution */
     }
 
     def ham_ham() {
@@ -25,6 +25,6 @@ dex.init(4)
 
 /*print(dex.b)*/
 print(dex.num)
-/* context() */
+/* __locals() */
 
 dex.ham_ham()
