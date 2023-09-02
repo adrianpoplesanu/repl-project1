@@ -1,10 +1,4 @@
-store: {a: <function at memory address: (.*)>, x: 11}
-outer: {}
-store: {y: 100}
-outer: {
-    store: {a: <function at memory address: (.*)>, x: 11}
-    outer: {}
-}
+{'x': 11, 'a': <function at memory address: (.*)>}
+{'y': 100}
 11
-store: {a: <function at memory address: (.*)>, x: 11}
-outer: {}
+{'x': 11, 'a': <function at memory address: (.*)>}

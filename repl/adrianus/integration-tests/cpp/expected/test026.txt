@@ -1,4 +1,3 @@
 56
 'buna dimineata!!!'
-store: {Student: <class object at memory address: (.*)>, s: <class instance at memory address: (.*)>}
-outer: {}
+{'s': <class instance at memory address: (.*)>, 'Student': <class object at memory address: (.*)>}

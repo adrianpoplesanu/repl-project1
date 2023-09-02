@@ -1,18 +1,27 @@
-"total 96
-drwxr-xr-x   16 adrianpoplesanu  staff   512 (.*) (.*) (.*):(.*) \.
-drwxr-xr-x@   8 adrianpoplesanu  staff   256 17 Apr  2022 \.\.
+'total 168
+drwxr-xr-x   25 adrianpoplesanu  staff   800 (.*) (.*) (.*):(.*) \.
+drwxr-xr-x@   8 adrianpoplesanu  staff   256 Aug 26 01:33 \.\.
+-rw-r--r--    1 adrianpoplesanu  staff    18 Aug 14 06:24 README.md
 -rw-r--r--    1 adrianpoplesanu  staff     8 (.*) (.*) (.*):(.*) bbb\.txt
 drwxr-xr-x    9 adrianpoplesanu  staff   288 (.*) (.*) (.*):(.*) bootstrap
--rwxr-xr-x    1 adrianpoplesanu  staff   167 17 May 09:30 build-binaries\.sh
--rwxr-xr-x    1 adrianpoplesanu  staff   146 17 May 09:30 cleanup-tests\.sh
+-rwxr-xr-x    1 adrianpoplesanu  staff   167 May 17 09:30 build-binaries\.sh
+-rwxr-xr-x    1 adrianpoplesanu  staff   146 May 17 09:30 cleanup-tests\.sh
 drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) expected
--rwxr-xr-x    1 adrianpoplesanu  staff    82  4 Mar 13:22 memory-check-linux\.sh
--rwxr--r--    1 adrianpoplesanu  staff    57 17 May 09:28 memory-check-macos\.sh
--rw-r--r--    1 adrianpoplesanu  staff  2400 26 Feb 23:40 run-memory-checks\.py
--rwxr-xr-x    1 adrianpoplesanu  staff   267 17 May 09:30 run-memory-checks\.sh
--rw-r--r--    1 adrianpoplesanu  staff  1403  5 Apr 01:58 run-tests\.py
--rwxr-xr-x    1 adrianpoplesanu  staff   407 17 May 09:36 run-tests\.sh
+-rwxr-xr-x    1 adrianpoplesanu  staff    82 Mar  4  2023 memory-check-linux\.sh
+-rwxr--r--    1 adrianpoplesanu  staff    57 May 17 09:28 memory-check-macos\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  2435 Aug 24 23:30 run-memory-checks-java\.py
+-rwxr--r--    1 adrianpoplesanu  staff   295 Aug 24 23:20 run-memory-checks-java\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  2437 Aug 20 14:37 run-memory-checks-python\.py
+-rwxr-xr-x    1 adrianpoplesanu  staff   274 Aug  6 10:42 run-memory-checks-python\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  2400 Feb 26  2023 run-memory-checks\.py
+-rwxr-xr-x    1 adrianpoplesanu  staff   267 May 17 09:30 run-memory-checks\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  1449 Aug 24 23:27 run-tests-java\.py
+-rwxr--r--    1 adrianpoplesanu  staff   415 Aug 24 23:04 run-tests-java\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  1453 Aug 20 14:33 run-tests-python\.py
+-rwxr-xr-x    1 adrianpoplesanu  staff   419 Aug  6 10:42 run-tests-python\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  1403 Apr  5 01:58 run-tests\.py
+-rwxr-xr-x    1 adrianpoplesanu  staff   407 May 17 09:36 run-tests\.sh
 -rw-r--r--    1 adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) test-list\.txt
--rw-r--r--    1 adrianpoplesanu  staff  1717  4 Dec  2022 test_proc_run_leaks\.py
--rw-r--r--    1 adrianpoplesanu  staff   280  4 Jan  2023 test_pyton3_re_fullmatch\.py
-"
+-rw-r--r--    1 adrianpoplesanu  staff  1717 Dec  4  2022 test_proc_run_leaks\.py
+-rw-r--r--    1 adrianpoplesanu  staff   280 Jan  4  2023 test_pyton3_re_fullmatch\.py
+'

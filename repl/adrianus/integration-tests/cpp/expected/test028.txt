@@ -1,3 +1,2 @@
-store: {Elev: <class object at memory address: (.*)>}
-outer: {}
+{'Elev': <class object at memory address: (.*)>}
 58
