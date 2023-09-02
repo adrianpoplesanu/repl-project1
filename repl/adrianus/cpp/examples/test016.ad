@@ -4,4 +4,4 @@ class Server {
 
 server = Server()
 server.port
-context()
+__locals()

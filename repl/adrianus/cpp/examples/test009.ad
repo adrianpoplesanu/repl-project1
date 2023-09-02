@@ -3,4 +3,4 @@ class Server {
 }
 
 server = Server()
-context()
+__locals()

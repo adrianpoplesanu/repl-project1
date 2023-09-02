@@ -5,5 +5,5 @@ def aaa() {
     print ('buna dimineata')
 }
 
-context()
-context()['aaa']()
+__locals()
+__locals()['aaa']()

@@ -13,6 +13,6 @@ class Elev {
     }
 }
 
-context()
+__locals()
 e = Elev()
 e.print_varsta(58)

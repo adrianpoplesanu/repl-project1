@@ -1,5 +1,5 @@
 x = 2
-class T { x = 4 def test(x) { context() this.x = x context() } def print() { context() } }
+class T { x = 4 def test(x) { print(__locals()) this.x = x print(__locals()) } def print_locals() { print(__locals()) } }
 a = T()
 x
 a.x

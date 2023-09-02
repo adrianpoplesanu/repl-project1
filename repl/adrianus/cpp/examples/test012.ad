@@ -1,8 +1,8 @@
 a = 8
-context()
+__locals()
 
 def test() {
     print("sunt in test()")
 }
 
-context()
+__locals()

@@ -11,4 +11,4 @@ s = Student()
 s.varsta
 s.print_aaa("buna dimineata!!!")
 
-context()
+__locals()

@@ -1,6 +1,6 @@
 a = 5
 
-context()
+__locals()
 
 class Server {
     port = 8080
@@ -11,4 +11,4 @@ server.port
 
 print("aaa")
 print("bbb")
-context()
+__locals()

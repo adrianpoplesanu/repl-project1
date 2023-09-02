@@ -14,7 +14,7 @@ class Server {
 
 server = Server(1)
 
-context()
+__locals()
 /* server.port */
 
 print("end script")

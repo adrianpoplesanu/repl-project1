@@ -17,6 +17,6 @@ class Elev {
 /*e = Elev()
 e.print_varsta(34)*/
 
-context()
+__locals()
 
 /*print(e)*/

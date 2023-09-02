@@ -10,7 +10,7 @@ class File {
     }
 
     def read() {
-        context()
+        print (__locals())
         print(operator)
         return file_object.read()
     }

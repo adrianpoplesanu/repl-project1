@@ -9,4 +9,4 @@ class Server {
 server = Server()
 server.port
 server.test()
-context()
+__locals()
