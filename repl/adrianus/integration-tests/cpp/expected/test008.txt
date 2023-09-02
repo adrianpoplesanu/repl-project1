@@ -1,3 +1,2 @@
-store: {Server: <class object at memory address: (.*)>, server: <class instance at memory address: (.*)>}
-outer: {}
+{'Server': <class object at memory address: (.*)>, 'server': <class instance at memory address: (.*)>}
 'end script'

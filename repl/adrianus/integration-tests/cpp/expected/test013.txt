@@ -1,8 +1,6 @@
-store: {a: 5}
-outer: {}
+{'a': 5}
 8080
 'listening...'
 'aaa'
 'bbb'
-store: {Server: <class object at memory address: (.*)>, a: 5, server: <class instance at memory address: (.*)>}
-outer: {}
+{'Server': <class object at memory address: (.*)>, 'a': 5, 'server': <class instance at memory address: (.*)>}
