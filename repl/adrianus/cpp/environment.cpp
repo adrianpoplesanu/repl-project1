@@ -134,7 +134,7 @@ void Environment::PrintStore(int level) {
     std::cout << "}\n";
 }
 
-Ad_Object* Environment::toHashObject(GarbageCollector *gc) {
+Ad_Object* Environment::storeToHashObject(GarbageCollector *gc) {
     std::map<std::string, HashPair> pairs;
 
     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
@@ -147,6 +147,14 @@ Ad_Object* Environment::toHashObject(GarbageCollector *gc) {
         HashPair hash_pair(key, value);
         pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair)); // value needs to be a HashPair
     }
+
+    Ad_Hash_Object *hashObject = new Ad_Hash_Object(pairs);
+    gc->addObject(hashObject);
+    return hashObject;
+}
+
+Ad_Object* Environment::contextToHashObject(GarbageCollector *gc) {
+    std::map<std::string, HashPair> pairs;
 
     Ad_Hash_Object *hashObject = new Ad_Hash_Object(pairs);
     gc->addObject(hashObject);

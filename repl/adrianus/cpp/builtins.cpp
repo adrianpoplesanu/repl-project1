@@ -146,7 +146,11 @@ Ad_Object* lower_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
 }
 
 Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
-    return env->toHashObject(gc);
+    return env->contextToHashObject(gc);
+}
+
+Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    return env->storeToHashObject(gc);
 }
 
 Ad_Object* __iofile_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
@@ -327,7 +331,8 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"__remove", new Ad_Builtin_Object(&remove_builtin)},
     {"__upper", new Ad_Builtin_Object(&upper_builtin)},
     {"__lower", new Ad_Builtin_Object(&lower_builtin)},
-    {"context", new Ad_Builtin_Object(&context_builtin, {0})},
+    {"__context", new Ad_Builtin_Object(&context_builtin, {0})},
+    {"__locals", new Ad_Builtin_Object(&locals_builtin, {0})},
     {"__iofile", new Ad_Builtin_Object(&__iofile_builtin)},
     {"__syssystem", new Ad_Builtin_Object(&__syssystem_builtin)},
     {"__iosocket", new Ad_Builtin_Object(&__iosocket_builtin)},

@@ -34,7 +34,8 @@ public:
     Ad_Object* lookupConstructor();
     void FreeObjectForKey(std::string);
     void PrintStore(int);
-    Ad_Object* toHashObject(GarbageCollector*);
+    Ad_Object* storeToHashObject(GarbageCollector*);
+    Ad_Object* contextToHashObject(GarbageCollector*);
     Environment* copy(GarbageCollector*);
 };
 
