@@ -2,7 +2,6 @@ package com.ad.builtin;
 
 import com.ad.environment.Environment;
 import com.ad.objects.AdObject;
-import com.ad.objects.AdStringObject;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class ContextBuiltin extends AbstractBuiltin {
     @Override
     public AdObject call(List<AdObject> args, Environment env) {
         //AdStringObject obj = new AdStringObject(env.toString());
-        AdObject obj = env.toAdHashObject();
-        return obj;
+        //AdObject obj = env.storeToAdHashObject();
+        return null;
     }
 }

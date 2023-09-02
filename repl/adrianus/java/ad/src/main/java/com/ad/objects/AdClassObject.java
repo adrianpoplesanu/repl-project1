@@ -17,7 +17,7 @@ public class AdClassObject extends AdObject {
 
     @Override
     public String inspect() {
-        return "<class at memory address: 0x" + Integer.toHexString(this.hashCode()) + ">";
+        return "<class object at memory address: 0x" + Integer.toHexString(this.hashCode()) + ">";
     }
 
     @Override

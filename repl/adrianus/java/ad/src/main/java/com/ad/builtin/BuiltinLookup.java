@@ -11,14 +11,15 @@ public class BuiltinLookup {
 			put("len", new AdBuiltinObject(new LenBuiltin()));
 			put("exit", new AdBuiltinObject(new LenBuiltin()));
 			put("print", new AdBuiltinObject(new PrintBuiltin()));
-			put("ref_count", new AdBuiltinObject(null)); // this should display not available in Java implementation
+			put("ref_count", new AdBuiltinObject(new RefCountBuiltin()));
 			put("type", new AdBuiltinObject(new TypeBuiltin()));
 			put("__append", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
 			put("__pop", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
 			put("__remove", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
 			put("__lower", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
 			put("__upper", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
-			put("context", new AdBuiltinObject(new ContextBuiltin()));
+			put("__context", new AdBuiltinObject(new ContextBuiltin()));
+			put("__locals", new AdBuiltinObject(new LocalsBuiltin()));
 			put("__iofile", new AdBuiltinObject(new IOFileBuiltin())); // TODO: update this
 			put("__syssystem", new AdBuiltinObject(new SysSystemBuiltin())); // TODO: update this
 			put("__iosocket", new AdBuiltinObject(new IOSocketBuiltin()));

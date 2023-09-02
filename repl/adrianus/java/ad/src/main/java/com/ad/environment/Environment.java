@@ -144,7 +144,7 @@ public class Environment {
 		return out;
 	}
 
-	public AdHashObject toAdHashObject() {
+	public AdHashObject storeToAdHashObject() {
 		AdHashObject result = new AdHashObject();
 		HashMap<String, HashPair<AdObject>> newElements = new HashMap<>();
 		result.setElements(newElements);
@@ -158,5 +158,9 @@ public class Environment {
 			result.getElements().put(keyObj.hash(), new HashPair<>(keyObj, entry.getValue()));
 		}
 		return result;
+	}
+
+	public AdHashObject contextToAdHashObject() {
+		return null;
 	}
 }
