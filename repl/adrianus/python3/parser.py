@@ -459,11 +459,13 @@ class Parser(object):
         self.next_token()
         name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
         stmt.name = name
+        stmt.operator = self.current_token.literal
         return stmt
 
     def parse_infix_plus_plus(self, left):
         stmt = ASTPostfixIncrement(token=self.current_token)
         stmt.name = left
+        stmt.operator = self.current_token.literal
         return stmt
 
     def parse_for_expression(self):

@@ -1,3 +1,5 @@
+from objects import Ad_Hash_Object, Ad_String_Object, Hash_Pair
+
 
 class Environment(object):
     def __init__(self):
@@ -74,6 +76,15 @@ class Environment(object):
             out += self.outer.print_store(level + 4) + "\n"
         out += "}"
         return out
+
+    def store_to_hash(self):
+        pairs = {}
+        for key, value in self.store.items():
+            key_obj = Ad_String_Object(key)
+            hashed = key_obj.hash_key()
+            pairs[hashed.value] = Hash_Pair(key=key_obj, value=value)
+        result = Ad_Hash_Object(pairs)
+        return result
 
     def __str__(self):
         out = "[Env] store: " + str(self.store) + "\n"

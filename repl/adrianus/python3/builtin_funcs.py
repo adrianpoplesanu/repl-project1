@@ -46,10 +46,14 @@ def append_builtin(args, env):
         list_obj.elements.append(obj)
 
 def context_builtin(args, env):
-    print (env.print_store(0))
+    #print (env.print_store(0))
     #result = Ad_String_Object(str(env))
     #return result
     return None
+
+def locals_builtin(args, env):
+    result = env.store_to_hash()
+    return result
 
 def pop_builtin(args, env):
     result = None
@@ -166,7 +170,8 @@ builtins_map = {
     "__remove": Ad_Builtin_Object(builtin_function=remove_builtin),
     "__lower": Ad_Builtin_Object(builtin_function=lower_builtin),
     "__upper": Ad_Builtin_Object(builtin_function=upper_builtin),
-    "context": Ad_Builtin_Object(builtin_function=context_builtin, accepted_parameters_size=[0]),
+    "__context": Ad_Builtin_Object(builtin_function=context_builtin, accepted_parameters_size=[0]),
+    "__locals": Ad_Builtin_Object(builtin_function=locals_builtin, accepted_parameters_size=[0]),
     "__iofile": Ad_Builtin_Object(builtin_function=iofile_builtin),
     "__syssystem": Ad_Builtin_Object(builtin_function=syssystem_builtin),
     "__iosocket": Ad_Builtin_Object(builtin_function=iosocket_builtin),

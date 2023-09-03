@@ -869,11 +869,13 @@ class Evaluator(object):
         return obj
 
     def eval_postfix_increment(self, node, env):
-        obj = env.get(node.name.value)
-        old_value = obj.value
-        if obj.type == ObjectType.INTEGER:
-            obj.value += 1
-        env.set(node.name.value, obj)
+        old_obj = env.get(node.name.value)
+        old_value = old_obj.value
+        if old_obj.type == ObjectType.INTEGER:
+            if node.operator == '++':
+                new_value = old_value + 1
+                new_obj = Ad_Integer_Object(new_value)
+                env.set(node.name.value, new_obj)
         return Ad_Integer_Object(value=old_value)
 
     def eval_for_expression(self, node, env):
