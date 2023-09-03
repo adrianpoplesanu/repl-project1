@@ -1,0 +1,2 @@
+{'f': <class instance at memory address: (.*)>}
+'content for tests'

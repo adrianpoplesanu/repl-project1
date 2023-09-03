@@ -1,3 +1,2 @@
 8080
-store: {a: 12, Server: class object, server: class instance at memory address: (.*)}
-outer: {}
+{'a': 12, 'Server': <class object at memory address: (.*)>, 'server': <class instance at memory address: (.*)>}
