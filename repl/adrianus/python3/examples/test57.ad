@@ -1,6 +1,6 @@
 def test() {
    f = File("README.md", "r")
-   context()
+   print(__locals())
    print (f.read())
 }
 

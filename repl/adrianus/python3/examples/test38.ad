@@ -14,7 +14,7 @@ class TestService() {
         /*print(test1)*/
         test1 = Test()
         test1.display()
-        /*context()*/
+        /*__locals()*/
     }
 }
 

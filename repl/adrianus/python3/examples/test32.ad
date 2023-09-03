@@ -6,7 +6,7 @@ class Server {
     }
 
     def print_port() {
-        context()
+        print (__locals())
         print(port + security_offset)
     }
 }
