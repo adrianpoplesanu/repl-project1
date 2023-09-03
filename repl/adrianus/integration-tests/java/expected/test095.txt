@@ -1,12 +1,18 @@
-'total 40
-drwxr-xr-x   10 adrianpoplesanu  staff   320 (.*) (.*) (.*):(.*) \.
-drwxr-xr-x@   8 adrianpoplesanu  staff   256 Apr 17  2022 \.\.
+'total 88
+drwxr-xr-x   16 adrianpoplesanu  staff   512 (.*) (.*) (.*):(.*) \.
+drwxr-xr-x@   8 adrianpoplesanu  staff   256 (.*) (.*) (.*):(.*) \.\.
+-rw-r--r--    1 adrianpoplesanu  staff    18 Aug 20 22:53 README.md
+-rw-r--r--    1 adrianpoplesanu  staff     8 (.*) (.*) (.*):(.*) bbb.txt
 drwxr-xr-x   11 adrianpoplesanu  staff   352 (.*) (.*) (.*):(.*) bootstrap
--rwxr-xr-x    1 adrianpoplesanu  staff   171 Aug 28  2022 build_project\.sh
+-rwxr-xr-x    1 adrianpoplesanu  staff   175 Aug 20 22:50 build_project\.sh
 -rwxr-xr-x    1 adrianpoplesanu  staff   112 Aug 28  2022 cleanup\.sh
 drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) examples
 drwxr-xr-x  108 adrianpoplesanu  staff  3456 (.*) (.*) (.*):(.*) expected
+-rw-r--r--    1 adrianpoplesanu  staff  1340 (.*) (.*) (.*):(.*) run-tests-cpp\.py
+-rwxr--r--    1 adrianpoplesanu  staff   195 (.*) (.*) (.*):(.*) run-tests-cpp\.sh
+-rw-r--r--    1 adrianpoplesanu  staff  1346 (.*) (.*) (.*):(.*) run-tests-python\.py
+-rwxr--r--    1 adrianpoplesanu  staff   202 (.*) (.*) (.*):(.*) run-tests-python\.sh
 -rw-r--r--    1 adrianpoplesanu  staff  1326 (.*) (.*) (.*):(.*) run-tests\.py
--rwxr--r--    1 adrianpoplesanu  staff    93 Aug 28  2022 run-tests\.sh
+-rwxr--r--    1 adrianpoplesanu  staff   195 Aug 20 22:50 run-tests\.sh
 -rw-r--r--    1 adrianpoplesanu  staff  2119 Apr  1 15:43 test-list\.txt
 '

@@ -1,1 +1,1 @@
-'{t: <class instance at memory address: (.*)>, Test: <class at memory address: (.*)>}'
+{'Test': <class object at memory address: (.*)>, 't': <class instance at memory address: (.*)>}
