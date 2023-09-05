@@ -290,6 +290,21 @@ Ad_Object* hasattr_builtin(std::vector<Ad_Object*> args, Environment *env, Garba
 }
 
 Ad_Object* getattr_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    if (args.size() == 2) {
+        Ad_Object* target = args.at(0);
+        std::string attrName = ((Ad_String_Object*) args.at(1))->value;
+
+        if (target->type == OBJ_INSTANCE) {
+            Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) target;
+            return klass_instance->instance_environment->lookupOnlyInStore(attrName);
+        }
+
+        if (target->type == OBJ_CLASS) {
+            Ad_Class_Object* klass_object = (Ad_Class_Object*) target;
+            // TODO: figure out what to do with this
+            // should i eval the astnode and return the object as an unbounded var?
+        }
+    }
     return NULL;
 }
 
@@ -298,6 +313,48 @@ Ad_Object* setattr_builtin(std::vector<Ad_Object*> args, Environment *env, Garba
 }
 
 Ad_Object* getattrs_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    if (args.size() == 1) {
+        Ad_Object* target = args.at(0);
+        std::vector<Ad_Object*> elements;
+        if (target->type == OBJ_INSTANCE) {
+            Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) target;
+            std::vector<std::string> keys = klass_instance->instance_environment->populateGetattrs();
+            for (int i = 0; i < keys.size(); i++) {
+                Ad_String_Object *attrName = new Ad_String_Object(keys.at(i));
+                gc->addObject(attrName);
+                elements.push_back(attrName);
+            }
+
+            Ad_List_Object* result = new Ad_List_Object(elements);
+            gc->addObject(result);
+            return result;
+        }
+        if (target->type == OBJ_CLASS) {
+            Ad_Class_Object* klass_object = (Ad_Class_Object*) target;
+            for (int i = 0; i < klass_object->attributes.size(); i++) {
+                Ad_AST_ExpressionStatement* stmt = (Ad_AST_ExpressionStatement*) klass_object->attributes.at(i);
+                Ad_AST_AssignStatement* assignStmt = (Ad_AST_AssignStatement*) stmt->expression;
+                Ad_String_Object *attrName = new Ad_String_Object(assignStmt->name->TokenLiteral());
+                gc->addObject(attrName);
+                elements.push_back(attrName);
+            }
+
+            for (int i = 0; i < klass_object->methods.size(); i++) {
+                Ad_AST_AssignStatement* stmt = (Ad_AST_AssignStatement*) klass_object->methods.at(i);
+
+                Ad_String_Object *attrName = new Ad_String_Object(stmt->name->TokenLiteral());
+                gc->addObject(attrName);
+                elements.push_back(attrName);
+            }
+
+            Ad_List_Object* result = new Ad_List_Object(elements);
+            gc->addObject(result);
+            return result; 
+        }
+        Ad_Error_Object* result = new Ad_Error_Object("getattrs can only be called on a class instance");
+        gc->addObject(result);
+        return result;
+    }
     return NULL;
 }
 

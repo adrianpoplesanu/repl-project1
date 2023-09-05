@@ -161,6 +161,14 @@ Ad_Object* Environment::contextToHashObject(GarbageCollector *gc) {
     return hashObject;
 }
 
+std::vector<std::string> Environment::populateGetattrs() {
+    std::vector<std::string> elements;
+    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
+        elements.push_back(it->first);
+    }
+    return elements;
+}
+
 Environment* Environment::copy(GarbageCollector *gc) {
     // TODO: asta strica tot, se face un loop infinit aici
     Environment *result = new Environment();

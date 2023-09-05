@@ -36,6 +36,7 @@ public:
     void PrintStore(int);
     Ad_Object* storeToHashObject(GarbageCollector*);
     Ad_Object* contextToHashObject(GarbageCollector*);
+    std::vector<std::string> populateGetattrs();
     Environment* copy(GarbageCollector*);
 };
 
