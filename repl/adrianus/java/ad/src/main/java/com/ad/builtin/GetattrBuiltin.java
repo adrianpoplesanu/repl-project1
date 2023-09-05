@@ -34,7 +34,7 @@ public class GetattrBuiltin extends AbstractBuiltin {
             }
             for (AstNode node : klassObject.getMethods()) {
                 // TODO: figure out what to do with this
-                // should i eval the astnode and return the object as an unbounded functuin?
+                // should i eval the astnode and return the object as an unbounded function?
                 System.out.println(node);
             }
         }

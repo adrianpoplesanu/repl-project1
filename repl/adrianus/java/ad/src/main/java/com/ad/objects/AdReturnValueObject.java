@@ -14,8 +14,9 @@ public class AdReturnValueObject extends AdObject {
 
 	@Override
 	public String inspect() {
-		// TODO Auto-generated method stub
-		return null;
+		//return null;
+		//return returnValue.inspect(); // TODO: asta e implementarea din cpp
+		return "WARNING: return outside function";
 	}
 
 	@Override

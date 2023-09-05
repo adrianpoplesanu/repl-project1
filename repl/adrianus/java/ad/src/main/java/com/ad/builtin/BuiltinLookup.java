@@ -20,14 +20,14 @@ public class BuiltinLookup {
 			put("__upper", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
 			put("__context", new AdBuiltinObject(new ContextBuiltin()));
 			put("__locals", new AdBuiltinObject(new LocalsBuiltin()));
-			put("__iofile", new AdBuiltinObject(new IOFileBuiltin())); // TODO: update this
-			put("__syssystem", new AdBuiltinObject(new SysSystemBuiltin())); // TODO: update this
+			put("__iofile", new AdBuiltinObject(new IOFileBuiltin()));
+			put("__syssystem", new AdBuiltinObject(new SysSystemBuiltin()));
 			put("__iosocket", new AdBuiltinObject(new IOSocketBuiltin()));
-			put("eval", new AdBuiltinObject(new EvalBuiltin())); // TODO: update this
+			put("eval", new AdBuiltinObject(new EvalBuiltin()));
 			put("__first", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("__last", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("map", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
-			put("input", new AdBuiltinObject(new InputBuiltin())); // TODO: update this
+			put("input", new AdBuiltinObject(new InputBuiltin()));
 			put("list", new AdBuiltinObject(new ListBuiltin()));
 			put("mat", new AdBuiltinObject(new MapBuiltin()));
 			put("hash", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
