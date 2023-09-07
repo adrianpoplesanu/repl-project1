@@ -1,0 +1,23 @@
+th1 = __thread("thread1")
+th2 = __thread("thread2")
+th3 = __thread("thread3")
+
+def runner(n) {
+    sleep(n * 1000)
+    return n
+}
+
+th1.callback(runner, 1)
+th2.callback(runner, 2)
+th3.callback(runner, 3)
+
+th1.runAsync()
+th2.runAsync()
+th3.runAsync()
+
+result = th1.await()
+print (result)
+result = th2.await()
+print (result)
+result = th3.await()
+print (result)
