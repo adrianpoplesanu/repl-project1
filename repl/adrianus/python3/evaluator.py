@@ -594,15 +594,21 @@ class Evaluator(object):
         #    return None
         evaluated = None
         evaluated = self.eval_file_object_method(node, env)
+        if evaluated and evaluated == NULLOBJECT:
+            return None
         if evaluated:
             # this needs re-written, looks crappy
             return evaluated
 
         evaluated = self.eval_socket_object_method(node, env)
+        if evaluated and evaluated == NULLOBJECT:
+            return None
         if evaluated:
             return evaluated
 
         evaluated = self.eval_thread_object_method(node, env)
+        if evaluated and evaluated == NULLOBJECT:
+            return None
         if evaluated:
             return evaluated
 
