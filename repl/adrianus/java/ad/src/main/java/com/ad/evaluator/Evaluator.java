@@ -1049,16 +1049,25 @@ public class Evaluator {
 		AstMemberAccess stmt = (AstMemberAccess) node;
 
 		AdObject evaluated = evalFileObjectMethod(node, stmt.getArguments(), env);
+		if (evaluated != null && evaluated == NULLOBJECT) {
+			return null;
+		}
 		if (evaluated != null) {
 			return evaluated;
 		}
 
 		evaluated = evalSocketObjectMethod(node, stmt.getArguments(), env);
+		if (evaluated != null && evaluated == NULLOBJECT) {
+			return null;
+		}
 		if (evaluated != null) {
 			return evaluated;
 		}
 
 		evaluated = evalThreadObjectMethod(node, stmt.getArguments(), env);
+		if (evaluated != null && evaluated == NULLOBJECT) {
+			return null;
+		}
 		if (evaluated != null) {
 			return evaluated;
 		}
