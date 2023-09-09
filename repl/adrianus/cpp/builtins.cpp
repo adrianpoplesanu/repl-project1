@@ -212,6 +212,15 @@ Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env, Ga
     return socketObject;
 }
 
+Ad_Object* __memory_address_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    Ad_Object *target = args[0];
+    std::stringstream ss;
+    ss << std::hex << target;
+    Ad_String_Object *result = new Ad_String_Object(ss.str());
+    gc->addObject(result);
+    return result;
+}
+
 Ad_Object* eval_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_String_Object* unescapedSource = (Ad_String_Object*) args[0];
     evalSource(unescapedSource->value, env, gc);
@@ -393,6 +402,7 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"__iofile", new Ad_Builtin_Object(&__iofile_builtin)},
     {"__syssystem", new Ad_Builtin_Object(&__syssystem_builtin)},
     {"__iosocket", new Ad_Builtin_Object(&__iosocket_builtin)},
+    {"__memory_address", new Ad_Builtin_Object(&__memory_address_builtin)},
     {"eval", new Ad_Builtin_Object(&eval_builtin)},
     {"__first", new Ad_Builtin_Object(&first_builtin)},
     {"__last", new Ad_Builtin_Object(&last_builtin)},
