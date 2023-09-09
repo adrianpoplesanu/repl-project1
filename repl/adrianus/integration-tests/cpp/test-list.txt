@@ -153,7 +153,6 @@ examples/test165.ad
 examples/test166.ad
 examples/test167.ad
 examples/test168.ad
-examples/test169.ad
 examples/test171.ad
 examples/test172.ad
 examples/test173.ad
@@ -165,3 +164,5 @@ examples/test181.ad
 examples/test182.ad
 examples/test183.ad
 examples/test184.ad
+examples/test185.ad
+examples/test186.ad

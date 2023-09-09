@@ -1,0 +1,3 @@
+'starting thread'
+(.\n\r)*
+'finishing thread'
