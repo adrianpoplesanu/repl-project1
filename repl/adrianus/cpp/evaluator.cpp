@@ -957,7 +957,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
 
     Ad_Object* evaluated = NULL;
     evaluated = EvalFileObjectMethod(node, member_access->arguments, env);
-    if (evaluated != NULL && evaluated == &NULLOBJECT) return NULL;
+    //if (evaluated != NULL && evaluated == &NULLOBJECT) return NULL;
     if (evaluated != NULL) return evaluated;
 
     evaluated = evalSocketObjectMethod(node, member_access->arguments, env);

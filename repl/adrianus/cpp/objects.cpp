@@ -722,7 +722,8 @@ Ad_File_Object::Ad_File_Object(std::string f, std::string o) {
 }
 
 Ad_File_Object::~Ad_File_Object() {
-
+    input_descriptor.close();
+    output_descriptor.close();
 }
 
 std::string Ad_File_Object::Inspect() {
