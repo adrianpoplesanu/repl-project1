@@ -875,6 +875,24 @@ class Evaluator(object):
         return obj
 
     def eval_postfix_increment(self, node, env):
+        if node.name.type == StatementType.INDEX_EXPRESSION:
+            #old_obj = self.eval_index_expression(node.name, env)
+            # TODO: create an eval_index_expression method that handles the infix expression
+            old_obj = self.eval(node.name, env)
+            value = old_obj.value
+            if node.operator == '++':
+                new_obj = Ad_Integer_Object(value + 1)
+                left = node.name.left
+                index = node.name.index
+                left_obj = self.eval(left, env)
+                index_obj = self.eval(index, env)
+                if left_obj.type == ObjectType.LIST:
+                    i = index_obj.value
+                    left_obj.elements[i] = new_obj
+                    returned_obj = Ad_Integer_Object(value)
+                    return returned_obj
+
+        # treat this as un identifier
         old_obj = env.get(node.name.value)
         old_value = old_obj.value
         if old_obj.type == ObjectType.INTEGER:
