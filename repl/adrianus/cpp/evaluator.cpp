@@ -1331,6 +1331,9 @@ Ad_Object* Evaluator::evalThreadObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
             if (member_ident->value == "await") {
                 thread_await(owner_obj_raw, garbageCollector, env);
                 Ad_Thread_Object* thread_object = (Ad_Thread_Object*) owner_obj_raw;
+                if (thread_object->result == NULL) {
+                    return &NULLOBJECT;
+                }
                 return thread_object->result;
             }
         } else {
