@@ -1,0 +1,21 @@
+th1 = __thread("thread-1")
+th2 = __thread("thread-2")
+
+counter = 0
+
+def runner(n) {
+    for (i = 0; i < n; i++) {
+        counter++
+    }
+}
+
+th1.callback(runner, 1000)
+th2.callback(runner, 2000)
+
+th1.runAsync()
+th2.runAsync()
+
+th1.await()
+th2.await()
+
+print ("counter [" + counter + "]")
