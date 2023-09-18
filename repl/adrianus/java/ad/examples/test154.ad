@@ -1,0 +1,18 @@
+th1 = __thread("thread1")
+th2 = __thread("thread2")
+
+def runner(n) {
+    sleep(1000)
+    return n
+}
+
+th1.callback(runner, 1)
+th2.callback(runner, 2)
+
+th1.runBlocking()
+th2.runBlocking()
+
+val1 = th1.await()
+val2 = th2.await()
+
+print (val1 + val2)
