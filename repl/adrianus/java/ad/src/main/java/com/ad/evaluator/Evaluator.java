@@ -1373,7 +1373,11 @@ public class Evaluator {
 					AdThreadObject threadObject = (AdThreadObject) rawObject;
 					try {
 						threadObject.getThread().join();
-						return threadObject.getResult();
+						AdObject result = threadObject.getResult();
+						if (result == null) {
+							return NULLOBJECT;
+						}
+						return result;
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}
