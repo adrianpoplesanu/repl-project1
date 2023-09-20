@@ -860,6 +860,8 @@ class Evaluator(object):
                     thread_blocking_run(owner, env)
                 elif node.member.value == 'await':
                     result = thread_await(owner, env)
+                    if not result:
+                        return NULLOBJECT
                     return result
             else:
                 pass
