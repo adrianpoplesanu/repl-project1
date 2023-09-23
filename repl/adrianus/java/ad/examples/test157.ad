@@ -1,0 +1,9 @@
+numbers = [22, 33, 44]
+
+def forEach(consumer) {
+    for (i = 0; i < len(numbers); i++) {
+        consumer(numbers[i])
+    }
+}
+
+forEach(func (a) { print (a + 5) })
