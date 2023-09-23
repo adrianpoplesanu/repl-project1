@@ -1,0 +1,18 @@
+/*(a) -> {
+    return a + 5
+}*/
+
+def execute_lambda(value, anonymous_function) {
+    return anonymous_function(value)
+}
+
+a = execute_lambda(10, func(a) { return a + 5 })
+print (a)
+
+
+def execute_lambda2(anonymous_function) {
+    return anonymous_function(22)
+}
+
+b = execute_lambda2(func (a) { return a + 33 })
+print (b)
