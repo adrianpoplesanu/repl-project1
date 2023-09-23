@@ -1,0 +1,16 @@
+let test = func(a, b) {
+    return a + b
+}
+
+test(2, 3)
+
+def operation(val) {
+    return val + 5
+}
+
+def test2(val, f) {
+    print (val)
+    print (f(val))
+}
+
+test2(8, operation)
