@@ -77,10 +77,6 @@ void Parser::ParseProgram(Ad_AST_Program &program) {
         //if (stmt) PrintNode(stmt);
         NextToken();
         ++limit;
-        if (limit > 99) {
-            std::cout << "exiting loop, max statement limit reached";
-            break;
-        }
     }
 }
 
