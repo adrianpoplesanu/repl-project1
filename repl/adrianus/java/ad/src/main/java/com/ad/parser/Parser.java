@@ -21,7 +21,7 @@ public class Parser {
 
     public Parser() {
         lexer = new Lexer();
-        prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier);
+        prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier); // equivalent to: () -> parseIdentifier()
         prefixParseFns.put(TokenTypeEnum.INT, this::parseIntegerLiteral);
         prefixParseFns.put(TokenTypeEnum.FLOAT, this::parseFloatLiteral);
         prefixParseFns.put(TokenTypeEnum.BANG, this::parsePrefixExpression);

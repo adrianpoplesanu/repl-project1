@@ -940,8 +940,13 @@ public class Evaluator {
 					&& (step == null || step.getType() == ObjectTypeEnum.INT)) {
 				return evalSubListIndexExpression(left, index, indexEnd, step);
 			}
+			if (left.getType() == ObjectTypeEnum.STRING
+					&& index.getType() == ObjectTypeEnum.INT
+					&& indexEnd.getType() == ObjectTypeEnum.INT
+					&& (step == null || step.getType() == ObjectTypeEnum.INT)) {
+				return evalSubStringIndexExpression(left, index, indexEnd, step);
+			}
 		}
-
     	if (left.getType() == ObjectTypeEnum.LIST && index.getType() == ObjectTypeEnum.INT) {
     		return evalListIndexExpression(left, index);
 		}
@@ -1001,6 +1006,10 @@ public class Evaluator {
 		}
 
 		return result;
+	}
+
+	private AdObject evalSubStringIndexExpression(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
+		return null;
 	}
 
 	private AdObject evalHashIndexExpression(AdObject left, AdObject index) {
