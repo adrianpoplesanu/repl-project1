@@ -1009,7 +1009,8 @@ public class Evaluator {
 	}
 
 	private AdObject evalSubStringIndexExpression(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		String result = "todo: build this";
+		return new AdStringObject(result);
 	}
 
 	private AdObject evalHashIndexExpression(AdObject left, AdObject index) {
