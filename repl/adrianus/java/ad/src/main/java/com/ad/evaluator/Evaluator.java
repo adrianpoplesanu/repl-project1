@@ -1009,7 +1009,7 @@ public class Evaluator {
 	}
 
 	private AdObject evalSubStringIndexExpression(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		int max = ((AdListObject) left).getElements().size();
+		int max = ((AdStringObject) left).getValue().length();
 		int idx = ((AdIntegerObject) index).getValue();
 		int idx_end = ((AdIntegerObject) indexEnd).getValue();
 		int idx_step = 1;
@@ -1028,7 +1028,24 @@ public class Evaluator {
 		if (idx_end < 0) idx_end += max;
 		if (idx_end >= max) idx_end = max;
 
-		String result = "todo: build this";
+		String result = "";
+		if (idx < idx_end) {
+			for (int i = idx; i < idx_end; ) {
+				result += ((AdStringObject) left).getValue().charAt(i);
+				i += idx_step;
+			}
+		} else {
+			if (idx_step >= 0) {
+				return new AdStringObject(result);
+			}
+			if (!isStep) {
+				return new AdStringObject(result);
+			}
+			for (int i = idx; i > idx_end; ) {
+				result += ((AdStringObject) left).getValue().charAt(i);
+				i += idx_step;
+			}
+		}
 		return new AdStringObject(result);
 	}
 
