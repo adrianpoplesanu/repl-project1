@@ -946,6 +946,30 @@ public class Evaluator {
 					&& (step == null || step.getType() == ObjectTypeEnum.INT)) {
 				return evalSubStringIndexExpression(left, index, indexEnd, step);
 			}
+			if (left.getType() == ObjectTypeEnum.STRING
+					&& index.getType() == ObjectTypeEnum.NULL
+					&& indexEnd.getType() == ObjectTypeEnum.INT
+					&& (step == null || step.getType() == ObjectTypeEnum.INT)) {
+				return evalSubStringIndexExpressionWithIndexStartMissing(left, index, indexEnd, step);
+			}
+			if (left.getType() == ObjectTypeEnum.STRING
+					&& index.getType() == ObjectTypeEnum.INT
+					&& indexEnd.getType() == ObjectTypeEnum.NULL
+					&& (step == null || step.getType() == ObjectTypeEnum.INT)) {
+				return evalSubStringIndexExpressionWithIndexEndMissing(left, index, indexEnd, step);
+			}
+			if (left.getType() == ObjectTypeEnum.STRING
+					&& index.getType() == ObjectTypeEnum.NULL
+					&& indexEnd.getType() == ObjectTypeEnum.NULL
+					&& (step == null || step.getType() == ObjectTypeEnum.INT)) {
+				return evalSubStringIndexExpressionWithIndexAndIndexEndMissing(left, index, indexEnd, step);
+			}
+			if (left.getType() == ObjectTypeEnum.STRING
+					&& index.getType() == ObjectTypeEnum.NULL
+					&& indexEnd.getType() == ObjectTypeEnum.NULL
+					&& (step == null || step.getType() == ObjectTypeEnum.NULL)) {
+				return evalSubStringIndexExpressionWithAllMissing(left, index, indexEnd, step);
+			}
 		}
     	if (left.getType() == ObjectTypeEnum.LIST && index.getType() == ObjectTypeEnum.INT) {
     		return evalListIndexExpression(left, index);
@@ -1028,10 +1052,23 @@ public class Evaluator {
 		if (idx_end < 0) idx_end += max;
 		if (idx_end >= max) idx_end = max;
 
+		// aici tratez cazurile extreme
+
+		if (idx < idx_end && idx_step < 0) {
+			return new AdStringObject("");
+		}
+		if (idx > idx_end && idx_step > 0) {
+			return new AdStringObject("");
+		}
+
+		// END aici tratez cazurile extreme
+
 		String result = "";
 		if (idx < idx_end) {
-			for (int i = idx; i < idx_end; ) {
-				result += ((AdStringObject) left).getValue().charAt(i);
+			for (int i = idx; i < idx_end && i >= 0; ) {
+				if (i >= 0) {
+					result += ((AdStringObject) left).getValue().charAt(i);
+				}
 				i += idx_step;
 			}
 		} else {
@@ -1047,6 +1084,37 @@ public class Evaluator {
 			}
 		}
 		return new AdStringObject(result);
+	}
+
+	private AdObject evalSubStringIndexExpressionWithIndexStartMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
+		return null;
+	}
+
+	private AdObject evalSubStringIndexExpressionWithIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
+		return null;
+	}
+
+	private AdObject evalSubStringIndexExpressionWithIndexAndIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
+		AdStringObject target = (AdStringObject) left;
+		int start = 0;
+		int end = target.getValue().length();
+		int inc = ((AdIntegerObject) step).getValue();
+		String result = "";
+		int i = start;
+		if (inc < 0) i += inc;
+		while (i >= -end && i < end) {
+			if (i >= 0 && i < end) {
+				result += target.getValue().charAt(i);
+			} else if (i < 0 && i >= -end) {
+				result += target.getValue().charAt(end + i);
+			}
+			i += inc;
+		}
+		return new AdStringObject(result);
+	}
+
+	private AdObject evalSubStringIndexExpressionWithAllMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
+		return null;
 	}
 
 	private AdObject evalHashIndexExpression(AdObject left, AdObject index) {
