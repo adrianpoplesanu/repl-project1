@@ -520,17 +520,45 @@ public class Parser {
     private AstNode parseIndexExpression(AstNode left) {
         AstIndexExpression expr = new AstIndexExpression(currentToken, left);
         nextToken();
-        AstNode index = parseExpression(PrecedenceTypeEnum.LOWEST);
+        AstNode index;
+        boolean skippedIndex = false;
+        if (currentTokenIs(TokenTypeEnum.COLON)) {
+            index = new AstNullExpression();
+            skippedIndex = true;
+        } else {
+            index = parseExpression(PrecedenceTypeEnum.LOWEST);
+        }
         expr.setIndex(index);
         if (expectPeek(TokenTypeEnum.COLON)) {
-            nextToken();
-            AstNode indexEnd = parseExpression(PrecedenceTypeEnum.LOWEST);
-            expr.setIndexEnd(indexEnd);
-            if (expectPeek(TokenTypeEnum.COLON)) {
+            if (!skippedIndex) {
                 nextToken();
-                AstNode step = parseExpression(PrecedenceTypeEnum.LOWEST);
-                expr.setStep(step);
             }
+            AstNode indexEnd;
+            if (currentTokenIs(TokenTypeEnum.COLON)) {
+                indexEnd = new AstNullExpression();
+            } else {
+                indexEnd = parseExpression(PrecedenceTypeEnum.LOWEST);
+                nextToken();
+            }
+            expr.setIndexEnd(indexEnd);
+            AstNode step;
+            if (currentTokenIs(TokenTypeEnum.RBRACKET)) {
+                // ... do nothing
+                step = new AstInteger(currentToken, 1);
+            } else if (currentTokenIs(TokenTypeEnum.COLON)) {
+                nextToken();
+                step = parseExpression(PrecedenceTypeEnum.LOWEST);
+                if (!expectPeek(TokenTypeEnum.RBRACKET)) {
+                    return null;
+                }
+            } else {
+                step = new AstInteger(currentToken, 1);
+                if (!expectPeek(TokenTypeEnum.RBRACKET)) {
+                    return null;
+                }
+            }
+            expr.setStep(step);
+            return expr;
         }
         if (!expectPeek(TokenTypeEnum.RBRACKET)) {
             return null;
