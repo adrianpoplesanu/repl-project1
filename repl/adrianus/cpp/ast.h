@@ -310,6 +310,8 @@ public:
     Token token;
     Ad_AST_Node *left;
     Ad_AST_Node *index;
+    Ad_AST_Node *indexEnd;
+    Ad_AST_Node *step;
 
     Ad_AST_IndexExpression();
     Ad_AST_IndexExpression(Token);
