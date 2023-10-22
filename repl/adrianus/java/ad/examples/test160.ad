@@ -1,0 +1,9 @@
+"ab" == "ab"
+"ab" == "ba"
+a = "ab"
+b = "ba"
+c = "ab"
+
+a == b
+b == c
+a == c
