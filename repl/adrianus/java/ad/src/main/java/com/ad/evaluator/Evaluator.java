@@ -1091,7 +1091,22 @@ public class Evaluator {
 	}
 
 	private AdObject evalSubStringIndexExpressionWithIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		AdStringObject target = (AdStringObject) left;
+		int start = ((AdIntegerObject) index).getValue();
+		int end = target.getValue().length();
+		int inc = ((AdIntegerObject) step).getValue();
+		String result = "";
+		int i = start;
+		if (inc < 0 && start >= 0) i += inc;
+		while (i >= -end && i < end) {
+			if (i >= 0 && i < end) {
+				result += target.getValue().charAt(i);
+			} else if (i < 0 && i >= -end) {
+				result += target.getValue().charAt(end + i);
+			}
+			i += inc;
+		}
+		return new AdStringObject(result);
 	}
 
 	private AdObject evalSubStringIndexExpressionWithIndexAndIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
@@ -1101,7 +1116,7 @@ public class Evaluator {
 		int inc = ((AdIntegerObject) step).getValue();
 		String result = "";
 		int i = start;
-		if (inc < 0) i += inc;
+		if (inc < 0 && start >= 0) i += inc;
 		while (i >= -end && i < end) {
 			if (i >= 0 && i < end) {
 				result += target.getValue().charAt(i);
