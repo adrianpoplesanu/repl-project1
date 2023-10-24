@@ -1,0 +1,4 @@
+a = "abcdefgh"
+
+a[:4]
+// 'abcd'
