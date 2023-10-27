@@ -559,6 +559,19 @@ public class Parser {
             }
             expr.setStep(step);
             return expr;
+        } else {
+            if (skippedIndex) {
+                nextToken();
+            }
+
+            AstNode indexEnd = parseExpression(PrecedenceTypeEnum.LOWEST);
+            expr.setIndexEnd(indexEnd);
+
+            if (expectPeek(TokenTypeEnum.COLON)) {
+                nextToken();
+                AstNode step = parseExpression(PrecedenceTypeEnum.LOWEST);
+                expr.setStep(step);
+            }
         }
         if (!expectPeek(TokenTypeEnum.RBRACKET)) {
             return null;
