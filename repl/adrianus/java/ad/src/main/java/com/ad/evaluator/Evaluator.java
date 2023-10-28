@@ -1073,21 +1073,89 @@ public class Evaluator {
 			}
 		} else {
 			if (idx_step >= 0) {
-				return new AdStringObject(result);
+				return new AdStringObject("");
 			}
 			if (!isStep) {
-				return new AdStringObject(result);
+				return new AdStringObject("");
 			}
 			for (int i = idx; i > idx_end; ) {
 				result += ((AdStringObject) left).getValue().charAt(i);
 				i += idx_step;
 			}
 		}
-		return new AdStringObject(result);
+
+		int i1 = ((AdIntegerObject) index).getValue();
+		int i2 = ((AdIntegerObject) indexEnd).getValue();
+		int i3 = ((AdIntegerObject) step).getValue();
+		return newSubString((AdStringObject) left, i1, i2, i3);
 	}
 
 	private AdObject evalSubStringIndexExpressionWithIndexStartMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		AdStringObject target = (AdStringObject) left;
+		int start = 0;
+		int end = ((AdIntegerObject) indexEnd).getValue();
+		if (end < 0) {
+			end += target.getValue().length();
+		}
+		int inc = 1;
+		if (step != null) {
+			inc = ((AdIntegerObject) step).getValue();
+		}
+		return newSubString(target, start, end, inc);
+	}
+
+	private AdStringObject newSubString(AdStringObject target, int i1, int i2, int step) {
+		String original = target.getValue();
+		String result = "";
+
+		/* edge cases */
+		if (i1 < 0 && i2 < 0 && step > 0) {
+			i1 += original.length();
+			i2 += original.length();
+		} else if (i1 < 0 && i2 < 0 && step < 0) {
+			i1 += original.length();
+			if (i2 < -original.length()) {
+				i2 = -1;
+			} else {
+				i2 += original.length();
+			}
+		} else if (i1 < 0 && i2 == original.length() && step < 0) {
+			if (i1 < -original.length()) {
+				return new AdStringObject("");
+			}
+			i1 += original.length();
+			i2 = -1;
+		} else if (i1 < 0 && i2 > 0) {
+			i1 += original.length();
+		} else if (i1 > 0 && i2 < 0 && step < 0) {
+			i2 += original.length();
+		} else if (i1 >= 0 && i2 < 0 && step > 0) {
+			i2 += original.length();
+		} else if (i1 < 0 && i2 >= 0 && step < 0) {
+			i1 += original.length();
+		} else if (i1 == 0 && i2 > 0 && step < 0) {
+			i1 += original.length() - 1;
+			if (i2 == original.length() - 1) {
+				i2 = -1;
+			}
+		}
+		/* end edge cases */
+
+		if (i1 < i2 && step > 0) {
+			for (int i = i1; i < i2; i += step) {
+				result += original.charAt(i);
+			}
+		} else if (i1 > i2 && step < 0) {
+			for (int i = i1; i > i2; i += step) {
+				result += original.charAt(i);
+			}
+		} else if (i1 < i2 && step < 0) {
+			for (int i = i2; i >= i1; i += step) {
+				result += original.charAt(i);
+			}
+		}
+
+		return new AdStringObject(result);
 	}
 
 	private AdObject evalSubStringIndexExpressionWithIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
@@ -1095,37 +1163,20 @@ public class Evaluator {
 		int start = ((AdIntegerObject) index).getValue();
 		int end = target.getValue().length();
 		int inc = ((AdIntegerObject) step).getValue();
-		String result = "";
-		int i = start;
-		if (inc < 0 && start >= 0) i += inc;
-		while (i >= -end && i < end) {
-			if (i >= 0 && i < end) {
-				result += target.getValue().charAt(i);
-			} else if (i < 0 && i >= -end) {
-				result += target.getValue().charAt(end + i);
-			}
-			i += inc;
-		}
-		return new AdStringObject(result);
+		return newSubString(target, start, end, inc);
 	}
 
 	private AdObject evalSubStringIndexExpressionWithIndexAndIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
 		AdStringObject target = (AdStringObject) left;
 		int start = 0;
-		int end = target.getValue().length();
+		int end;
 		int inc = ((AdIntegerObject) step).getValue();
-		String result = "";
-		int i = start;
-		if (inc < 0 && start >= 0) i += inc;
-		while (i >= -end && i < end) {
-			if (i >= 0 && i < end) {
-				result += target.getValue().charAt(i);
-			} else if (i < 0 && i >= -end) {
-				result += target.getValue().charAt(end + i);
-			}
-			i += inc;
+		if (start >= 0 && inc >= 0) {
+			end = target.getValue().length();
+		} else {
+			end = target.getValue().length() - 1;
 		}
-		return new AdStringObject(result);
+		return newSubString(target, start, end, inc);
 	}
 
 	private AdObject evalSubStringIndexExpressionWithAllMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
