@@ -520,19 +520,70 @@ public class Parser {
     private AstNode parseIndexExpression(AstNode left) {
         AstIndexExpression expr = new AstIndexExpression(currentToken, left);
         nextToken();
+        if (currentTokenIs(TokenTypeEnum.COLON)) {
+            AstNode index = new AstNullExpression();
+            expr.setIndex(index);
+        } else {
+            AstNode index = parseExpression(PrecedenceTypeEnum.LOWEST);
+            expr.setIndex(index);
+            nextToken();
+            if (currentTokenIs(TokenTypeEnum.RBRACKET)) {
+                return expr;
+            }
+        }
+
+        nextToken();
+
+        if (currentTokenIs(TokenTypeEnum.COLON)) {
+            AstNode indexEnd = new AstNullExpression();
+            expr.setIndexEnd(indexEnd);
+        } else {
+            AstNode indexEnd = parseExpression(PrecedenceTypeEnum.LOWEST);
+            expr.setIndexEnd(indexEnd);
+            nextToken();
+            if (currentTokenIs(TokenTypeEnum.RBRACKET)) {
+                AstNode step = new AstInteger(currentToken, 1);
+                expr.setStep(step);
+                return expr;
+            }
+        }
+
+        nextToken();
+
+        if (currentTokenIs(TokenTypeEnum.RBRACKET)) {
+            AstNode step = new AstInteger(currentToken, 1);
+            expr.setStep(step);
+            return expr;
+        } else {
+            AstNode step = parseExpression(PrecedenceTypeEnum.LOWEST);
+            nextToken();
+            expr.setStep(step);
+        }
+
+        if (!currentTokenIs(TokenTypeEnum.RBRACKET)) {
+            return null;
+        }
+
+        return expr;
+    }
+
+    private AstNode parseIndexExpressionOld(AstNode left) {
+        AstIndexExpression expr = new AstIndexExpression(currentToken, left);
+        nextToken();
         AstNode index;
-        boolean skippedIndex = false;
         if (currentTokenIs(TokenTypeEnum.COLON)) {
             index = new AstNullExpression();
-            skippedIndex = true;
+            expr.setIndex(index);
         } else {
             index = parseExpression(PrecedenceTypeEnum.LOWEST);
-        }
-        expr.setIndex(index);
-        if (expectPeek(TokenTypeEnum.COLON)) {
-            if (!skippedIndex) {
-                nextToken();
+            expr.setIndex(index);
+            nextToken();
+            if (currentTokenIs(TokenTypeEnum.RBRACKET)) {
+                return expr;
             }
+        }
+        if (currentTokenIs(TokenTypeEnum.COLON)) {
+            nextToken();
             AstNode indexEnd;
             if (currentTokenIs(TokenTypeEnum.COLON)) {
                 indexEnd = new AstNullExpression();
@@ -560,10 +611,6 @@ public class Parser {
             expr.setStep(step);
             return expr;
         } else {
-            if (skippedIndex) {
-                nextToken();
-            }
-
             AstNode indexEnd = parseExpression(PrecedenceTypeEnum.LOWEST);
             expr.setIndexEnd(indexEnd);
 
