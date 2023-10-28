@@ -286,9 +286,39 @@ Ad_AST_Node* Parser::ParseIndexExpression(Ad_AST_Node* left) {
         }
     }
 
-    // TODO: add parsing for indexEnd and step
+    NextToken();
 
-    return NULL;
+    if (CurrentTokenIs(TT_COLON)) {
+        Ad_AST_Node *indexEnd = new Ad_AST_Null_Expression();
+        expr->indexEnd = indexEnd;
+    } else {
+        Ad_AST_Node *indexEnd = ParseExpression(PT_LOWEST);
+        expr->indexEnd = indexEnd;
+        NextToken();
+        if (CurrentTokenIs(TT_RBRACKET)) {
+            Ad_AST_Node *step = new Ad_AST_Integer(current_token, 1);
+            expr->step = step;
+            return expr;
+        }
+    }
+
+    NextToken();
+
+    if (CurrentTokenIs(TT_RBRACKET)) {
+        Ad_AST_Node *step = new Ad_AST_Integer(current_token, 1);
+        expr->step = step;
+        return expr;
+    } else {
+        Ad_AST_Node *step = ParseExpression(PT_LOWEST);
+        NextToken();
+        expr->step = step;
+    }
+
+    if (!CurrentTokenIs(TT_RBRACKET)) {
+        return NULL;
+    }
+
+    return expr;
 }
 
 Ad_AST_Node* Parser::ParseIndexExpressionOld(Ad_AST_Node* left) {
