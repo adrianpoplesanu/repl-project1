@@ -273,6 +273,27 @@ Ad_AST_Node* Parser::ParseGroupedExpression() {
 Ad_AST_Node* Parser::ParseIndexExpression(Ad_AST_Node* left) {
     Ad_AST_IndexExpression* expr = new Ad_AST_IndexExpression(current_token, left);
     NextToken();
+
+    if (CurrentTokenIs(TT_COLON)) {
+        Ad_AST_Node *index = new Ad_AST_Null_Expression();
+        expr->index = index;
+    } else {
+        Ad_AST_Node *index = ParseExpression(PT_LOWEST);
+        expr->index = index;
+        NextToken();
+        if (CurrentTokenIs(TT_RBRACKET)) {
+            return expr;
+        }
+    }
+
+    // TODO: add parsing for indexEnd and step
+
+    return NULL;
+}
+
+Ad_AST_Node* Parser::ParseIndexExpressionOld(Ad_AST_Node* left) {
+    Ad_AST_IndexExpression* expr = new Ad_AST_IndexExpression(current_token, left);
+    NextToken();
     expr->index = ParseExpression(PT_LOWEST);
     if (!ExpectPeek(TT_RBRACKET)) {
         return NULL;
