@@ -16,6 +16,7 @@ public class Bootstrap {
     final File bootstrapFolder = new File("bootstrap");
 
     private List<File> bootstrapFiles;
+    private static boolean SKIP_BOOTSTRAP = false;
 
     public Bootstrap() {
         /*bootstrapFiles = new ArrayList<>();
@@ -34,6 +35,9 @@ public class Bootstrap {
 
     public void loadBootstrap(AstProgram program, Parser parser, Evaluator evaluator, Environment env) {
         for (final File fileEntry : bootstrapFolder.listFiles()) {
+            if (SKIP_BOOTSTRAP) {
+                break;
+            }
             if (!fileEntry.isDirectory()) {
                 String source = "";
                 try {
