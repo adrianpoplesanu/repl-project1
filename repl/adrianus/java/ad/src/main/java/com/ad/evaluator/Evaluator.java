@@ -1180,7 +1180,8 @@ public class Evaluator {
 	}
 
 	private AdObject evalSubStringIndexExpressionWithAllMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		AdStringObject target = (AdStringObject) left;
+		return new AdStringObject(target.getValue());
 	}
 
 	private AdObject evalHashIndexExpression(AdObject left, AdObject index) {
