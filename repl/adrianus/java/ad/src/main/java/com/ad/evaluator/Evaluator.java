@@ -1037,10 +1037,8 @@ public class Evaluator {
 		int idx = ((AdIntegerObject) index).getValue();
 		int idx_end = ((AdIntegerObject) indexEnd).getValue();
 		int idx_step = 1;
-		boolean isStep = false;
 
 		if (step != null) {
-			isStep = true;
 			idx_step = ((AdIntegerObject) step).getValue();
 		}
 
@@ -1062,27 +1060,6 @@ public class Evaluator {
 		}
 
 		// END aici tratez cazurile extreme
-
-		String result = "";
-		if (idx < idx_end) {
-			for (int i = idx; i < idx_end && i >= 0; ) {
-				if (i >= 0) {
-					result += ((AdStringObject) left).getValue().charAt(i);
-				}
-				i += idx_step;
-			}
-		} else {
-			if (idx_step >= 0) {
-				return new AdStringObject("");
-			}
-			if (!isStep) {
-				return new AdStringObject("");
-			}
-			for (int i = idx; i > idx_end; ) {
-				result += ((AdStringObject) left).getValue().charAt(i);
-				i += idx_step;
-			}
-		}
 
 		int i1 = ((AdIntegerObject) index).getValue();
 		int i2 = ((AdIntegerObject) indexEnd).getValue();
