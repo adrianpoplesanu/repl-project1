@@ -2,6 +2,7 @@ package com.ad.evaluator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1057,34 +1058,6 @@ public class Evaluator {
 	}
 
 	private AdObject evalSubListIndexExpression(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		int max = ((AdStringObject) left).getValue().length();
-		int idx = ((AdIntegerObject) index).getValue();
-		int idx_end = ((AdIntegerObject) indexEnd).getValue();
-		int idx_step = 1;
-
-		if (step != null) {
-			idx_step = ((AdIntegerObject) step).getValue();
-		}
-
-		if (idx < -max) idx = -max;
-		if (idx < 0) idx += max;
-		if (idx >= max) idx = max;
-
-		if (idx_end < -max) idx_end = -max;
-		if (idx_end < 0) idx_end += max;
-		if (idx_end >= max) idx_end = max;
-
-		// aici tratez cazurile extreme
-
-		if (idx < idx_end && idx_step < 0) {
-			return new AdListObject();
-		}
-		if (idx > idx_end && idx_step > 0) {
-			return new AdListObject();
-		}
-
-		// END aici tratez cazurile extreme
-
 		int i1 = ((AdIntegerObject) index).getValue();
 		int i2 = ((AdIntegerObject) indexEnd).getValue();
 		int i3 = ((AdIntegerObject) step).getValue();
@@ -1092,19 +1065,47 @@ public class Evaluator {
 	}
 
 	private AdObject evalSubListIndexExpressionWithIndexStartMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		int i3 = ((AdIntegerObject) step).getValue();
+		if (i3 > 0) {
+			int i1 = 0;
+			int i2 = ((AdIntegerObject) indexEnd).getValue();
+			return newSubList((AdListObject) left, i1, i2, i3);
+		} else {
+			int i1 = Integer.MAX_VALUE;
+			int i2 = ((AdIntegerObject) indexEnd).getValue();
+			return newSubList((AdListObject) left, i1, i2, i3);
+		}
 	}
 
 	private AdObject evalSubListIndexExpressionWithIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		int i3 = ((AdIntegerObject) step).getValue();
+		if (i3 > 0) {
+			int i1 = ((AdIntegerObject) index).getValue();
+			int i2 = ((AdListObject) left).getElements().size();
+			return newSubList((AdListObject) left, i1, i2, i3);
+		} else {
+			int i1 = ((AdIntegerObject) index).getValue();
+			int i2 = -Integer.MAX_VALUE;
+			return newSubList((AdListObject) left, i1, i2, i3);
+		}
 	}
 
 	private AdObject evalSubListIndexExpressionWithIndexStartAndIndexEndMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		int i3 = ((AdIntegerObject) step).getValue();
+		if (i3 > 0) {
+			int i1 = 0;
+			int i2 = ((AdListObject) left).getElements().size();
+			return newSubList((AdListObject) left, i1, i2, i3);
+		} else {
+			int i1 = ((AdListObject) left).getElements().size() - 1;
+			int i2 = -Integer.MAX_VALUE;
+			return newSubList((AdListObject) left, i1, i2, i3);
+		}
 	}
 
 	private AdObject evalSubListIndexExpressionWithAllMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		int max = ((AdListObject) left).getElements().size();
+		return newSubList((AdListObject) left, 0, max, 1);
 	}
 
 	private AdObject evalSubStringIndexExpression(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
@@ -1157,7 +1158,49 @@ public class Evaluator {
 	}
 
 	private AdListObject newSubList(AdListObject target, int i1, int i2, int step) {
-		return new AdListObject();
+		ArrayList<AdObject> elements = new ArrayList<>();
+
+		int max = target.getElements().size();
+
+		if (step < 0 && i1 < -max) {
+			return new AdListObject(new ArrayList<>());
+		}
+
+		if (step < 0 && i1 >= max) {
+			i1 = Integer.MAX_VALUE;
+		}
+
+		if (step < 0 && i2 < -max) {
+			i2 = - Integer.MAX_VALUE;
+		}
+
+		if (i1 == Integer.MAX_VALUE) {
+			i1 = max - 1;
+		} else {
+			if (i1 < -max) i1 = -max;
+			if (i1 < 0) i1 += max;
+			if (i1 > max) i1 = max;
+		}
+
+		if (i2 == -Integer.MAX_VALUE) {
+			i2 = -1;
+		} else {
+			if (i2 < -max) i2 = -max;
+			if (i2 < 0) i2 += max;
+			if (i2 > max) i2 = max;
+		}
+
+		if (step > 0) {
+			for (int i = i1; i < i2; i += step) {
+				elements.add(target.getElements().get(i));
+			}
+		} else if (step < 0) {
+			for (int i = i1; i > i2; i += step) {
+				elements.add(target.getElements().get(i));
+			}
+		}
+
+		return new AdListObject(elements);
 	}
 
 	private AdStringObject newSubString(AdStringObject target, int i1, int i2, int step) {
