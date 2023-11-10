@@ -1057,7 +1057,38 @@ public class Evaluator {
 	}
 
 	private AdObject evalSubListIndexExpression(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
-		return null;
+		int max = ((AdStringObject) left).getValue().length();
+		int idx = ((AdIntegerObject) index).getValue();
+		int idx_end = ((AdIntegerObject) indexEnd).getValue();
+		int idx_step = 1;
+
+		if (step != null) {
+			idx_step = ((AdIntegerObject) step).getValue();
+		}
+
+		if (idx < -max) idx = -max;
+		if (idx < 0) idx += max;
+		if (idx >= max) idx = max;
+
+		if (idx_end < -max) idx_end = -max;
+		if (idx_end < 0) idx_end += max;
+		if (idx_end >= max) idx_end = max;
+
+		// aici tratez cazurile extreme
+
+		if (idx < idx_end && idx_step < 0) {
+			return new AdListObject();
+		}
+		if (idx > idx_end && idx_step > 0) {
+			return new AdListObject();
+		}
+
+		// END aici tratez cazurile extreme
+
+		int i1 = ((AdIntegerObject) index).getValue();
+		int i2 = ((AdIntegerObject) indexEnd).getValue();
+		int i3 = ((AdIntegerObject) step).getValue();
+		return newSubList((AdListObject) left, i1, i2, i3);
 	}
 
 	private AdObject evalSubListIndexExpressionWithIndexStartMissing(AdObject left, AdObject index, AdObject indexEnd, AdObject step) {
@@ -1123,6 +1154,10 @@ public class Evaluator {
 			inc = ((AdIntegerObject) step).getValue();
 		}
 		return newSubString(target, start, end, inc);
+	}
+
+	private AdListObject newSubList(AdListObject target, int i1, int i2, int step) {
+		return new AdListObject();
 	}
 
 	private AdStringObject newSubString(AdStringObject target, int i1, int i2, int step) {
