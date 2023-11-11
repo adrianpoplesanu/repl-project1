@@ -133,6 +133,10 @@ Token Lexer::NextToken() {
             token.type = TT_ASTERISK;
             token.literal = current_char;
         break;
+        case '%':
+            token.type = TT_MODULUS;
+            token.literal = current_char;
+        break;
         case '/':
             if (PeekChar() == '*') {
                 ReadChar();

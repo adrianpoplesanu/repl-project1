@@ -283,6 +283,11 @@ Ad_Object* Evaluator::EvalIntegerInfixExpression(std::string _operator, Ad_Objec
         garbageCollector->addObject(obj);
         return obj;
     }
+    if (_operator == "%") {
+        Ad_Integer_Object* obj = new Ad_Integer_Object(left_val % right_val);
+        garbageCollector->addObject(obj);
+        return obj;
+    }
     if (_operator == "<") {
         return NativeBoolToBooleanObject(left_val < right_val);
     }

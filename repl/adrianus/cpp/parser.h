@@ -35,6 +35,7 @@ std::map<TokenType, PrecedenceType> precedences = {
     {TT_PLUS, PT_SUM},
     {TT_MINUS, PT_SUM},
     {TT_SLASH, PT_PRODUCT},
+    {TT_MODULUS, PT_PRODUCT},
     {TT_ASTERISK, PT_PRODUCT},
     {TT_LPAREN, PT_CALL},
     {TT_LBRACKET, PT_INDEX},

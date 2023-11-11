@@ -34,6 +34,7 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_ASTERISK, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_MODULUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_EQ, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_NOT_EQ, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_LT, &Parser::ParseInfixExpression));
@@ -126,6 +127,7 @@ void Parser::PeekError(std::string msg) {
 }
 
 Ad_AST_Node* Parser::ParseStatement() {
+    // aici ar trebui sa stea toate keyword-urile, expresiile ar trebui sa fie doar aritmetice, ar fi mai frumos
     if (current_token.type == TT_LET)
         return ParseLetStatement();
     if (current_token.type == TT_RETURN)
