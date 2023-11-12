@@ -161,6 +161,7 @@ Token Lexer::NextToken() {
         break;
         case '<':
             if (PeekChar() == '=') {
+                ReadChar();
                 token.type = TT_LTE;
                 token.literal = "<=";
             } else {
