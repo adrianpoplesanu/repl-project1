@@ -384,6 +384,24 @@ Ad_Object* Evaluator::EvalFloatInfixExpression(std::string _operator, Ad_Object*
         garbageCollector->addObject(obj);
         return obj;
     }
+    if (_operator == "<") {
+        return NativeBoolToBooleanObject(left_val < right_val);
+    }
+    if (_operator == ">") {
+        return NativeBoolToBooleanObject(left_val > right_val);
+    }
+    if (_operator == "<=") {
+        return NativeBoolToBooleanObject(left_val <= right_val);
+    }
+    if (_operator == ">=") {
+        return NativeBoolToBooleanObject(left_val >= right_val);
+    }
+    if (_operator == "==") {
+        return NativeBoolToBooleanObject(left_val == right_val);
+    }
+    if (_operator == "!=") {
+        return NativeBoolToBooleanObject(left_val != right_val);
+    }
     return NULL;
 }
 
