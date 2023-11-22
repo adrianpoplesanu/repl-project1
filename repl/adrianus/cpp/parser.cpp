@@ -14,7 +14,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_TRUE, &Parser::ParseBoolean));
     prefixParseFns.insert(std::make_pair(TT_FALSE, &Parser::ParseBoolean));
     prefixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseGroupedExpression));
-    prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
+    //prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
     prefixParseFns.insert(std::make_pair(TT_FUNC, &Parser::ParseFunctionLiteral));
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
     prefixParseFns.insert(std::make_pair(TT_FOR, &Parser::ParseForExpression));
@@ -23,7 +23,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseListLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACE, &Parser::ParseHashLiteral));
     prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionExpression));
-    prefixParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefExpression));
+    //prefixParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefExpression));
     prefixParseFns.insert(std::make_pair(TT_FUN, &Parser::ParseFunExpression));
     prefixParseFns.insert(std::make_pair(TT_CLASS, &Parser::ParseClassStatement));
     prefixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePrefixPlusPlus));
@@ -140,6 +140,10 @@ Ad_AST_Node* Parser::ParseStatement() {
         return ParseComment();
     if (current_token.type == TT_SINGLECOMMENT)
         return ParseSingleLineComment();
+    if (current_token.type == TT_IF)
+        return ParseIfExpression();
+    if (current_token.type == TT_DEF)
+        return ParseDefExpression();
     return ParseExpressionStatement();
 }
 
