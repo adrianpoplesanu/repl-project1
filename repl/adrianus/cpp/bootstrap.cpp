@@ -4,6 +4,8 @@
 
 #include "bootstrap.h"
 
+#define SKIP_BOOTSTRAP false
+
 std::vector<std::string> bootstrap_files {
     "bootstrap/file.ad",
     "bootstrap/test.ad",
@@ -46,6 +48,9 @@ Environment* load_bootstrap(Ad_AST_Program &program, Parser parser, Evaluator *e
     bootstrap->isBootstrapEnvironment = true;
     evaluator->garbageCollector->addEnvironment(bootstrap);
     for (std::vector<std::string>::iterator it = bootstrap_files.begin() ; it != bootstrap_files.end(); ++it) {
+        if (SKIP_BOOTSTRAP) {
+            break;
+        }
         std::ifstream in;
         in.open(*it);
         std::string content = "", line;
