@@ -29,11 +29,11 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.TRUE, this::parseBoolean);
         prefixParseFns.put(TokenTypeEnum.FALSE, this::parseBoolean);
         prefixParseFns.put(TokenTypeEnum.LPAREN, this::parseGroupedExpression);
-        prefixParseFns.put(TokenTypeEnum.IF, this::parseIfExpression);
+        //prefixParseFns.put(TokenTypeEnum.IF, this::parseIfExpression);
         prefixParseFns.put(TokenTypeEnum.FUNCTION, this::parseFunctionStatement);
         prefixParseFns.put(TokenTypeEnum.WHILE, this::parseWhileExpression);
         prefixParseFns.put(TokenTypeEnum.FOR, this::parseForExpression);
-        prefixParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
+        //prefixParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
         prefixParseFns.put(TokenTypeEnum.FUN, this::parseFunStatement);
         prefixParseFns.put(TokenTypeEnum.FUNC, this::parseFunctionLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACKET, this::parseListLiteral);
@@ -132,6 +132,10 @@ public class Parser {
             return parseMultiCommentStatement();
         } else if (currentToken.getType() == TokenTypeEnum.SINGLE_COMMENT) {
             return parseSingleCommentStatement();
+        } else if (currentToken.getType() == TokenTypeEnum.IF) {
+            return parseIfExpression();
+        } else if (currentToken.getType() == TokenTypeEnum.DEF) {
+            return parseDefStatement();
         } else {
             return parseExpressionStatement();
         }
