@@ -1,0 +1,2 @@
+<class instance at memory address: (.*)>
+55
