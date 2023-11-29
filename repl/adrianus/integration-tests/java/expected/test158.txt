@@ -1,0 +1,6 @@
+'b'
+'bcd'
+'fg'
+'fgh'
+'fedcb'
+''
