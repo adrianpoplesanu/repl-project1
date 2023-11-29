@@ -1,0 +1,2 @@
+{'aaa': <function at memory address: (.*)>, 'a': 5, 'b': 7}
+'buna dimineata'

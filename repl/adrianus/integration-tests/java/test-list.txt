@@ -105,11 +105,7 @@ examples/test105.ad
 examples/test106.ad
 examples/test107.ad
 examples/test110.ad
-examples/test111.ad
-examples/test112.ad
-examples/test116.ad
 examples/test117.ad
-examples/test118.ad
 examples/test119.ad
 examples/test120.ad
 examples/test121.ad

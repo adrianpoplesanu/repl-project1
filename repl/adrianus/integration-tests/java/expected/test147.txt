@@ -1,0 +1,2 @@
+\['bebe', 'dex', 'e', 'un', 'dragutz', 'si', 'un', 'scumpec'\]
+\['dex', 'e', 'un'\]
