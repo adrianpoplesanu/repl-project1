@@ -82,7 +82,7 @@ public:
     Ad_AST_Node* ParsePrefixExpression();
     Ad_AST_Node* ParseBoolean();
     Ad_AST_Node* ParseGroupedExpression();
-    Ad_AST_Node* ParseIfExpression();
+    Ad_AST_Node* ParseIfStatement();
     Ad_AST_Node* ParseBlockStatement();
     Ad_AST_Node* ParseSingleBlockStatement();
     Ad_AST_Node* ParseFunctionLiteral();
@@ -102,8 +102,8 @@ public:
     Ad_AST_Node* ParseDefExpression();
     Ad_AST_Node* ParseFunExpression();
     Ad_AST_Node* ParseFunctionExpression();
-    Ad_AST_Node* ParseComment();
-    Ad_AST_Node* ParseSingleLineComment();
+    Ad_AST_Node* ParseMultiCommentStatement();
+    Ad_AST_Node* ParseSingleLineCommentStatement();
     Ad_AST_Node* ParseClassStatement();
     Ad_AST_Node* ParseMemberAccess(Ad_AST_Node*);
     Ad_AST_Node* ParsePrefixPlusPlus();

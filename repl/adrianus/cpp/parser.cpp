@@ -137,11 +137,11 @@ Ad_AST_Node* Parser::ParseStatement() {
     if (current_token.type == TT_CONTINUE)
         return ParseContinueStatement();
     if (current_token.type == TT_MULTICOMMENT)
-        return ParseComment();
+        return ParseMultiCommentStatement();
     if (current_token.type == TT_SINGLECOMMENT)
-        return ParseSingleLineComment();
+        return ParseSingleLineCommentStatement();
     if (current_token.type == TT_IF)
-        return ParseIfExpression();
+        return ParseIfStatement();
     if (current_token.type == TT_DEF)
         return ParseDefExpression();
     return ParseExpressionStatement();
@@ -337,7 +337,7 @@ Ad_AST_Node* Parser::ParseIndexExpressionOld(Ad_AST_Node* left) {
     return expr;
 }
 
-Ad_AST_Node* Parser::ParseIfExpression() {
+Ad_AST_Node* Parser::ParseIfStatement() {
     Ad_AST_IfExpression* expr = new Ad_AST_IfExpression(current_token);
     if (!ExpectPeek(TT_LPAREN)) {
         free_Ad_AST_Node_memory(expr);
@@ -648,12 +648,12 @@ Ad_AST_Node* Parser::ParseFunctionExpression() {
 }
 
 
-Ad_AST_Node* Parser::ParseComment() {
+Ad_AST_Node* Parser::ParseMultiCommentStatement() {
     Ad_AST_Comment *comm = new Ad_AST_Comment(current_token);
     return comm;
 }
 
-Ad_AST_Node* Parser::ParseSingleLineComment() {
+Ad_AST_Node* Parser::ParseSingleLineCommentStatement() {
     Ad_AST_Comment *comm = new Ad_AST_Comment(current_token);
     return comm;
 }
