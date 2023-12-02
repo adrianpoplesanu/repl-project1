@@ -6,6 +6,9 @@
 #include "ast.cpp"
 
 Parser::Parser() {
+    statementParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfStatement));
+    statementParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefStatement));
+
     prefixParseFns.insert(std::make_pair(TT_IDENT, &Parser::ParseIdentifier));
     prefixParseFns.insert(std::make_pair(TT_INT, &Parser::ParseIntegerLiteral));
     prefixParseFns.insert(std::make_pair(TT_FLOAT, &Parser::ParseFloatLiteral));
@@ -14,7 +17,6 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_TRUE, &Parser::ParseBoolean));
     prefixParseFns.insert(std::make_pair(TT_FALSE, &Parser::ParseBoolean));
     prefixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseGroupedExpression));
-    //prefixParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfExpression));
     prefixParseFns.insert(std::make_pair(TT_FUNC, &Parser::ParseFunctionLiteral));
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
     prefixParseFns.insert(std::make_pair(TT_FOR, &Parser::ParseForExpression));
@@ -23,13 +25,13 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseListLiteral));
     prefixParseFns.insert(std::make_pair(TT_LBRACE, &Parser::ParseHashLiteral));
     prefixParseFns.insert(std::make_pair(TT_FUNCTION, &Parser::ParseFunctionExpression));
-    //prefixParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefExpression));
     prefixParseFns.insert(std::make_pair(TT_FUN, &Parser::ParseFunExpression));
     prefixParseFns.insert(std::make_pair(TT_CLASS, &Parser::ParseClassStatement));
     prefixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePrefixPlusPlus));
     prefixParseFns.insert(std::make_pair(TT_NULL, &Parser::ParseNullExpression));
     prefixParseFns.insert(std::make_pair(TT_THIS, &Parser::ParseThisExpression));
     prefixParseFns.insert(std::make_pair(TT_SUPER, &Parser::parseSuperExpression));
+
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_SLASH, &Parser::ParseInfixExpression));
@@ -143,7 +145,7 @@ Ad_AST_Node* Parser::ParseStatement() {
     if (current_token.type == TT_IF)
         return ParseIfStatement();
     if (current_token.type == TT_DEF)
-        return ParseDefExpression();
+        return ParseDefStatement();
     return ParseExpressionStatement();
 }
 
@@ -521,7 +523,7 @@ Ad_AST_Node* Parser::ParseAssignExpression(Ad_AST_Node* left) {
     return stmt;
 }
 
-Ad_AST_Node* Parser::ParseDefExpression() {
+Ad_AST_Node* Parser::ParseDefStatement() {
     Ad_AST_Def_Statement* stmt = new Ad_AST_Def_Statement(current_token);
     NextToken();
     Ad_AST_Identifier* name = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
@@ -674,7 +676,7 @@ Ad_AST_Node* Parser::ParseClassStatement() {
     }
     while(!CurrentTokenIs(TT_RBRACE)) {
         if (CurrentTokenIs(TT_DEF)) {
-            Ad_AST_Node* stmt = ParseDefExpression();
+            Ad_AST_Node* stmt = ParseDefStatement();
             Ad_INCREF(stmt);
             expr->methods.push_back(stmt);
         }

@@ -99,7 +99,7 @@ public:
     Ad_AST_Node* ParseIndexExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseIndexExpressionOld(Ad_AST_Node*);
     Ad_AST_Node* ParseAssignExpression(Ad_AST_Node*);
-    Ad_AST_Node* ParseDefExpression();
+    Ad_AST_Node* ParseDefStatement();
     Ad_AST_Node* ParseFunExpression();
     Ad_AST_Node* ParseFunctionExpression();
     Ad_AST_Node* ParseMultiCommentStatement();
