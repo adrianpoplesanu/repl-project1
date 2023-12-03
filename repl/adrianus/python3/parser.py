@@ -23,6 +23,7 @@ class Parser(object):
         self.errors = []
         self.statement_parse_functions[TokenType.IF] = self.parse_if_expression
         self.statement_parse_functions[TokenType.DEF] = self.parse_def_expression
+
         self.prefix_parse_functions[TokenType.IDENT] = self.parse_identifier
         self.prefix_parse_functions[TokenType.INT] = self.parse_integer_literal
         self.prefix_parse_functions[TokenType.FLOAT] = self.parse_float_literal
@@ -31,8 +32,6 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.TRUE] = self.parse_boolean
         self.prefix_parse_functions[TokenType.FALSE] = self.parse_boolean
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
-        #self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
-        self.prefix_parse_functions[TokenType.DEF] = self.parse_def_expression
         self.prefix_parse_functions[TokenType.FUN] = self.parse_fun_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_expression
         self.prefix_parse_functions[TokenType.CLASS] = self.parse_class_statement
@@ -46,6 +45,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.NULL] = self.parse_null_expression
         self.prefix_parse_functions[TokenType.THIS] = self.parse_this_expression
         self.prefix_parse_functions[TokenType.SUPER] = self.parse_super_expression
+
         self.infix_parse_functions[TokenType.PLUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.MINUS] = self.parse_infix_expression
         self.infix_parse_functions[TokenType.SLASH] = self.parse_infix_expression
