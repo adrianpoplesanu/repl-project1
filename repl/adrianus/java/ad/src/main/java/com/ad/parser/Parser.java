@@ -23,6 +23,9 @@ public class Parser {
 
     public Parser() {
         lexer = new Lexer();
+        statementParseFns.put(TokenTypeEnum.IF, this::parseIfExpression);
+        statementParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
+
         prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier); // equivalent to: () -> parseIdentifier()
         prefixParseFns.put(TokenTypeEnum.INT, this::parseIntegerLiteral);
         prefixParseFns.put(TokenTypeEnum.FLOAT, this::parseFloatLiteral);
@@ -119,6 +122,10 @@ public class Parser {
     }
 
     private AstNode parseStatement() {
+        if (statementParseFns.containsKey(currentToken.getType())) {
+            return statementParseFns.get(currentToken.getType()).get();
+        }
+
         if (currentToken.getType() == TokenTypeEnum.LET) {
             return parseLetStatement();
         } else if (currentToken.getType() == TokenTypeEnum.RETURN) {
@@ -133,10 +140,6 @@ public class Parser {
             return parseMultiCommentStatement();
         } else if (currentToken.getType() == TokenTypeEnum.SINGLE_COMMENT) {
             return parseSingleCommentStatement();
-        } else if (currentToken.getType() == TokenTypeEnum.IF) {
-            return parseIfExpression();
-        } else if (currentToken.getType() == TokenTypeEnum.DEF) {
-            return parseDefStatement();
         } else {
             return parseExpressionStatement();
         }
