@@ -19,7 +19,10 @@ class Parser(object):
         self.peek_token = None
         self.prefix_parse_functions = {}
         self.infix_parse_functions = {}
+        self.statement_parse_functions = {}
         self.errors = []
+        self.statement_parse_functions[TokenType.IF] = self.parse_if_expression
+        self.statement_parse_functions[TokenType.DEF] = self.parse_def_expression
         self.prefix_parse_functions[TokenType.IDENT] = self.parse_identifier
         self.prefix_parse_functions[TokenType.INT] = self.parse_integer_literal
         self.prefix_parse_functions[TokenType.FLOAT] = self.parse_float_literal
@@ -28,7 +31,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.TRUE] = self.parse_boolean
         self.prefix_parse_functions[TokenType.FALSE] = self.parse_boolean
         self.prefix_parse_functions[TokenType.LPAREN] = self.parse_grouped_expression
-        self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
+        #self.prefix_parse_functions[TokenType.IF] = self.parse_if_expression
         self.prefix_parse_functions[TokenType.DEF] = self.parse_def_expression
         self.prefix_parse_functions[TokenType.FUN] = self.parse_fun_expression
         self.prefix_parse_functions[TokenType.FUNCTION] = self.parse_function_expression
@@ -105,6 +108,8 @@ class Parser(object):
         return PrecedenceType.LOWEST
 
     def parse_statement(self):
+        if self.current_token.type in self.statement_parse_functions:
+            return self.statement_parse_functions[self.current_token.type]()
         if self.current_token.type == TokenType.LET:
             return self.parse_let_statement()
         elif self.current_token.type == TokenType.RETURN:
