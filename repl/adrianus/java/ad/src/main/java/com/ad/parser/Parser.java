@@ -19,6 +19,8 @@ public class Parser {
     private HashMap<TokenTypeEnum, Supplier<AstNode>> prefixParseFns = new HashMap<>();
     private HashMap<TokenTypeEnum, Function<AstNode, AstNode>> infixParseFns = new HashMap<>();
 
+    private HashMap<TokenTypeEnum, Supplier<AstNode>> statementParseFns = new HashMap<>();
+
     public Parser() {
         lexer = new Lexer();
         prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier); // equivalent to: () -> parseIdentifier()
@@ -29,11 +31,9 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.TRUE, this::parseBoolean);
         prefixParseFns.put(TokenTypeEnum.FALSE, this::parseBoolean);
         prefixParseFns.put(TokenTypeEnum.LPAREN, this::parseGroupedExpression);
-        //prefixParseFns.put(TokenTypeEnum.IF, this::parseIfExpression);
         prefixParseFns.put(TokenTypeEnum.FUNCTION, this::parseFunctionStatement);
         prefixParseFns.put(TokenTypeEnum.WHILE, this::parseWhileExpression);
         prefixParseFns.put(TokenTypeEnum.FOR, this::parseForExpression);
-        //prefixParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
         prefixParseFns.put(TokenTypeEnum.FUN, this::parseFunStatement);
         prefixParseFns.put(TokenTypeEnum.FUNC, this::parseFunctionLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACKET, this::parseListLiteral);
@@ -46,6 +46,7 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.NULL, this::parseNullExpression);
         prefixParseFns.put(TokenTypeEnum.THIS, this::parseThisExpression);
         prefixParseFns.put(TokenTypeEnum.SUPER, this::parseSuperExpression);
+
         infixParseFns.put(TokenTypeEnum.PLUS, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.MINUS, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.ASTERISK, this::parseInfixExpression);
