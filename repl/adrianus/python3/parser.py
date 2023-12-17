@@ -21,8 +21,8 @@ class Parser(object):
         self.infix_parse_functions = {}
         self.statement_parse_functions = {}
         self.errors = []
-        self.statement_parse_functions[TokenType.IF] = self.parse_if_expression
-        self.statement_parse_functions[TokenType.DEF] = self.parse_def_expression
+        self.statement_parse_functions[TokenType.IF] = self.parse_if_statement
+        self.statement_parse_functions[TokenType.DEF] = self.parse_def_statement
 
         self.prefix_parse_functions[TokenType.IDENT] = self.parse_identifier
         self.prefix_parse_functions[TokenType.INT] = self.parse_integer_literal
@@ -191,7 +191,7 @@ class Parser(object):
             return None
         return expr
 
-    def parse_if_expression(self):
+    def parse_if_statement(self):
         expr = ASTIfExpression(token=self.current_token)
         if not self.expect_peek(TokenType.LPAREN):
             return None
@@ -228,7 +228,7 @@ class Parser(object):
         block.statements.append(stmt)
         return block
 
-    def parse_def_expression(self):
+    def parse_def_statement(self):
         stmt = ASTDefStatement(token=self.current_token)
         self.next_token()
         name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
@@ -431,10 +431,10 @@ class Parser(object):
 
         while not self.current_token_is(TokenType.RBRACE):
             if self.current_token_is(TokenType.DEF):
-                stmt = self.parse_def_expression()
+                stmt = self.parse_def_statement()
                 expr.methods.append(stmt)
             if self.current_token_is(TokenType.FUN):
-                stmt = self.parse_def_expression()
+                stmt = self.parse_def_statement()
                 expr.methods.append(stmt)
             elif self.current_token_is(TokenType.IDENT):
                 stmt = self.parse_expression_statement()
