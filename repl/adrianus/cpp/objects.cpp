@@ -890,6 +890,13 @@ std::string Ad_Thread_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Object* Ad_Thread_Object::copy(GarbageCollector *gc) {
+    Ad_Thread_Object *new_obj = new Ad_Thread_Object();
+    new_obj->callback = callback;
+    gc->addObject(new_obj);
+    return new_obj;
+}
+
 void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;

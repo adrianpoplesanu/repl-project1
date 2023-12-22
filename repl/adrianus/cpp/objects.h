@@ -367,7 +367,7 @@ public:
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
-	//virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
+	virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
 void Ad_INCREF(Ad_Object*);
