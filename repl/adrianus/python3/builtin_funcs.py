@@ -29,6 +29,11 @@ def print_builtin(args, env):
         if obj:
             print (obj.inspect())
 
+def println_builtin(args, env):
+    for obj in args:
+        if obj:
+            print (obj.inspect(), end='')
+
 def exit_builtin(args, env):
     sys.exit(0)
 
@@ -163,6 +168,7 @@ builtins_map = {
     "len": Ad_Builtin_Object(builtin_function=len_builtin),
     "exit": Ad_Builtin_Object(builtin_function=exit_builtin),
     "print": Ad_Builtin_Object(builtin_function=print_builtin),
+    "println": Ad_Builtin_Object(builtin_function=println_builtin),
     "ref_count": Ad_Builtin_Object(builtin_function=ref_count_builtin),
     "type": Ad_Builtin_Object(builtin_function=type_builtin),
     "__append": Ad_Builtin_Object(builtin_function=append_builtin),
