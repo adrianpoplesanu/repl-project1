@@ -17,8 +17,6 @@ while(true) {
     th1.callback(worker, client)
     print ("callback set")
     th1.runAsync()
-    //th1.await()
-    //client.close()
 }
 
 socket.close()
