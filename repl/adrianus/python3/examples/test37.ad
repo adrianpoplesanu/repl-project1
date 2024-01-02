@@ -10,9 +10,9 @@ class User {
     }
 
     def display() {
-        print(name)
-        print(firstname)
-        print(age)
+        println(name)
+        println(firstname)
+        println(age)
     }
 }
 

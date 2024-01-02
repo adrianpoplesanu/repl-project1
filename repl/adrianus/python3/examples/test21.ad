@@ -6,4 +6,4 @@ def a(x) {
 }
 
 b = a(6)
-print(b)
+println(b)

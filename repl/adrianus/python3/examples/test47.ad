@@ -7,4 +7,4 @@ class Test {
 }
 
 t = Test("aaa")
-print(t.a)
+println(t.a)

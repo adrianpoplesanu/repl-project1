@@ -6,8 +6,8 @@ class Server {
     }
 
     def print_port() {
-        print (__locals())
-        print(port + security_offset)
+        println(__locals())
+        println(port + security_offset)
     }
 }
 

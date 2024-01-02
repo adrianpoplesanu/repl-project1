@@ -1,5 +1,5 @@
-print("buna dimineata")
+println("buna dimineata")
 
 /* print("test comentarii") */
 
-print("bla bla bla")
+println("bla bla bla")

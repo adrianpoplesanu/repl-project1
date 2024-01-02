@@ -5,4 +5,4 @@ class Test {
 }
 
 t = Test()
-print(t.a)
+println(t.a)

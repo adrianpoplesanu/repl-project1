@@ -6,7 +6,7 @@ class Test {
     }
 
     def show() {
-        print(this.a)
+        println(this.a)
     }
 }
 

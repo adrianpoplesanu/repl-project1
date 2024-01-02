@@ -1,4 +1,4 @@
-print("start");
+println("start");
 
 a = 12
 
@@ -6,7 +6,7 @@ class Server {
     port = 8080
 
     def test(number) {
-        print(number + 111)
+        println(number + 111)
     }
 }
 
@@ -19,8 +19,8 @@ nginx_port = server.port + 2
 
 ports = [server.port, https_port, nginx_port]
 
-print(ports)
+println(ports)
 
 /*__locals()*/
 
-print("stop")
+println("stop")

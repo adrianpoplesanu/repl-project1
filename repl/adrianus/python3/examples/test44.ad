@@ -1,6 +1,6 @@
 class Test {
     def constructor() {
-        print("in constructor");
+        println("in constructor");
     }
 }
 

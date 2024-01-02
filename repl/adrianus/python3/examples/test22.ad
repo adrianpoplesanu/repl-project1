@@ -16,5 +16,5 @@ offset = Offseter()
 listening_port = server.port + offset.offset1
 listening_port2 = server.port + offset.multiply_offset(2)
 
-print(listening_port)
-print(listening_port2)
+println(listening_port)
+println(listening_port2)

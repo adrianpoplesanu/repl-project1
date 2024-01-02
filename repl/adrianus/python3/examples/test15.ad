@@ -5,10 +5,10 @@ class Server {
     }
 
     def listen() {
-        print("listening")
-        print(port)
-        print("timeout")
-        print(timeout)
+        println("listening")
+        println(port)
+        println("timeout")
+        println(timeout)
     }
 }
 

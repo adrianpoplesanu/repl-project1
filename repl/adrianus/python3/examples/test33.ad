@@ -5,4 +5,4 @@ class Test {
 test = Test()
 test.atribut = 7
 
-print(test.atribut)
+println(test.atribut)

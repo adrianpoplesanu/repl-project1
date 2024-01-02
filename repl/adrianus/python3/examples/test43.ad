@@ -1,8 +1,8 @@
 def test() {
    f = File()
-   print(__locals())
+   println(__locals())
    f.init("README.md", "r")
-   print (f.read())
+   println(f.read())
 }
 
 test()

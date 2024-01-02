@@ -2,10 +2,10 @@ def test() {
     i = 0
     while(i < 10) {
         if (i == 5) {
-            print ("cinci")
+            println("cinci")
             return 78
         } else {
-            print(i)
+            println(i)
         }
         i++
     }
@@ -13,4 +13,4 @@ def test() {
 }
 
 b = test()
-print(b)
+println(b)

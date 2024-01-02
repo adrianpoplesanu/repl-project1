@@ -1,8 +1,8 @@
 i = 0
 
 while(i++ < 5) {
-    print(i)
+    println(i)
 }
 
-print("valoarea lui a:")
-print(i)
+println("valoarea lui a:")
+println(i)

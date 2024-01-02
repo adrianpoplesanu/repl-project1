@@ -13,7 +13,7 @@ class Dexiciul {
     def ham_ham() {
         i = 0
         while (i < num) {
-            print("ham ham ham")
+            println("ham ham ham")
             i = i + 1
         }
     }
@@ -23,8 +23,8 @@ dex = Dexiciul()
 
 dex.init(4)
 
-print(dex.b)
-print(dex.num)
+println(dex.b)
+println(dex.num)
 /* __locals() */
 
 dex.ham_ham()

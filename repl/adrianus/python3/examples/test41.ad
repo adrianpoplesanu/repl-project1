@@ -2,7 +2,7 @@ class Test {
     a = 6
 
     def b() {
-        print(a)
+        println(a)
     }
 
     def c() {

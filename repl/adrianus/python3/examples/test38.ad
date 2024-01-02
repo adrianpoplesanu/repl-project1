@@ -2,14 +2,14 @@ a = 747
 
 class Test {
     def display() {
-        print ("buna dimineata!")
+        println("buna dimineata!")
     }
 }
 
 class TestService() {
 
     def display_service() {
-        print ("display_service")
+        println("display_service")
         /*test1 = a*/
         /*print(test1)*/
         test1 = Test()

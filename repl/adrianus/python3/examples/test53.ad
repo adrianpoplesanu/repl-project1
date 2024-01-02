@@ -3,7 +3,7 @@ n = len(a)
 
 def back(i, n) {
     if (i == n) {
-        print(a)
+        println(a)
     } else {
         k = 0
         while(k < n) {

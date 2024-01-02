@@ -6,4 +6,4 @@ let a = func(x) {
 }
 
 b = a(6)
-print(b)
+println(b)

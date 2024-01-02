@@ -1,7 +1,7 @@
 def test() {
    f = File("README.md", "r")
-   print(__locals())
-   print (f.read())
+   println(__locals())
+   println(f.read())
 }
 
 test()

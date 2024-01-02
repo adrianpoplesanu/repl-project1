@@ -9,4 +9,4 @@ def test() {
 }
 
 numar = test();
-print(numar);
+println(numar);

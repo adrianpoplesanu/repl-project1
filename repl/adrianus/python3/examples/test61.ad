@@ -31,10 +31,10 @@ class Continent {
 }
 
 north_america = Continent("North America")
-print (north_america.name)
-print (north_america.getCountry().name)
-print (north_america.getCountry().getFlag().colors)
-print (north_america.getCountry().getFlag().getColors())
+println(north_america.name)
+println(north_america.getCountry().name)
+println(north_america.getCountry().getFlag().colors)
+println(north_america.getCountry().getFlag().getColors())
 
 def generator() {
     asia = Continent("Asia")
@@ -45,21 +45,21 @@ def generator2() {
     return north_america
 }
 
-print (generator().name)
-print (generator().getCountry().name)
-print (generator().getCountry().getFlag().colors)
-print (generator().getCountry().getFlag().getColors())
+println(generator().name)
+println(generator().getCountry().name)
+println(generator().getCountry().getFlag().colors)
+println(generator().getCountry().getFlag().getColors())
 
-print (generator2().name)
-print (generator2().getCountry().name)
-print (generator2().getCountry().getFlag().colors)
-print (generator2().getCountry().getFlag().getColors())
+println(generator2().name)
+println(generator2().getCountry().name)
+println(generator2().getCountry().getFlag().colors)
+println(generator2().getCountry().getFlag().getColors())
 
 flag2 = generator2().getCountry().getFlag()
 flag2.colors = ["red", "red", "wine"]
-print (generator2().getCountry().getFlag().getColors())
-print (north_america.getCountry().getFlag().getColors())
+println(generator2().getCountry().getFlag().getColors())
+println(north_america.getCountry().getFlag().getColors())
 
 /*generator2().getCountry().getFlag().colors = ["red", "white", "green"]
-print (generator2().getCountry().getFlag().colors)
-print (generator2().getCountry().getFlag().getColors())*/
+println(generator2().getCountry().getFlag().colors)
+println(generator2().getCountry().getFlag().getColors())*/

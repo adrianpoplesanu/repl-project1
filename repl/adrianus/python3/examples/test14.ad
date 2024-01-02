@@ -9,7 +9,7 @@ class Server {
     def print_port(a) {
         /*port = Port()*/
         /*__locals()*/
-        print(8080 + a)
+        println(8080 + a)
     }
 }
 

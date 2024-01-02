@@ -5,4 +5,4 @@ class Server {
 server = Server()
 server.port = 8081
 
-print(server.port)
+println(server.port)
