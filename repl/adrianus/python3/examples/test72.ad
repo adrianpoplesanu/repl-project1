@@ -1,4 +1,4 @@
 a = 5
 
-if (a > 2) print ('e mai mare')
-else print ('e mai mic')
+if (a > 2) println('e mai mare')
+else println('e mai mic')

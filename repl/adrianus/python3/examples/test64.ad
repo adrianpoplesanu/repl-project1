@@ -4,7 +4,7 @@ class Bedus {
     }
 
     fun printName() {
-        print (name)
+        println(name)
     }
 }
 

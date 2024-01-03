@@ -3,11 +3,11 @@ th2 = __thread("thread 2")
 th3 = __thread("thread 3")
 
 def runner(n) {
-    print ("starting thread")
+    println("starting thread")
     for(i = 0; i < n; i++) {
-        print (i)
+        println(i)
     }
-    print ("finishing thread")
+    println("finishing thread")
 }
 
 th1.callback(runner, 100)

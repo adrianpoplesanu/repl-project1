@@ -36,6 +36,6 @@ def generator() {
 }
 
 america = generator()
-print (america.getCountry().getFlag().colors)
+println(america.getCountry().getFlag().colors)
 america.getCountry().getFlag().colors = ["white", "brown", "black"]
-print (america.getCountry().getFlag().colors)
+println(america.getCountry().getFlag().colors)

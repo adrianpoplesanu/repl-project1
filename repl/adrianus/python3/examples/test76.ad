@@ -1,3 +1,3 @@
 // testing one-line comment
-print ("aaa")
+println("aaa")
 // testing one-line comment

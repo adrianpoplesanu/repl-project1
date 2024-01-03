@@ -15,8 +15,8 @@ class Dex : Dog {
     }
 
     def printInfo() {
-        print (name)
-        print (age)
+        println(name)
+        println(age)
     }
 }
 

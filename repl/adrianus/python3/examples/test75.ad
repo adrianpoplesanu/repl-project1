@@ -7,8 +7,8 @@ class Dog {
 }
 
 dog = Dog()
-print (dog.name)
+println(dog.name)
 dog2 = dog.me()
-print (dog2.name)
-print (dog)
-print (dog2)
+println(dog2.name)
+println(dog)
+println(dog2)

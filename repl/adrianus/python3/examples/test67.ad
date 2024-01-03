@@ -4,7 +4,7 @@ class Dog {
     }
 
     def ham_ham_ham() {
-        print ("wooof")
+        println("wooof")
     }
 }
 
