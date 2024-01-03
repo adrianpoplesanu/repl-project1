@@ -15,6 +15,7 @@ failure_actual = []
 
 for test_file in test_files:
     target = test_file.strip()
+    print('running ' + target)
     proc = subprocess.Popen(["python3", script_path + script_name, script_path + target], stdout=subprocess.PIPE)
     proc.wait()
     output = proc.communicate()[0]
@@ -40,3 +41,4 @@ else:
     print ('\033[0;32mALL tests passed!\033[0m')
     for s in success:
         print (s)
+
