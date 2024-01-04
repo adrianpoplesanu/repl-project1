@@ -1,4 +1,4 @@
-print("aaa")
+println("aaa")
 
 let fib = func(x) {
     if (x == 0) {
@@ -10,7 +10,7 @@ let fib = func(x) {
     return fib(x - 1) + fib(x - 2);
 }
 
-print("bbb")
+println("bbb")
 
 let b = fib(8)
-print(b)
+println(b)

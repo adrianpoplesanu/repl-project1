@@ -1,15 +1,15 @@
 a = [1, 2 + 3, 5 + 7]
 
-print(a)
+println(a)
 
-print(a[1] + a[2])
+println(a[1] + a[2])
 
 if (a[2] > 4) {
-    print(a[2] * 2);
+    println(a[2] * 2);
 } else {
-    print "no bueno"
+    println("no bueno")
 }
 
 a[1] = 11
 
-print(a)
+println(a)

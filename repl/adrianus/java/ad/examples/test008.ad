@@ -7,7 +7,7 @@ let a = func(x) {
 }
 
 let suma = a(10)
-print(suma)
+println(suma)
 
 let text = "test string"
-print(text)
+println(text)

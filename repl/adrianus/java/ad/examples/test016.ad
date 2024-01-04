@@ -6,13 +6,13 @@ class Server {
     }
 
     def listen() {
-        print("listening")
+        println("listening")
         this.add_security_offset(1)
-        print(port)
+        println(port)
     }
 
     def test() {
-        print(__locals())
+        println(__locals())
     }
 }
 
