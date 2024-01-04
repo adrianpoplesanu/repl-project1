@@ -11,6 +11,7 @@ public class BuiltinLookup {
 			put("len", new AdBuiltinObject(new LenBuiltin()));
 			put("exit", new AdBuiltinObject(new LenBuiltin()));
 			put("print", new AdBuiltinObject(new PrintBuiltin()));
+			put("println", new AdBuiltinObject(new PrintlnBuiltin()));
 			put("ref_count", new AdBuiltinObject(new RefCountBuiltin()));
 			put("type", new AdBuiltinObject(new TypeBuiltin()));
 			put("__append", new AdBuiltinObject(new TypeBuiltin())); // TODO: update this
@@ -29,7 +30,7 @@ public class BuiltinLookup {
 			put("map", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("input", new AdBuiltinObject(new InputBuiltin()));
 			put("list", new AdBuiltinObject(new ListBuiltin()));
-			put("mat", new AdBuiltinObject(new MapBuiltin()));
+			put("mat", new AdBuiltinObject(new MatBuiltin()));
 			put("hash", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("hasattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("getattr", new AdBuiltinObject(new GetattrBuiltin()));
