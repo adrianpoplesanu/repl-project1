@@ -7,7 +7,7 @@ class Dog {
 }
 
 dex = Dog(12)
-print (dex.age)
+println(dex.age)
 
 /* expected output:
 12

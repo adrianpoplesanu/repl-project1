@@ -1,4 +1,4 @@
 name = "bebe dex"
 for (i = 0; i < len(name); i++) {
-    print (name[i])
+    println(name[i])
 }

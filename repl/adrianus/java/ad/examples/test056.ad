@@ -12,4 +12,4 @@ def generator() {
     return country
 }
 
-print (generator().flag.colors)
+println(generator().flag.colors)

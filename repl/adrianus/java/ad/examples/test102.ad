@@ -1,6 +1,6 @@
 a = "aaa\nbbb"
-print (a)
+println(a)
 
-eval("print('aaa')")
+eval("println('aaa')")
 
-eval("print(\"aaa\")")
+eval("println(\"aaa\")")

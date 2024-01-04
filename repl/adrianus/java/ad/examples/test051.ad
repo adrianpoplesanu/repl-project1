@@ -6,7 +6,7 @@ class Country {
 
     def constructor(name) {
         flag = Flag()
-        print (flag)
+        println(flag)
     }
 }
 

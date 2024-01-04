@@ -4,6 +4,6 @@ def change(a) {
     a = 6
 }
 
-print (a)
+println(a)
 change(a)
-print (a)
+println(a)

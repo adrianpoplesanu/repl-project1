@@ -11,6 +11,6 @@ class Country {
 }
 
 country = Country("USA")
-print (country.name)
-print (country.flag.colors)
+println(country.name)
+println(country.flag.colors)
 

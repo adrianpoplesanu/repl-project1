@@ -2,7 +2,7 @@ class Country {
     name = "USA"
 
     def getName(n) {
-        print (2 * n)
+        println(2 * n)
         return name
     }
 }
@@ -12,4 +12,4 @@ def generator() {
     return country
 }
 
-print (generator().getName(5))
+println(generator().getName(5))

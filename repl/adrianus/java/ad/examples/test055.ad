@@ -24,4 +24,4 @@ class Continent {
 }
 
 america = Continent()
-print (america.country.getFlag().size.height)
+println(america.country.getFlag().size.height)

@@ -4,7 +4,7 @@ class Dog {
     ham = "ham ham ham"
 
     def bark() {
-        print (ham)
+        println(ham)
     }
 }
 
@@ -12,7 +12,7 @@ class Dex : Dog {
     age = 12
 
     def bark() {
-        print (speak)
+        println(speak)
     }
 
     def bark2() {
@@ -20,12 +20,12 @@ class Dex : Dog {
     }
 
     def initial_age() {
-        print (super(Dog).age)
+        println(super(Dog).age)
     }
 }
 
 dex = Dex()
-print (dex.age)
+println(dex.age)
 dex.bark()
 dex.bark2()
 dex.initial_age()

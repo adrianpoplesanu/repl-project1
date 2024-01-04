@@ -30,10 +30,10 @@ class Globe {
 globe = Globe()
 
 for (i = 0; i < 3; i++) {
-    print (globe.continents[i].country.flag.colors)
+    println(globe.continents[i].country.flag.colors)
 }
 
 for (i = 0; i < 3; i++) {
     cont = globe.continents[i]
-    print (cont.country.flag.colors)
+    println(cont.country.flag.colors)
 }

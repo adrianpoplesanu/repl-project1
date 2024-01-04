@@ -26,4 +26,4 @@ def getContinent() {
 
 }
 
-print (getContinent().getCountry().getFlag().getColors())
+println(getContinent().getCountry().getFlag().getColors())

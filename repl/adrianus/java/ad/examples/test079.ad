@@ -6,4 +6,4 @@ def change(a) {
 }
 
 change(a)
-print(a)
+println(a)

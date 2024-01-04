@@ -3,11 +3,11 @@ class A {
 }
 
 a = A()
-print(a.a)
+println(a.a)
 
 class B : A {
     b = 6
 }
 
 b = B()
-print(b.b)
+println(b.b)

@@ -1,20 +1,20 @@
 def a() {
-    print("first")
+    println("first")
 }
 
 def a() {
-    print("second")
+    println("second")
 }
 
 a()
 
 class B {
     def a() {
-        print("B.a() first")
+        println("B.a() first")
     }
 
     def a() {
-        print("B.a() second")
+        println("B.a() second")
     }
 }
 

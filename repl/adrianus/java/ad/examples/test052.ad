@@ -15,4 +15,4 @@ class Continent {
 }
 
 america = Continent()
-print (america.country.flag.colors)
+println(america.country.flag.colors)

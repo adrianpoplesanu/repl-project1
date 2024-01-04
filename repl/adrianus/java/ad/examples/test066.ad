@@ -7,5 +7,5 @@ class Dex : Dog {
 }
 
 dex = Dex()
-print (dex.name)
-print (dex.age)
+println(dex.name)
+println(dex.age)

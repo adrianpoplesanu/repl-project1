@@ -12,4 +12,4 @@ class Country {
 }
 
 america = Country("USA")
-print (america.flag.colors)
+println(america.flag.colors)

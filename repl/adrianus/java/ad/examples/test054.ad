@@ -10,7 +10,7 @@ class Country {
     }
 
     def getFlag(n) {
-        print (2 * n)
+        println(2 * n)
         return flag;
     }
 }
@@ -20,4 +20,4 @@ class Continent {
 }
 
 america = Continent()
-print (america.country.getFlag(4).colors)
+println(america.country.getFlag(4).colors)

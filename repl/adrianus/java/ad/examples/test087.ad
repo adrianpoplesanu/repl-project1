@@ -26,10 +26,10 @@ class Continent {
 continents = [Continent("USA", ["red", "green", "blue"]), Continent("Asia", ["yellow", "red", "black"]), Continent("Africa", ["ros", "galb", "albas"])]
 
 for (i = 0; i < 3; i++) {
-    print (continents[i].country.flag.colors)
+    println(continents[i].country.flag.colors)
 }
 
 for (i = 0; i < 3; i++) {
     cont = continents[i]
-    print (cont.country.flag.colors)
+    println(cont.country.flag.colors)
 }

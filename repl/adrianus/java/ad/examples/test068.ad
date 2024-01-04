@@ -30,4 +30,4 @@ def getContinent() {
 
 }
 
-print (getContinent().getColors())
+println(getContinent().getColors())

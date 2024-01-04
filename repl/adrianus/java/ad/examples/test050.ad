@@ -16,6 +16,6 @@ class Country {
 
 country = Country("USA")
 flag = Flag()
-print (country.name)
-print (country.year)
-print (flag.colors)
+println(country.name)
+println(country.year)
+println(flag.colors)

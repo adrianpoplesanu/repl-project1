@@ -1,2 +1,2 @@
 eval("a=5+7")
-print (a)
+println(a)
