@@ -4,7 +4,7 @@ def test() {
     }
 
     a = A()
-    print (a.x)
+    println(a.x)
 }
 
 test()

@@ -3,7 +3,7 @@ def dispatch(callback) {
 }
 
 def server() {
-    print ("<html><head></head><body><h1>Hello World!</h1></body></html>")
+    println("<html><head></head><body><h1>Hello World!</h1></body></html>")
 }
 
 dispatch(server)

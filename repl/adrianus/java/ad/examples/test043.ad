@@ -11,7 +11,7 @@ def valid(k) {
 
 def back(k) {
     if (k == 3) {
-        print(a)
+        println(a)
     } else {
         a[k] = 0
         while (a[k] < 3) {

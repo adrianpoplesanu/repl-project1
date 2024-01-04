@@ -1,7 +1,7 @@
 def generator() {
     a = 2
     def test(n) {
-        print (a * n)
+        println(a * n)
     }
     a = 5
     return test

@@ -15,7 +15,7 @@ def check_solution(k) {
 
 def back(k) {
     if (k == length) {
-        print (numbers)
+        println(numbers)
     } else {
         numbers[k] = 0
         while (numbers[k] < magnitude) {
