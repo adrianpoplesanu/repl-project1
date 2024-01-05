@@ -5,7 +5,7 @@ th3 = __thread("thread 3")
 class Task {
     def runner() {
         for(i = 0; i < 100; i++) {
-            print (i)
+            println(i)
         }
     }
 }
@@ -27,4 +27,4 @@ th1.join()
 th2.join()
 th3.join()
 
-print("after threads")
+println("after threads")

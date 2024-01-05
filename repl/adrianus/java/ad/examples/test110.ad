@@ -1,7 +1,7 @@
 th = __thread("thread name")
 
 def runner() {
-    print ("running")
+    println("running")
 }
 
 th.execute(runner)

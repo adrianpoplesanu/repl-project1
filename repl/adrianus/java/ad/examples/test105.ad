@@ -11,20 +11,20 @@ def generator() {
     return reader
 }
 
-print(generator().file.read())
+println(generator().file.read())
 
 b = File("../README.md", "r")
-print (b.read())
+println(b.read())
 
 def test() {
     c = File("../README.md", "r")
-    print (c.read())
+    println(c.read())
 }
 
 test()
 
 d = generator()
-print(d.file.read())
+println(d.file.read())
 
 reader = Reader()
-print (reader.file.read())
+println(reader.file.read())

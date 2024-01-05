@@ -10,5 +10,5 @@ response = client.send(client.socket, "buna dimineata", null)
 response2 = client.read(client.socket, null)
 /*response2 = client.socket.read()*/
 
-print(response2)
+println(response2)
 client.close()

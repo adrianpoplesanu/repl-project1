@@ -1,11 +1,11 @@
 class Executor {
     def constructor() {
-        print ("constructor Executor")
+        println("constructor Executor")
 
         file = File("../README.md", "r")
-        print (file.read())
+        println(file.read())
 
-        print ("end constructor Executor")
+        println("end constructor Executor")
     }
 }
 
