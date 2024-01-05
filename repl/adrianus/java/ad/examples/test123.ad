@@ -5,8 +5,8 @@ class Dog {
     }
 
     def printDog() {
-        print (name)
-        print (age)
+        println(name)
+        println(age)
     }
 }
 

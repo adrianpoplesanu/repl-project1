@@ -2,16 +2,16 @@ fun test(a, b) {
     return a + b
 }
 
-print (test(4, 5))
+println(test(4, 5))
 
 function test2(a, b) {
     return a - b;
 }
 
-print (test2(4, 5))
+println(test2(4, 5))
 
 let test3 = func(a, b) {
     return a * b
 }
 
-print (test3(4, 5))
+println(test3(4, 5))

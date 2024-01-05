@@ -1,8 +1,8 @@
-print (12 + "aaa")
-print ("bbb" + 23)
+println(12 + "aaa")
+println("bbb" + 23)
 
 a = 12 + "aaa"
-print (type(a))
+println(type(a))
 
 b = "aaa" + 34
-print (type(b))
+println(type(b))
