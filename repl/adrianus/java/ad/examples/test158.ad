@@ -2,8 +2,8 @@
 
 a = "abcdefgh"
 
-print (a[1:4])
-print (a[-3:7])
-print (a[-3:8])
-print (a[5:0:-1])
-print (a[4:0:1])
+println(a[1:4])
+println(a[-3:7])
+println(a[-3:8])
+println(a[5:0:-1])
+println(a[4:0:1])

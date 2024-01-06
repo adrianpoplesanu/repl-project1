@@ -5,8 +5,8 @@ def test4(k) {
     return false
 }
 
-print (test4(0))
-print (test4(1))
-print (test4(2))
-print (test4(3))
-print (test4(4))
+println(test4(0))
+println(test4(1))
+println(test4(2))
+println(test4(3))
+println(test4(4))

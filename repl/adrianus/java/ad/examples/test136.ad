@@ -5,11 +5,11 @@ def test4(k) {
     return false
 }
 
-print (test4(2))
+println(test4(2))
 
 /* def test5(k) {
     for (i = 0; i < 3; i++) if (a[i] == k) { return true }
     return false
 }
 
-print (test5(2)) */
+println(test5(2)) */

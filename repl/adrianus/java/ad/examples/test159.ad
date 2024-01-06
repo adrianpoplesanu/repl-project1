@@ -1,4 +1,4 @@
 a = "abcba"
 
-print (a[::-1])
-print (a == a[::-1])
+println(a[::-1])
+println(a == a[::-1])

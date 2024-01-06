@@ -2,19 +2,19 @@ def check() {
     return true;
 }
 
-print (check())
+println(check())
 
 def check2() {
     return true
 }
 
-print (check2())
+println(check2())
 
 def check3() {
     return 15
     a = 6
     b = "aaa"
-    print ("ccc")
+    println("ccc")
 }
 
-print (check3())
+println(check3())

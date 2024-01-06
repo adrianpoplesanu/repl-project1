@@ -2,20 +2,20 @@ socket = __iosocket("server", "localhost", 5003, true, false, false, true)
 socket.create_server()
 
 def worker(client) {
-    print ("pre render")
+    println("pre render")
     client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 92\r\nConnection: close\r\n\r\n<html>this is a <b>http bebe dex</b> response from Ad Server cpp with better escaping</html>")
-    print ("post render")
+    println("post render")
     client.close()
 }
 
 while(true) {
-    print ("waiting connection")
+    println("waiting connection")
     client = socket.accept()
-    print ("accepted request")
+    println("accepted request")
     th1 = __thread("thread 1")
-    print ("created thread")
+    println("created thread")
     th1.callback(worker, client)
-    print ("callback set")
+    println("callback set")
     th1.runAsync()
 }
 

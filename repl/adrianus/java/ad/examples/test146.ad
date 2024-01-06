@@ -1,14 +1,14 @@
 def test1() {
-    print ("test1")
+    println("test1")
     test2()
 }
 
 def test2() {
-    print ("test2")
+    println("test2")
 }
 
 def main() {
     test1()
 }
 
-main()`
+main()
