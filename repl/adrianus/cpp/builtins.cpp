@@ -62,6 +62,10 @@ Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
     return NULL;
 }
 
+Ad_Object* println_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    return NULL;
+}
+
 Ad_Object* ref_count(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_Object* target = args[0];
     Ad_Integer_Object* obj = new Ad_Integer_Object(target->ref_count);
@@ -390,6 +394,7 @@ std::map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
     {"exit", new Ad_Builtin_Object(&exit_builtin)},
     {"print", new Ad_Builtin_Object(&print_builtin)},
+    {"println", new Ad_Builtin_Object(&println_builtin)},
     {"ref_count", new Ad_Builtin_Object(&ref_count)},
     {"type", new Ad_Builtin_Object(&type_builtin)},
     {"__append", new Ad_Builtin_Object(&append_builtin)},
