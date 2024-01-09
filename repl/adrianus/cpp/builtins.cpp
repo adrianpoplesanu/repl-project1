@@ -63,6 +63,14 @@ Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
 }
 
 Ad_Object* println_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    Ad_Object* obj = args[0];
+    if (obj == NULL) {
+        // this should print null, but maybe the upstream should return an Ad_Null_Objject
+        free_builtin_arguments(args);
+        return NULL;
+    }
+    std::cout << obj->Inspect() << "\n";
+    free_builtin_arguments(args);
     return NULL;
 }
 
