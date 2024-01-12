@@ -1,0 +1,3 @@
+system = SystemCommand()
+output = system.execute('echo "something /aaa/bbb/ccc" | sed "s/.*\/aaa\/bbb\///g"')
+println(output)
