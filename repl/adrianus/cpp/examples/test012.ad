@@ -2,7 +2,7 @@ a = 8
 __locals()
 
 def test() {
-    print("sunt in test()")
+    println("sunt in test()")
 }
 
 __locals()

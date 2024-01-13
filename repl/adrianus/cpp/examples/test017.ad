@@ -2,7 +2,7 @@ class Server {
     port = 8080
 
     def test() {
-        print("running test() in Server");
+        println("running test() in Server");
     }
 }
 

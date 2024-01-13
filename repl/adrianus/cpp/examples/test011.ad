@@ -9,6 +9,6 @@ class Server {
 server = Server()
 server.port
 
-print("aaa")
-print("bbb")
+println("aaa")
+println("bbb")
 __locals()
