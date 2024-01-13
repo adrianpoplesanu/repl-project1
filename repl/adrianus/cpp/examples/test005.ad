@@ -2,4 +2,4 @@ a = 4
 /* this is a comment, this should be ignored by the evaluator a = a + 5 */
 a = a + 1
 /* print(a) */
-print(a)
+println(a)

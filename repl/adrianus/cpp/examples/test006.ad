@@ -7,4 +7,4 @@ def listen(x) {
 
 nginx_port = listen(1)
 
-print(nginx_port)
+println(nginx_port)

@@ -1,4 +1,4 @@
-print("test class parsing for Ad")
+println("test class parsing for Ad")
 
 class Server {
     port = 8080
@@ -8,4 +8,4 @@ class Server {
     }
 }
 
-print("end test class parsing for Ad")
+println("end test class parsing for Ad")
