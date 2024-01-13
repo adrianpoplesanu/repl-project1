@@ -1,7 +1,7 @@
 x = 11
 
 def a(x) {
-    print (__locals())
+    println(__locals())
     if (3 > 1) { return x + 1001; } else { return x + 1002; }
 }
 

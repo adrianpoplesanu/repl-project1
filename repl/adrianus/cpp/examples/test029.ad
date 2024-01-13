@@ -1,6 +1,6 @@
 def test() {
     def a(x) {
-        print(x + 2);
+        println(x + 2);
     }
 
     a(5)

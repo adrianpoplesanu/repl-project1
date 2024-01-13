@@ -5,11 +5,11 @@ class Elev {
     ccc = 1 + 56
 
     def construct(offset) {
-        print(offset)
+        println(offset)
     }
 
     def print_varsta(offset2) {
-        print(offset2)
+        println(offset2)
     }
 }
 

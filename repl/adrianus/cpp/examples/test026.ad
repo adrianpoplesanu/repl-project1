@@ -3,7 +3,7 @@ class Student {
     clasa = 2
 
     def print_aaa(mesaj) {
-        print(mesaj)
+        println(mesaj)
     }
 }
 

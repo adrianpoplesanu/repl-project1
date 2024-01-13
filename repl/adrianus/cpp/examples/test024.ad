@@ -1,5 +1,5 @@
 a = 12
-print("start test")
+println("start test")
 
 class Elev {
     varsta = 12
@@ -9,16 +9,16 @@ class Elev {
 
     def construct(offset) {
         /*this.offset = offset*/
-        print(offset)
+        println(offset)
     }
 
     def print_varsta(offset2) {
         /*offset2 + this.offset + varsta*/
-        print(offset2)
+        println(offset2)
     }
 }
 
-print("end class declaration")
+println("end class declaration")
 
 /*e = Elev()
 e.print_varsta(34)*/
@@ -26,4 +26,4 @@ e.print_varsta(34)*/
 __locals()
 
 /*print(e)*/
-print("end class test")
+println("end class test")
