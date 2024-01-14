@@ -7,10 +7,10 @@ def serve_response() {
 
 server_sock.listen(serve_response)
 
-print(server_sock)
+println(server_sock)
 
 client_sock = __iosocket("client 1", 8080, true, false, true, false)
 
 client_sock.send("neata")
 
-print(client_sock)
+println(client_sock)
