@@ -4,7 +4,7 @@ class Test {
     def b() {
         c = this.a
         /* c = 9 */
-        print(c)
+        println(c)
     }
 }
 

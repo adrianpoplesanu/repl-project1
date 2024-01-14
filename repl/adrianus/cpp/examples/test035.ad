@@ -1,9 +1,9 @@
 class Test {
     def test(x) {
         if (x > 5) {
-            print("aaa");
+            println("aaa");
         } else {
-            print("bbb");
+            println("bbb");
         }
     }
 }

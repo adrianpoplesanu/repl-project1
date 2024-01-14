@@ -1,6 +1,6 @@
 class Test {
     def read() {
-        print("some text")
+        println("some text")
     }
 }
 

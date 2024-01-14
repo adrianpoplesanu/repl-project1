@@ -8,4 +8,4 @@ class Test {
 
 t = Test()
 t.b()
-print (t.a)
+println(t.a)

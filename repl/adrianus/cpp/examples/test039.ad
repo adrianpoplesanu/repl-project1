@@ -4,7 +4,7 @@ class Test {
     }
 
     def b() {
-        print(this.a);
+        println(this.a);
     }
 }
 
