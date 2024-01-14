@@ -6,5 +6,5 @@ class Test {
 
 t = Test()
 t.init()
-print(t.a)
+println(t.a)
 ref_count(t.a)

@@ -7,4 +7,4 @@ class Generator {
 
 gen = Generator()
 a = gen.get_number()
-print(a)
+println(a)

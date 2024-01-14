@@ -1,4 +1,4 @@
-class T { def a() { print("ingerul pazitor"); } }
+class T { def a() { println("ingerul pazitor"); } }
 
 t = T()
 t.a()
