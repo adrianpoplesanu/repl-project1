@@ -1,17 +1,17 @@
 def generator() {
     def analyzer(n) {
         if (n >= 5) {
-            print ("life")
+            println("life")
         } else {
-            print ("bad")
+            println("bad")
         }
     }
-    print (analyzer)
+    println(analyzer)
     return analyzer
 }
 
 callback = generator()
-print (callback)
+println(callback)
 callback(5)
 callback(8)
 callback(10)

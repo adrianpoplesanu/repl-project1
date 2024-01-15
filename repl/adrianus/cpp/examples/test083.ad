@@ -4,4 +4,4 @@ def generator() {
 
 a = generator()
 a++
-print(a)
+println(a)

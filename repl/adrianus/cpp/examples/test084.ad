@@ -7,4 +7,4 @@ def generator() {
 }
 
 callback = generator()
-print (callback(3))
+println(callback(3))

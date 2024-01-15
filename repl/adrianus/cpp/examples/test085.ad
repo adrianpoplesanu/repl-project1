@@ -1,6 +1,6 @@
 def generator() {
     def a(n) {
-        print (2 * n)
+        println(2 * n)
     }
 
     return a

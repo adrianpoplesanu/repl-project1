@@ -3,7 +3,7 @@ def test() {
         a = 5
     }
     b = A()
-    print(b.a)
+    println(b.a)
 }
 
 test()

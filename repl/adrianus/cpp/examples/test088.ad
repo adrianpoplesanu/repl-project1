@@ -1,11 +1,11 @@
 def gen() {
     def a () {
-        print ("aaa")
+        println("aaa")
     }
     return a
 }
 
 callback = gen()
-print("bbb")
+println("bbb")
 
 callback()
