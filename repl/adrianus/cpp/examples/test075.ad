@@ -2,7 +2,7 @@ def test() {
     def rahat() {
         class A {
             def aaa() {
-                print ("aaa")
+                println("aaa")
             }
         }
     a = A()

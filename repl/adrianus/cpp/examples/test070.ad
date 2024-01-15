@@ -4,6 +4,6 @@ def t() {
     }
 }
 
-print ("inainte de apelul lui t()")
+println("inainte de apelul lui t()")
 t()
-print ("dupa apelul lui t()")
+println("dupa apelul lui t()")
