@@ -1,5 +1,5 @@
 def test(n) {
-    print (n)
+    println(n)
     if (n > 0) {
         test(n - 1)
     }

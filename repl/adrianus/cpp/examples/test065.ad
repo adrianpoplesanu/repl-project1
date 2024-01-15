@@ -1,6 +1,6 @@
 class A {
     def test() {
-        print ("test")
+        println("test")
     }
 }
 

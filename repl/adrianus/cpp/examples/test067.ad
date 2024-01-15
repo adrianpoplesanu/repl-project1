@@ -3,8 +3,8 @@ b = 77
 
 def test(a) {
     a = 88
-    print (b)
+    println(b)
 }
 
 test(7)
-print(a)
+println(a)

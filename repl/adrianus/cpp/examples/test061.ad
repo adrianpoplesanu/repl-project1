@@ -3,12 +3,12 @@ def test() {
         x = 5
     }
     a = A()
-    print (a.x)
+    println(a.x)
 }
 
 test()
 
 t = Test()
-print (t.a)
-print (t.a())
+println(t.a)
+println(t.a())
 /* problema mai sus e ca a() din Test din bootstrap nu are return */

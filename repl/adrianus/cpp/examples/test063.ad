@@ -1,5 +1,5 @@
 def t() {
-    print ("aaa")
+    println("aaa")
 }
 
 t()

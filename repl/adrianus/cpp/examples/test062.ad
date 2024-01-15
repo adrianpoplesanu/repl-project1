@@ -1,7 +1,7 @@
 def t() {
     class A {
         def test() {
-            print ("test")
+            println("test")
         }
     }
     a = A()

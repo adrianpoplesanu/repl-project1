@@ -1,6 +1,6 @@
 def t() {
     def b() {
-        print ("bbb")
+        println("bbb")
     }
     b()
 }
