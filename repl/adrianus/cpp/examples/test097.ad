@@ -13,12 +13,12 @@ class Country {
 
 america = Country("USA")
 
-print (america.name)
+println(america.name)
 
 f = america.flag
 
-print (f.colors)
+println(f.colors)
 
 f2 = america.flag2
 
-print(f2.colors)
+println(f2.colors)

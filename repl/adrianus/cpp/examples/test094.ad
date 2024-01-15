@@ -1,7 +1,7 @@
 def generator() {
     def analyzer(n) {
         while (n < 10) {
-            print (n)
+            println(n)
             n++
         }
     }

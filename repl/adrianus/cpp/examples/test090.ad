@@ -8,4 +8,4 @@ def generator() {
 
 callback = generator()
 value = callback(4)
-print (value)
+println(value)

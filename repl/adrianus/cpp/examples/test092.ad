@@ -1,9 +1,9 @@
 def generator() {
     def big(n) {
         if (n > 9) {
-            print ("e mare")
+            println("e mare")
         } else {
-            print ("e mic")
+            println("e mic")
         }
     }
 

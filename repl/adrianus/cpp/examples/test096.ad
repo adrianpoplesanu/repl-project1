@@ -1,13 +1,13 @@
 let a = func() {
-    print ("aaa")
+    println("aaa")
 }
 
 a()
-print (a)
+println(a)
 
 let b = func(n) {
     while (n > 0) {
-        print (n * 2)
+        println(n * 2)
         n = n - 1
         b(n)
     }
@@ -15,5 +15,5 @@ let b = func(n) {
 
 c = 9
 b(c)
-print(b)
-print(c)
+println(b)
+println(c)

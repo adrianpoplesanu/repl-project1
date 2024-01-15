@@ -7,9 +7,9 @@ def changeElementValue(element) {
 }
 
 element = Element()
-print (element.value)
-print (element)
+println(element.value)
+println(element)
 
 changeElementValue(element)
-print (element.value)
-print (element)
+println(element.value)
+println(element)
