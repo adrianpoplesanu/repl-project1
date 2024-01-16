@@ -11,4 +11,4 @@ def generate() {
     return country
 }
 
-print(generate().getName())
+println(generate().getName())
