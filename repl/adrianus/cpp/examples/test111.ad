@@ -1,4 +1,4 @@
 a = list(3, list(2, [4]))
-print (a)
+println(a)
 a[0][0][0] = 6
-print (a)
+println(a)

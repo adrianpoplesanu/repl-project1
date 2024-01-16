@@ -19,8 +19,8 @@ class Continent {
 }
 
 america = Continent()
-print (america.country.getFlag().colors)
+println(america.country.getFlag().colors)
 
 america.country.getFlag().colors = ["brown", "purple", "cyan"]
 
-print (america.country.getFlag().colors)
+println(america.country.getFlag().colors)

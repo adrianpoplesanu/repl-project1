@@ -8,9 +8,9 @@ def change_name(scriitor) {
     scriitor.name = "mircea cartarescu"
 }
 
-print (scriitor.name)
+println(scriitor.name)
 change_name(scriitor)
-print (scriitor.name)
+println(scriitor.name)
 
 numbers = [1, 2, 3]
 
@@ -18,9 +18,9 @@ def change_numbers(numbers) {
     numbers[1] = 5
 }
 
-print (numbers)
+println(numbers)
 change_numbers(numbers)
-print (numbers)
+println(numbers)
 
 age = 11
 
@@ -29,6 +29,6 @@ def change_age(age) {
     age = 12
 }
 
-print (age)
+println(age)
 change_age(age)
-print (age)
+println(age)
