@@ -3,9 +3,9 @@ class Test {
 
     def b() {
         c = this.a
-        print (c)
+        println(c)
         c = 9
-        print (c)
+        println(c)
     }
 }
 
