@@ -1,6 +1,6 @@
 class Dog {
     def test() {
-        print ("aaa")
+        println("aaa")
     }
 }
 

@@ -2,7 +2,7 @@ eval("print(6)")
 
 eval("bbb=7")
 
-print(bbb)
+println(bbb)
 
 bbb = 15
 

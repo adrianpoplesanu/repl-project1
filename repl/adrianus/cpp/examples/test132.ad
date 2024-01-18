@@ -1,12 +1,12 @@
 class Dog {
     def test() {
-        print ("aaa")
+        println("aaa")
     }
 }
 
 class Dex : Dog {
     def test2() {
-        print ("bbb")
+        println("bbb")
     }
 }
 
