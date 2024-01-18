@@ -3,27 +3,27 @@ th2 = __thread("thread 2")
 th3 = __thread("thread 3")
 
 def runner1() {
-    print ("starting thread")
+    println("starting thread")
     for(i1 = 0; i1 < 100; i1++) {
-        print (i1)
+        println(i1)
     }
-    print ("finishing thread")
+    println("finishing thread")
 }
 
 def runner2() {
-    print ("starting thread")
+    println("starting thread")
     for(i2 = 0; i2 < 100; i2++) {
-        print (i2)
+        println(i2)
     }
-    print ("finishing thread")
+    println("finishing thread")
 }
 
 def runner3() {
-    print ("starting thread")
+    println("starting thread")
     for(i3 = 0; i3 < 100; i3++) {
-        print (i3)
+        println(i3)
     }
-    print ("finishing thread")
+    println("finishing thread")
 }
 
 

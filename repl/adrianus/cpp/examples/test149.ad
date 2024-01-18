@@ -12,7 +12,7 @@ def validate(k) {
 
 def back(k) {
     if (k == n) {
-        print (a)
+        println(a)
     } else {
         a[k] = 0
         while (a[k] < n) {

@@ -1,7 +1,7 @@
 th1 = __thread("thread 1")
 
 def runner1() {
-    print ("neatza")
+    println("neatza")
 }
 
 th1.callback(runner1)

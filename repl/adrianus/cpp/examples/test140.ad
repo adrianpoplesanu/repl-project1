@@ -2,4 +2,4 @@ import("examples/test139.ad")
 /* the second import is for the it tests to work */
 import("../../cpp/examples/test139.ad")
 
-print(var1)
+println(var1)

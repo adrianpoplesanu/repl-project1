@@ -1,5 +1,5 @@
 socket = __iosocket("server", "localhost", 5003, true, false, false, true)
 socket.create_client()
 message = socket.read()
-print (message)
+println(message)
 socket.close()
