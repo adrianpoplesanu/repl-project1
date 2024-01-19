@@ -5,8 +5,8 @@ def thread_work(callback, arguments) {
 }
 
 def analyze(arguments) {
-    print (len(arguments))
-    print (arguments)
+    println(len(arguments))
+    println(arguments)
 }
 
 thread_work(analyze, [1, "aaa", true])

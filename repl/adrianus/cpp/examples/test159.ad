@@ -6,5 +6,5 @@ class A {
 
 a = A()
 a.put()
-print (a)
-print (a.b)
+println(a)
+println(a.b)

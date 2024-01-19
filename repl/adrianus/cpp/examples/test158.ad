@@ -7,7 +7,7 @@ class A {
 }
 
 b = A()
-print (b.b)
+println(b.b)
 c = b.get()
-print (c)
-print (c.b)
+println(c)
+println(c.b)

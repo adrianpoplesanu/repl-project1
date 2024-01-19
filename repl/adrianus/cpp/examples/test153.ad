@@ -2,7 +2,7 @@ class Flag {
     color = "blue"
 
     def printColor() {
-        print (color)
+        println(color)
     }
 
     def setColor(c) {
@@ -27,7 +27,7 @@ class Country {
     }
 
     def getColor() {
-        print (this.flag.color)
+        println(this.flag.color)
     }
 }
 

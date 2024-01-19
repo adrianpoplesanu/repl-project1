@@ -1,13 +1,13 @@
 class TestingVim {
     def constructor() {
-        print ("running something")
+        println("running something")
     }
 
     def test() {
-        print ("runnning test")
+        println("runnning test")
     }
 }
 
 testing = TestingVim()
 testing.test()
-print (testing.test)
+println(testing.test)

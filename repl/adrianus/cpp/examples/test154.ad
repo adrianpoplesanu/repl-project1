@@ -2,7 +2,7 @@ class Flag {
     color = "blue"
 
     def print_color() {
-        print (color)
+        println(color)
     }
 }
 

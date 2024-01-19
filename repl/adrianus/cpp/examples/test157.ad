@@ -8,5 +8,5 @@ class Portocala {
 
 portocala = Portocala()
 portocala.insert()
-print (portocala)
-print (portocala.portocala)
+println(portocala)
+println(portocala.portocala)
