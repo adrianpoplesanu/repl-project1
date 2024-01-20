@@ -1,13 +1,13 @@
-for (i = 0; i < 10; i++) if (i < 5) print (i)
+for (i = 0; i < 10; i++) if (i < 5) println(i)
 
 def test() {
-    for (i = 0; i < 10; i++) if (i < 5) print (i)
+    for (i = 0; i < 10; i++) if (i < 5) println(i)
 }
 
 test()
 
 def test2(k) {
-    for (i = 0; i < k; i++) if (i < 5) print (i)
+    for (i = 0; i < k; i++) if (i < 5) println(i)
 }
 
 test2(10)
@@ -16,7 +16,7 @@ def test3(k) {
     for (i = 0; i < k; i++) if (i < 5) return true
 }
 
-print (test3(10))
+println(test3(10))
 
 a = [1, 2, 3]
 
@@ -25,8 +25,8 @@ def test4(k) {
     return false
 }
 
-print (test4(0))
-print (test4(1))
-print (test4(2))
-print (test4(3))
-print (test4(4))
+println(test4(0))
+println(test4(1))
+println(test4(2))
+println(test4(3))
+println(test4(4))

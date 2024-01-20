@@ -1,5 +1,5 @@
 // testing single comments
-print ('aaa')
+println('aaa')
 // testing single comments
-print ('bbb')
+println('bbb')
 // testing single comments

@@ -1,4 +1,4 @@
 /* aaa */
-print ("test")
+println("test")
 /* testing() 
 __locals() */
