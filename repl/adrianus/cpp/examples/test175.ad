@@ -11,11 +11,11 @@ class AsyncEchoServer {
     }
 
     def process(client) {
-        print ('handling request')
-        print (client)
+        println('handling request')
+        println(client)
 
         request_message = client.read()
-        print (request_message)
+        println(request_message)
 
         client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
     }
@@ -23,7 +23,7 @@ class AsyncEchoServer {
     def start() {
         while(true) {
             server.accept()
-            print (server.client)
+            println(server.client)
             th1 = __thread("thread 1")
 
             th1.callback(this.process, server.client)

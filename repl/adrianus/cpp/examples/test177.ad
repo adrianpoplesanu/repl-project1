@@ -11,8 +11,8 @@ class AsyncEchoServer {
     }
 
     def process(client) {
-        print ('handling request')
-        print (client)
+        println('handling request')
+        println(client)
 
         sleep(10000)
 
@@ -22,7 +22,7 @@ class AsyncEchoServer {
     def start() {
         while(true) {
             server.accept()
-            print (server.client)
+            println(server.client)
             th1 = __thread("thread 1")
 
             th1.callback(this.process, server.client)

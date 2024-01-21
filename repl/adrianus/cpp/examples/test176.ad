@@ -1,5 +1,5 @@
-print ("aaa")
+println("aaa")
 sleep(1000)
-print ("bbb")
+println("bbb")
 sleep(1000)
-print ("ccc")
+println("ccc")

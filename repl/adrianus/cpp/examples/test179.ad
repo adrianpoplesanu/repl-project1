@@ -5,11 +5,11 @@ def change(target) {
 }
 
 change(numbers)
-print (numbers)
+println(numbers)
 
 def change2(target) {
     target = [55, 66, 77]
 }
 
 change2(numbers)
-print (numbers)
+println(numbers)
