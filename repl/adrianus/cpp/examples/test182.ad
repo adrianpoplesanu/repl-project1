@@ -20,7 +20,7 @@ def getProfile() {
     name = th1.await()
     age = th2.await()
 
-    print ('name: ' + name + ', age: ' + age)
+    println('name: ' + name + ', age: ' + age)
 }
 
 getProfile()

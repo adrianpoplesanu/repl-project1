@@ -1,11 +1,11 @@
 names = ['bebe', 'dex', 'dragutz']
 
-print (__memory_address(names))
+println(__memory_address(names))
 def change(nume) {
-    print (__memory_address(nume))
+    println(__memory_address(nume))
     nume[1] = 'cezar'
 } 
 
 change(names)
 
-print (names)
+println(names)

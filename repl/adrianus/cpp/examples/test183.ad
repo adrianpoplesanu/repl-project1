@@ -2,4 +2,4 @@ def generate() {
     return {'aaa': 2, 'bbb': 5}
 }
 
-print (generate()['aaa'])
+println(generate()['aaa'])
