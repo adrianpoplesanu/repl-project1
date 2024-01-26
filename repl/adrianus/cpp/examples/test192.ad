@@ -7,7 +7,7 @@ def execute_lambda(value, anonymous_function) {
 }
 
 a = execute_lambda(10, func(a) { return a + 5 })
-print (a)
+println(a)
 
 
 def execute_lambda2(anonymous_function) {
@@ -15,4 +15,4 @@ def execute_lambda2(anonymous_function) {
 }
 
 b = execute_lambda2(func (a) { return a + 33 })
-print (b)
+println(b)

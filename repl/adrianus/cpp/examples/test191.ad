@@ -9,8 +9,8 @@ def operation(val) {
 }
 
 def test2(val, f) {
-    print (val)
-    print (f(val))
+    println(val)
+    println(f(val))
 }
 
 test2(8, operation)

@@ -57,7 +57,8 @@ Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
         free_builtin_arguments(args);
         return NULL;
     }
-    std::cout << obj->Inspect() << "\n";
+    // std::cout << obj->Inspect() << "\n"; // old print builtin
+    std::cout << obj->Inspect();
     free_builtin_arguments(args);
     return NULL;
 }
@@ -198,6 +199,11 @@ Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env, G
         //printf("%c", c);
         result += c;
     }
+
+    // TODO: determine if this really is a good idea, it looks good, but i'm not 100%
+    //if (!result.empty()) {
+    //    result.pop_back();
+    //}
 
     pclose(fpipe);
     Ad_String_Object* obj = new Ad_String_Object(result);

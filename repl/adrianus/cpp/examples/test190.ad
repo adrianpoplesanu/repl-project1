@@ -18,4 +18,4 @@ th2.runAsync()
 th1.await()
 th2.await()
 
-print ("counter [" + counter + "]")
+println("counter [" + counter + "]")

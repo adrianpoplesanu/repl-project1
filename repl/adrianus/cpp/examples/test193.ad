@@ -6,4 +6,4 @@ def forEach(consumer) {
     }
 }
 
-forEach(func (a) { print (a + 5) })
+forEach(func (a) { println(a + 5) })
