@@ -1,4 +1,4 @@
-eval("print(6)")
+eval("println(6)")
 
 eval("bbb=7")
 
@@ -6,10 +6,10 @@ println(bbb)
 
 bbb = 15
 
-eval("print(bbb)")
+eval("println(bbb)")
 
-eval("print('bebe dex')")
+eval("println('bebe dex')")
 
 name = "dexiciut"
 
-eval("print(name)")
+eval("println(name)")
