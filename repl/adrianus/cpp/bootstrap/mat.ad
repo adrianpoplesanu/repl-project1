@@ -9,10 +9,10 @@ class __AdMatrixLibrary {
        if (n > 0) {
            m = len(matrix[0])
            for (i = 0; i < n; i++) {
-               print (matrix[i])
+               println(matrix[i])
            }
        } else {
-           print ("")
+           println("")
        }
     }
 }
