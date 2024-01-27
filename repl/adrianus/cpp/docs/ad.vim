@@ -10,22 +10,23 @@ hi Comment ctermfg=DarkGray
 hi FuncName ctermfg=Yellow
 
 syntax match adComment "\v\/\*.*\*\/$"
+syntax region adComment start=/^\/\*/ end=/\*\//
 syntax match lineComment "\v\/\/.*$"
 highlight link adComment Comment
 highlight link lineComment Comment
-syntax region potionString start=/\v"/ skip=/\v\\./ end=/\v"/
+syntax region portionString start=/\v"/ skip=/\v\\./ end=/\v"/
 " syntax region potionFuncName start=/\vdef/ skip=/\v\\./ end=/\v\(/
 
 syntax keyword adFunction len print println func list
 syntax keyword adKeyword if else return while class for
 syntax keyword adLet let def function fun
-syntax keyword adBoolean true false potionString
+syntax keyword adBoolean true false portionString
 
 highlight link adKeyword Keyword
 highlight link adFunction Function
 highlight link adLet Let
 highlight link adBoolean Boolean
-highlight link potionString String
+highlight link portionString String
 " highlight link potionFuncName FuncName
 
 
