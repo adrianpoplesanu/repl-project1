@@ -201,9 +201,9 @@ Ad_Object* __syssystem_builtin(std::vector<Ad_Object*> args, Environment *env, G
     }
 
     // TODO: determine if this really is a good idea, it looks good, but i'm not 100%
-    //if (!result.empty()) {
-    //    result.pop_back();
-    //}
+    if (!result.empty()) {
+        result.pop_back();
+    }
 
     pclose(fpipe);
     Ad_String_Object* obj = new Ad_String_Object(result);
