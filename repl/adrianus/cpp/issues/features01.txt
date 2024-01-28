@@ -1,3 +1,5 @@
 - try catch
 - default params, ex: def test(a=5) { ... }
 - overloading functions/methods -> env needs to differentiate between function/method names and number of params
+- dynamic adding of attributes/methods to native types, ex: a = "aaa" println(a.size)
+-
