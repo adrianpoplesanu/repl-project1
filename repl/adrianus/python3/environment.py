@@ -86,6 +86,9 @@ class Environment(object):
         result = Ad_Hash_Object(pairs)
         return result
 
+    def populate_getattrs(self):
+        return self.store.keys()
+
     def __str__(self):
         out = "[Env] store: " + str(self.store) + "\n"
         if self.outer:
