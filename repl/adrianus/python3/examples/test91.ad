@@ -5,4 +5,4 @@ class Test2 {
     }
 }
 
-getattrs(Test2)
+println(getattrs(Test2))
