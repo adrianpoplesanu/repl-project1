@@ -1,0 +1,8 @@
+class Test2 {
+    a = 5
+    def b() {
+
+    }
+}
+
+getattrs(Test2)

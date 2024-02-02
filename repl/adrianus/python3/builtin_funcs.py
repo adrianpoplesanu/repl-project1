@@ -1,7 +1,8 @@
 import sys
 import time
 
-from objects import Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object, Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Ad_Thread_Object, Ad_Socket_Object
+from objects import (Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object,
+                     Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Ad_Thread_Object, Ad_Socket_Object)
 from object_type import ObjectType
 from eval_utils import eval_source, import_source
 from thread_utils import sleep_builtin_executor
@@ -151,7 +152,26 @@ def setattr_builtin(args, env):
     pass
 
 def getattrs_builtin(args, env):
-    pass
+    if len(args) == 1:
+        target = args[0]
+        if target.type == ObjectType.INSTANCE:
+            result = Ad_List_Object()
+            result.elements = []
+            for entry in target.instance_environment.populate_getattrs():
+                result.elements.append(Ad_String_Object(entry))
+            return result
+        elif target.type == ObjectType.CLASS:
+            result = Ad_List_Object()
+            result.elements = []
+            for attribute in target.attributes:
+                result.elements.append(Ad_String_Object(attribute.expression.name.token_literal()))
+            for method in target.methods:
+                result.elements.append(Ad_String_Object(method.name.token_literal()))
+            return result
+        else:
+            return Ad_Error_Object("getattrs can only be called on a class instance")
+    else:
+        return None
 
 def thread_builtin(args, env):
     thread_obj = Ad_Thread_Object()
