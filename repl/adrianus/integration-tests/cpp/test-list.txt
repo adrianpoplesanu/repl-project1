@@ -166,3 +166,7 @@ examples/test183.ad
 examples/test184.ad
 examples/test185.ad
 examples/test186.ad
+examples/test187.ad
+examples/test188.ad
+examples/test189.ad
+examples/test190.ad
