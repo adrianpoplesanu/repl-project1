@@ -126,6 +126,7 @@ public class Environment {
 	}
 
 	public List<String> populateGetattrs() {
+		// TODO: should this be recursive? looking also in outer? idk
 		List<String> result = new ArrayList<>();
 		store.keySet().stream().forEach(key -> result.add(key));
 		return result;
