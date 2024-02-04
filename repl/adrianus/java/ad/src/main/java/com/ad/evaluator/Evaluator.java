@@ -1395,24 +1395,35 @@ public class Evaluator {
 				if (stmt.getOwner().getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
 					return recursiveMemberAccessCall(stmt, env);
 				}
-				AstIdentifier owner = (AstIdentifier) stmt.getOwner();
+				AstIdentifier owner = (AstIdentifier) stmt.getOwner(); // TODO: this could be something else that an AstIdentifier
 				AstIdentifier member = (AstIdentifier) stmt.getMember();
-				AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
-				Environment old = klassInstance.getEnvironment().getOuter();
-				klassInstance.getEnvironment().setOuter(env);
-				AdObject klassMethod = klassInstance.getEnvironment().get(member.getValue());
-				if (klassMethod == null) {
-					return new AdErrorObject("method " + member.getValue() + " not found in class " + klassInstance.getAdClassObject().getName().tokenLiteral());
-					//return NULLOBJECT;
+				AdObject target = env.get(owner.getValue());
+				if (target.getType() == ObjectTypeEnum.INSTANCE) {
+					AdClassInstance klassInstance = (AdClassInstance) env.get(owner.getValue());
+					Environment old = klassInstance.getEnvironment().getOuter();
+					klassInstance.getEnvironment().setOuter(env);
+					AdObject klassMethod = klassInstance.getEnvironment().get(member.getValue());
+					if (klassMethod == null) {
+						return new AdErrorObject("method " + member.getValue() + " not found in class " + klassInstance.getAdClassObject().getName().tokenLiteral());
+						//return NULLOBJECT;
+					}
+					List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
+					if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {
+						return argObjs.get(0);
+					}
+					AdObject result = applyMethod(klassMethod, argObjs, klassInstance.getEnvironment());
+					klassInstance.getEnvironment().setOuter(old);
+					return result;
+				} else {
+					return EvaluatorUtils.dispatchMemberAccessPerObjectType(target, member);
 				}
-				List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
-				if (argObjs.size() == 1 && argObjs.get(0).getType() == ObjectTypeEnum.ERROR) {
-					return argObjs.get(0);
-				}
-				AdObject result = applyMethod(klassMethod, argObjs, klassInstance.getEnvironment());
-				klassInstance.getEnvironment().setOuter(old);
-				return result;
 			} else {
+				if (stmt.getOwner().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+					return recursiveMemberAccessCall(stmt, env);
+				}
+				if (stmt.getOwner().getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
+					return recursiveMemberAccessCall(stmt, env);
+				}
 				if (stmt.getOwner().getType() == AstNodeTypeEnum.IDENTIFIER) {
 					AstIdentifier owner = (AstIdentifier) stmt.getOwner(); // stmt: "AstMemberAccess"
 					AstIdentifier member = (AstIdentifier) stmt.getMember();
@@ -1422,12 +1433,6 @@ public class Evaluator {
 					AdObject result = eval(member, klassInstance.getEnvironment());
 					klassInstance.getEnvironment().setOuter(old);
 					return result;
-				}
-				if (stmt.getOwner().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
-					return recursiveMemberAccessCall(stmt, env);
-				}
-				if (stmt.getOwner().getType() == AstNodeTypeEnum.CALL_EXPRESSION) {
-					return recursiveMemberAccessCall(stmt, env);
 				}
 			}
 		}
