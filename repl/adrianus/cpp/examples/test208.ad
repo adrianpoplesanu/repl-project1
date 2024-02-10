@@ -1,0 +1,13 @@
+th1 = __thread("thread1")
+
+def runner() {
+    sleep(1500)
+    return 9
+}
+
+th1.callback(runner)
+
+th1.runBlocking()
+
+result = th1.await()
+println(result)
