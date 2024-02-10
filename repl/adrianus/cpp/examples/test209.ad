@@ -1,0 +1,12 @@
+th1 = __thread("thread1")
+
+def runner() {
+    sleep(1500)
+    println("bebe dutz")
+}
+
+th1.callback(runner)
+
+th1.runAsync()
+
+println("done main thread")
