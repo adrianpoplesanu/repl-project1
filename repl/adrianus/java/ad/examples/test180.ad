@@ -1,0 +1,7 @@
+class Catelus {
+    name = ["bebe", "dex"]
+}
+
+catelus = Catelus()
+println(catelus.name)
+println(catelus.name.size())
