@@ -1482,11 +1482,19 @@ public class Evaluator {
 		}
 		// end initialize env
 
+		ObjectTypeEnum previousMemberType = null;
 		for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
             AstMemberAccess currentMemberAccess = chainedMemberAccesses.get(i);
 			if (currentMemberAccess.isMethod()) {
 				// am de a face cu un call
+				if (previousMemberType != null && previousMemberType == ObjectTypeEnum.LIST) {
+					// TODO: maybe add some logic here for primitive data types
+					if (currentMemberAccess.getMember().tokenLiteral() == "size") {
+						// TODO: maybe like this, but it needs to preserve recursive access
+					}
+				}
 				AdObject obj = eval(currentMemberAccess.getMember(), currentEnv);
+				previousMemberType = obj.getType();
 				if (obj.getType() == ObjectTypeEnum.FUNCTION) {
 					List<AdObject> argObjs = evalExpressions(chainedMemberAccesses.get(i).getArguments(), env);
 					AdObject obj2 = applyMethod(obj, argObjs, ((AdFunctionObject) obj).getEnv());
@@ -1502,7 +1510,11 @@ public class Evaluator {
 				}
 			} else {
 				// am de a face cu un identificator
+				if (previousMemberType != null && previousMemberType == ObjectTypeEnum.LIST) {
+					// TODO: maybe add some logic here for primitive data types
+				}
 				AdObject obj = eval(currentMemberAccess.getMember(), currentEnv);
+				previousMemberType = obj.getType();
 				if (i == 0) {
 					// i have reached the end, i need to return
 					return obj;
@@ -1515,6 +1527,7 @@ public class Evaluator {
 			}
 		}
 		// daca am ajuns aici atunci nu cred ca e ok
+		// test180.ad ajunge aici
 		return null;
 	}
 
