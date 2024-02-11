@@ -11,3 +11,5 @@ th1.runAsync()
 
 result = th1.await()
 println(result)
+
+println("done main thread")
