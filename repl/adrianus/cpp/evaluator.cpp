@@ -682,6 +682,10 @@ Ad_Object* Evaluator::UnwrapReturnValue(Ad_Object* obj, Environment *env) {
 }*/
 
 Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object*> args) {
+    // arguments is the list of evaluated object passed as arguments
+	// evalIdentifier returns the env.get object, this is why lists are passed as pseudo-"reference"
+	// class instances have an internal env, that's why class instances are passed as pseudo-"reference"
+	// ints are passed just the same, but all changing operation produce a new object
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
     Environment* extended = newEnclosedEnvironment(func_obj->env);
     Ad_INCREF(func_obj->env);
