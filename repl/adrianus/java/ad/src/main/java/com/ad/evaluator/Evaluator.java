@@ -1394,7 +1394,8 @@ public class Evaluator {
 					klassInstance.getEnvironment().setOuter(old);
 					return result;
 				} else {
-					return EvaluatorUtils.dispatchMemberAccessPerObjectType(target, member);
+					List<AdObject> argObjs = evalExpressions(stmt.getArguments(), env);
+					return EvaluatorUtils.dispatchMemberAccessPerObjectType(target, member, argObjs);
 				}
 			} else {
 				if (stmt.getOwner().getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
@@ -1468,8 +1469,13 @@ public class Evaluator {
 				// am de a face cu un call
 				if (previousMemberType != null && previousMemberType == ObjectTypeEnum.LIST) {
 					// TODO: maybe add some logic here for primitive data types
-					if (currentMemberAccess.getMember().tokenLiteral() == "size") {
+					if (currentMemberAccess.getMember().tokenLiteral().equals("size")) {
 						// TODO: maybe like this, but it needs to preserve recursive access
+						AstNode owner = currentMemberAccess.getOwner();
+						AstMemberAccess ownerMemberAccess = (AstMemberAccess) owner;
+						AdObject obj = eval(ownerMemberAccess.getMember(), currentEnv);
+						AdListObject listObject = (AdListObject) obj;
+						return new AdIntegerObject(listObject.getElements().size());
 					}
 				}
 				AdObject obj = eval(currentMemberAccess.getMember(), currentEnv);
