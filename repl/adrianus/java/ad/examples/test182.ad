@@ -1,0 +1,3 @@
+text = "irosit ratacit risipit estompat stins palid sters disperat deznadajduit descurajat demoralizat nevalorificat consumat"
+println(text.split())
+println(text.split().size()) // asta nu merge
