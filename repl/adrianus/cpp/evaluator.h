@@ -78,4 +78,6 @@ private:
     bool validateNumberOfArguments(std::vector<int>, int);
 };
 
+void dispatchMemberAccessPerObjectType(Ad_Object*, Ad_AST_Identifier*, std::vector<Ad_Object*>);
+
 #endif
