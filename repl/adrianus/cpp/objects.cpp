@@ -285,7 +285,7 @@ Ad_String_Object::Ad_String_Object(std::string val) {
 }
 
 std::string Ad_String_Object::Inspect() {
-    return "\'" + value + "\'";
+    return value;
 }
 
 void Ad_String_Object::Print() {
