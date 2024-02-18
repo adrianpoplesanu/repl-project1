@@ -1,4 +1,5 @@
 import sys
+import time
 from repl import Repl
 from parser import Parser
 from ast import ASTProgram
@@ -8,6 +9,7 @@ from compiler import Compiler
 from vm import VM
 
 DEBUG = False
+SHOW_RUNNING_TIME = True
 
 
 def main(args):
@@ -37,6 +39,9 @@ def main(args):
         #test_parser()
         #test_parser2()
         test_parser3()
+    start = 0
+    if SHOW_RUNNING_TIME:
+        start = time.time_ns()
     parser = Parser()
     program = ASTProgram()
     evaluator = Evaluator()
@@ -53,6 +58,9 @@ def main(args):
         repl.execute_file(source=source, use_vm=use_vm)
     else:
         repl.loop(use_vm)
+    if SHOW_RUNNING_TIME:
+        end = time.time_ns()
+        print("ran for: {}sec".format(float((end - start) / 1000000) / 1000))
 
 
 if __name__ == '__main__':
