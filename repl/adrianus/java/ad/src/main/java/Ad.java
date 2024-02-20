@@ -9,8 +9,10 @@ import com.ad.parser.test.ParserTest;
 import com.ad.repl.Repl;
 
 public class Ad {
+	private static boolean showRunningTime = false;
 
 	public static void main(String[] args) {
+		long startTime = System.nanoTime();
 		if (args.length > 0) {
 			String filename = args[0];
 			String source;
@@ -37,6 +39,12 @@ public class Ad {
 	
 			Repl repl = new Repl(parser, program, evaluator);
 			repl.loop();
+		}
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime) / 1000000;
+		double timeInSeconds = (double)duration / 1000;
+		if (showRunningTime) {
+			System.out.println("ran for: " + timeInSeconds + "sec\n");
 		}
 	}
 }
