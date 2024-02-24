@@ -40,6 +40,16 @@ public class AstNodeUtils {
 					PrintASTNode(expr.getAlternative(), level + 2);
 				}
 				break;
+			case ASSIGN_STATEMENT:
+				System.out.println("AssignStatement " + ((AstAssignStatement) node).getToken() + " " + ((AstAssignStatement) node).getName().getToken());
+				PrintASTNode(((AstAssignStatement) node).getValue(), level + 2);
+				break;
+			case DEF_STATEMENT:
+				System.out.println("DefStatement");
+				break;
+			case WHILE_EXPRESSION:
+				System.out.println("WhileExpression");
+				break;
     		default:
     			System.out.println("not recognized node type for printing: " + AstNodeTypeConverter.convertToString(node.getType()));
     		break;

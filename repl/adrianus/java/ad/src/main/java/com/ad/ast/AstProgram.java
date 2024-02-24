@@ -1,5 +1,7 @@
 package com.ad.ast;
 
+import com.ad.token.Token;
+
 import java.util.ArrayList;
 
 public class AstProgram extends AstNode {
@@ -17,6 +19,11 @@ public class AstProgram extends AstNode {
 	@Override
 	public String tokenLiteral() {
 		// ProgramStatement has no token
+		return null;
+	}
+
+	@Override
+	public Token getToken() {
 		return null;
 	}
 

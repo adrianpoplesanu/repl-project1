@@ -17,6 +17,11 @@ public class AstBreakStatement extends AstNode {
     }
 
     @Override
+    public Token getToken() {
+        return token;
+    }
+
+    @Override
     public String toString() {
         return null;
     }
