@@ -1,0 +1,22 @@
+SIZE = 1000
+BASE = 10000
+
+def init() {
+   return list(SIZE, 0)
+}
+
+def copy(a, b) {
+    for (i = 0; i < SIZE; i++) a[i] = b[i]
+}
+
+def sum(a, b, c) {
+    remainder = 0
+    for (i = 0; i < SIZE; i++) {
+        c[i] = a[i] + b[i] + remainder
+        remainder = 0
+        while (c[i] >= BASE) {
+            remainder++
+            c[i] = c[i] - BASE
+        }
+    }
+}

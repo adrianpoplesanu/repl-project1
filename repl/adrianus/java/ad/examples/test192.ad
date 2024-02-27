@@ -1,0 +1,26 @@
+SIZE = 1000
+
+a = list(SIZE, 0)
+b = list(SIZE, 0)
+
+def test(a) {
+    for (i = 0; i < 1000; i++) {
+        a[i] = i
+    }
+}
+
+def copy(a, b) {
+    for (i = 0; i < 1000; i++) a[i] = b[i]
+}
+
+def main() {
+    i = 0
+    while (i < 1000) {
+        //test(a)
+        //test(b)
+        copy(a, b)
+        i++
+    }
+}
+
+main()
