@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <ctime>
 #include "tests.cpp"
 #include "test_objects.cpp"
 #include "test_parser.cpp"
@@ -19,7 +20,7 @@
 #define RUN_FUNCTION_LITERAL_TESTS 0
 #define RUN_LISTOBJECT_TESTS 0
 #define RUN_LIST_TESTS 0
-
+#define SHOW_RUNNING_TIME 1
 
 int main(int argc, char *argv[]) {
 	if (RUN_TESTS) {
@@ -39,6 +40,10 @@ int main(int argc, char *argv[]) {
 	if (RUN_LIST_TESTS) {
 		test_list_parsing();
 	}
+	clock_t begin;
+	if (SHOW_RUNNING_TIME) {
+		begin = clock();
+	}
 	Repl repl;
 	if (argc == 1) {
 		std::cout << "Ad interpreter [C++]... v1.0\n";
@@ -48,6 +53,11 @@ int main(int argc, char *argv[]) {
 			std::ifstream target(argv[i]);
 			repl.ExecuteFile(target);
 		}
+	}
+	if (SHOW_RUNNING_TIME) {
+		clock_t end = clock();
+		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+		std::cout << "ran for: " << elapsed_secs << "sec\n";
 	}
 	return 0;
 }
