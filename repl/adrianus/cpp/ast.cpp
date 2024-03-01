@@ -633,7 +633,7 @@ Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token t) {
     token = t;
 }
 
-Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token t, std::map<Ad_AST_Node*, Ad_AST_Node*> p) {
+Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token t, std::unordered_map<Ad_AST_Node*, Ad_AST_Node*> p) {
     type = ST_HASH_LITERAL;
     ref_count = 0;
     token = t;
@@ -641,7 +641,7 @@ Ad_AST_HashLiteral::Ad_AST_HashLiteral(Token t, std::map<Ad_AST_Node*, Ad_AST_No
 }
 
 Ad_AST_HashLiteral::~Ad_AST_HashLiteral() {
-    for(std::map<Ad_AST_Node*, Ad_AST_Node*>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+    for(std::unordered_map<Ad_AST_Node*, Ad_AST_Node*>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         Ad_DECREF(it->first);
         Ad_DECREF(it->second);
         free_Ad_AST_Node_memory(it->first);

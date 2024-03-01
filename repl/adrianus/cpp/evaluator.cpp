@@ -14,8 +14,9 @@ Ad_Boolean_Object FALSE(false);
 
 Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
     switch(node->type) {
-        case ST_PROGRAM:
+        case ST_PROGRAM: {
             return EvalProgram(node, env);
+        }
         break;
         case ST_LET_STATEMENT: {
             Ad_Object* obj = Eval(((Ad_AST_LetStatement*)node)->value, env);
@@ -35,10 +36,11 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return obj;
         }
         break;
-        case ST_EXPRESSION_STATEMENT:
+        case ST_EXPRESSION_STATEMENT: {
             if (((Ad_AST_ExpressionStatement*)node)->expression) {
                 return Eval(((Ad_AST_ExpressionStatement*)node)->expression, env);
             }
+        }
         break;
         case ST_IDENTIFIER: {
             return EvalIdentifier(node, env);
@@ -51,8 +53,9 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return obj;
         }
         break;
-        case ST_FLOAT:
+        case ST_FLOAT: {
             return EvalFloatExpression(node, env);
+        }
         break;
         case ST_BOOLEAN: {
             return NativeBoolToBooleanObject(((Ad_AST_Boolean*)node)->value);
@@ -135,26 +138,33 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return EvalMemberAccess(node, env);
         }
         break;
-        case ST_PREFIX_INCREMENT:
+        case ST_PREFIX_INCREMENT: {
             return EvalPrefixIncrement(node, env);
+        }
         break;
-        case ST_POSTFIX_INCREMENT:
+        case ST_POSTFIX_INCREMENT: {
             return EvalPostfixIncrement(node, env);
+        }
         break;
-        case ST_FOR_EXPRESSION:
+        case ST_FOR_EXPRESSION: {
             return EvalForExpression(node, env);
+        }
         break;
-        case ST_BREAK_STATEMENT:
+        case ST_BREAK_STATEMENT: {
             return EvalBreakStatement(node, env);
+        }
         break;
-        case ST_CONTINUE_STATEMENT:
+        case ST_CONTINUE_STATEMENT: {
             return EvalContinueStatement(node, env);
+        }
         break;
-        case ST_NULL_EXPRESSION:
+        case ST_NULL_EXPRESSION: {
             return EvalNullExpression(node, env);
+        }
         break;
-        case ST_THIS_EXPRESSION:
+        case ST_THIS_EXPRESSION: {
             return evalThisExpression(node, &env);
+        }
         break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
@@ -441,10 +451,8 @@ Ad_Object* Evaluator::EvalMinusPrefixOperatorExpression(Ad_Object* right) {
 Ad_Object* Evaluator::EvalIdentifier(Ad_AST_Node* node, Environment &env) {
     Ad_Object* obj;
     obj = NULL;
-    if (env.Check(((Ad_AST_Identifier*)node)->token.literal)) {
-        obj = env.Get(((Ad_AST_Identifier*)node)->token.literal);
-        return obj;
-    }
+    obj = env.Get(((Ad_AST_Identifier*)node)->token.literal);
+    if (obj != NULL) return obj;
     if (builtins_map.find(((Ad_AST_Identifier*)node)->token.literal) != builtins_map.end()) {
         return builtins_map[((Ad_AST_Identifier*)node)->token.literal];
         //return NULL;
@@ -757,15 +765,13 @@ Ad_Object* Evaluator::EvalListIndexExpression(Ad_Object* left, Ad_Object* index)
 }
 
 Ad_Object* Evaluator::EvalHashLiteral(Ad_AST_Node* node, Environment &env) {
-    std::map<std::string, HashPair> pairs;
-    for(std::map<Ad_AST_Node*, Ad_AST_Node*>::iterator it = ((Ad_AST_HashLiteral*)node)->pairs.begin(); it != ((Ad_AST_HashLiteral*)node)->pairs.end(); ++it) {
+    std::unordered_map<std::string, HashPair> pairs;
+    for(std::unordered_map<Ad_AST_Node*, Ad_AST_Node*>::iterator it = ((Ad_AST_HashLiteral*)node)->pairs.begin(); it != ((Ad_AST_HashLiteral*)node)->pairs.end(); ++it) {
         Ad_Object* key = Eval(it->first, env);
         if (IsError(key)) {
             return key;
         }
         Ad_Object* value = Eval(it->second, env);
-        Ad_INCREF(key);
-        Ad_INCREF(value);
         if (IsError(value)) {
             return value;
         }
@@ -857,32 +863,25 @@ Ad_Object* Evaluator::EvalIndexExpressionAssign(Ad_AST_Node* node, Environment &
         int idx = ((Ad_Integer_Object*)index)->value;
         Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
         Ad_List_Object* list_obj = (Ad_List_Object*)obj;
-        Ad_Object* old_obj = list_obj->elements[idx];
-        Ad_INCREF(value);
         list_obj->elements[idx] = value;
         // TODO: mark and sweep cleanup
         //free_Ad_Object_memory(index);
-        Ad_DECREF(old_obj);
         // TODO: mark and sweep cleanup
         //free_Ad_Object_memory(old_obj);
     }
     if (obj->Type() == OBJ_HASH) {
         std::hash<std::string> hash_string;
         Ad_Object* value = Eval(((Ad_AST_AssignStatement*)node)->value, env);
-        Ad_INCREF(index);
-        Ad_INCREF(value);
         HashPair hash_pair(index, value);
         Ad_Hash_Object* hash_obj = (Ad_Hash_Object*)obj;
         std::string hash = std::to_string(hash_string(index->Hash()));
 
-        std::map<std::string, HashPair>::iterator it = hash_obj->pairs.find(hash);
+        std::unordered_map<std::string, HashPair>::iterator it = hash_obj->pairs.find(hash);
 
         if (it == hash_obj->pairs.end()) {
             hash_obj->pairs.insert(std::make_pair(hash, hash_pair));
         } else {
             HashPair old_hash_pair = it->second;
-            Ad_DECREF(old_hash_pair.key);
-            Ad_DECREF(old_hash_pair.value);
             // TODO: mark and sweep cleanup
             //free_Ad_Object_memory(old_hash_pair.key);
             //free_Ad_Object_memory(old_hash_pair.value);
@@ -1415,7 +1414,7 @@ Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) 
                 HashPair hash_pair(index_obj, new_obj);
                 std::string hash = std::to_string(hash_string(index_obj->Hash()));
 
-                std::map<std::string, HashPair>::iterator it = target->pairs.find(hash);
+                std::unordered_map<std::string, HashPair>::iterator it = target->pairs.find(hash);
 
                 if (it == target->pairs.end()) {
                     target->pairs.insert(std::make_pair(hash, hash_pair));
@@ -1434,13 +1433,20 @@ Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) 
     Ad_Object* old_obj = env.Get(ident->value);
     if (old_obj->Type() == OBJ_INT) {
         int value = ((Ad_Integer_Object*) old_obj)->value;
-        Ad_Integer_Object* new_obj = new Ad_Integer_Object(value + 1);
-        garbageCollector->addObject(new_obj);
-        env.Set(ident->value, new_obj);
-        Ad_Integer_Object* result = new Ad_Integer_Object(value);
-        garbageCollector->addObject(result);
-        return result;
+        if ("++" == expr->_operator) {
+            Ad_Integer_Object *result = new Ad_Integer_Object(value);
+            garbageCollector->addObject(result);
+            ((Ad_Integer_Object*) old_obj)->value++;
+            return result;
+        }        
+        if ("--" == expr->_operator) {
+            Ad_Integer_Object *result = new Ad_Integer_Object(value);
+            garbageCollector->addObject(result);
+            ((Ad_Integer_Object*) old_obj)->value--;
+            return result;
+        }
     }
+
     return &NULLOBJECT;
 }
 
@@ -1482,6 +1488,7 @@ Ad_Object* Evaluator::EvalContinueStatement(Ad_AST_Node* node, Environment& env)
 }
 
 Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
+    //std::cout << "#";
     Ad_AST_CallExpression *callExpression = (Ad_AST_CallExpression*) node;
     Ad_Object* func = Eval(callExpression->function, *env);
     if (IsError(func)) return func;
@@ -1491,7 +1498,8 @@ Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
         garbageCollector->addObject(result);
         return result;
     }
-    std::vector<Ad_Object*> args_objs = EvalExpressions(callExpression->arguments, *env);
+    std::vector<Ad_Object*> args_objs;
+    args_objs = EvalExpressions(callExpression->arguments, *env);
     if (args_objs.size() == 1 && IsError(args_objs[0])) {
         return args_objs[0];
     }
@@ -1563,4 +1571,46 @@ bool Evaluator::validateNumberOfArguments(std::vector<int> accepterNumberArgumen
 
 void Evaluator::setGarbageCollector(GarbageCollector *gc) {
     garbageCollector = gc;
+}
+
+void Evaluator::initRuntimeStatistics() {
+    eval_times_per_statement_type[ST_PROGRAM] = 0;
+    eval_times_per_statement_type[ST_LET_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_RETURN_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_EXPRESSION_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_IDENTIFIER] = 0;
+    eval_times_per_statement_type[ST_INTEGER] = 0;
+    eval_times_per_statement_type[ST_FLOAT] = 0;
+    eval_times_per_statement_type[ST_BOOLEAN] = 0;
+    eval_times_per_statement_type[ST_INFIX_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_PREFIX_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_CALL_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_IF_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_BLOCK_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_FUNCTION_LITERAL] = 0;
+    eval_times_per_statement_type[ST_WHILE_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_STRING_LITERAL] = 0;
+    eval_times_per_statement_type[ST_LIST_LITERAL] = 0;
+    eval_times_per_statement_type[ST_INDEX_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_HASH_LITERAL] = 0;
+    eval_times_per_statement_type[ST_ASSIGN_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_DEF_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_CLASS_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_MEMBER_ACCESS] = 0;
+    eval_times_per_statement_type[ST_COMMENT] = 0;
+    eval_times_per_statement_type[ST_PREFIX_INCREMENT] = 0;
+    eval_times_per_statement_type[ST_POSTFIX_INCREMENT] = 0;
+    eval_times_per_statement_type[ST_FOR_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_BREAK_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_CONTINUE_STATEMENT] = 0;
+    eval_times_per_statement_type[ST_NULL_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_THIS_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_SUPER_EXPRESSION] = 0;
+}
+
+void Evaluator::printRuntimeStatistics() {
+    std::cout << "runtime per statement types:\n";
+    for (const std::pair<const StatementType, double> info : eval_times_per_statement_type) {
+        std::cout << statement_type_map[info.first] << " ran for " << info.second << "secs\n";
+    }
 }

@@ -88,8 +88,8 @@ void GarbageCollector::markObjects() {
     }
 
     if (mainEnv != NULL) {
-        for (std::map<std::string, Ad_Object*>::iterator it = mainEnv->store.begin(); it != mainEnv->store.end(); ++it) {
-            markObject(it->second);
+        for (const std::pair<const std::string, Ad_Object*>& it : mainEnv->store) {
+            markObject(it.second);
         }
     } else {
         //std::cout << "oops!!! nu am environment principal\n";
@@ -100,13 +100,13 @@ void GarbageCollector::markObjects() {
         //if (env->bootstrap != NULL) {
         //    // TODO: handle the bootstrap event
         //}
-        for(std::map<std::string, Ad_Object*>::iterator it = env->store.begin(); it != env->store.end(); ++it) {
-            markObject(it->second);
+        for (const std::pair<const std::string, Ad_Object*>& it : env->store) {
+            markObject(it.second);
         }
 
-        for(std::map<std::string, Environment* >::const_iterator it = env->siblings.begin(); it != env->siblings.end(); ++it) {
-            for(std::map<std::string, Ad_Object*>::iterator j = it->second->store.begin(); j != it->second->store.end(); ++j) {
-                markObject(j->second);
+        for(std::unordered_map<std::string, Environment* >::const_iterator it = env->siblings.begin(); it != env->siblings.end(); ++it) {
+            for (const std::pair<const std::string, Ad_Object*>& j : it->second->store) {
+                markObject(j.second);
             }
         }
     }
@@ -168,7 +168,7 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         case OBJ_HASH: {
             obj->marked = true;
             Ad_Hash_Object *hashObject = (Ad_Hash_Object*) obj;
-            for(std::map<std::string, HashPair>::iterator it = hashObject->pairs.begin(); it != hashObject->pairs.end(); it++) {
+            for(std::unordered_map<std::string, HashPair>::iterator it = hashObject->pairs.begin(); it != hashObject->pairs.end(); it++) {
                 markObject(it->second.GetKey());
                 markObject(it->second.GetValue());
             }
@@ -184,8 +184,8 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             // TODO: i need to determine what to do with the contained Environment* object
             Ad_Class_Instance *instanceObject = (Ad_Class_Instance*) obj;
             markObject(instanceObject->klass_object);
-            for (std::map<std::string, Ad_Object*>::iterator it = instanceObject->instance_environment->store.begin(); it != instanceObject->instance_environment->store.end(); ++it) {
-                markObject(it->second);
+            for (const std::pair<const std::string, Ad_Object*>& it : instanceObject->instance_environment->store) {
+                markObject(it.second);
             }
             break;
         }

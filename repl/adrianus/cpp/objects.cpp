@@ -416,10 +416,6 @@ Ad_List_Object::Ad_List_Object(std::vector<Ad_Object*> e) {
     ref_count = 0;
     marked = false;
     elements = e;
-    // this is not efficient
-    for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
-        Ad_INCREF(*it);
-    }
 }
 
 Ad_List_Object::~Ad_List_Object() {
@@ -474,7 +470,7 @@ Ad_Hash_Object::Ad_Hash_Object() {
     marked = false;
 }
 
-Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, HashPair> p) {
+Ad_Hash_Object::Ad_Hash_Object(std::unordered_map<std::string, HashPair> p) {
     type = OBJ_HASH;
     ref_count = 0;
     marked = false;
@@ -482,7 +478,7 @@ Ad_Hash_Object::Ad_Hash_Object(std::map<std::string, HashPair> p) {
 }
 
 Ad_Hash_Object::~Ad_Hash_Object() {
-    for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+    for(std::unordered_map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         //Ad_DECREF(it->second.key);
         //Ad_DECREF(it->second.value);
         // TODO: mark and sweep cleanup
@@ -494,7 +490,7 @@ Ad_Hash_Object::~Ad_Hash_Object() {
 std::string Ad_Hash_Object::Inspect() {
     std::string out = "{";
     bool displayed_first = false;
-    for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+    for(std::unordered_map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         if (displayed_first) out += ", ";
         else displayed_first = true;
         out += it->second.key->Inspect() + ": " + it->second.value->Inspect();
@@ -516,8 +512,8 @@ std::string Ad_Hash_Object::Hash() {
 }
 
 Ad_Object* Ad_Hash_Object::copy(GarbageCollector *gc) {
-    std::map<std::string, HashPair> newPairs;
-    for(std::map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+    std::unordered_map<std::string, HashPair> newPairs;
+    for(std::unordered_map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
         std::string key = it->first;
         Ad_Object* k = it->second.GetKey()->copy(gc);
         Ad_Object* v = it->second.GetValue()->copy(gc);
@@ -897,7 +893,7 @@ Ad_Object* Ad_Thread_Object::copy(GarbageCollector *gc) {
     return new_obj;
 }
 
-void Ad_INCREF(Ad_Object* obj) {
+/*void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
     }
@@ -907,7 +903,7 @@ void Ad_DECREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count--;
     }
-}
+}*/
 
 void free_Ad_Object_memory(Ad_Object* obj) {
     //return;

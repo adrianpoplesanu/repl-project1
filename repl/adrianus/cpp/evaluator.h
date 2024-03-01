@@ -6,11 +6,15 @@
 #include "environment.h"
 #include "settings.h"
 #include "gc.h"
+#include <unordered_map>
+#include <ctime>
 
 class Evaluator {
 public:
     std::vector<Environment*> environment_garbage_collection;
     GarbageCollector *garbageCollector;
+    std::unordered_map<StatementType, double> eval_times_per_statement_type;
+    Ad_Object *tmp_obj;
 
     Ad_Object* Eval(Ad_AST_Node*, Environment&);
     Ad_Object* EvalProgram(Ad_AST_Node*, Environment&);
@@ -73,6 +77,9 @@ public:
     void GarbageCollectEnvironments();
     void addEnvironmentGarbageCollectorListener(Environment *);
     void setGarbageCollector(GarbageCollector*); // using this in eval builtin
+
+    void initRuntimeStatistics();
+    void printRuntimeStatistics();
 
 private:
     bool validateNumberOfArguments(std::vector<int>, int);

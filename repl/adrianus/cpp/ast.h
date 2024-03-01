@@ -41,7 +41,7 @@ enum StatementType {
     ST_SUPER_EXPRESSION
 };
 
-std::map<StatementType, std::string> statement_type_map = {
+std::unordered_map<StatementType, std::string> statement_type_map = {
     {ST_PROGRAM, "Program"},
     {ST_LET_STATEMENT, "LetStatement"},
     {ST_RETURN_STATEMENT, "ReturnStatement"},
@@ -324,11 +324,11 @@ public:
 class Ad_AST_HashLiteral : public Ad_AST_Node {
 public:
     Token token;
-    std::map<Ad_AST_Node*, Ad_AST_Node*> pairs;
+    std::unordered_map<Ad_AST_Node*, Ad_AST_Node*> pairs;
 
     Ad_AST_HashLiteral();
     Ad_AST_HashLiteral(Token);
-    Ad_AST_HashLiteral(Token, std::map<Ad_AST_Node*, Ad_AST_Node*>);
+    Ad_AST_HashLiteral(Token, std::unordered_map<Ad_AST_Node*, Ad_AST_Node*>);
     ~Ad_AST_HashLiteral();
     virtual std::string TokenLiteral();
     virtual std::string ToString();

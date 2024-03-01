@@ -2,6 +2,7 @@
 #define __ENVIRONMENT_H
 
 #include <map>
+#include <unordered_map>
 #include "objects.h"
 #include "gc.h"
 
@@ -9,10 +10,10 @@ class GarbageCollector; // forward declaration for GarbageCollector
 
 class Environment {
 public:
-    std::map<std::string, Ad_Object*> store;
+    std::unordered_map<std::string, Ad_Object*> store;
     Environment* outer;
     Environment* bootstrap;
-    std::map<std::string, Environment*> siblings;
+    std::unordered_map<std::string, Environment*> siblings;
     int ref_count;
     bool isBootstrapEnvironment;
     bool isGlobalEnvironment;

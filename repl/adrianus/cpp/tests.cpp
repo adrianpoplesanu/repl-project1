@@ -3,7 +3,7 @@
 
 void test_keywords_map() {
 	std::cout << "testing keywords map...\n";
-	for(std::map<std::string, TokenType>::iterator it = keywords.begin(); it != keywords.end(); ++it) {
+	for(std::unordered_map<std::string, TokenType>::iterator it = keywords.begin(); it != keywords.end(); ++it) {
 		std::cout << "Key: " << it->first << '\n';
   		std::cout << "Value: " << it->second << '\n';
 	}

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include "ast.h"
 #include "signal.h"
@@ -35,7 +36,7 @@ enum Ad_Object_Type {
 	OBJ_CONTINUE
 };
 
-std::map<Ad_Object_Type, std::string> object_type_map = {
+std::unordered_map<Ad_Object_Type, std::string> object_type_map = {
 	{OBJ_NULL, "NULL"},
 	{OBJ_INT, "INTEGER"},
 	{OBJ_FLOAT, "FLOAT"},
@@ -258,10 +259,10 @@ public:
 
 class Ad_Hash_Object : public Ad_Object {
 public:
-	std::map<std::string, HashPair> pairs; // do i need a HashPair implementation also? the answer is yes, i do need it
+	std::unordered_map<std::string, HashPair> pairs; // do i need a HashPair implementation also? the answer is yes, i do need it
 
 	Ad_Hash_Object();
-	Ad_Hash_Object(std::map<std::string, HashPair>);
+	Ad_Hash_Object(std::unordered_map<std::string, HashPair>);
 	~Ad_Hash_Object();
 	virtual std::string Inspect();
 	virtual void Print();
@@ -370,8 +371,8 @@ public:
 	virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
 };
 
-void Ad_INCREF(Ad_Object*);
-void Ad_DECREF(Ad_Object*);
+//void Ad_INCREF(Ad_Object*);
+//void Ad_DECREF(Ad_Object*);
 
 void free_Ad_Object_memory(Ad_Object*);
 void print_Ad_Object(Ad_Object*);

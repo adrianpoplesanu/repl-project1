@@ -12,10 +12,7 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
-    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        // ... do nothing, no need to DECREF objects in store, garbage collector will handle them
-    }
-    for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
+    for(std::unordered_map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
         // TODO: do this proper, maybe mark the env for sweeping using the gc?
         Ad_DECREF(it->second);
         delete it->second;
@@ -59,31 +56,18 @@ Ad_Object* Environment::lookupConstructor() {
 
 void Environment::Set(std::string key, Ad_Object* obj) {
     if (store.find(key) != store.end()) {
-        int old_ref_count = store[key]->ref_count;
-        FreeObjectForKey(key);
         store[key] = obj;
-        Ad_INCREF(obj); // this should be old_ref_count
         return;
     }
     if (outer && outer->Check(key)) {
         outer->Set(key, obj);
         return;
     }
-    if (store.find(key) != store.end()) {
-        // delete old object if this is an over write
-        FreeObjectForKey(key);
-    }
     store[key] = obj;
-    Ad_INCREF(obj);
 }
 
 void Environment::setLocalParam(std::string key, Ad_Object* obj) {
-    if (store.find(key) != store.end()) {
-        // delete old object if this is an over write
-        FreeObjectForKey(key);
-    }
     store[key] = obj;
-    Ad_INCREF(obj);
 }
 
 void Environment::addSibling(std::string key, Environment *env) {
@@ -106,11 +90,6 @@ void Environment::SetBootstrapEnvironment(Environment *b) {
     bootstrap = b;
 }
 
-void Environment::FreeObjectForKey(std::string key) {
-    // TODO: this method does nothig now, remove this
-    Ad_DECREF(store[key]);
-}
-
 void Environment::PrintStore(int level) {
     int k = 0;
     if (level != 0) std::cout << "\n";
@@ -118,9 +97,9 @@ void Environment::PrintStore(int level) {
     std::cout << "store: {";
     int size = store.size();
     int total = 0;
-    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        std::cout << it->first << ": ";
-        std::cout << it->second->Inspect();
+    for (const std::pair<const std::string, Ad_Object*>& it : store) {
+        std::cout << it.first << ": ";
+        std::cout << it.second->Inspect();
         total++;
         if (total < size) std::cout << ", "; // hmmm, this needs to be fixed
     }
@@ -135,14 +114,14 @@ void Environment::PrintStore(int level) {
 }
 
 Ad_Object* Environment::storeToHashObject(GarbageCollector *gc) {
-    std::map<std::string, HashPair> pairs;
+    std::unordered_map<std::string, HashPair> pairs;
 
-    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
+    for (const std::pair<const std::string, Ad_Object*>& it : store) {
         std::hash<std::string> hash_string;
 
-        Ad_Object *key = new Ad_String_Object(it->first);
+        Ad_Object *key = new Ad_String_Object(it.first);
         gc->addObject(key);
-        Ad_Object *value = it->second;
+        Ad_Object *value = it.second;
 
         HashPair hash_pair(key, value);
         pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair)); // value needs to be a HashPair
@@ -154,7 +133,7 @@ Ad_Object* Environment::storeToHashObject(GarbageCollector *gc) {
 }
 
 Ad_Object* Environment::contextToHashObject(GarbageCollector *gc) {
-    std::map<std::string, HashPair> pairs;
+    std::unordered_map<std::string, HashPair> pairs;
 
     Ad_Hash_Object *hashObject = new Ad_Hash_Object(pairs);
     gc->addObject(hashObject);
@@ -163,8 +142,8 @@ Ad_Object* Environment::contextToHashObject(GarbageCollector *gc) {
 
 std::vector<std::string> Environment::populateGetattrs() {
     std::vector<std::string> elements;
-    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        elements.push_back(it->first);
+    for (const std::pair<const std::string, Ad_Object*>& it : store) {
+        elements.push_back(it.first);
     }
     return elements;
 }
@@ -178,12 +157,6 @@ Environment* Environment::copy(GarbageCollector *gc) {
     }
     if (result != NULL) {
         result->bootstrap = bootstrap; // asta n-ar trebui sa se schimbe
-    }
-    for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
-        //result->store[it->first] = it->second->copy(gc);
-    }
-    for(std::map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
-        //result->siblings[it->first] = it->second->copy(gc);
     }
     return result;
 }
