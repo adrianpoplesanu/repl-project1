@@ -291,7 +291,6 @@ Ad_Object* list_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageC
         Ad_Object* default_object = args[1];
         for (int i = 0; i < size; i++) {
             Ad_Object* new_object = default_object->copy(gc);
-            Ad_INCREF(new_object);
             list_object->elements.push_back(new_object);
         }
         free_builtin_arguments(args);
@@ -404,7 +403,7 @@ Ad_Object* sleep_builtin(std::vector<Ad_Object*> args, Environment *env, Garbage
 }
 
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
-std::map<std::string, Ad_Object*> builtins_map = {
+std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
     {"exit", new Ad_Builtin_Object(&exit_builtin)},
     {"print", new Ad_Builtin_Object(&print_builtin)},
@@ -452,7 +451,7 @@ void free_builtin_arguments(std::vector<Ad_Object*> args) {
 }
 
 void free_builtin_map() {
-    for (std::map<std::string, Ad_Object*>::iterator it = builtins_map.begin(); it != builtins_map.end(); ++it) {
+    for (std::unordered_map<std::string, Ad_Object*>::iterator it = builtins_map.begin(); it != builtins_map.end(); ++it) {
         // TODO: mark and sweep cleanup
         free_Ad_Object_memory(it->second); // i need to find a way to do this with gc
     }
