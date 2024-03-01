@@ -5,6 +5,7 @@
 #include "ast.h"
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 enum PrecedenceType {
@@ -22,7 +23,7 @@ enum PrecedenceType {
     PT_MEMBERACCESS
 };
 
-std::map<TokenType, PrecedenceType> precedences = {
+std::unordered_map<TokenType, PrecedenceType> precedences = {
     {TT_ASSIGN, PT_ASSIGN},
     {TT_EQ, PT_EQUALS},
     {TT_NOT_EQ, PT_EQUALS},
@@ -40,7 +41,8 @@ std::map<TokenType, PrecedenceType> precedences = {
     {TT_LPAREN, PT_CALL},
     {TT_LBRACKET, PT_INDEX},
     {TT_DOT, PT_MEMBERACCESS},
-    {TT_PLUSPLUS, PT_PLUSPLUS}
+    {TT_PLUSPLUS, PT_PLUSPLUS},
+    {TT_MINUSMINUS, PT_PLUSPLUS}
 };
 
 class Parser {
@@ -54,9 +56,9 @@ public:
     typedef Ad_AST_Node* (Parser::*PrefixCallback)();
     typedef Ad_AST_Node* (Parser::*InfixCallback)(Ad_AST_Node*);
     typedef Ad_AST_Node* (Parser::*StatementCallback)();
-    std::map<TokenType, PrefixCallback> prefixParseFns;
-    std::map<TokenType, InfixCallback> infixParseFns;
-    std::map<TokenType, StatementCallback> statementParseFns;
+    std::unordered_map<TokenType, PrefixCallback> prefixParseFns;
+    std::unordered_map<TokenType, InfixCallback> infixParseFns;
+    std::unordered_map<TokenType, StatementCallback> statementParseFns;
 
     Parser();
     ~Parser();

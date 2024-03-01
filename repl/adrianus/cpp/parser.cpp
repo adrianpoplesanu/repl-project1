@@ -48,6 +48,7 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_ASSIGN, &Parser::ParseAssignExpression));
     infixParseFns.insert(std::make_pair(TT_DOT, &Parser::ParseMemberAccess));
     infixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePostfixPlusPlus));
+    infixParseFns.insert(std::make_pair(TT_MINUSMINUS, &Parser::ParsePostfixPlusPlus));
 }
 
 Parser::~Parser() {
