@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <unordered_map>
 
 enum TokenType {
     TT_ILLEGAL,
@@ -57,11 +58,12 @@ enum TokenType {
     TT_MULTICOMMENT,
     TT_SINGLECOMMENT,
     TT_PLUSPLUS,
+    TT_MINUSMINUS,
     TT_NULL,
     TT_SUPER
 };
 
-std::map<TokenType, std::string> token_type_map = {
+std::unordered_map<TokenType, std::string> token_type_map = {
     {TT_ILLEGAL, "ILLEGAL"},
     {TT_ASSIGN, "ASSIGN"},
     {TT_EOF, "EOF"},
@@ -114,11 +116,12 @@ std::map<TokenType, std::string> token_type_map = {
     {TT_MULTICOMMENT, "MULTICOMMENT"},
     {TT_SINGLECOMMENT, "SINGLECOMMENT"},
     {TT_PLUSPLUS, "INCREMENT_OPERATOR"},
+    {TT_MINUSMINUS, "DECREMENT_OPERATOR"},
     {TT_NULL, "NULL"},
     {TT_SUPER, "SUPER"}
 };
 
-std::map<std::string, TokenType> keywords = {
+std::unordered_map<std::string, TokenType> keywords = {
     {"let", TT_LET},
     {"return", TT_RETURN},
     {"break", TT_BREAK},

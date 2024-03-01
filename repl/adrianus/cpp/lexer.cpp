@@ -126,8 +126,14 @@ Token Lexer::NextToken() {
             }
         break;
         case '-':
-            token.type = TT_MINUS;
-            token.literal = current_char;
+            if (PeekChar() == '-') {
+                ReadChar();
+                token.type = TT_MINUSMINUS;
+                token.literal = "--";
+            } else {
+                token.type = TT_MINUS;
+                token.literal = current_char;
+            }
         break;
         case '*':
             token.type = TT_ASTERISK;
