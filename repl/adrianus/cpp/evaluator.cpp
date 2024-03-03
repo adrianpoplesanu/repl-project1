@@ -197,17 +197,27 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
         if (result != NULL && result->Type() == OBJ_ERROR) {
             // TODO: mark and sweep cleanup
             //free_Ad_Object_memory(result);
-            garbageCollector->markObjects();
-            garbageCollector->sweepObjects();
-            return NULL;
+            if (garbageCollector->cycle2 < garbageCollector->maxCycle2) {
+                garbageCollector->cycle2++;
+            } else {
+                garbageCollector->cycle2 = 0;
+                garbageCollector->markObjects();
+                garbageCollector->sweepObjects();
+                return NULL;
+            }
         }
         // TODO: mark and sweep cleanup
         //if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result); // TODO: remove OBJ_BUILTIN check and use ref_count
         // OBJ_BUILTINS get destroyed on termination by free_builtin_map
         //std::cout << statement_type_map[obj->type] << "\n";
-        GarbageCollectEnvironments(); // commented this because garbage collecting after each statement might clear the environment before all the statements in the block got evaluated
-        garbageCollector->markObjects();
-        garbageCollector->sweepObjects();
+        if (garbageCollector->cycle2 < garbageCollector->maxCycle2) {
+            garbageCollector->cycle2++;
+        } else {
+            garbageCollector->cycle2 = 0;
+            GarbageCollectEnvironments(); // commented this because garbage collecting after each statement might clear the environment before all the statements in the block got evaluated
+            garbageCollector->markObjects();
+            garbageCollector->sweepObjects();
+        }
     }
     return NULL;
 }

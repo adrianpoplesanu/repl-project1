@@ -16,6 +16,11 @@ public:
     Ad_Object* head;
     Ad_Object* tail;
 
+    int cycle1;
+    int cycle2;
+    int maxCycle1 = 100;
+    int maxCycle2 = 100;
+
     GarbageCollector();
     ~GarbageCollector();
     void addEnvironment(Environment*);

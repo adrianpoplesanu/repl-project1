@@ -4,6 +4,9 @@ GarbageCollector::GarbageCollector() {
     head = NULL;
     tail = NULL;
     mainEnv = NULL;
+
+    cycle1 = 0;
+    cycle2 = 0;
 }
 
 GarbageCollector::~GarbageCollector() {
@@ -17,6 +20,11 @@ void GarbageCollector::addEnvironment(Environment *env) {
 }
 
 void GarbageCollector::sweepEnvironments() {
+    cycle1++;
+    if (cycle1 < maxCycle1) {
+        return;
+    }
+    cycle1 = 0;
     //std::cout << "running sweepEnvironments()\n";
     int count = 0;
     std::vector<Environment*> referencedEnvironments;
