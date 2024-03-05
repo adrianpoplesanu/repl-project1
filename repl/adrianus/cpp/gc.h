@@ -18,8 +18,10 @@ public:
 
     int cycle1;
     int cycle2;
+    int cycle3;
     int maxCycle1 = 100;
     int maxCycle2 = 100;
+    int maxCycle3 = 100;
 
     GarbageCollector();
     ~GarbageCollector();

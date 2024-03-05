@@ -7,6 +7,7 @@ GarbageCollector::GarbageCollector() {
 
     cycle1 = 0;
     cycle2 = 0;
+    cycle3 = 0;
 }
 
 GarbageCollector::~GarbageCollector() {
@@ -67,6 +68,11 @@ void GarbageCollector::scheduleEnvironmentToDECREF(Environment *env) {
 }
 
 void GarbageCollector::consumeScheduledDECREFEnvironments() {
+    cycle3++;
+    if (cycle3 < maxCycle3) {
+        return;
+    }
+    cycle3 = 0;
     for (Environment *env : scheduled_to_DECREF_environments) {
         Ad_DECREF(env);
     }
