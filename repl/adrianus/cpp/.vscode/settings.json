@@ -79,7 +79,8 @@
         "*.tcc": "cpp",
         "numeric": "cpp",
         "random": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "list": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
