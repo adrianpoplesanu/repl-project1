@@ -5,6 +5,8 @@
 #include "test_objects.cpp"
 #include "test_parser.cpp"
 #include "test_listobject.cpp"
+#include "profiling.h"
+#include "profiling.cpp"
 // #include "lexer.cpp" TODO: remove .cpp imports from other files and fix imports, use only .h
 #include "repl.h"
 #include "repl.cpp"
@@ -40,9 +42,9 @@ int main(int argc, char *argv[]) {
 	if (RUN_LIST_TESTS) {
 		test_list_parsing();
 	}
-	clock_t begin;
+    ExecutionTimeProfiling executionTimeProfiling("ad");
 	if (SHOW_RUNNING_TIME) {
-		begin = clock();
+        executionTimeProfiling.start();
 	}
 	Repl repl;
 	if (argc == 1) {
@@ -55,9 +57,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	if (SHOW_RUNNING_TIME) {
-		clock_t end = clock();
-		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-		std::cout << "ran for: " << elapsed_secs << "sec\n";
+        executionTimeProfiling.stop();
+        executionTimeProfiling.showMetric();
 	}
 	return 0;
 }
