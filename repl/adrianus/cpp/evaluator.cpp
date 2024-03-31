@@ -715,6 +715,7 @@ Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object
 }
 
 Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
+    executionTimeProfiling.start("EvalWhileExpression");
     Ad_Object* condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     if (IsError(condition)) {
         return NULL;
@@ -736,6 +737,7 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
         }
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
+    executionTimeProfiling.stop("EvalWhileExpression");
     return NULL;
 }
 
