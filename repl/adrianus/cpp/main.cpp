@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 	if (RUN_LIST_TESTS) {
 		test_list_parsing();
 	}
-    ExecutionTimeProfiling executionTimeProfiling("ad");
+
 	if (SHOW_RUNNING_TIME) {
         executionTimeProfiling.start();
 	}
