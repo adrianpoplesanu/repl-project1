@@ -1,6 +1,6 @@
 all:
-	g++ -g -std=c++17 main.cpp -c -o main.o
-	g++ -g -std=c++17 main.o -o main
+	g++ -O3 -finline-functions -funroll-loops -fomit-frame-pointer -g -std=c++17 main.cpp -c -o main.o
+	g++ -O3 -finline-functions -funroll-loops -fomit-frame-pointer -g -std=c++17 main.o -o main
 
 clean:
 	find . -type f ! -name "*.h" ! -name "*.cpp" ! -name "README.md" ! -name "Makefile" ! -name "*.*" -delete
