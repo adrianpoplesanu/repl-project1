@@ -715,7 +715,7 @@ Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object
 }
 
 Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
-    executionTimeProfiling.start("EvalWhileExpression");
+    //executionTimeProfiling.start("EvalWhileExpression");
     Ad_Object* condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     if (IsError(condition)) {
         return NULL;
@@ -737,7 +737,7 @@ Ad_Object* Evaluator::EvalWhileExpression(Ad_AST_Node* node, Environment &env) {
         }
         condition = Eval(((Ad_AST_WhileExpression*)node)->condition, env);
     }
-    executionTimeProfiling.stop("EvalWhileExpression");
+    //executionTimeProfiling.stop("EvalWhileExpression");
     return NULL;
 }
 
@@ -1399,6 +1399,7 @@ Ad_Object* Evaluator::EvalPrefixIncrement(Ad_AST_Node* node, Environment& env) {
 }
 
 Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) {
+    //executionTimeProfiling.start("EvalPostfixIncrement");
     Ad_AST_PostfixIncrement *expr = (Ad_AST_PostfixIncrement*) node;
     if (expr->name->type == ST_INDEX_EXPRESSION) {
         Ad_AST_IndexExpression *indexExpression = (Ad_AST_IndexExpression*) (expr->name);
@@ -1417,6 +1418,7 @@ Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) 
                 target->elements[i] = new_obj;
                 Ad_Integer_Object *returned_obj = new Ad_Integer_Object(value);
                 garbageCollector->addObject(returned_obj);
+                //executionTimeProfiling.stop("EvalPostfixIncrement");
                 return returned_obj;
             }
             if (left_obj->type == OBJ_HASH) {
@@ -1437,6 +1439,7 @@ Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) 
 
                 Ad_Integer_Object *returned_obj = new Ad_Integer_Object(value);
                 garbageCollector->addObject(returned_obj);
+                //executionTimeProfiling.stop("EvalPostfixIncrement");
                 return returned_obj;
             }
         }
@@ -1446,19 +1449,26 @@ Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) 
     if (old_obj->Type() == OBJ_INT) {
         int value = ((Ad_Integer_Object*) old_obj)->value;
         if ("++" == expr->_operator) {
+            //executionTimeProfiling.start("new Ad_Integer_Object");
             Ad_Integer_Object *result = new Ad_Integer_Object(value);
+            //executionTimeProfiling.stop("new Ad_Integer_Object");
+            //executionTimeProfiling.start("garbageCollector->addObject");
             garbageCollector->addObject(result);
+            //executionTimeProfiling.stop("garbageCollector->addObject");
             ((Ad_Integer_Object*) old_obj)->value++;
+            //executionTimeProfiling.stop("EvalPostfixIncrement");
             return result;
-        }        
+        }
         if ("--" == expr->_operator) {
             Ad_Integer_Object *result = new Ad_Integer_Object(value);
             garbageCollector->addObject(result);
             ((Ad_Integer_Object*) old_obj)->value--;
+            //executionTimeProfiling.stop("EvalPostfixIncrement");
             return result;
         }
     }
 
+    //executionTimeProfiling.stop("EvalPostfixIncrement");
     return &NULLOBJECT;
 }
 
