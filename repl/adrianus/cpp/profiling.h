@@ -24,4 +24,16 @@ public:
     void stop(const std::string&);
 };
 
+class MemoryProfiling {
+private:
+    int totalAllocated;
+    int totalFreed;
+
+public:
+    MemoryProfiling();
+    void addAllocated(int);
+    void addFreed(int);
+    void printUsage();
+};
+
 #endif //AD_PROFILING_H
