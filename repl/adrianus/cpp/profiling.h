@@ -28,12 +28,16 @@ class MemoryProfiling {
 private:
     int totalAllocated;
     int totalFreed;
+    int numAllocations;
+    int numFreed;
 
 public:
     MemoryProfiling();
     void addAllocated(int);
     void addFreed(int);
     void printUsage();
+    void incrementAllocation();
+    void incrementFreed();
 };
 
 #endif //AD_PROFILING_H
