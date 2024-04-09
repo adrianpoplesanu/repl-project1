@@ -48,4 +48,11 @@ void ExecutionTimeProfiling::stop(const std::string& metricName) {
     }
 }
 
+MemoryProfiling::MemoryProfiling() {
+    totalAllocated = 0;
+    totalFreed = 0;
+    numAllocations = 0;
+    numFreed = 0;
+}
+
 ExecutionTimeProfiling executionTimeProfiling("ad");
