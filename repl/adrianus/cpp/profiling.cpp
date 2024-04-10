@@ -55,4 +55,20 @@ MemoryProfiling::MemoryProfiling() {
     numFreed = 0;
 }
 
+void MemoryProfiling::addAllocated(int size) {
+    totalAllocated += size;
+}
+
+void MemoryProfiling::addFreed(int size) {
+    totalFreed += size;
+}
+
+void MemoryProfiling::incrementAllocation() {
+    numAllocations++;
+}
+
+void MemoryProfiling::incrementFreed() {
+    numFreed++;
+}
+
 ExecutionTimeProfiling executionTimeProfiling("ad");
