@@ -902,6 +902,10 @@ class Evaluator(object):
                 new_value = old_value + 1
                 new_obj = Ad_Integer_Object(new_value)
                 env.set(node.name.value, new_obj)
+            if node.operator == '--':
+                new_value = old_value - 1
+                new_obj = Ad_Integer_Object(new_value)
+                env.set(node.name.value, new_obj)
         return Ad_Integer_Object(value=old_value)
 
     def eval_for_expression(self, node, env):
