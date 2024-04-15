@@ -120,6 +120,10 @@ Token Lexer::NextToken() {
                 ReadChar();
                 token.type = TT_PLUSPLUS;
                 token.literal = "++";
+            } else if (PeekChar() == '=') {
+                ReadChar();
+                token.type = TT_PLUS_EQ;
+                token.literal = "+=";
             } else {
                 token.type = TT_PLUS;
                 token.literal = current_char;
@@ -130,6 +134,10 @@ Token Lexer::NextToken() {
                 ReadChar();
                 token.type = TT_MINUSMINUS;
                 token.literal = "--";
+            } else if (PeekChar() == '=') {
+                ReadChar();
+                token.type = TT_PLUS_EQ;
+                token.literal = "-=";
             } else {
                 token.type = TT_MINUS;
                 token.literal = current_char;
