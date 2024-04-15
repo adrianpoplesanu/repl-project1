@@ -59,6 +59,7 @@ enum TokenType {
     TT_SINGLECOMMENT,
     TT_PLUSPLUS,
     TT_MINUSMINUS,
+    TT_PLUS_EQ,
     TT_NULL,
     TT_SUPER
 };
