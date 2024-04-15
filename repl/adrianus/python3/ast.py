@@ -31,6 +31,7 @@ class StatementType(object):
     SUPER_EXPRESSION = 'SUPER_EXPRESSION'
     BREAK_STATEMENT = 'BREAK_STATEMENT'
     CONTINUE_STATEMENT = 'CONTINUE_STATEMENT'
+    PLUS_EQUALS_STATEMENT = 'ASSIGN_EQUALS_STATEMNT'
 
 
 statement_type_map = {
@@ -125,6 +126,21 @@ class ASTAssignStatement(ASTNode):
 
     def __str__(self):
         return 'AssignStatement [' + str(self.token.literal) + '] <' + str(self.name.value) +'>: ' + (str(self.value) if self.value else '')
+
+
+class ASTPlusEqualsStatement(ASTNode):
+    type = StatementType.PLUS_EQUALS_STATEMENT
+
+    def __init__(self, token=None, name=None, value=None):
+        self.token = token
+        self.name = name
+        self.value = value
+
+    def token_literal(self):
+        return self.token.literal
+
+    def __str__(self):
+        return 'PlusEqualsStatement [' + str(self.token.literal) + '] <' + str(self.name.value) + ">: " + (str(self.value) if self.value else '')
 
 
 class ASTReturnStatement(ASTNode):
