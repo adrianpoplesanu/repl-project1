@@ -8,7 +8,7 @@ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressio
                 ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
                 ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
                 ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
-                ASTFloat, ASTSuperExpression, ASTBrakeStatement, ASTContinueStatement
+                ASTFloat, ASTSuperExpression, ASTBrakeStatement, ASTContinueStatement, ASTPlusEqualsStatement
 
 
 class Parser(object):
@@ -42,6 +42,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
         self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
         self.prefix_parse_functions[TokenType.PLUSPLUS] = self.parse_prefix_plus_plus
+        self.prefix_parse_functions[TokenType.MINUSMINUS] = self.parse_prefix_minus_minus
         self.prefix_parse_functions[TokenType.NULL] = self.parse_null_expression
         self.prefix_parse_functions[TokenType.THIS] = self.parse_this_expression
         self.prefix_parse_functions[TokenType.SUPER] = self.parse_super_expression
@@ -64,6 +65,8 @@ class Parser(object):
         self.infix_parse_functions[TokenType.LBRACKET] = self.parse_index_expression
         self.infix_parse_functions[TokenType.DOT] = self.parse_member_access
         self.infix_parse_functions[TokenType.PLUSPLUS] = self.parse_infix_plus_plus
+        self.infix_parse_functions[TokenType.MINUSMINUS] = self.parse_infix_minus_minus
+        self.infix_parse_functions[TokenType.PLUS_EQ] = self.parse_plus_equals_expression
 
     def reset(self, source):
         self.source = source
@@ -467,10 +470,33 @@ class Parser(object):
         stmt.operator = self.current_token.literal
         return stmt
 
+    def parse_prefix_minus_minus(self):
+        stmt = ASTPrefixIncrement(token=self.current_token)
+        self.next_token()
+        name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+        stmt.name = name
+        stmt.operator = self.current_token.literal
+        return stmt
+
     def parse_infix_plus_plus(self, left):
         stmt = ASTPostfixIncrement(token=self.current_token)
         stmt.name = left
         stmt.operator = self.current_token.literal
+        return stmt
+
+    def parse_infix_minus_minus(self, left):
+        stmt = ASTPostfixIncrement(token=self.current_token)
+        stmt.name = left
+        stmt.operator = self.current_token.literal
+        return stmt
+
+    def parse_plus_equals_expression(self, left):
+        stmt = ASTPlusEqualsStatement(token=self.current_token)
+        stmt.name = left
+        self.next_token()
+        stmt.value = self.parse_expression(PrecedenceType.LOWEST)
+        if self.current_token_is(TokenType.SEMICOLON):
+            self.next_token()
         return stmt
 
     def parse_for_expression(self):
