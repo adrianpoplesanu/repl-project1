@@ -32,5 +32,7 @@ precedences = {
     TokenType.LPAREN: PrecedenceType.CALL,
     TokenType.LBRACKET: PrecedenceType.INDEX,
     TokenType.DOT: PrecedenceType.MEMBER_ACCESS,
-    TokenType.PLUSPLUS: PrecedenceType.PLUSPLUS
+    TokenType.PLUSPLUS: PrecedenceType.PLUSPLUS,
+    TokenType.MINUSMINUS: PrecedenceType.PLUSPLUS,
+    TokenType.PLUS_EQ: PrecedenceType.ASSIGN
 }
