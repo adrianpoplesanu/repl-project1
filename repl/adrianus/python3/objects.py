@@ -132,7 +132,7 @@ class Ad_String_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
-        return "\'" + self.value + "\'"
+        return self.value
 
     def hash_key(self):
         return HashKey(type=type, value=hash(self.value))
