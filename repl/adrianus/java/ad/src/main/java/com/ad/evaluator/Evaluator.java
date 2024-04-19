@@ -718,6 +718,25 @@ public class Evaluator {
 	}
 
 	private AdObject evalPrefixIncrement(AstNode node, Environment env) {
+		AstPrefixIncrement prefixIncrement = (AstPrefixIncrement) node;
+		AstIdentifier identifier = (AstIdentifier) prefixIncrement.getName();
+		AdObject oldObj = env.get(identifier.getValue());
+		if (oldObj.getType() == ObjectTypeEnum.INT) {
+			if ("++".equals(prefixIncrement.getOperation())) {
+				int value = ((AdIntegerObject) oldObj).getValue();
+				AdIntegerObject newObj = new AdIntegerObject(value + 1);
+				env.set(identifier.getValue(), newObj);
+				AdIntegerObject result = new AdIntegerObject(value + 1);
+				return result;
+			}
+			if ("--".equals(prefixIncrement.getOperation())) {
+				int value = ((AdIntegerObject) oldObj).getValue();
+				AdIntegerObject newObj = new AdIntegerObject(value - 1);
+				env.set(identifier.getValue(), newObj);
+				AdIntegerObject result = new AdIntegerObject(value - 1);
+				return result;
+			}
+		}
 		return null;
 	}
 
