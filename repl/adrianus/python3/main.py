@@ -9,7 +9,7 @@ from compiler import Compiler
 from vm import VM
 
 DEBUG = False
-SHOW_RUNNING_TIME = False
+SHOW_RUNNING_TIME = True
 
 
 def main(args):
