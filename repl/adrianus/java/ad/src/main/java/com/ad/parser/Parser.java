@@ -620,13 +620,21 @@ public class Parser {
     }
 
     private AstNode parsePrefixPlusPlus() {
-        // TODO: implement this
-        return null;
+        AstPrefixIncrement expr = new AstPrefixIncrement(currentToken);
+        expr.setOperation(currentToken.getLiteral());
+        nextToken();
+        AstIdentifier identifier = new AstIdentifier(currentToken, currentToken.getLiteral());
+        expr.setName(identifier);
+        return expr;
     }
 
     private AstNode parsePrefixMinusMinus() {
-        // TODO: implement this
-        return null;
+        AstPrefixIncrement expr = new AstPrefixIncrement(currentToken);
+        expr.setOperation(currentToken.getLiteral());
+        nextToken();
+        AstIdentifier identifier = new AstIdentifier(currentToken, currentToken.getLiteral());
+        expr.setName(identifier);
+        return expr;
     }
 
     private AstNode parseNullExpression() {
