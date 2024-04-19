@@ -9,7 +9,7 @@ import com.ad.parser.test.ParserTest;
 import com.ad.repl.Repl;
 
 public class Ad {
-	private static boolean showRunningTime = false;
+	private static boolean showRunningTime = true;
 
 	public static void main(String[] args) {
 		long startTime = System.nanoTime();
