@@ -871,8 +871,12 @@ class Evaluator(object):
 
     def eval_prefix_increment(self, node, env):
         obj = env.get(node.name.value)
-        if obj.type == ObjectType.INTEGER:
-            obj.value += 1
+        if node.operator == '++':
+            if obj.type == ObjectType.INTEGER:
+                obj.value += 1
+        if node.operator == '--':
+            if obj.type == ObjectType.INTEGER:
+                obj.value -= 1
         env.set(node.name.value, obj)
         return obj
 
