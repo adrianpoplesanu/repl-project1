@@ -462,20 +462,19 @@ class Parser(object):
         return member_access
 
     def parse_prefix_plus_plus(self):
-        # TODO: investigate if this can be a regular parse_prefix_expression call
         stmt = ASTPrefixIncrement(token=self.current_token)
+        stmt.operator = self.current_token.literal
         self.next_token()
         name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
         stmt.name = name
-        stmt.operator = self.current_token.literal
         return stmt
 
     def parse_prefix_minus_minus(self):
         stmt = ASTPrefixIncrement(token=self.current_token)
+        stmt.operator = self.current_token.literal
         self.next_token()
         name = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
         stmt.name = name
-        stmt.operator = self.current_token.literal
         return stmt
 
     def parse_infix_plus_plus(self, left):
