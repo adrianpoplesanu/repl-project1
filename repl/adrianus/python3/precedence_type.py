@@ -34,5 +34,6 @@ precedences = {
     TokenType.DOT: PrecedenceType.MEMBER_ACCESS,
     TokenType.PLUSPLUS: PrecedenceType.PLUSPLUS,
     TokenType.MINUSMINUS: PrecedenceType.PLUSPLUS,
-    TokenType.PLUS_EQ: PrecedenceType.ASSIGN
+    TokenType.PLUS_EQ: PrecedenceType.ASSIGN,
+    TokenType.MINUS_EQ: PrecedenceType.ASSIGN
 }
