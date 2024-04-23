@@ -67,6 +67,7 @@ class Parser(object):
         self.infix_parse_functions[TokenType.PLUSPLUS] = self.parse_infix_plus_plus
         self.infix_parse_functions[TokenType.MINUSMINUS] = self.parse_infix_minus_minus
         self.infix_parse_functions[TokenType.PLUS_EQ] = self.parse_plus_equals_expression
+        self.infix_parse_functions[TokenType.MINUS_EQ] = self.parse_plus_equals_expression
 
     def reset(self, source):
         self.source = source
