@@ -117,6 +117,8 @@ class Evaluator(object):
             return self.eval_break_expression(node, env)
         elif node.type == StatementType.CONTINUE_STATEMENT:
             return self.eval_continue_expression(node, env)
+        elif node.type == StatementType.PLUS_EQUALS_STATEMENT:
+            return self.eval_plus_equals_assign_statement(node, env)
         else:
             print ('unknown AST node: ' + node.type)
 
@@ -554,6 +556,42 @@ class Evaluator(object):
             if self.is_error(obj):
                 return obj
             env.set(node.name.value, obj)
+        return None
+
+    def eval_plus_equals_assign_statement(self, node, env):
+        if node.name.type == StatementType.INDEX_EXPRESSION:
+            # TODO: implement this
+            pass
+        elif node.name.type == StatementType.MEMBER_ACCESS:
+            if node.name.owner.type == StatementType.THIS_EXPRESSION:
+                # TODO: implement this
+                pass
+            elif node.name.owner.type == StatementType.SUPER_EXPRESSION:
+                # TODO: implement this
+                pass
+            elif node.name.owner.type == StatementType.MEMBER_ACCESS:
+                # TODO: implement this
+                pass
+            else:
+                # TODO: implement this
+                pass
+        else:
+            obj = env.get(node.name.value)
+            if self.is_error(obj):
+                return obj
+
+            step_obj = self.eval(node.value, env)
+            if self.is_error(step_obj):
+                return obj
+
+            if node.token_literal() == '+=':
+                if obj.type == ObjectType.INTEGER:
+                    obj.value += step_obj.value
+            if node.token_literal() == '-=':
+                if obj.type == ObjectType.INTEGER:
+                    obj.value -= step_obj.value
+
+            #env.set(node.name.value, obj) # no need for this, already updated the reference
         return None
 
     def eval_index_expression_assign(self, node, env):
