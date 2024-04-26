@@ -119,6 +119,8 @@ std::unordered_map<TokenType, std::string> token_type_map = {
     {TT_SINGLECOMMENT, "SINGLECOMMENT"},
     {TT_PLUSPLUS, "INCREMENT_OPERATOR"},
     {TT_MINUSMINUS, "DECREMENT_OPERATOR"},
+    {TT_PLUS_EQ, "PLUS_EQUAL"},
+    {TT_MINUS_EQ, "MINUS_EQUAL"},
     {TT_NULL, "NULL"},
     {TT_SUPER, "SUPER"}
 };
