@@ -1387,13 +1387,24 @@ Ad_Object* Evaluator::EvalPrefixIncrement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) prefix_increment->name;
     Ad_Object* old_obj = env.Get(ident->value);
     if (old_obj->Type() == OBJ_INT) {
-        int value = ((Ad_Integer_Object*) old_obj)->value;
-        Ad_Integer_Object* new_obj = new Ad_Integer_Object(value + 1);
-        garbageCollector->addObject(new_obj);
-        env.Set(ident->value, new_obj);
-        Ad_Integer_Object* result = new Ad_Integer_Object(value + 1);
-        garbageCollector->addObject(result);
-        return result;
+        if (prefix_increment->_operator == "++") {
+            int value = ((Ad_Integer_Object *) old_obj)->value;
+            Ad_Integer_Object *new_obj = new Ad_Integer_Object(value + 1);
+            garbageCollector->addObject(new_obj);
+            env.Set(ident->value, new_obj);
+            Ad_Integer_Object *result = new Ad_Integer_Object(value + 1);
+            garbageCollector->addObject(result);
+            return result;
+        }
+        if (prefix_increment->_operator == "--") {
+            int value = ((Ad_Integer_Object *) old_obj)->value;
+            Ad_Integer_Object *new_obj = new Ad_Integer_Object(value - 1);
+            garbageCollector->addObject(new_obj);
+            env.Set(ident->value, new_obj);
+            Ad_Integer_Object *result = new Ad_Integer_Object(value - 1);
+            garbageCollector->addObject(result);
+            return result;
+        }
     }
     return &NULLOBJECT;
 }

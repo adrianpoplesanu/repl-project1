@@ -28,6 +28,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_FUN, &Parser::ParseFunExpression));
     prefixParseFns.insert(std::make_pair(TT_CLASS, &Parser::ParseClassStatement));
     prefixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePrefixPlusPlus));
+    prefixParseFns.insert(std::make_pair(TT_MINUSMINUS, &Parser::ParsePrefixPlusPlus));
     prefixParseFns.insert(std::make_pair(TT_NULL, &Parser::ParseNullExpression));
     prefixParseFns.insert(std::make_pair(TT_THIS, &Parser::ParseThisExpression));
     prefixParseFns.insert(std::make_pair(TT_SUPER, &Parser::parseSuperExpression));
@@ -710,6 +711,7 @@ Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
 
 Ad_AST_Node* Parser::ParsePrefixPlusPlus() {
     Ad_AST_PrefixIncrement* expr = new Ad_AST_PrefixIncrement(current_token);
+    expr->_operator = current_token.literal;
     NextToken();
     Ad_AST_Identifier* name = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
     expr->name = name;
