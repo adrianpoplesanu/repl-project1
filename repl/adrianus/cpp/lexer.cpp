@@ -136,7 +136,7 @@ Token Lexer::NextToken() {
                 token.literal = "--";
             } else if (PeekChar() == '=') {
                 ReadChar();
-                token.type = TT_PLUS_EQ;
+                token.type = TT_MINUS_EQ;
                 token.literal = "-=";
             } else {
                 token.type = TT_MINUS;
