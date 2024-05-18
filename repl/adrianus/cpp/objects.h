@@ -339,7 +339,7 @@ public:
 	bool isClient;
 	bool isServer;
 	int listenfd; // listen file descriptor
-	int connfd; // connection file descriptor
+	int connfd = 0; // connection file descriptor
 	char sendBuff[1024];
 	char recvBuff[1024];
 
