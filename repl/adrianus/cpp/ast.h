@@ -38,7 +38,9 @@ enum StatementType {
     ST_CONTINUE_STATEMENT,
     ST_NULL_EXPRESSION,
     ST_THIS_EXPRESSION,
-    ST_SUPER_EXPRESSION
+    ST_SUPER_EXPRESSION,
+    ST_PLUS_EQUALS,
+    ST_MINUS_EQUALS
 };
 
 std::unordered_map<StatementType, std::string> statement_type_map = {
@@ -73,7 +75,9 @@ std::unordered_map<StatementType, std::string> statement_type_map = {
     {ST_CONTINUE_STATEMENT, "ContinueStatement"},
     {ST_NULL_EXPRESSION, "NullExpression"},
     {ST_THIS_EXPRESSION, "ThisExpression"},
-    {ST_SUPER_EXPRESSION, "SuperExpression"}
+    {ST_SUPER_EXPRESSION, "SuperExpression"},
+    {ST_PLUS_EQUALS, "PlusEquals"},
+    {ST_MINUS_EQUALS, "MinusEquals"}
 };
 
 class Ad_AST_Node {
