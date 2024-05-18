@@ -1049,6 +1049,10 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
             Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
 
+            if (klass_instance == NULL) {
+                return NULL;
+            }
+
             Environment* klass_environment = klass_instance->instance_environment;
             //Environment* old = klass_environment->outer;
             klass_environment->outer = &env;
@@ -1310,6 +1314,9 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
     Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
     Ad_AST_Identifier* member_ident = (Ad_AST_Identifier*) member_access->member;
     Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
+    if (owner_obj_raw == NULL) {
+        return NULL;
+    }
     if (owner_obj_raw->type == OBJ_SOCKET) {
         if (member_access->is_method) {
             if (member_ident->value == "create_server") {
@@ -1351,6 +1358,9 @@ Ad_Object* Evaluator::evalThreadObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
     Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
     Ad_AST_Identifier* member_ident = (Ad_AST_Identifier*) member_access->member;
     Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
+    if (owner_obj_raw == NULL) {
+        return NULL;
+    }
     if (owner_obj_raw->type == OBJ_THREAD) {
         if (member_access->is_method) {
             if (member_ident->value == "callback" || member_ident->value == "execute") {
