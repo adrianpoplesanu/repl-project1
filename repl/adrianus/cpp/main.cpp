@@ -22,7 +22,7 @@
 #define RUN_FUNCTION_LITERAL_TESTS 0
 #define RUN_LISTOBJECT_TESTS 0
 #define RUN_LIST_TESTS 0
-#define SHOW_RUNNING_TIME 1
+#define SHOW_RUNNING_TIME 0
 
 int main(int argc, char *argv[]) {
 	if (RUN_TESTS) {
