@@ -32,12 +32,15 @@ private:
     int numFreed;
 
 public:
-    MemoryProfiling();
+    std::string name;
+
+    MemoryProfiling(std::string);
     void addAllocated(int);
     void addFreed(int);
     void printUsage();
     void incrementAllocation();
     void incrementFreed();
+    void showTotalResidualGCObjects(GarbageCollector*);
 };
 
 #endif //AD_PROFILING_H

@@ -48,7 +48,8 @@ void ExecutionTimeProfiling::stop(const std::string& metricName) {
     }
 }
 
-MemoryProfiling::MemoryProfiling() {
+MemoryProfiling::MemoryProfiling(std::string memoryProfilingName) {
+    name = memoryProfilingName;
     totalAllocated = 0;
     totalFreed = 0;
     numAllocations = 0;
@@ -71,4 +72,9 @@ void MemoryProfiling::incrementFreed() {
     numFreed++;
 }
 
+void MemoryProfiling::showTotalResidualGCObjects(GarbageCollector *gc) {
+    std::cout << "[ " << name << " ] residual elements number: " << gc->getTotalResidualGCObjects();
+}
+
 ExecutionTimeProfiling executionTimeProfiling("ad");
+MemoryProfiling memoryProfiling("ad");
