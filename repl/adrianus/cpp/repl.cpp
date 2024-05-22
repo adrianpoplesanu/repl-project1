@@ -8,6 +8,8 @@
 #include "thread_workers.h"
 #include <thread>
 
+#define SHOW_RESIDUAL_GC_OBJECTS 0
+
 Repl::Repl() {
     garbageCollector = new GarbageCollector();
     evaluator.setGarbageCollector(garbageCollector);
@@ -39,6 +41,9 @@ void Repl::Loop() {
         }
     }
     evaluator.GarbageCollectEnvironments();
+    if (SHOW_RESIDUAL_GC_OBJECTS) {
+        memoryProfiling.showTotalResidualGCObjects(evaluator.garbageCollector);
+    }
     evaluator.garbageCollector->forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();
 }
@@ -86,6 +91,9 @@ void Repl::ExecuteFile(std::ifstream &target) {
     }
     //std::cout << "Finished joining!!!!!\n";
     evaluator.GarbageCollectEnvironments();
+    if (SHOW_RESIDUAL_GC_OBJECTS) {
+        memoryProfiling.showTotalResidualGCObjects(evaluator.garbageCollector);
+    }
     evaluator.garbageCollector->forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();
 }
