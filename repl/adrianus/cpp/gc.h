@@ -42,6 +42,7 @@ public:
     void forceFreeAstNodes();
     void scheduleEnvironmentToDECREF(Environment*);
     void consumeScheduledDECREFEnvironments();
+    int getTotalResidualGCObjects();
 };
 
 #endif

@@ -278,6 +278,16 @@ void GarbageCollector::sweepObjects() {
     }
 }
 
+int GarbageCollector::getTotalResidualGCObjects() {
+    int result = 0;
+    Ad_Object* iter = head;
+    while(iter != NULL) {
+        iter = iter->next;
+        result++;
+    }
+    return result;
+}
+
 void GarbageCollector::forceFreeObjects() {
     unmarkAllObjects();
     sweepObjects();
