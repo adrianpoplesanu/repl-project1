@@ -489,6 +489,16 @@ public:
     ~Ad_AST_Super_Expression();
 };
 
+class Ad_AST_Plus_Equals_Statement : public Ad_AST_Node {
+public:
+    Token token;
+};
+
+class Ad_AST_Minus_Equals_Statement : public Ad_AST_Node {
+public:
+    Token token;
+};
+
 bool StatementIs(Ad_AST_Node *stmt, StatementType st) {
     return stmt->type == st;
 }
