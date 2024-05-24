@@ -50,6 +50,8 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_DOT, &Parser::ParseMemberAccess));
     infixParseFns.insert(std::make_pair(TT_PLUSPLUS, &Parser::ParsePostfixPlusPlus));
     infixParseFns.insert(std::make_pair(TT_MINUSMINUS, &Parser::ParsePostfixPlusPlus));
+    infixParseFns.insert(std::make_pair(TT_PLUS_EQ, &Parser::parsePlusEqualsExpression));
+    infixParseFns.insert(std::make_pair(TT_MINUS_EQ, &Parser::parsePlusEqualsExpression));
 }
 
 Parser::~Parser() {
@@ -723,6 +725,17 @@ Ad_AST_Node* Parser::ParsePostfixPlusPlus(Ad_AST_Node* left) {
     expr->name = left;
     expr->_operator = current_token.GetLiteral();
     return expr;
+}
+
+Ad_AST_Node* Parser::parsePlusEqualsExpression(Ad_AST_Node* left) {
+    Ad_AST_Plus_Equals_Statement *stmt = new Ad_AST_Plus_Equals_Statement(current_token);
+    stmt->name = left;
+    NextToken();
+    stmt->value = ParseExpression(PT_LOWEST);
+    if (CurrentTokenIs(TT_SEMICOLON)) {
+        NextToken();
+    }
+    return stmt;
 }
 
 Ad_AST_Node* Parser::ParseForExpression() {

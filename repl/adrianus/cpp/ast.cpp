@@ -1014,6 +1014,30 @@ std::string Ad_AST_ContinueStatement::ToString() {
     return "Ad_AST_BreakStatement.ToString()";
 }
 
+Ad_AST_Plus_Equals_Statement::Ad_AST_Plus_Equals_Statement() {
+    type = ST_PLUS_EQUALS;
+}
+
+Ad_AST_Plus_Equals_Statement::Ad_AST_Plus_Equals_Statement(Token t) {
+    type = ST_PLUS_EQUALS;
+    token = t;
+}
+
+Ad_AST_Plus_Equals_Statement::Ad_AST_Plus_Equals_Statement(Token t, Ad_AST_Node *n, Ad_AST_Node *v) {
+    type = ST_PLUS_EQUALS;
+    token = t;
+    name = n;
+    value = v;
+}
+
+std::string Ad_AST_Plus_Equals_Statement::TokenLiteral() {
+    return "todo: implement this";
+}
+
+std::string Ad_AST_Plus_Equals_Statement::ToString() {
+    return "todo: implement this";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;

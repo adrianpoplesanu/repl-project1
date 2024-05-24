@@ -116,6 +116,7 @@ public:
     Ad_AST_Node* ParseNullExpression();
     Ad_AST_Node* ParseThisExpression();
     Ad_AST_Node* parseSuperExpression();
+    Ad_AST_Node* parsePlusEqualsExpression(Ad_AST_Node*);
 };
 
 #endif

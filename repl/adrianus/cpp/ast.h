@@ -492,6 +492,14 @@ public:
 class Ad_AST_Plus_Equals_Statement : public Ad_AST_Node {
 public:
     Token token;
+    Ad_AST_Node *name;
+    Ad_AST_Node *value;
+
+    Ad_AST_Plus_Equals_Statement();
+    Ad_AST_Plus_Equals_Statement(Token);
+    Ad_AST_Plus_Equals_Statement(Token, Ad_AST_Node*, Ad_AST_Node*);
+    virtual std::string TokenLiteral();
+    virtual std::string ToString();
 };
 
 class Ad_AST_Minus_Equals_Statement : public Ad_AST_Node {
