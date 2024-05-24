@@ -560,18 +560,14 @@ class Evaluator(object):
 
     def eval_plus_equals_assign_statement(self, node, env):
         if node.name.type == StatementType.INDEX_EXPRESSION:
-            # TODO: implement this
-            pass
+            self.eval_plus_equals_index_expression(node, env)
         elif node.name.type == StatementType.MEMBER_ACCESS:
             if node.name.owner.type == StatementType.THIS_EXPRESSION:
-                # TODO: implement this
-                pass
+                self.eval_plus_equals_this_expression(node, env)
             elif node.name.owner.type == StatementType.SUPER_EXPRESSION:
-                # TODO: implement this
-                pass
+                self.eval_plus_equals_super_expression(node, env)
             elif node.name.owner.type == StatementType.MEMBER_ACCESS:
-                # TODO: implement this
-                pass
+                self.eval_plus_equals_member_access(node, env)
             else:
                 # TODO: implement this
                 pass
@@ -593,6 +589,18 @@ class Evaluator(object):
 
             #env.set(node.name.value, obj) # no need for this, already updated the reference
         return None
+
+    def eval_plus_equals_index_expression(self, node, env):
+        pass
+
+    def eval_plus_equals_this_expression(self, node, env):
+        pass
+
+    def eval_plus_equals_super_expression(self, node, env):
+        pass
+
+    def eval_plus_equals_member_access(self, node, env):
+        pass
 
     def eval_index_expression_assign(self, node, env):
         obj = self.eval(node.name.left, env)
