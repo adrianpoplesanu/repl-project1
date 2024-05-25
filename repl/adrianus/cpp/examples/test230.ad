@@ -1,0 +1,21 @@
+n = 3
+a = list(n, 0)
+
+def check(k) {
+    for (i = 0; i < k; i++) if (a[i] == a[k]) return false
+    return true
+}
+
+def back(k) {
+    if (k == n) {
+        println(a)
+    } else {
+        a[k] = 0
+        while (a[k] < n) {
+            if (check(k)) back(k+1)
+            a[k]++
+        }
+    }
+}
+
+back(0)
