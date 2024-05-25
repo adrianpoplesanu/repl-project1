@@ -1,6 +1,6 @@
-from code import Code
-from opcode import Opcode
-from opcode import OpcodeEnum
+from code_ad import Code
+from opcode_ad import Opcode
+from opcode_ad import OpcodeEnum
 
 def simple_test():
     code = Code()

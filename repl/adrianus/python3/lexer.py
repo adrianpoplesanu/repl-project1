@@ -1,5 +1,5 @@
-from token import Token, TokenType
-from token import keywords_map, token_type_map
+from token_ad import Token, TokenType
+from token_ad import keywords_map, token_type_map
 
 
 class Lexer(object):

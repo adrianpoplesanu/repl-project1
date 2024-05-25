@@ -1,6 +1,6 @@
 from definition import Definition
 from instructions import Instructions
-from opcode import Opcode, OpcodeEnum
+from opcode_ad import Opcode, OpcodeEnum
 
 
 class Code:

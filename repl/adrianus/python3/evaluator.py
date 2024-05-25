@@ -591,7 +591,30 @@ class Evaluator(object):
         return None
 
     def eval_plus_equals_index_expression(self, node, env):
-        pass
+        obj = self.eval(node.name.left, env)
+        if self.is_error(obj):
+            return obj
+        index = self.eval(node.name.index, env)
+        if self.is_error(index):
+            return index
+        if obj.type == ObjectType.LIST:
+            idx = index.value
+            value = self.eval(node.value, env)
+            if node.token.literal == "+=" and obj.elements[idx].type == ObjectType.INTEGER and value.type == ObjectType.INTEGER:
+                obj.elements[idx].value += value.value
+            if node.token.literal == "-=" and obj.elements[idx].type == ObjectType.INTEGER and value.type == ObjectType.INTEGER:
+                obj.elements[idx] -= value
+        elif obj.type == ObjectType.HASH:
+            value = self.eval(node.value, env)
+            hashed = index.hash_key()
+            old_obj = obj.pairs[hashed.value].value
+            if node.token.literal == "+=":
+                old_obj.value += value.value
+                #obj.pairs[hashed.value] = Hash_Pair(key=index, value=old_value + value)
+            if node.token.literal == "-=":
+                old_obj.value -= value.value
+                #obj.pairs[hashed.value] = Hash_Pair(key=index, value=old_value - value)
+        return None
 
     def eval_plus_equals_this_expression(self, node, env):
         pass

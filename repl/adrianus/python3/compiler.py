@@ -2,10 +2,10 @@ from instructions import Instructions
 from bytecode import Bytecode
 from objects import Ad_Integer_Object
 from parser import Parser
-from code import Code
+from code_ad import Code
 from ast import ASTProgram
 from ast import StatementType
-from opcode import OpConstant, OpAdd, OpPop, OpSub, OpMul, OpDiv
+from opcode_ad import OpConstant, OpAdd, OpPop, OpSub, OpMul, OpDiv
 
 
 class Compiler:
