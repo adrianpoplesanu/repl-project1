@@ -578,13 +578,13 @@ class Evaluator(object):
 
             step_obj = self.eval(node.value, env)
             if self.is_error(step_obj):
-                return obj
+                return step_obj
 
             if node.token_literal() == '+=':
-                if obj.type == ObjectType.INTEGER:
+                if obj.type == ObjectType.INTEGER and step_obj.type == ObjectType.INTEGER:
                     obj.value += step_obj.value
             if node.token_literal() == '-=':
-                if obj.type == ObjectType.INTEGER:
+                if obj.type == ObjectType.INTEGER and step_obj.type == ObjectType.INTEGER:
                     obj.value -= step_obj.value
 
             #env.set(node.name.value, obj) # no need for this, already updated the reference
