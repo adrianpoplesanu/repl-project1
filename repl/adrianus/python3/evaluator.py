@@ -562,15 +562,10 @@ class Evaluator(object):
         if node.name.type == StatementType.INDEX_EXPRESSION:
             self.eval_plus_equals_index_expression(node, env)
         elif node.name.type == StatementType.MEMBER_ACCESS:
-            if node.name.owner.type == StatementType.THIS_EXPRESSION:
-                self.eval_plus_equals_this_expression(node, env)
-            elif node.name.owner.type == StatementType.SUPER_EXPRESSION:
-                self.eval_plus_equals_super_expression(node, env)
-            elif node.name.owner.type == StatementType.MEMBER_ACCESS:
-                self.eval_plus_equals_member_access(node, env)
-            else:
-                # TODO: implement this
-                pass
+            obj = self.eval_member_access(node.name, env)
+            step_obj = self.eval(node.value, env)
+            if obj.type == ObjectType.INTEGER and step_obj.type == ObjectType.INTEGER:
+                obj.value += step_obj.value
         else:
             obj = env.get(node.name.value)
             if self.is_error(obj):
@@ -610,20 +605,9 @@ class Evaluator(object):
             old_obj = obj.pairs[hashed.value].value
             if node.token.literal == "+=" and old_obj.type == ObjectType.INTEGER and value_obj.type == ObjectType.INTEGER:
                 old_obj.value += value_obj.value
-                #obj.pairs[hashed.value] = Hash_Pair(key=index, value=old_value + value)
             if node.token.literal == "-=" and old_obj.type == ObjectType.INTEGER and value_obj.type == ObjectType.INTEGER:
                 old_obj.value -= value_obj.value
-                #obj.pairs[hashed.value] = Hash_Pair(key=index, value=old_value - value)
         return None
-
-    def eval_plus_equals_this_expression(self, node, env):
-        pass
-
-    def eval_plus_equals_super_expression(self, node, env):
-        pass
-
-    def eval_plus_equals_member_access(self, node, env):
-        pass
 
     def eval_index_expression_assign(self, node, env):
         obj = self.eval(node.name.left, env)
