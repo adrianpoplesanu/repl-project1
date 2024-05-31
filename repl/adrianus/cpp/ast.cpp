@@ -1030,8 +1030,13 @@ Ad_AST_Plus_Equals_Statement::Ad_AST_Plus_Equals_Statement(Token t, Ad_AST_Node 
     value = v;
 }
 
+Ad_AST_Plus_Equals_Statement::~Ad_AST_Plus_Equals_Statement() {
+    free_Ad_AST_Node_memory(name);
+    free_Ad_AST_Node_memory(value);
+}
+
 std::string Ad_AST_Plus_Equals_Statement::TokenLiteral() {
-    return "todo: implement this";
+    return token.GetLiteral();
 }
 
 std::string Ad_AST_Plus_Equals_Statement::ToString() {
@@ -1150,6 +1155,9 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_FOR_EXPRESSION:
             delete (Ad_AST_ForExprssion*) node;
+        break;
+        case ST_PLUS_EQUALS:
+            delete (Ad_AST_Plus_Equals_Statement*) node;
         break;
         case ST_PROGRAM:
             delete (Ad_AST_Program*) node;

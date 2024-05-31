@@ -498,6 +498,7 @@ public:
     Ad_AST_Plus_Equals_Statement();
     Ad_AST_Plus_Equals_Statement(Token);
     Ad_AST_Plus_Equals_Statement(Token, Ad_AST_Node*, Ad_AST_Node*);
+    ~Ad_AST_Plus_Equals_Statement();
     virtual std::string TokenLiteral();
     virtual std::string ToString();
 };
