@@ -667,7 +667,8 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
 
 Environment* Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*> args_objs, Environment& env) {
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
-    Environment* extended = newEnclosedEnvironmentUnfreeable((func_obj)->env);
+    //Environment* extended = newEnclosedEnvironmentUnfreeable((func_obj)->env);
+    Environment* extended = newEnclosedEnvironmentUnfreeable(&env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
         extended->setLocalParam((*it)->TokenLiteral(), args_objs[i]);
