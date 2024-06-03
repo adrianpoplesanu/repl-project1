@@ -166,6 +166,10 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
             return evalThisExpression(node, &env);
         }
         break;
+        case ST_PLUS_EQUALS: {
+            return evalPlusEqualsStatement(node, &env);
+        }
+        break;
         default:
             std::cout << "unimplemented eval for token " << statement_type_map[node->type] << "\n";
         break;
@@ -1054,7 +1058,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             }
 
             Environment* klass_environment = klass_instance->instance_environment;
-            //Environment* old = klass_environment->outer;
+            Environment* old = klass_environment->outer;
             klass_environment->outer = &env;
             //klass_environment->outer = NULL;
 
@@ -1071,7 +1075,7 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             }
 
             Ad_Object* result = ApplyMethod(klass_method, args_objs, *klass_environment);
-            //klass_environment->outer = old;
+            klass_environment->outer = old;
             return result;
         } else {
             if (member_access->owner->type == ST_IDENTIFIER) {
@@ -1570,6 +1574,38 @@ Ad_Object* Evaluator::evalThisExpression(Ad_AST_Node* node, Environment *env) {
     }
     if (env->outer->isInstanceEnvironment) {
         return env->outer->owningInstanceEnvironment;
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::evalPlusEqualsStatement(Ad_AST_Node* node, Environment *env) {
+    Ad_AST_Plus_Equals_Statement* stmt = (Ad_AST_Plus_Equals_Statement*) node;
+    if (stmt->name->type == ST_INDEX_EXPRESSION) {
+        // eval_plus_equals_index_expression();
+    } else if (stmt->name->type == ST_MEMBER_ACCESS) {
+        // eval_mermber_access call
+    } else {
+        Ad_AST_Identifier *ident = (Ad_AST_Identifier*) stmt->name;
+        Ad_Object *obj = env->Get(ident->value);
+        if (IsError(obj)) {
+            return obj;
+        }
+
+        Ad_Object *step_obj = Eval(stmt->value, *env);
+        if (IsError(step_obj)) {
+            return step_obj;
+        }
+
+        if (node->TokenLiteral() == "+=") {
+            if (obj->type == OBJ_INT && obj->type == OBJ_INT) {
+                ((Ad_Integer_Object *) obj)->value += ((Ad_Integer_Object*) step_obj)->value;
+            }
+        }
+        if (node->TokenLiteral() == "-=") {
+            if (obj->type == OBJ_INT && obj->type == OBJ_INT) {
+                ((Ad_Integer_Object *) obj)->value -= ((Ad_Integer_Object*) step_obj)->value;
+            }
+        }
     }
     return NULL;
 }
