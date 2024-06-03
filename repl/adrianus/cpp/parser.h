@@ -42,7 +42,9 @@ std::unordered_map<TokenType, PrecedenceType> precedences = {
     {TT_LBRACKET, PT_INDEX},
     {TT_DOT, PT_MEMBERACCESS},
     {TT_PLUSPLUS, PT_PLUSPLUS},
-    {TT_MINUSMINUS, PT_PLUSPLUS}
+    {TT_MINUSMINUS, PT_PLUSPLUS},
+    {TT_PLUS_EQ, PT_ASSIGN},
+    {TT_MINUS_EQ, PT_ASSIGN}
 };
 
 class Parser {
