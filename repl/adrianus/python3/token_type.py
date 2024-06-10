@@ -13,6 +13,7 @@ class TokenType(object):
     DEF = "DEF"
     FUN = "FUN"
     FUNCTION = "FUNCTION"
+    METHOD = "METHOD"
     IDENT = "IDENT"
     INT = "INT"
     FLOAT = "FLOAT"

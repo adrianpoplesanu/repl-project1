@@ -38,6 +38,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
         self.prefix_parse_functions[TokenType.FOR] = self.parse_for_expression
         self.prefix_parse_functions[TokenType.FUNC] = self.parse_func_literal
+        self.prefix_parse_functions[TokenType.METHOD] = self.parse_func_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
         self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
