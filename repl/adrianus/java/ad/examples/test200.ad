@@ -1,0 +1,12 @@
+class Dog {
+    age = 14
+}
+
+dex = Dog()
+dex.printAge = func() {
+    println(age)
+}
+
+println(dex.printAge)
+
+dex.printAge()
