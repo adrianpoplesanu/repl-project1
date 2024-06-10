@@ -39,6 +39,7 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.FOR, this::parseForExpression);
         prefixParseFns.put(TokenTypeEnum.FUN, this::parseFunStatement);
         prefixParseFns.put(TokenTypeEnum.FUNC, this::parseFunctionLiteral);
+        prefixParseFns.put(TokenTypeEnum.METHOD, this::parseFunctionLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACKET, this::parseListLiteral);
         prefixParseFns.put(TokenTypeEnum.LBRACE, this::parseHashLiteral);
         prefixParseFns.put(TokenTypeEnum.DOUBLE_QUOTES, this::parseStringLiteral);

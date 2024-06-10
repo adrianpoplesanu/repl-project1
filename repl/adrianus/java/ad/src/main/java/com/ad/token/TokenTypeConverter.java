@@ -20,6 +20,7 @@ public class TokenTypeConverter {
 			put(TokenTypeEnum.DEF, "DEF");
 			put(TokenTypeEnum.FUNC, "FUNC");
 			put(TokenTypeEnum.FUN, "FUN");
+			put(TokenTypeEnum.METHOD, "METHOD");
 			put(TokenTypeEnum.IDENT, "IDENT");
 			put(TokenTypeEnum.INT, "INT");
 			put(TokenTypeEnum.FLOAT, "FLOAT");

@@ -17,6 +17,7 @@ public class TokenKeywordConverter {
 		    put("def", TokenTypeEnum.DEF);
 			put("fun", TokenTypeEnum.FUN);
 			put("function", TokenTypeEnum.FUNCTION);
+			put("method", TokenTypeEnum.METHOD);
 		    put("null", TokenTypeEnum.NULL);
 		    put("class", TokenTypeEnum.CLASS);
 		    put("this", TokenTypeEnum.THIS);

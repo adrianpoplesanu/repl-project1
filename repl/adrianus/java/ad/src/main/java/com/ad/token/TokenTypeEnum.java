@@ -15,6 +15,7 @@ public enum TokenTypeEnum {
 	DEF,
 	FUNC,
 	FUN,
+	METHOD,
 	IDENT,
 	INT,
 	FLOAT,
