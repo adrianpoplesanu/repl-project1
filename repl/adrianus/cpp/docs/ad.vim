@@ -17,7 +17,7 @@ highlight link lineComment Comment
 syntax region portionString start=/\v"/ skip=/\v\\./ end=/\v"/
 " syntax region potionFuncName start=/\vdef/ skip=/\v\\./ end=/\v\(/
 
-syntax keyword adFunction len print println func list
+syntax keyword adFunction len print println func list method map
 syntax keyword adKeyword if else return while class for
 syntax keyword adLet let def function fun
 syntax keyword adBoolean true false portionString
