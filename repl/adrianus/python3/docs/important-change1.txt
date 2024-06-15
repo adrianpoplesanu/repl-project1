@@ -1,0 +1,392 @@
+diff --git a/repl/adrianus/python3/ast.py b/repl/adrianus/python3/ast.py
+index a66dc87..817ac95 100644
+--- a/repl/adrianus/python3/ast.py
++++ b/repl/adrianus/python3/ast.py
+@@ -297,10 +297,12 @@ class ASTCallExpression(ASTNode):
+         @param token: the node's token
+         @param func: ASTNode subclass representing the Function Literal
+         arguments: the list of arguments in the call
++        @:param default_params: map of params
+         """
+         self.token = token
+         self.func = func
+         self.arguments = None
++        self.kw_args = None
+ 
+     def token_literal(self):
+         return self.token.literal
+@@ -358,14 +360,16 @@ class ASTBlockStatement(ASTNode):
+ class ASTFunctionLiteral(ASTNode):
+     type = StatementType.FUNCTION_LITERAL
+ 
+-    def __init__(self, token=None, parameters=None, body=None):
++    def __init__(self, token=None, parameters=None, default_params=None, body=None):
+         """
+         @param token: the node's token
+         @param parameters: list
++        @:param default_params: list of default params
+         @param body: ASTBlockStatement
+         """
+         self.token = token
+         self.parameters = parameters
++        self.default_params = default_params
+         self.body = body
+ 
+     def token_literal(self):
+@@ -472,15 +476,17 @@ class ASTHashLiteral(ASTNode):
+ class ASTDefStatement(ASTNode):
+     type = StatementType.DEF_STATEMENT
+ 
+-    def __init__(self, token=None, name=None, parameters=None, body=None):
++    def __init__(self, token=None, name=None, parameters=None, default_params=None, body=None):
+         """
+         @param name: AstNode - identifier that will store the function, it needs to be like a let statement in the eval
+         @param params: AstNode[] list of funtion arguments
++        @:param default_params: default params when missing argument
+         @param body: AstNode block statement that is the body of the function
+         """
+         self.name = name
+         self.token = token
+         self.parameters = parameters
++        self.default_params = default_params
+         self.body = body
+ 
+     def token_literal(self):
+diff --git a/repl/adrianus/python3/evaluator.py b/repl/adrianus/python3/evaluator.py
+index 5d2166b..1d6742a 100644
+--- a/repl/adrianus/python3/evaluator.py
++++ b/repl/adrianus/python3/evaluator.py
+@@ -61,7 +61,7 @@ class Evaluator(object):
+         elif node.type == StatementType.BLOCK_STATEMENT:
+             return self.eval_block_statement(node, env)
+         elif node.type == StatementType.FUNCTION_LITERAL:
+-            obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
++            obj = Ad_Function_Object(parameters=node.parameters, default_params=node.default_params, body=node.body, env=env)
+             return obj
+         elif node.type == StatementType.CALL_EXPRESSION:
+             # TODO: i need to check if this is a class constructor
+@@ -69,9 +69,13 @@ class Evaluator(object):
+             if self.is_error(func):
+                 return func
+             args_objs = self.eval_expressions(node.arguments, env)
++            kw_objs = {}
++            for assignment in node.kw_args:
++                obj = self.eval(assignment.value, env)
++                kw_objs[assignment.name.token.literal] = obj
+             if len(args_objs) == 1 and self.is_error(args_objs[0]):
+                 return args_objs[0]
+-            return self.apply_function(func, args_objs, env)
++            return self.apply_function(func, args_objs, kw_objs, env)
+         elif node.type == StatementType.WHILE_EXPRESSION:
+             return self.eval_while_expression(node, env)
+         elif node.type == StatementType.STRING_LITERAL:
+@@ -326,11 +330,16 @@ class Evaluator(object):
+             res.append(evaluated)
+         return res
+ 
+-    def apply_function(self, func, args_objs, env):
++    def apply_function(self, func, args_objs, kw_objs, env):
+         if func.type == ObjectType.FUNCTION:
+-            if len(func.parameters) != len(args_objs):
++            default_params = self.eval_expressions(func.default_params, env)
++            # TODO: update the check and the placeholder-ing
++            if len(func.parameters) > len(args_objs) + len(default_params):
+                 return Ad_Error_Object("function signature unrecognized, different number of params")
++            args_objs.extend(default_params[len(args_objs):])
+             extended_env = self.extend_function_env(func, args_objs)
++            for k, v in kw_objs.items():
++                extended_env.set(k, v)
+             evaluated = self.eval(func.body, extended_env)
+             return self.unwrap_return_value(evaluated)
+         if func.type == ObjectType.BUILTIN:
+@@ -358,7 +367,7 @@ class Evaluator(object):
+                         key = attribute.expression.name.value
+                         klass_instance.instance_environment.set_local_param(key, evaluated)
+             for method in func.methods:
+-                func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
++                func_obj = Ad_Function_Object(parameters=method.parameters, default_params=method.default_params, body=method.body, env=klass_instance.instance_environment)
+                 klass_instance.instance_environment.set_local_param(method.name.value, func_obj)
+             # i also need to call the class constructor, if one is present
+             constructor_return = self.call_instance_constructor(klass_instance, args_objs, env)
+@@ -409,7 +418,7 @@ class Evaluator(object):
+                         klass_instance.instance_environment.add_sibling(super_klass.token_literal(), klass_env)
+ 
+             for method in target_klass.methods:
+-                func_object = Ad_Function_Object(method.parameters, method.body, klass_instance.instance_environment)
++                func_object = Ad_Function_Object(method.parameters, method.default_params, method.body, klass_instance.instance_environment)
+                 ident = method.name
+                 klass_instance.instance_environment.set(ident.value, func_object)
+ 
+@@ -627,7 +636,7 @@ class Evaluator(object):
+         return None
+ 
+     def eval_def_statement(self, node, env):
+-        obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
++        obj = Ad_Function_Object(parameters=node.parameters, default_params=node.default_params, body=node.body, env=env)
+         env.set(node.name.value, obj)
+         return None
+ 
+diff --git a/repl/adrianus/python3/examples/test104.ad b/repl/adrianus/python3/examples/test104.ad
+index a85ddd3..5c78f33 100644
+--- a/repl/adrianus/python3/examples/test104.ad
++++ b/repl/adrianus/python3/examples/test104.ad
+@@ -1,5 +1,8 @@
+ def test(a = 3, b = 5) {
++    println(a)
++    println(b)
+     println(a+b)
++    println('---')
+ }
+ 
+ test()
+diff --git a/repl/adrianus/python3/main.py b/repl/adrianus/python3/main.py
+index 266edcb..e9df784 100644
+--- a/repl/adrianus/python3/main.py
++++ b/repl/adrianus/python3/main.py
+@@ -9,7 +9,7 @@ from compiler import Compiler
+ from vm import VM
+ 
+ DEBUG = False
+-SHOW_RUNNING_TIME = True
++SHOW_RUNNING_TIME = False
+ 
+ 
+ def main(args):
+diff --git a/repl/adrianus/python3/objects.py b/repl/adrianus/python3/objects.py
+index 5730dd0..a4ef09f 100644
+--- a/repl/adrianus/python3/objects.py
++++ b/repl/adrianus/python3/objects.py
+@@ -108,13 +108,15 @@ class Ad_Continue_Object(Ad_Object):
+ class Ad_Function_Object(Ad_Object):
+     type = ObjectType.FUNCTION
+ 
+-    def __init__(self, parameters=None, body=None, env=None):
++    def __init__(self, parameters=None, default_params=None, body=None, env=None):
+         """
+         @param parameters: list of ASTNode
++        @:param default_params: list of ASTNode
+         @param body: ASTNode
+         @param env: Environment
+         """
+         self.parameters = parameters
++        self.default_params = default_params
+         self.body = body
+         self.env = env
+ 
+@@ -132,7 +134,7 @@ class Ad_String_Object(Ad_Object):
+         self.value = value
+ 
+     def inspect(self):
+-        return self.value
++        return "'" + self.value + "'"
+ 
+     def hash_key(self):
+         return HashKey(type=type, value=hash(self.value))
+diff --git a/repl/adrianus/python3/parser.py b/repl/adrianus/python3/parser.py
+index 53acac5..9433a31 100644
+--- a/repl/adrianus/python3/parser.py
++++ b/repl/adrianus/python3/parser.py
+@@ -2,13 +2,13 @@ from lexer import Lexer
+ from token_type import TokenType
+ from precedence_type import PrecedenceType, precedences
+ from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
+-                ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
+-                ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
+-                ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
+-                ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
+-                ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
+-                ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
+-                ASTFloat, ASTSuperExpression, ASTBrakeStatement, ASTContinueStatement, ASTPlusEqualsStatement
++    ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
++    ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
++    ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
++    ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
++    ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
++    ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
++    ASTFloat, ASTSuperExpression, ASTBrakeStatement, ASTContinueStatement, ASTPlusEqualsStatement, StatementType
+ 
+ 
+ class Parser(object):
+@@ -241,7 +241,8 @@ class Parser(object):
+         if not self.expect_peek(TokenType.LPAREN):
+             # this should return an error object
+             return None
+-        stmt.parameters = self.parse_function_parameters()
++        res = self.parse_function_parameters()
++        stmt.parameters, stmt.default_params = res[0], res[1]
+         if not self.expect_peek(TokenType.LBRACE):
+             return None
+         stmt.body = self.parse_block_statement()
+@@ -256,7 +257,8 @@ class Parser(object):
+         if not self.expect_peek(TokenType.LPAREN):
+             # this should return an error object
+             return None
+-        stmt.parameters = self.parse_function_parameters()
++        res = self.parse_function_parameters()
++        stmt.parameters, stmt.default_params = res[0], res[1]
+         if not self.expect_peek(TokenType.LBRACE):
+             return None
+         stmt.body = self.parse_block_statement()
+@@ -271,7 +273,8 @@ class Parser(object):
+         if not self.expect_peek(TokenType.LPAREN):
+             # this should return an error object
+             return None
+-        stmt.parameters = self.parse_function_parameters()
++        res = self.parse_function_parameters()
++        stmt.parameters, stmt.default_params = res[0], res[1]
+         if not self.expect_peek(TokenType.LBRACE):
+             return None
+         stmt.body = self.parse_block_statement()
+@@ -281,7 +284,8 @@ class Parser(object):
+         func = ASTFunctionLiteral(token=self.current_token)
+         if not self.expect_peek(TokenType.LPAREN):
+             return None
+-        func.parameters = self.parse_function_parameters()
++        res = self.parse_function_parameters()
++        func.parameters, func.default_params = res[0], res[1]
+         if not self.expect_peek(TokenType.LBRACE):
+             return None
+         func.body = self.parse_block_statement()
+@@ -289,20 +293,35 @@ class Parser(object):
+ 
+     def parse_function_parameters(self):
+         identifiers = []
++        default_params = []
+         if self.peek_token_is(TokenType.RPAREN):
+             self.next_token()
+-            return identifiers
++            return identifiers, default_params
+         self.next_token()
+         ident = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+         identifiers.append(ident)
++        if self.peek_token_is(TokenType.ASSIGN):
++            self.next_token()
++            self.next_token()
++            value = self.parse_expression(PrecedenceType.LOWEST)
++            default_params.append(value)
+         while self.peek_token_is(TokenType.COMMA):
+             self.next_token()
+             self.next_token()
+             ident = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
+             identifiers.append(ident)
++            if self.peek_token_is(TokenType.ASSIGN):
++                self.next_token()
++                self.next_token()
++                value = self.parse_expression(PrecedenceType.LOWEST)
++                default_params.append(value)
++            else:
++                if len(default_params) > 0 and default_params[-1] is not None:
++                    raise Exception("problem!!!")
++                default_params.append(None)
+         if not self.expect_peek(TokenType.RPAREN):
+-            return []
+-        return identifiers
++            return [], []
++        return identifiers, default_params
+ 
+     def parse_infix_expression(self, left):
+         expr = ASTInfixExpression(token=self.current_token, operator=self.current_token.literal, left=left)
+@@ -314,23 +333,32 @@ class Parser(object):
+     def parse_call_expression(self, func):
+         # TODO: this call expression might be a class constructor
+         expr = ASTCallExpression(self.current_token, func)
+-        expr.arguments = self.parse_call_arguments()
++        res = self.parse_call_arguments()
++        expr.arguments, expr.kw_args = res[0], res[1]
+         return expr
+ 
+     def parse_call_arguments(self):
+         args = []
++        kw_args = []
+         if self.peek_token_is(TokenType.RPAREN):
+             self.next_token()
+-            return args
++            return args, kw_args
+         self.next_token()
+-        args.append(self.parse_expression(PrecedenceType.LOWEST))
++        expr1 = self.parse_expression(PrecedenceType.LOWEST)
++        if expr1.type == StatementType.ASSIGN_STATEMENT:
++            kw_args.append(expr1)
++        else:
++            args.append(expr1)
+         while self.peek_token_is(TokenType.COMMA):
+             self.next_token()
+             self.next_token()
+-            args.append(self.parse_expression(PrecedenceType.LOWEST))
++            if self.peek_token_is(TokenType.ASSIGN):
++                kw_args.append(self.parse_expression(PrecedenceType.LOWEST))
++            else:
++                args.append(self.parse_expression(PrecedenceType.LOWEST))
+         if not self.expect_peek(TokenType.RPAREN):
+-            return []
+-        return args
++            return [], {}
++        return args, kw_args
+ 
+     def parse_while_expression(self):
+         expr = ASTWhileExpression(token=self.current_token)
+@@ -456,7 +484,8 @@ class Parser(object):
+ 
+         if self.peek_token_is(TokenType.LPAREN):
+             self.next_token()
+-            member_access.arguments = self.parse_call_arguments()
++            res = self.parse_call_arguments()
++            member_access.arguments = res[0]
+             member_access.is_method = True
+         else:
+             member_access.arguments = []
+@@ -504,27 +533,27 @@ class Parser(object):
+         stmt = ASTForExpression(token=self.current_token)
+         self.next_token()
+         if not self.current_token_is(TokenType.LPAREN):
+-            print ('error parsing for expression: LPRAEN expected')
++            print('error parsing for expression: LPRAEN expected')
+             return None
+         self.next_token()
+         stmt.initialization = self.parse_expression(PrecedenceType.LOWEST)
+         if not self.expect_peek(TokenType.SEMICOLON):
+-            print ('error parsing for expression: SEMICOLON expected')
++            print('error parsing for expression: SEMICOLON expected')
+             return None
+         self.next_token()
+         stmt.condition = self.parse_expression(PrecedenceType.LOWEST)
+         if not self.expect_peek(TokenType.SEMICOLON):
+-            print ('error parsing for expression: second SEMICOLON expected')
++            print('error parsing for expression: second SEMICOLON expected')
+             return None
+         self.next_token()
+         stmt.step = self.parse_expression(PrecedenceType.LOWEST)
+         if not self.expect_peek(TokenType.RPAREN):
+-            print ('error parsing for expression: RPRAREN not found')
++            print('error parsing for expression: RPRAREN not found')
+             return None
+         if not self.expect_peek(TokenType.LBRACE):
+-            stmt.body =  self.parse_single_block_statement()
++            stmt.body = self.parse_single_block_statement()
+         else:
+-            stmt.body =  self.parse_block_statement()
++            stmt.body = self.parse_block_statement()
+         return stmt
+ 
+     def parse_null_expression(self):
+diff --git a/repl/adrianus/python3/thread_worker.py b/repl/adrianus/python3/thread_worker.py
+index 28a1c2e..87a39c0 100644
+--- a/repl/adrianus/python3/thread_worker.py
++++ b/repl/adrianus/python3/thread_worker.py
+@@ -4,12 +4,14 @@ def ad_worker_async(raw_callback, params, thread_obj, env):
+     if raw_callback.type == ObjectType.FUNCTION:
+         from evaluator import Evaluator # this import sucks, but it works
+         evaluator = Evaluator()
+-        result = evaluator.apply_function(raw_callback, params, env)
++        # TODO: fix empty dict passed as kw_objs
++        result = evaluator.apply_function(raw_callback, params, {}, env)
+         thread_obj.result = result
+ 
+ def ad_worker_blocking(raw_callback, params, thread_obj, env):
+     if raw_callback.type == ObjectType.FUNCTION:
+         from evaluator import Evaluator # this import sucks, but it works
+         evaluator = Evaluator()
+-        result = evaluator.apply_function(raw_callback, params, env)
++        # TODO: fix empty dict passed as kw_objs
++        result = evaluator.apply_function(raw_callback, params, {}, env)
+         thread_obj.result = result
