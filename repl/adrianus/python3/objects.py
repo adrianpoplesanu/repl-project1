@@ -108,13 +108,15 @@ class Ad_Continue_Object(Ad_Object):
 class Ad_Function_Object(Ad_Object):
     type = ObjectType.FUNCTION
 
-    def __init__(self, parameters=None, body=None, env=None):
+    def __init__(self, parameters=None, default_params=None, body=None, env=None):
         """
         @param parameters: list of ASTNode
+        @:param default_params: list of ASTNode
         @param body: ASTNode
         @param env: Environment
         """
         self.parameters = parameters
+        self.default_params = default_params
         self.body = body
         self.env = env
 
@@ -132,7 +134,7 @@ class Ad_String_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
-        return self.value
+        return "'" + self.value + "'"
 
     def hash_key(self):
         return HashKey(type=type, value=hash(self.value))

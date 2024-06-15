@@ -297,10 +297,12 @@ class ASTCallExpression(ASTNode):
         @param token: the node's token
         @param func: ASTNode subclass representing the Function Literal
         arguments: the list of arguments in the call
+        @:param default_params: map of params
         """
         self.token = token
         self.func = func
         self.arguments = None
+        self.kw_args = None
 
     def token_literal(self):
         return self.token.literal
@@ -358,14 +360,16 @@ class ASTBlockStatement(ASTNode):
 class ASTFunctionLiteral(ASTNode):
     type = StatementType.FUNCTION_LITERAL
 
-    def __init__(self, token=None, parameters=None, body=None):
+    def __init__(self, token=None, parameters=None, default_params=None, body=None):
         """
         @param token: the node's token
         @param parameters: list
+        @:param default_params: list of default params
         @param body: ASTBlockStatement
         """
         self.token = token
         self.parameters = parameters
+        self.default_params = default_params
         self.body = body
 
     def token_literal(self):
@@ -472,15 +476,17 @@ class ASTHashLiteral(ASTNode):
 class ASTDefStatement(ASTNode):
     type = StatementType.DEF_STATEMENT
 
-    def __init__(self, token=None, name=None, parameters=None, body=None):
+    def __init__(self, token=None, name=None, parameters=None, default_params=None, body=None):
         """
         @param name: AstNode - identifier that will store the function, it needs to be like a let statement in the eval
         @param params: AstNode[] list of funtion arguments
+        @:param default_params: default params when missing argument
         @param body: AstNode block statement that is the body of the function
         """
         self.name = name
         self.token = token
         self.parameters = parameters
+        self.default_params = default_params
         self.body = body
 
     def token_literal(self):

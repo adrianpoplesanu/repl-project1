@@ -61,7 +61,7 @@ class Evaluator(object):
         elif node.type == StatementType.BLOCK_STATEMENT:
             return self.eval_block_statement(node, env)
         elif node.type == StatementType.FUNCTION_LITERAL:
-            obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
+            obj = Ad_Function_Object(parameters=node.parameters, default_params=node.default_params, body=node.body, env=env)
             return obj
         elif node.type == StatementType.CALL_EXPRESSION:
             # TODO: i need to check if this is a class constructor
@@ -69,9 +69,13 @@ class Evaluator(object):
             if self.is_error(func):
                 return func
             args_objs = self.eval_expressions(node.arguments, env)
+            kw_objs = {}
+            for assignment in node.kw_args:
+                obj = self.eval(assignment.value, env)
+                kw_objs[assignment.name.token.literal] = obj
             if len(args_objs) == 1 and self.is_error(args_objs[0]):
                 return args_objs[0]
-            return self.apply_function(func, args_objs, env)
+            return self.apply_function(func, args_objs, kw_objs, env)
         elif node.type == StatementType.WHILE_EXPRESSION:
             return self.eval_while_expression(node, env)
         elif node.type == StatementType.STRING_LITERAL:
@@ -326,11 +330,16 @@ class Evaluator(object):
             res.append(evaluated)
         return res
 
-    def apply_function(self, func, args_objs, env):
+    def apply_function(self, func, args_objs, kw_objs, env):
         if func.type == ObjectType.FUNCTION:
-            if len(func.parameters) != len(args_objs):
+            default_params = self.eval_expressions(func.default_params, env)
+            # TODO: update the check and the placeholder-ing
+            if len(func.parameters) > len(args_objs) + len(default_params):
                 return Ad_Error_Object("function signature unrecognized, different number of params")
+            args_objs.extend(default_params[len(args_objs):])
             extended_env = self.extend_function_env(func, args_objs)
+            for k, v in kw_objs.items():
+                extended_env.set(k, v)
             evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
         if func.type == ObjectType.BUILTIN:
@@ -358,7 +367,7 @@ class Evaluator(object):
                         key = attribute.expression.name.value
                         klass_instance.instance_environment.set_local_param(key, evaluated)
             for method in func.methods:
-                func_obj = Ad_Function_Object(parameters=method.parameters, body=method.body, env=klass_instance.instance_environment)
+                func_obj = Ad_Function_Object(parameters=method.parameters, default_params=method.default_params, body=method.body, env=klass_instance.instance_environment)
                 klass_instance.instance_environment.set_local_param(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
             constructor_return = self.call_instance_constructor(klass_instance, args_objs, env)
@@ -409,7 +418,7 @@ class Evaluator(object):
                         klass_instance.instance_environment.add_sibling(super_klass.token_literal(), klass_env)
 
             for method in target_klass.methods:
-                func_object = Ad_Function_Object(method.parameters, method.body, klass_instance.instance_environment)
+                func_object = Ad_Function_Object(method.parameters, method.default_params, method.body, klass_instance.instance_environment)
                 ident = method.name
                 klass_instance.instance_environment.set(ident.value, func_object)
 
@@ -627,7 +636,7 @@ class Evaluator(object):
         return None
 
     def eval_def_statement(self, node, env):
-        obj = Ad_Function_Object(parameters=node.parameters, body=node.body, env=env)
+        obj = Ad_Function_Object(parameters=node.parameters, default_params=node.default_params, body=node.body, env=env)
         env.set(node.name.value, obj)
         return None
 

@@ -2,13 +2,13 @@ from lexer import Lexer
 from token_type import TokenType
 from precedence_type import PrecedenceType, precedences
 from ast import ASTLetStatement, ASTIdentifier, ASTReturnStatement, ASTExpressionStatement, \
-                ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
-                ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
-                ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
-                ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
-                ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
-                ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
-                ASTFloat, ASTSuperExpression, ASTBrakeStatement, ASTContinueStatement, ASTPlusEqualsStatement
+    ASTBoolean, ASTInteger, ASTPrefixExpression, ASTIfExpression, \
+    ASTCallExpression, ASTInfixExpression, ASTFunctionLiteral, \
+    ASTBlockStatement, ASTStringLiteral, ASTListLiteral, ASTIndexExpression, \
+    ASTHashLiteral, ASTWhileExpression, ASTAssignStatement, ASTDefStatement, \
+    ASTClassStatement, ASTMemberAccess, ASTComment, ASTPrefixIncrement, \
+    ASTPostfixIncrement, ASTForExpression, ASTNullExpression, ASTThisExpression, \
+    ASTFloat, ASTSuperExpression, ASTBrakeStatement, ASTContinueStatement, ASTPlusEqualsStatement, StatementType
 
 
 class Parser(object):
@@ -241,7 +241,8 @@ class Parser(object):
         if not self.expect_peek(TokenType.LPAREN):
             # this should return an error object
             return None
-        stmt.parameters = self.parse_function_parameters()
+        res = self.parse_function_parameters()
+        stmt.parameters, stmt.default_params = res[0], res[1]
         if not self.expect_peek(TokenType.LBRACE):
             return None
         stmt.body = self.parse_block_statement()
@@ -256,7 +257,8 @@ class Parser(object):
         if not self.expect_peek(TokenType.LPAREN):
             # this should return an error object
             return None
-        stmt.parameters = self.parse_function_parameters()
+        res = self.parse_function_parameters()
+        stmt.parameters, stmt.default_params = res[0], res[1]
         if not self.expect_peek(TokenType.LBRACE):
             return None
         stmt.body = self.parse_block_statement()
@@ -271,7 +273,8 @@ class Parser(object):
         if not self.expect_peek(TokenType.LPAREN):
             # this should return an error object
             return None
-        stmt.parameters = self.parse_function_parameters()
+        res = self.parse_function_parameters()
+        stmt.parameters, stmt.default_params = res[0], res[1]
         if not self.expect_peek(TokenType.LBRACE):
             return None
         stmt.body = self.parse_block_statement()
@@ -281,7 +284,8 @@ class Parser(object):
         func = ASTFunctionLiteral(token=self.current_token)
         if not self.expect_peek(TokenType.LPAREN):
             return None
-        func.parameters = self.parse_function_parameters()
+        res = self.parse_function_parameters()
+        func.parameters, func.default_params = res[0], res[1]
         if not self.expect_peek(TokenType.LBRACE):
             return None
         func.body = self.parse_block_statement()
@@ -289,20 +293,35 @@ class Parser(object):
 
     def parse_function_parameters(self):
         identifiers = []
+        default_params = []
         if self.peek_token_is(TokenType.RPAREN):
             self.next_token()
-            return identifiers
+            return identifiers, default_params
         self.next_token()
         ident = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
         identifiers.append(ident)
+        if self.peek_token_is(TokenType.ASSIGN):
+            self.next_token()
+            self.next_token()
+            value = self.parse_expression(PrecedenceType.LOWEST)
+            default_params.append(value)
         while self.peek_token_is(TokenType.COMMA):
             self.next_token()
             self.next_token()
             ident = ASTIdentifier(token=self.current_token, value=self.current_token.literal)
             identifiers.append(ident)
+            if self.peek_token_is(TokenType.ASSIGN):
+                self.next_token()
+                self.next_token()
+                value = self.parse_expression(PrecedenceType.LOWEST)
+                default_params.append(value)
+            else:
+                if len(default_params) > 0 and default_params[-1] is not None:
+                    raise Exception("problem!!!")
+                default_params.append(None)
         if not self.expect_peek(TokenType.RPAREN):
-            return []
-        return identifiers
+            return [], []
+        return identifiers, default_params
 
     def parse_infix_expression(self, left):
         expr = ASTInfixExpression(token=self.current_token, operator=self.current_token.literal, left=left)
@@ -314,23 +333,32 @@ class Parser(object):
     def parse_call_expression(self, func):
         # TODO: this call expression might be a class constructor
         expr = ASTCallExpression(self.current_token, func)
-        expr.arguments = self.parse_call_arguments()
+        res = self.parse_call_arguments()
+        expr.arguments, expr.kw_args = res[0], res[1]
         return expr
 
     def parse_call_arguments(self):
         args = []
+        kw_args = []
         if self.peek_token_is(TokenType.RPAREN):
             self.next_token()
-            return args
+            return args, kw_args
         self.next_token()
-        args.append(self.parse_expression(PrecedenceType.LOWEST))
+        expr1 = self.parse_expression(PrecedenceType.LOWEST)
+        if expr1.type == StatementType.ASSIGN_STATEMENT:
+            kw_args.append(expr1)
+        else:
+            args.append(expr1)
         while self.peek_token_is(TokenType.COMMA):
             self.next_token()
             self.next_token()
-            args.append(self.parse_expression(PrecedenceType.LOWEST))
+            if self.peek_token_is(TokenType.ASSIGN):
+                kw_args.append(self.parse_expression(PrecedenceType.LOWEST))
+            else:
+                args.append(self.parse_expression(PrecedenceType.LOWEST))
         if not self.expect_peek(TokenType.RPAREN):
-            return []
-        return args
+            return [], {}
+        return args, kw_args
 
     def parse_while_expression(self):
         expr = ASTWhileExpression(token=self.current_token)
@@ -456,7 +484,8 @@ class Parser(object):
 
         if self.peek_token_is(TokenType.LPAREN):
             self.next_token()
-            member_access.arguments = self.parse_call_arguments()
+            res = self.parse_call_arguments()
+            member_access.arguments = res[0]
             member_access.is_method = True
         else:
             member_access.arguments = []
@@ -504,27 +533,27 @@ class Parser(object):
         stmt = ASTForExpression(token=self.current_token)
         self.next_token()
         if not self.current_token_is(TokenType.LPAREN):
-            print ('error parsing for expression: LPRAEN expected')
+            print('error parsing for expression: LPRAEN expected')
             return None
         self.next_token()
         stmt.initialization = self.parse_expression(PrecedenceType.LOWEST)
         if not self.expect_peek(TokenType.SEMICOLON):
-            print ('error parsing for expression: SEMICOLON expected')
+            print('error parsing for expression: SEMICOLON expected')
             return None
         self.next_token()
         stmt.condition = self.parse_expression(PrecedenceType.LOWEST)
         if not self.expect_peek(TokenType.SEMICOLON):
-            print ('error parsing for expression: second SEMICOLON expected')
+            print('error parsing for expression: second SEMICOLON expected')
             return None
         self.next_token()
         stmt.step = self.parse_expression(PrecedenceType.LOWEST)
         if not self.expect_peek(TokenType.RPAREN):
-            print ('error parsing for expression: RPRAREN not found')
+            print('error parsing for expression: RPRAREN not found')
             return None
         if not self.expect_peek(TokenType.LBRACE):
-            stmt.body =  self.parse_single_block_statement()
+            stmt.body = self.parse_single_block_statement()
         else:
-            stmt.body =  self.parse_block_statement()
+            stmt.body = self.parse_block_statement()
         return stmt
 
     def parse_null_expression(self):
