@@ -1,0 +1,17 @@
+class Dog {
+    def constructor(name='bebe dex', age=14) {
+        this.name = name
+        this.age = age
+    }
+
+    def echo() {
+        println(name)
+        println(age)
+    }
+}
+
+dex = Dog()
+dex.echo()
+
+dex2 = Dog(name='bedus', age=13)
+dex2.echo()
