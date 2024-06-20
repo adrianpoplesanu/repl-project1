@@ -18,6 +18,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_FALSE, &Parser::ParseBoolean));
     prefixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseGroupedExpression));
     prefixParseFns.insert(std::make_pair(TT_FUNC, &Parser::ParseFunctionLiteral));
+    prefixParseFns.insert(std::make_pair(TT_METHOD, &Parser::ParseFunctionLiteral));
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
     prefixParseFns.insert(std::make_pair(TT_FOR, &Parser::ParseForExpression));
     prefixParseFns.insert(std::make_pair(TT_DOUBLE_QUOTES, &Parser::ParseStringLiteral));
