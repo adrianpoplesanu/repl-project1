@@ -153,6 +153,8 @@ Ad_AST_Node* Parser::ParseStatement() {
         return ParseIfStatement();
     if (current_token.type == TT_DEF)
         return ParseDefStatement();
+    if (current_token.type == TT_FUN)
+        return ParseDefStatement();
     return ParseExpressionStatement();
 }
 
@@ -683,6 +685,11 @@ Ad_AST_Node* Parser::ParseClassStatement() {
     }
     while(!CurrentTokenIs(TT_RBRACE)) {
         if (CurrentTokenIs(TT_DEF)) {
+            Ad_AST_Node* stmt = ParseDefStatement();
+            Ad_INCREF(stmt);
+            expr->methods.push_back(stmt);
+        }
+        if (CurrentTokenIs(TT_FUN)) {
             Ad_AST_Node* stmt = ParseDefStatement();
             Ad_INCREF(stmt);
             expr->methods.push_back(stmt);
