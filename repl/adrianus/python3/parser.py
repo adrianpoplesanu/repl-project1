@@ -318,7 +318,7 @@ class Parser(object):
             else:
                 if len(default_params) > 0 and default_params[-1] is not None:
                     raise Exception("problem!!!")
-                default_params.append(None)
+                #default_params.append(None)
         if not self.expect_peek(TokenType.RPAREN):
             return [], []
         return identifiers, default_params
@@ -334,7 +334,8 @@ class Parser(object):
         # TODO: this call expression might be a class constructor
         expr = ASTCallExpression(self.current_token, func)
         res = self.parse_call_arguments()
-        expr.arguments, expr.kw_args = res[0], res[1]
+        expr.arguments = res[0]
+        expr.kw_args = res[1]
         return expr
 
     def parse_call_arguments(self):
@@ -486,9 +487,11 @@ class Parser(object):
             self.next_token()
             res = self.parse_call_arguments()
             member_access.arguments = res[0]
+            member_access.kw_args = res[1]
             member_access.is_method = True
         else:
             member_access.arguments = []
+            member_access.kw_args = []
             member_access.is_method = False
         return member_access
 

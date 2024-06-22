@@ -540,7 +540,7 @@ class ASTClassStatement(ASTNode):
 class ASTMemberAccess(ASTNode):
     type = StatementType.MEMBER_ACCESS
 
-    def __init__(self, token=None, arguments=None, owner=None, member=None, is_method=False):
+    def __init__(self, token=None, arguments=None, kw_args=None, owner=None, member=None, is_method=False):
         """
         @param token: the node's token
         @param arguments:
@@ -550,6 +550,7 @@ class ASTMemberAccess(ASTNode):
         """
         self.token = token
         self.arguments = arguments
+        self.kw_args = kw_args
         self.owner = owner
         self.member = member
         self.is_method = is_method

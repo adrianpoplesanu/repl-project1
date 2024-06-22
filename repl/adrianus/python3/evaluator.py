@@ -370,13 +370,13 @@ class Evaluator(object):
                 func_obj = Ad_Function_Object(parameters=method.parameters, default_params=method.default_params, body=method.body, env=klass_instance.instance_environment)
                 klass_instance.instance_environment.set_local_param(method.name.value, func_obj)
             # i also need to call the class constructor, if one is present
-            constructor_return = self.call_instance_constructor(klass_instance, args_objs, env)
+            constructor_return = self.call_instance_constructor(klass_instance, args_objs, kw_objs, env)
             if self.is_error(constructor_return):
                 return constructor_return
             return klass_instance
         return None
 
-    def call_instance_constructor(self, klass_instance, args_objs, env):
+    def call_instance_constructor(self, klass_instance, args_objs, kw_objs, env):
         #klass_method = klass_instance.instance_environment.get("constructor")
         klass_method = klass_instance.instance_environment.lookup_constructor()
         if klass_method:
@@ -384,7 +384,7 @@ class Evaluator(object):
                 return args_objs[0]
             klass_environment = klass_instance.instance_environment
             klass_environment.outer = env
-            return self.apply_method(klass_method, args_objs, klass_environment)
+            return self.apply_method(klass_method, args_objs, kw_objs, klass_environment)
         else:
             return None
 
@@ -425,12 +425,20 @@ class Evaluator(object):
                 klass_env.set_local_param(ident.value, func_object)
                 klass_instance.instance_environment.add_sibling(super_klass.token_literal(), klass_env)
 
-    def apply_method(self, func, args_objs, env):
+    def apply_method(self, func, args_objs, kw_objs, env):
         if func.type == ObjectType.FUNCTION:
-            if len(func.parameters) != len(args_objs):
+            default_params = self.eval_expressions(func.default_params, env)
+            remaining_params = len(func.parameters)
+            for param in func.parameters:
+                if param not in kw_objs.keys():
+                    remaining_params -= 1
+            if remaining_params > len(args_objs) + len(default_params):
                 err = Ad_Error_Object("some error message here")
                 return err
+            args_objs.extend(default_params[len(args_objs):])
             extended_env = self.extend_method_env(func, args_objs, env)
+            for k, v in kw_objs.items():
+                extended_env.set(k, v)
             evaluated = self.eval(func.body, extended_env)
             return self.unwrap_return_value(evaluated)
         return None
@@ -449,6 +457,8 @@ class Evaluator(object):
     def extend_method_env(self, func, args_objs, env):
         extended = new_enclosed_environment(env)
         for i, param in enumerate(func.parameters):
+            if i >= len(args_objs):
+                break
             extended.set_local_param(param.token_literal(), args_objs[i])
         return extended
 
@@ -678,20 +688,28 @@ class Evaluator(object):
             if node.is_method:
                 klass_method = env.get(node.member.value)
                 args_objs = self.eval_expressions(node.arguments, env)
+                kw_objs = {}
+                for assignment in node.kw_args:
+                    obj = self.eval(assignment.value, env)
+                    kw_objs[assignment.name.token.literal] = obj
                 if len(args_objs) == 1 and self.is_error(args_objs[0]):
                     return args_objs[0]
-                return self.apply_method(klass_method, args_objs, env)
+                return self.apply_method(klass_method, args_objs, kw_objs, env)
             else:
                 evaluated = self.eval(node.member, env)
             return evaluated
         elif node.owner.type == StatementType.SUPER_EXPRESSION:
             if node.is_method:
                 args_objs = self.eval_expressions(node.arguments, env)
+                kw_objs = {}
+                for assignment in node.kw_args:
+                    obj = self.eval(assignment.value, env)
+                    kw_objs[assignment.name.token.literal] = obj
                 if len(args_objs) == 1 and self.is_error(args_objs[0]):
                     return args_objs[0]
                 parent_klass_env = env.outer.get_sibling(node.owner.target.token_literal())
                 parent_method = parent_klass_env.get(node.member.value)
-                result = self.apply_method(parent_method, args_objs, env.outer)
+                result = self.apply_method(parent_method, args_objs, kw_objs, env.outer)
                 return result
             else:
                 parent_klass_env = env.outer.get_sibling(node.owner.target.token_literal())
@@ -707,12 +725,16 @@ class Evaluator(object):
                 klass_instance = env.get(node.owner.value)
                 klass_method = klass_instance.instance_environment.get(node.member.value)
                 args_objs = self.eval_expressions(node.arguments, env)
+                kw_objs = {}
+                for assignment in node.kw_args:
+                    obj = self.eval(assignment.value, env)
+                    kw_objs[assignment.name.token.literal] = obj
                 if len(args_objs) == 1 and self.is_error(args_objs[0]):
                     return args_objs[0]
                 klass_environment = klass_instance.instance_environment
                 old = klass_environment.outer
                 klass_environment.outer = env
-                result = self.apply_method(klass_method, args_objs, klass_environment)
+                result = self.apply_method(klass_method, args_objs, kw_objs, klass_environment)
                 klass_environment.outer = old
                 return result
             else:
@@ -770,7 +792,11 @@ class Evaluator(object):
                 obj = self.eval(current_member_acccess.member, current_environment)
                 if obj.type == ObjectType.FUNCTION:
                     args_objs = self.eval_expressions(current_member_acccess.arguments, env)
-                    obj2 = self.apply_method(obj, args_objs, obj.env)
+                    kw_objs = {}
+                    for assignment in current_member_acccess.kw_args:
+                        obj = self.eval(assignment.value, env)
+                        kw_objs[assignment.name.token.literal] = obj
+                    obj2 = self.apply_method(obj, args_objs, kw_objs, obj.env)
                     if i == 0:
                         return obj2
                     if obj2.type == ObjectType.INSTANCE:
@@ -833,7 +859,11 @@ class Evaluator(object):
                 obj = self.eval(current_member_acccess.member, current_environment)
                 if obj.type == ObjectType.FUNCTION:
                     args_objs = self.eval_expressions(current_member_acccess.arguments, env)
-                    obj2 = self.apply_method(obj, args_objs, obj.env)
+                    kw_objs = {}
+                    for assignment in current_member_acccess.kw_args:
+                        obj = self.eval(assignment.value, env)
+                        kw_objs[assignment.name.token.literal] = obj
+                    obj2 = self.apply_method(obj, args_objs, kw_objs, obj.env)
                     if i == 0:
                         pass
                         #return obj2
