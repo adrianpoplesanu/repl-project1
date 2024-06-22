@@ -1,0 +1,12 @@
+class Bedus {
+    fun constructor(name) {
+        this.name = name
+    }
+
+    fun printName() {
+        println(name)
+    }
+}
+
+bedus = Bedus("bebe dex")
+bedus.printName()
