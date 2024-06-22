@@ -45,6 +45,8 @@ Parser::Parser() {
     infixParseFns.insert(std::make_pair(TT_GT, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_LTE, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_GTE, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_AND, &Parser::ParseInfixExpression));
+    infixParseFns.insert(std::make_pair(TT_OR, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseCallExpression));
     infixParseFns.insert(std::make_pair(TT_LBRACKET, &Parser::ParseIndexExpression));
     infixParseFns.insert(std::make_pair(TT_ASSIGN, &Parser::ParseAssignExpression));
