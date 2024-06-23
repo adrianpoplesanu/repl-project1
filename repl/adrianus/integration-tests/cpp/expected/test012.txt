@@ -1,2 +1,2 @@
 {'a': 8}
-{'test': <function at memory address: (.*)>, 'a': 8}
+{'a': 8, 'test': <function at memory address: (.*)>}

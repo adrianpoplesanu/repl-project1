@@ -1,1 +1,1 @@
-{'Server': <class object at memory address: (.*)>, 'server': <class instance at memory address: (.*)>}
+{'server': <class instance at memory address: (.*)>, 'Server': <class object at memory address: (.*)>}

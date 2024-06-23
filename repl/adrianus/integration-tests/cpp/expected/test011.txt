@@ -2,4 +2,4 @@
 8080
 'aaa'
 'bbb'
-{'Server': <class object at memory address: (.*)>, 'a': 5, 'server': <class instance at memory address: (.*)>}
+{'a': 5, 'server': <class instance at memory address: (.*)>, 'Server': <class object at memory address: (.*)>}

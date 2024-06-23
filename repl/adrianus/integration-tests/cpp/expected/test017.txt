@@ -1,3 +1,3 @@
 8080
 'running test\(\) in Server'
-{'Server': <class object at memory address: (.*)>, 'server': <class instance at memory address: (.*)>}
+{'server': <class instance at memory address: (.*)>, 'Server': <class object at memory address: (.*)>}

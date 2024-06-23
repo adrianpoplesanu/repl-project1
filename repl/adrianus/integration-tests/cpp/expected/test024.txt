@@ -1,4 +1,4 @@
 'start test'
 'end class declaration'
-{'Elev': <class object at memory address: (.*)>, 'a': 12}
+{'a': 12, 'Elev': <class object at memory address: (.*)>}
 'end class test'
