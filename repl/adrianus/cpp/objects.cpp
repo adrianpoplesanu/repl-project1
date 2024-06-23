@@ -703,6 +703,17 @@ std::string Ad_Class_Instance::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+Ad_Object* Ad_Class_Instance::copy(GarbageCollector *gc) {
+    // TODO: verify this
+    Ad_Class_Instance *new_obj = new Ad_Class_Instance();
+    new_obj->name = name;
+	new_obj->klass_object = klass_object;
+    new_obj->instance_environment = instance_environment;
+	new_obj->inheritFrom = inheritFrom;
+    gc->addObject(new_obj);
+    return new_obj;
+}
+
 Ad_File_Object::Ad_File_Object() {
     type = OBJ_FILE;
     ref_count = 0;

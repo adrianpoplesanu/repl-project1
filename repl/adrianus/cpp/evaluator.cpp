@@ -870,7 +870,12 @@ Ad_Object* Evaluator::EvalAssignStatement(Ad_AST_Node* node, Environment &env) {
             return obj;
         }
         Ad_AST_Identifier* identifier = (Ad_AST_Identifier*)assign_statement->name;
-        env.Set(identifier->value, obj);
+        if (assign_statement->value->type == ST_IDENTIFIER && obj->type == OBJ_INT) {
+            // TODO: verify this
+            env.Set(identifier->value, obj->copy(garbageCollector));
+        } else {
+            env.Set(identifier->value, obj);
+        }
     }
     return NULL;
 }
