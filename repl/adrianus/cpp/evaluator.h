@@ -69,6 +69,7 @@ public:
     Ad_Object* EvalBreakStatement(Ad_AST_Node*, Environment&);
     Ad_Object* EvalContinueStatement(Ad_AST_Node*, Environment&);
     Ad_Object* evalPlusEqualsStatement(Ad_AST_Node*, Environment*);
+    Ad_Object* evalPlusEqualsIndexExpression(Ad_AST_Node*, Environment*);
     Ad_Object* EvalNullExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalFloatExpression(Ad_AST_Node*, Environment&);
     Ad_Object* evalThisExpression(Ad_AST_Node*, Environment*);

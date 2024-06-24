@@ -1593,7 +1593,7 @@ Ad_Object* Evaluator::evalThisExpression(Ad_AST_Node* node, Environment *env) {
 Ad_Object* Evaluator::evalPlusEqualsStatement(Ad_AST_Node* node, Environment *env) {
     Ad_AST_Plus_Equals_Statement* stmt = (Ad_AST_Plus_Equals_Statement*) node;
     if (stmt->name->type == ST_INDEX_EXPRESSION) {
-        // eval_plus_equals_index_expression();
+        evalPlusEqualsIndexExpression(node, env);
     } else if (stmt->name->type == ST_MEMBER_ACCESS) {
         // eval_mermber_access call
     } else {
@@ -1617,6 +1617,44 @@ Ad_Object* Evaluator::evalPlusEqualsStatement(Ad_AST_Node* node, Environment *en
             if (obj->type == OBJ_INT && obj->type == OBJ_INT) {
                 ((Ad_Integer_Object *) obj)->value -= ((Ad_Integer_Object*) step_obj)->value;
             }
+        }
+    }
+    return NULL;
+}
+
+Ad_Object* Evaluator::evalPlusEqualsIndexExpression(Ad_AST_Node* node, Environment *env) {
+    Ad_AST_Plus_Equals_Statement* stmt = (Ad_AST_Plus_Equals_Statement*) node;
+    Ad_AST_IndexExpression* idxExpr = (Ad_AST_IndexExpression*) stmt->name;
+    Ad_Object *obj = Eval(idxExpr->left, *env);
+    if (IsError(obj)) {
+        return obj;
+    }
+    Ad_Object* index = Eval(idxExpr->index, *env);
+    if (IsError(index)) {
+        return index;
+    }
+    if (obj->type == OBJ_LIST) {
+        Ad_List_Object* target = (Ad_List_Object*) obj;
+        Ad_Object* valObj = Eval(stmt->value, *env);
+        Ad_Integer_Object* idxValue = (Ad_Integer_Object*) index;
+        if (node->TokenLiteral() == "+=" && target->elements[idxValue->value]->type == OBJ_INT && valObj->type == OBJ_INT) {
+            ((Ad_Integer_Object*)target->elements[idxValue->value])->value += ((Ad_Integer_Object*) valObj)->value;
+        }
+        if (node->TokenLiteral() == "-=" && target->elements[idxValue->value]->type == OBJ_INT && valObj->type == OBJ_INT) {
+            ((Ad_Integer_Object*)target->elements[idxValue->value])->value -= ((Ad_Integer_Object*) valObj)->value;
+        }
+    }
+    if (obj->type == OBJ_HASH) {
+        std::hash<std::string> hash_string;
+        Ad_Hash_Object* target = (Ad_Hash_Object*) obj;
+        Ad_Object* valObj = Eval(stmt->value, *env);
+        std::string hashed = index->Hash();
+        Ad_Object* oldObj = target->pairs[std::to_string(hash_string(index->Hash()))].value;
+        if (node->TokenLiteral() == "+=" && oldObj->type == OBJ_INT && valObj->type == OBJ_INT) {
+            ((Ad_Integer_Object*) oldObj)->value += ((Ad_Integer_Object*) valObj)->value;
+        }
+        if (node->TokenLiteral() == "-=" && oldObj->type == OBJ_INT && valObj->type == OBJ_INT) {
+            ((Ad_Integer_Object*) oldObj)->value -= ((Ad_Integer_Object*) valObj)->value;
         }
     }
     return NULL;
