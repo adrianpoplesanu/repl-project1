@@ -1016,15 +1016,18 @@ std::string Ad_AST_ContinueStatement::ToString() {
 
 Ad_AST_Plus_Equals_Statement::Ad_AST_Plus_Equals_Statement() {
     type = ST_PLUS_EQUALS;
+    ref_count = 0;
 }
 
 Ad_AST_Plus_Equals_Statement::Ad_AST_Plus_Equals_Statement(Token t) {
     type = ST_PLUS_EQUALS;
+    ref_count = 0;
     token = t;
 }
 
 Ad_AST_Plus_Equals_Statement::Ad_AST_Plus_Equals_Statement(Token t, Ad_AST_Node *n, Ad_AST_Node *v) {
     type = ST_PLUS_EQUALS;
+    ref_count = 0;
     token = t;
     name = n;
     value = v;
