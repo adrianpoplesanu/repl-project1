@@ -64,6 +64,8 @@ public class Parser {
         infixParseFns.put(TokenTypeEnum.LPAREN, this::parseCallExpression);
         infixParseFns.put(TokenTypeEnum.LBRACKET, this::parseIndexExpression);
         infixParseFns.put(TokenTypeEnum.ASSIGN, this::parseAssignExpression);
+        infixParseFns.put(TokenTypeEnum.PLUS_EQ, this::parsePlusEqualsExpression);
+        infixParseFns.put(TokenTypeEnum.MINUS_EQ, this::parsePlusEqualsExpression);
         infixParseFns.put(TokenTypeEnum.DOT, this::parseMemberAccess);
         infixParseFns.put(TokenTypeEnum.PLUSPLUS, this::parsePostfixExpression);
         infixParseFns.put(TokenTypeEnum.MINUSMINUS, this::parsePostfixExpression);
@@ -586,6 +588,10 @@ public class Parser {
             nextToken();
         }
         return stmt;
+    }
+
+    private AstNode parsePlusEqualsExpression(AstNode left) {
+        return null;
     }
 
     private AstNode parseClassStatement() {
