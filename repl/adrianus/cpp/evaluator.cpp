@@ -1596,6 +1596,11 @@ Ad_Object* Evaluator::evalPlusEqualsStatement(Ad_AST_Node* node, Environment *en
         evalPlusEqualsIndexExpression(node, env);
     } else if (stmt->name->type == ST_MEMBER_ACCESS) {
         // eval_mermber_access call
+        Ad_Object* obj = EvalMemberAccess(stmt->name, *env);
+        Ad_Object* step_obj = Eval(stmt->value, *env);
+        if (obj->type == OBJ_INT && step_obj->type == OBJ_INT) {
+            ((Ad_Integer_Object*) obj)->value += ((Ad_Integer_Object*) step_obj)->value;
+        }
     } else {
         Ad_AST_Identifier *ident = (Ad_AST_Identifier*) stmt->name;
         Ad_Object *obj = env->Get(ident->value);
