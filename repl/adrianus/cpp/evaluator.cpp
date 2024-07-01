@@ -209,6 +209,7 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
                 garbageCollector->sweepObjects();
                 return NULL;
             }
+            return NULL;
         }
         // TODO: mark and sweep cleanup
         //if (result != NULL && result->Type() != OBJ_BUILTIN && result->ref_count <= 0) free_Ad_Object_memory(result); // TODO: remove OBJ_BUILTIN check and use ref_count
