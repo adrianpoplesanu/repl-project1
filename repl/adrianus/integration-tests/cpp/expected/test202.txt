@@ -1,0 +1,9 @@
+'total 8
+drwxr-xr-x@  (.*) adrianpoplesanu  staff  256 Aug 26  2023 .
+drwxr-xr-x   (.*) adrianpoplesanu  staff  288 Apr 17  2022 ..
+-rw-r--r--   (.*) adrianpoplesanu  staff  145 Aug 28  2022 README.md
+-rw-r--r--   (.*) adrianpoplesanu  staff    0 Apr 17  2022 check-all.sh
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) cpp
+-rw-r--r--   (.*) adrianpoplesanu  staff    0 Apr 17  2022 cross-check.sh
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) java
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) (.*) (.*):(.*) python'
