@@ -760,6 +760,47 @@ Ad_Object* Evaluator::evalIndexExpression(Ad_AST_Node* node, Environment* env) {
     Ad_Object* index = Eval(((Ad_AST_IndexExpression*)node)->index, *env);
     if (IsError(index)) return index;
 
+    Ad_AST_IndexExpression *expr = (Ad_AST_IndexExpression*) node;
+    if (expr->indexEnd != NULL) {
+        Ad_Object *indexEnd = Eval(expr->indexEnd, *env);
+        garbageCollector->addObject(indexEnd);
+        Ad_Object *step = NULL;
+        if (expr->step != NULL) {
+            step = Eval(expr->step, *env);
+            garbageCollector->addObject(step);
+        }
+
+        if (left->type == OBJ_LIST && index->type == OBJ_INT && indexEnd->type == OBJ_INT && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubListIndexExpression(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_LIST && index->type == OBJ_NULL && indexEnd->type == OBJ_INT && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubListIndexExpressionWithIndexStartMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_LIST && index->type == OBJ_INT && indexEnd->type == OBJ_NULL && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubListIndexExpressionWithIndexEndMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_LIST && index->type == OBJ_NULL && indexEnd->type == OBJ_NULL && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubListIndexExpressionWithIndexStartAndIndexEndMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_LIST && index->type == OBJ_NULL && indexEnd->type == OBJ_NULL && (step == NULL || step->type == OBJ_NULL)) {
+            Ad_Object *result = evalSubListIndexExpressionWithAllMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+    }
+
     if (left->type == OBJ_LIST && index->type == OBJ_INT) {
         return EvalListIndexExpression(left, index);
     }
@@ -1664,6 +1705,102 @@ Ad_Object* Evaluator::evalPlusEqualsIndexExpression(Ad_AST_Node* node, Environme
         }
     }
     return NULL;
+}
+
+Ad_Object* Evaluator::evalSubListIndexExpression(Ad_Object *left, Ad_Object *index, Ad_Object *indexEnd, Ad_Object *step) {
+    int i1 = ((Ad_Integer_Object*) index)->value;
+    int i2 = ((Ad_Integer_Object*) indexEnd)->value;
+    int i3 = ((Ad_Integer_Object*) step)->value;
+    return newSubList(left, i1, i2, i3);
+}
+
+Ad_Object* Evaluator::evalSubListIndexExpressionWithIndexStartMissing(Ad_Object *left, Ad_Object *index, Ad_Object *indexEnd, Ad_Object *step) {
+    int i3 = ((Ad_Integer_Object*) step)->value;
+    if (i3 > 0) {
+        int i1 = 0;
+        int i2 = ((Ad_Integer_Object*) indexEnd)->value;
+        return newSubList(left, i1, i2, i3);
+    } else {
+        int i1 = INT_MAX;
+        int i2 = ((Ad_Integer_Object*) indexEnd)->value;
+        return newSubList(left, i1, i2, i3);
+    }
+}
+
+Ad_Object* Evaluator::evalSubListIndexExpressionWithIndexEndMissing(Ad_Object *left, Ad_Object *index, Ad_Object *indexEnd, Ad_Object *step) {
+    int i3 = ((Ad_Integer_Object*) step)->value;
+    if (i3 > 0) {
+        int i1 = ((Ad_Integer_Object*) index)->value;
+        int i2 = ((Ad_List_Object*) left)->elements.size();
+        return newSubList(left, i1, i2, i3);
+    } else {
+        int i1 = ((Ad_Integer_Object*) index)->value;
+        int i2 = -INT_MAX;
+        return newSubList(left, i1, i2, i3);
+    }
+}
+
+Ad_Object* Evaluator::evalSubListIndexExpressionWithIndexStartAndIndexEndMissing(Ad_Object *left, Ad_Object *index, Ad_Object *indexEnd, Ad_Object *step) {
+    int i3 = ((Ad_Integer_Object*) step)->value;
+    if (i3 > 0) {
+        int i1 = 0;
+        int i2 = ((Ad_List_Object*) left)->elements.size();
+        return newSubList(left, i1, i2, i3);
+    } else {
+        int i1 = ((Ad_List_Object*) left)->elements.size() - 1;
+        int i2 = -INT_MAX;
+        return newSubList(left, i1, i2, i3);
+    }
+}
+
+Ad_Object* Evaluator::evalSubListIndexExpressionWithAllMissing(Ad_Object *left, Ad_Object *index, Ad_Object *indexEnd, Ad_Object *step) {
+    int max = ((Ad_List_Object*) left)->elements.size();
+    return newSubList(left, 0, max, 1);
+}
+
+Ad_Object* Evaluator::newSubList(Ad_Object* target, int i1, int i2, int step) {
+    std::vector<Ad_Object*> elements;
+    int max = ((Ad_List_Object*) target)->elements.size();
+
+    if (step < 0 && i1 < -max) {
+        return new Ad_List_Object();
+    }
+
+    if (step < 0 && i1 >= max) {
+        i1 = INT_MAX;
+    }
+
+    if (step < 0 && i2 < -max) {
+        i2 = -INT_MAX;
+    }
+
+    if (i1 == INT_MAX) {
+		i1 = max - 1;
+	} else {
+		if (i1 < -max) i1 = -max;
+		if (i1 < 0) i1 += max;
+		if (i1 > max) i1 = max;
+	}
+
+	if (i2 == -INT_MAX) {
+		i2 = -1;
+	} else {
+		if (i2 < -max) i2 = -max;
+		if (i2 < 0) i2 += max;
+		if (i2 > max) i2 = max;
+	}
+
+    if (step > 0) {
+		for (int i = i1; i < i2; i += step) {
+			elements.push_back(((Ad_List_Object*)target)->elements.at(i)->copy(garbageCollector));
+		}
+	} else if (step < 0) {
+		for (int i = i1; i > i2; i += step) {
+			elements.push_back(((Ad_List_Object*)target)->elements.at(i)->copy(garbageCollector));
+		}
+	}
+
+    return new Ad_List_Object(elements);
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {

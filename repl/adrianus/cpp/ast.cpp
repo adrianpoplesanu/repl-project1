@@ -611,6 +611,8 @@ Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t, Ad_AST_Node* l) {
 Ad_AST_IndexExpression::~Ad_AST_IndexExpression() {
     free_Ad_AST_Node_memory(left);
     free_Ad_AST_Node_memory(index);
+    free_Ad_AST_Node_memory(indexEnd);
+    free_Ad_AST_Node_memory(step);
 }
 
 std::string Ad_AST_IndexExpression::TokenLiteral() {

@@ -73,6 +73,12 @@ public:
     Ad_Object* EvalNullExpression(Ad_AST_Node*, Environment&);
     Ad_Object* EvalFloatExpression(Ad_AST_Node*, Environment&);
     Ad_Object* evalThisExpression(Ad_AST_Node*, Environment*);
+    Ad_Object* newSubList(Ad_Object*, int, int, int);
+    Ad_Object* evalSubListIndexExpression(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubListIndexExpressionWithIndexStartMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubListIndexExpressionWithIndexEndMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubListIndexExpressionWithIndexStartAndIndexEndMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubListIndexExpressionWithAllMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
     Environment* ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     //void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void Init();
