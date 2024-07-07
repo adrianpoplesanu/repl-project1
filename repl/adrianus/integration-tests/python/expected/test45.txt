@@ -1,1 +1,1 @@
-null
+ERROR: variable a undefined.
