@@ -210,3 +210,11 @@ examples/test233.ad
 examples/test234.ad
 examples/test235.ad
 examples/test236.ad
+examples/test237.ad
+examples/test238.ad
+examples/test239.ad
+examples/test240.ad
+examples/test241.ad
+examples/test242.ad
+examples/test243.ad
+examples/test244.ad
