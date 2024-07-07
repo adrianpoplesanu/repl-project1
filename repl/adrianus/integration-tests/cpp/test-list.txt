@@ -218,3 +218,4 @@ examples/test241.ad
 examples/test242.ad
 examples/test243.ad
 examples/test244.ad
+examples/test245.ad
