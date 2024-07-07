@@ -79,6 +79,12 @@ public:
     Ad_Object* evalSubListIndexExpressionWithIndexEndMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
     Ad_Object* evalSubListIndexExpressionWithIndexStartAndIndexEndMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
     Ad_Object* evalSubListIndexExpressionWithAllMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* newSubString(Ad_Object*, int, int, int);
+    Ad_Object* evalSubStringIndexExpression(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubStringIndexExpressionWithIndexStartMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubStringIndexExpressionWithIndexEndMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubStringIndexExpressionWithIndexAndIndexEndMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
+    Ad_Object* evalSubStringIndexExpressionWithAllMissing(Ad_Object*, Ad_Object*, Ad_Object*, Ad_Object*);
     Environment* ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     //void ExtendMethodEnv(Ad_Object*, std::vector<Ad_Object*>, Environment&);
     void Init();

@@ -763,11 +763,9 @@ Ad_Object* Evaluator::evalIndexExpression(Ad_AST_Node* node, Environment* env) {
     Ad_AST_IndexExpression *expr = (Ad_AST_IndexExpression*) node;
     if (expr->indexEnd != NULL) {
         Ad_Object *indexEnd = Eval(expr->indexEnd, *env);
-        garbageCollector->addObject(indexEnd);
         Ad_Object *step = NULL;
         if (expr->step != NULL) {
             step = Eval(expr->step, *env);
-            garbageCollector->addObject(step);
         }
 
         if (left->type == OBJ_LIST && index->type == OBJ_INT && indexEnd->type == OBJ_INT && (step == NULL || step->type == OBJ_INT)) {
@@ -796,6 +794,36 @@ Ad_Object* Evaluator::evalIndexExpression(Ad_AST_Node* node, Environment* env) {
 
         if (left->type == OBJ_LIST && index->type == OBJ_NULL && indexEnd->type == OBJ_NULL && (step == NULL || step->type == OBJ_NULL)) {
             Ad_Object *result = evalSubListIndexExpressionWithAllMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_STRING && index->type == OBJ_INT && indexEnd->type == OBJ_INT && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubStringIndexExpression(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_STRING && index->type == OBJ_NULL && indexEnd->type == OBJ_INT && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubStringIndexExpressionWithIndexStartMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_STRING && index->type == OBJ_INT && indexEnd->type == OBJ_NULL && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubStringIndexExpressionWithIndexEndMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_STRING && index->type == OBJ_NULL && indexEnd->type == OBJ_NULL && (step == NULL || step->type == OBJ_INT)) {
+            Ad_Object *result = evalSubStringIndexExpressionWithIndexAndIndexEndMissing(left, index, indexEnd, step);
+            garbageCollector->addObject(result);
+            return result;
+        }
+
+        if (left->type == OBJ_STRING && index->type == OBJ_NULL && indexEnd->type == OBJ_NULL && (step == NULL || step->type == OBJ_NULL)) {
+            Ad_Object *result = evalSubStringIndexExpressionWithAllMissing(left, index, indexEnd, step);
             garbageCollector->addObject(result);
             return result;
         }
@@ -1801,6 +1829,135 @@ Ad_Object* Evaluator::newSubList(Ad_Object* target, int i1, int i2, int step) {
 	}
 
     return new Ad_List_Object(elements);
+}
+
+Ad_Object* Evaluator::evalSubStringIndexExpression(Ad_Object* left, Ad_Object* index, Ad_Object* indexEnd, Ad_Object* step) {
+	int max = ((Ad_String_Object*) left)->value.size();
+	int idx = ((Ad_Integer_Object*) index)->value;
+	int idx_end = ((Ad_Integer_Object*) indexEnd)->value;
+	int idx_step = 1;
+
+	if (step != NULL) {
+		idx_step = ((Ad_Integer_Object*) step)->value;
+	}
+
+	if (idx < -max) idx = -max;
+	if (idx < 0) idx += max;
+	if (idx >= max) idx = max;
+
+	if (idx_end < -max) idx_end = -max;
+	if (idx_end < 0) idx_end += max;
+	if (idx_end >= max) idx_end = max;
+
+	// aici tratez cazurile extreme
+
+	if (idx < idx_end && idx_step < 0) {
+		return new Ad_String_Object("");
+	}
+	if (idx > idx_end && idx_step > 0) {
+		return new Ad_String_Object("");
+	}
+
+	// END aici tratez cazurile extreme
+
+	int i1 = ((Ad_Integer_Object*) index)->value;
+	int i2 = ((Ad_Integer_Object*) indexEnd)->value;
+	int i3 = ((Ad_Integer_Object*) step)->value;
+	return newSubString(left, i1, i2, i3);
+}
+
+Ad_Object* Evaluator::evalSubStringIndexExpressionWithIndexStartMissing(Ad_Object* left, Ad_Object* index, Ad_Object* indexEnd, Ad_Object* step) {
+	Ad_String_Object* target = (Ad_String_Object*) left;
+	int start = 0;
+	int end = ((Ad_Integer_Object*) indexEnd)->value;
+	if (end < 0) {
+		end += target->value.size();
+	}
+	int inc = 1;
+	if (step != NULL) {
+		inc = ((Ad_Integer_Object*) step)->value;
+	}
+	return newSubString(target, start, end, inc);
+}
+
+Ad_Object* Evaluator::evalSubStringIndexExpressionWithIndexEndMissing(Ad_Object* left, Ad_Object* index, Ad_Object* indexEnd, Ad_Object* step) {
+	Ad_String_Object* target = (Ad_String_Object*) left;
+	int start = ((Ad_Integer_Object*) index)->value;
+	int end = target->value.size();
+	int inc = ((Ad_Integer_Object*) step)->value;
+	return newSubString(target, start, end, inc);
+}
+
+Ad_Object* Evaluator::evalSubStringIndexExpressionWithIndexAndIndexEndMissing(Ad_Object* left, Ad_Object* index, Ad_Object* indexEnd, Ad_Object* step) {
+	Ad_String_Object* target = (Ad_String_Object*) left;
+	int start = 0;
+	int end;
+	int inc = ((Ad_Integer_Object*) step)->value;
+	if (start >= 0 && inc >= 0) {
+		end = target->value.size();
+	} else {
+		end = target->value.size() - 1;
+	}
+	return newSubString(target, start, end, inc);
+}
+
+Ad_Object* Evaluator::evalSubStringIndexExpressionWithAllMissing(Ad_Object* left, Ad_Object* index, Ad_Object* indexEnd, Ad_Object* step) {
+	Ad_String_Object* target = (Ad_String_Object*) left;
+	return new Ad_String_Object(target->value);
+}
+
+Ad_Object* Evaluator::newSubString(Ad_Object *target, int i1, int i2, int step) {
+    std::string original = ((Ad_String_Object*) target)->value;
+    std::string result = "";
+
+    /* edge cases */
+	if (i1 < 0 && i2 < 0 && step > 0) {
+		i1 += original.length();
+		i2 += original.length();
+	} else if (i1 < 0 && i2 < 0 && step < 0) {
+		i1 += original.length();
+		if (i2 < -original.length()) {
+			i2 = -1;
+		} else {
+			i2 += original.length();
+		}
+	} else if (i1 < 0 && i2 == original.length() && step < 0) {
+		if (i1 < -original.length()) {
+			return new Ad_String_Object("");
+		}
+		i1 += original.length();
+		i2 = -1;
+	} else if (i1 < 0 && i2 > 0) {
+		i1 += original.length();
+	} else if (i1 > 0 && i2 < 0 && step < 0) {
+		i2 += original.length();
+	} else if (i1 >= 0 && i2 < 0 && step > 0) {
+		i2 += original.length();
+	} else if (i1 < 0 && i2 >= 0 && step < 0) {
+		i1 += original.length();
+	} else if (i1 == 0 && i2 > 0 && step < 0) {
+		i1 += original.length() - 1;
+		if (i2 == original.length() - 1) {
+			i2 = -1;
+		}
+	}
+	/* end edge cases */
+
+	if (i1 < i2 && step > 0) {
+		for (int i = i1; i < i2; i += step) {
+			result += original.at(i);
+		}
+	} else if (i1 > i2 && step < 0) {
+		for (int i = i1; i > i2; i += step) {
+			result += original.at(i);
+		}
+	} else if (i1 < i2 && step < 0) {
+		for (int i = i2; i >= i1; i += step) {
+			result += original.at(i);
+		}
+	}
+
+	return new Ad_String_Object(result);
 }
 
 bool Evaluator::IsTruthy(Ad_Object* obj) {
