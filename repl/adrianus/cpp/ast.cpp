@@ -593,12 +593,16 @@ std::string Ad_AST_ListLiteral::ToString() {
 Ad_AST_IndexExpression::Ad_AST_IndexExpression() {
     type = ST_INDEX_EXPRESSION;
     ref_count = 0;
+    indexEnd = NULL;
+    step = NULL;
 }
 
 Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t) {
     type = ST_INDEX_EXPRESSION;
     ref_count = 0;
     token = t;
+    indexEnd = NULL;
+    step = NULL;
 }
 
 Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t, Ad_AST_Node* l) {
@@ -606,6 +610,8 @@ Ad_AST_IndexExpression::Ad_AST_IndexExpression(Token t, Ad_AST_Node* l) {
     ref_count = 0;
     token = t;
     left = l;
+    indexEnd = NULL;
+    step = NULL;
 }
 
 Ad_AST_IndexExpression::~Ad_AST_IndexExpression() {
