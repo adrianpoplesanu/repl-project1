@@ -1,0 +1,2 @@
+\['irosit', 'ratacit', 'risipit', 'estompat', 'stins', 'palid', 'sters', 'disperat', 'deznadajduit', 'descurajat', 'demoralizat', 'nevalorificat', 'consumat'\]
+\['irosit ratacit risipit estompat stins ', ' sters disperat deznadajduit descurajat demoralizat nevalorificat consumat'\]
