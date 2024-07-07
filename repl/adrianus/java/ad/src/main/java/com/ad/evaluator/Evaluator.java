@@ -91,6 +91,8 @@ public class Evaluator {
 			return evalPrefixIncrement(node, env);
 		case THIS_EXPRESSION:
 			return evalThisExpression(node, env);
+		case PLUS_EQUALS_STATEMENT:
+			return evalPlusEqualsStatement(node, env);
 		default:
 			System.out.println("Unknown evaluation for AST node: " + astNodeTypeMap.get(node.getType()));
 			break;
@@ -746,6 +748,87 @@ public class Evaluator {
 		}
 		if (env.getOuter().isInstanceEnvironment()) {
 			return env.getOuter().getOwningInstanceEnvironment();
+		}
+		return null;
+	}
+
+	private AdObject evalPlusEqualsStatement(AstNode node, Environment env) {
+		AstPlusEqualsStatement stmt = (AstPlusEqualsStatement) node;
+		if (stmt.name.getType() == AstNodeTypeEnum.INDEX_EXPRESSION) {
+			evalPlusEqualsIndexExpression(node, env);
+		} else if (stmt.name.getType() == AstNodeTypeEnum.MEMBER_ACCESS) {
+			AdObject obj = evalMemberAccess(stmt.name, env);
+			AdObject step_obj = eval(stmt.value, env);
+			if (obj.getType() == ObjectTypeEnum.INT && step_obj.getType() == ObjectTypeEnum.INT) {
+				int val = ((AdIntegerObject)obj).getValue();
+				val += ((AdIntegerObject)step_obj).getValue();
+				((AdIntegerObject)obj).setValue(val);
+			}
+		} else {
+			AdObject obj = env.get(((AstIdentifier)stmt.name).getValue());
+			if (isError(obj)) {
+				return obj;
+			}
+
+			AdObject step_obj = eval(stmt.value, env);
+			if (isError(step_obj)) {
+				return step_obj;
+			}
+
+			if (node.getToken().getLiteral().equals("+=")) {
+				if (obj.getType() == ObjectTypeEnum.INT && step_obj.getType() == ObjectTypeEnum.INT) {
+					int val = ((AdIntegerObject)obj).getValue();
+					val += ((AdIntegerObject)step_obj).getValue();
+					((AdIntegerObject)obj).setValue(val);
+				}
+			}
+			if (node.getToken().getLiteral().equals("-=")) {
+				if (obj.getType() == ObjectTypeEnum.INT && step_obj.getType() == ObjectTypeEnum.INT) {
+					int val = ((AdIntegerObject)obj).getValue();
+					val -= ((AdIntegerObject)step_obj).getValue();
+					((AdIntegerObject)obj).setValue(val);
+				}
+			}
+		}
+		return null;
+	}
+
+	private AdObject evalPlusEqualsIndexExpression(AstNode node, Environment env) {
+		AstIndexExpression stmt = (AstIndexExpression) ((AstPlusEqualsStatement) node).name;
+		AdObject obj = eval(stmt.getLeft(), env);
+		if (isError(obj)) {
+			return obj;
+		}
+		AdObject index = eval(stmt.getIndex(), env);
+		if (isError(index)) {
+			return index;
+		}
+		if (obj.getType() == ObjectTypeEnum.LIST) {
+			int idx = ((AdIntegerObject) index).getValue();
+			AdObject value_obj = eval(((AstPlusEqualsStatement) node).value, env);
+			AdListObject listObject = (AdListObject) obj;
+			if (node.getToken().getLiteral().equals("+=") && listObject.getElements().get(idx).getType() == ObjectTypeEnum.INT && value_obj.getType() == ObjectTypeEnum.INT) {
+				int val = ((AdIntegerObject)listObject.getElements().get(idx)).getValue();
+				((AdIntegerObject)listObject.getElements().get(idx)).setValue(val + ((AdIntegerObject)value_obj).getValue());
+			}
+			if (node.getToken().getLiteral().equals("-=") && listObject.getElements().get(idx).getType() == ObjectTypeEnum.INT && value_obj.getType() == ObjectTypeEnum.INT) {
+				int val = ((AdIntegerObject)listObject.getElements().get(idx)).getValue();
+				((AdIntegerObject)listObject.getElements().get(idx)).setValue(val - ((AdIntegerObject)value_obj).getValue());
+			}
+		}
+		else if(obj.getType() == ObjectTypeEnum.HASH) {
+			AdHashObject hashObject = (AdHashObject) obj;
+			AdObject value_obj = eval(((AstPlusEqualsStatement) node).value, env);
+			String hashed = index.hash();
+			AdObject old_obj = hashObject.getElements().get(hashed).getValue();
+			if (node.getToken().getLiteral().equals("+=") && old_obj.getType() == ObjectTypeEnum.INT && value_obj.getType() == ObjectTypeEnum.INT) {
+				int val = ((AdIntegerObject) old_obj).getValue();
+				((AdIntegerObject) old_obj).setValue(val + ((AdIntegerObject) value_obj).getValue());
+			}
+			if (node.getToken().getLiteral().equals("-=") && old_obj.getType() == ObjectTypeEnum.INT && value_obj.getType() == ObjectTypeEnum.INT) {
+				int val = ((AdIntegerObject) old_obj).getValue();
+				((AdIntegerObject) old_obj).setValue(val - ((AdIntegerObject) value_obj).getValue());
+			}
 		}
 		return null;
 	}

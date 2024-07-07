@@ -591,7 +591,14 @@ public class Parser {
     }
 
     private AstNode parsePlusEqualsExpression(AstNode left) {
-        return null;
+        AstPlusEqualsStatement stmt = new AstPlusEqualsStatement(currentToken);
+        stmt.name = left;
+        nextToken();
+        stmt.value = parseExpression(PrecedenceTypeEnum.LOWEST);
+        if (currentTokenIs(TokenTypeEnum.SEMICOLON)) {
+            nextToken();
+        }
+        return stmt;
     }
 
     private AstNode parseClassStatement() {

@@ -1,1 +1,1 @@
-__syssystem("ls -la")
+__syssystem("ls -la ..")
