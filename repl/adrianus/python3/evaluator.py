@@ -139,7 +139,8 @@ class Evaluator(object):
             return env.get(node.token.literal)
         if node.token.literal in builtins_map:
             return builtins_map[node.value]
-        return NULLOBJECT
+        obj = Ad_Error_Object("variable " + node.token.literal + " undefined.")
+        return obj
 
     def eval_integer(self, node, env):
         obj = Ad_Integer_Object(value=node.value)
