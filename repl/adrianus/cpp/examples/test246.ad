@@ -1,0 +1,79 @@
+SIZE = 1000
+BASE = 1000000
+
+def init() {
+   return list(SIZE, 0)
+}
+
+def copy(a, b) {
+    for (i = 0; i < SIZE; i++) a[i] = b[i]
+}
+
+def sum(a, b, c) {
+    remainder = 0
+    for (i = 0; i < SIZE; i++) {
+        c[i] = a[i] + b[i] + remainder
+        remainder = 0
+        while (c[i] >= BASE) {
+            remainder++
+            c[i] = c[i] - BASE
+        }
+    }
+}
+
+def print_number(a) {
+    found = false
+    out = ''
+    for (i = SIZE - 1; i >= 0; i--) {
+        if (!found) {
+            if (a[i] != 0) {
+                found = true
+                out = out + a[i]
+            }
+        } else {
+            out = out + print_digit(a[i])
+        }
+    }
+    println(out)
+}
+
+def print_digit(val) {
+    if (val < 10) {
+        return '00000' + val
+    }
+    if (val < 100) {
+        return '0000' + val
+    }
+    if (val < 1000) {
+        return '000' + val
+    }
+    if (val < 10000) {
+        return '00' + val
+    }
+    if (val < 100000) {
+        return '0' + val
+    }
+    return val
+}
+
+def main() {
+    a = init()
+    b = init()
+    c = init()
+
+    println('running fibonacci calculator')
+
+    b[0] = 1
+
+    i = 0
+    while (i < 10000) {
+        sum(a, b, c)
+        copy(a, b)
+        copy(b, c)
+        i++
+    }
+
+    print_number(a)
+}
+
+main()
