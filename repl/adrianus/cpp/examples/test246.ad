@@ -66,7 +66,7 @@ def main() {
     b[0] = 1
 
     i = 0
-    while (i < 10000) {
+    while (i < 1000) {
         sum(a, b, c)
         copy(a, b)
         copy(b, c)
