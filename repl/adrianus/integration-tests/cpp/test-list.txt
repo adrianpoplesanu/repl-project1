@@ -219,3 +219,11 @@ examples/test242.ad
 examples/test243.ad
 examples/test244.ad
 examples/test245.ad
+examples/test246.ad
+examples/test247.ad
+examples/test248.ad
+examples/test249.ad
+examples/test250.ad
+examples/test251.ad
+examples/test252.ad
+examples/test253.ad
