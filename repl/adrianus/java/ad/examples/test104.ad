@@ -1,4 +1,4 @@
-import("examples/test103.ad")
+import("examples/calculator.ad")
 
 calculator = Calculator()
 println(calculator.fibonacci(0))
