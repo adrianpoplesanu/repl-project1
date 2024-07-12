@@ -334,10 +334,13 @@ class Evaluator(object):
     def apply_function(self, func, args_objs, kw_objs, env):
         if func.type == ObjectType.FUNCTION:
             default_params = self.eval_expressions(func.default_params, env)
-            # TODO: update the check and the placeholder-ing
-            if len(func.parameters) > len(args_objs) + len(default_params):
+            remaining_params = len(func.parameters)
+            for param in func.parameters:
+                if param.token_literal() in kw_objs.keys():
+                    remaining_params -= 1
+            if remaining_params > len(args_objs) + len(default_params):
                 return Ad_Error_Object("function signature unrecognized, different number of params")
-            args_objs.extend(default_params[len(args_objs):])
+            args_objs.extend(default_params[len(default_params) - remaining_params + len(args_objs):])
             extended_env = self.extend_function_env(func, args_objs)
             for k, v in kw_objs.items():
                 extended_env.set(k, v)
@@ -431,12 +434,12 @@ class Evaluator(object):
             default_params = self.eval_expressions(func.default_params, env)
             remaining_params = len(func.parameters)
             for param in func.parameters:
-                if param not in kw_objs.keys():
+                if param.token_literal() in kw_objs.keys():
                     remaining_params -= 1
             if remaining_params > len(args_objs) + len(default_params):
                 err = Ad_Error_Object("some error message here")
                 return err
-            args_objs.extend(default_params[len(args_objs):])
+            args_objs.extend(default_params[len(default_params) - remaining_params + len(args_objs):])
             extended_env = self.extend_method_env(func, args_objs, env)
             for k, v in kw_objs.items():
                 extended_env.set(k, v)
@@ -452,6 +455,8 @@ class Evaluator(object):
     def extend_function_env(self, func, args_objs):
         extended = new_enclosed_environment(func.env)
         for i, param in enumerate(func.parameters):
+            if i >= len(args_objs):
+                break
             extended.set_local_param(param.token_literal(), args_objs[i])
         return extended
 
