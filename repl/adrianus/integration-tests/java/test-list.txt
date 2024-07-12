@@ -187,3 +187,4 @@ examples/test200.ad
 examples/test201.ad
 examples/test202.ad
 examples/test203.ad
+examples/test204.ad
