@@ -226,12 +226,39 @@ Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, Ad_AST_Node*
     }
 }
 
+Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, std::vector<Ad_AST_Node*> dp, Ad_AST_Node* b, Environment* e) {
+    type = OBJ_FUNCTION;
+    ref_count = 0;
+    marked = false;
+    params = p;
+    default_params = dp;
+    body = b;
+    env = e;
+
+    if (body) {
+        Ad_INCREF(body);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = params.begin() ; it != params.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        Ad_INCREF(obj);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = default_params.begin() ; it != default_params.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        Ad_INCREF(obj);
+    }
+}
+
 Ad_Function_Object::~Ad_Function_Object() {
     if (body) {
         Ad_DECREF(body);
         free_Ad_AST_Node_memory(body);
     }
     for (std::vector<Ad_AST_Node*>::iterator it = params.begin() ; it != params.end(); ++it) {
+        Ad_AST_Node *obj = *it;
+        Ad_DECREF(obj);
+        free_Ad_AST_Node_memory(obj);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = default_params.begin() ; it != default_params.end(); ++it) {
         Ad_AST_Node *obj = *it;
         Ad_DECREF(obj);
         free_Ad_AST_Node_memory(obj);

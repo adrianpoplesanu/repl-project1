@@ -87,7 +87,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_FUNCTION_LITERAL: {
-            Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->body, &env);
+            Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->default_params, ((Ad_AST_FunctionLiteral*)node)->body, &env);
             garbageCollector->addObject(obj);
             // TODP: add obj to gc
             return obj;
@@ -550,17 +550,37 @@ std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> arg
     return res;
 }
 
-Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args, Environment &env) {
+Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args, std::unordered_map<std::string, Ad_Object*> kw_args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
-        if (func_obj->params.size() != args.size()) {
-            // TODO: mark and sweep cleanup
-            //for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
-            Ad_Error_Object *obj = new Ad_Error_Object("function signature unrecognized, different number of params");
+        std::vector<Ad_Object*> default_params = EvalExpressions(func_obj->default_params, env);
+        int remainingParams = func_obj->params.size();
+        
+        for (auto& it : func_obj->params) {
+            std::unordered_map<std::string,Ad_Object*>::const_iterator got = kw_args.find(it->TokenLiteral());
+            if (got != kw_args.end()) {
+                remainingParams--;
+            }
+        }
+        if (remainingParams > args.size() + default_params.size()) {
+            Ad_Error_Object *obj = new Ad_Error_Object("some error message here");
             garbageCollector->addObject(obj);
             return obj;
         }
+
+        int counter = 0;
+        for (std::vector<Ad_Object*>::iterator it = default_params.begin() ; it != default_params.end(); ++it) {
+            if (counter >= default_params.size() - func_obj->params.size() + args.size()) {
+                args.push_back(*it);
+            }
+            counter++;
+        }
         Environment* extendedEnv = extendFunctionEnv(func, args);
+
+        for (auto& it : kw_args) {
+            extendedEnv->Set(it.first, it.second);
+        }
+
         Ad_INCREF(extendedEnv);
         garbageCollector->addEnvironment(extendedEnv);
         garbageCollector->scheduleEnvironmentToDECREF(extendedEnv);
@@ -618,13 +638,13 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         std::vector<Ad_AST_Node*> methods = klass_object->methods;
         for (std::vector<Ad_AST_Node*>::iterator it = methods.begin(); it != methods.end(); ++it) {
             Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
-            Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, klass_instance->instance_environment);
+            Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->default_params, def_stmt->body, klass_instance->instance_environment);
             garbageCollector->addObject(method_obj);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             //std::cout << def_ident->value << "\n";
             klass_instance->instance_environment->setLocalParam(def_ident->value, method_obj);
         }
-        Ad_Object* constructorReturn = CallInstanceConstructor(klass_instance, args, env);
+        Ad_Object* constructorReturn = CallInstanceConstructor(klass_instance, args, kw_args, env);
         if (IsError(constructorReturn)) {
             // TODO: mark and sweep cleanup
             //free_Ad_Object_memory(klass_instance);
@@ -642,7 +662,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
     return NULL;
 }
 
-Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::vector<Ad_Object*> args, Environment &env) {
+Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::vector<Ad_Object*> args, std::unordered_map<std::string, Ad_Object*> kw_args, Environment &env) {
     Environment* instance_environment = ((Ad_Class_Instance*) klass_instance)->instance_environment;
     Ad_Object* klass_method = instance_environment->lookupConstructor();
     if (klass_method != NULL) {
@@ -650,21 +670,48 @@ Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::ve
         if (args.size() == 1 && IsError(args[0])) {
             return args[0];
         }
+        std::unordered_map<std::string, Ad_Object*> kw_objs;
+        /*for (int i = 0; i < currentMemberAccess->kw_args.size(); i++) {
+            Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) currentMemberAccess->kw_args.at(i);
+            kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
+        }*/
         instance_environment->outer = &env;
-        return ApplyMethod(klass_method, args, *instance_environment);
+        return ApplyMethod(klass_method, args, kw_args, *instance_environment);
     }
     return NULL;
 }
 
-Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args, Environment &env) {
+Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args, std::unordered_map<std::string, Ad_Object*> kw_args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
-        if (func_obj->params.size() != args.size()) {
+        std::vector<Ad_Object*> default_params = EvalExpressions(func_obj->default_params, env);
+        int remainingParams = func_obj->params.size();
+        
+        for (auto& it : func_obj->params) {
+            std::unordered_map<std::string,Ad_Object*>::const_iterator got = kw_args.find(it->TokenLiteral());
+            if (got != kw_args.end()) {
+                remainingParams--;
+            }
+        }
+        if (remainingParams > args.size() + default_params.size()) {
             Ad_Error_Object *obj = new Ad_Error_Object("some error message here");
             garbageCollector->addObject(obj);
             return obj;
         }
+
+        int counter = 0;
+        for (std::vector<Ad_Object*>::iterator it = default_params.begin() ; it != default_params.end(); ++it) {
+            if (counter >= default_params.size() - remainingParams + args.size()) {
+                args.push_back(*it);
+            }
+            counter++;
+        }
         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
+
+        for (auto& it : kw_args) {
+            extendedEnv->Set(it.first, it.second);
+        }
+
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
         garbageCollector->addEnvironment(extendedEnv);
         return UnwrapReturnValue(evaluated, extendedEnv);
@@ -678,6 +725,9 @@ Environment* Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*>
     Environment* extended = newEnclosedEnvironmentUnfreeable(&env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
+        if (i >= args_objs.size()) {
+            break;
+        }
         extended->setLocalParam((*it)->TokenLiteral(), args_objs[i]);
         ++i;
     }
@@ -721,6 +771,9 @@ Environment* Evaluator::extendFunctionEnv(Ad_Object* func, std::vector<Ad_Object
     Ad_INCREF(func_obj->env);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
+        if (i >= args.size()) {
+            break;
+        }
         extended->setLocalParam((*it)->TokenLiteral(), args[i++]);
     }
     return extended;
@@ -993,10 +1046,11 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_Def_Statement* def_statement = (Ad_AST_Def_Statement*) node;
 
     std::vector<Ad_AST_Node*> parameters = def_statement->parameters;
+    std::vector<Ad_AST_Node*> default_params = def_statement->default_params;
     Ad_AST_Node* body = def_statement->body;
 
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) def_statement->name;
-    Ad_Function_Object* func = new Ad_Function_Object(parameters, body, &env);
+    Ad_Function_Object* func = new Ad_Function_Object(parameters, default_params, body, &env);
     garbageCollector->addObject(func);
     env.Set(ident->value, func);
     return NULL; // this is correct, i don't want to print the function memory address on its definition statement
@@ -1064,7 +1118,7 @@ void Evaluator::updateInstanceWithInheritedClasses(Ad_Object* obj, Environment& 
         for (std::vector<Ad_AST_Node*>::iterator it = parentAdClassObject->methods.begin(); it != parentAdClassObject->methods.end(); ++it) {
             // this adds everything to main class
             Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
-            Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->body, adClassInstance->instance_environment);
+            Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->default_params, def_stmt->body, adClassInstance->instance_environment);
             garbageCollector->addObject(method_obj);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             adClassInstance->instance_environment->Set(def_ident->value, method_obj);
@@ -1099,7 +1153,14 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
                 return args_objs[0];
             }
-            return ApplyMethod(klass_method, args_objs, env);
+            std::unordered_map<std::string, Ad_Object*> kw_objs;
+            for (int i = 0; i < member_access->kw_args.size(); i++) {
+                Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) member_access->kw_args.at(i);
+                kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
+                //std::cout << assignStatement->name->TokenLiteral() << "\n";
+            }
+            //std::cout << "aaa:" << ((Ad_Function_Object*)klass_method)->default_params.size() << "\n";
+            return ApplyMethod(klass_method, args_objs, kw_objs, env);
         } else {
             evaluated = Eval(member_access->member, *env.outer);
         }
@@ -1110,11 +1171,16 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             if (args_objs.size() == 1 && IsError(args_objs[0])) {
                 return args_objs[0];
             }
+            std::unordered_map<std::string, Ad_Object*> kw_objs;
+            for (int i = 0; i < member_access->kw_args.size(); i++) {
+                Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) member_access->kw_args.at(i);
+                kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
+            }
             Ad_AST_Super_Expression *superExpression = (Ad_AST_Super_Expression*) member_access->owner;
             Environment *parentKlassEnv = env.outer->getSibling(superExpression->target->TokenLiteral());
             Ad_AST_Identifier *member = (Ad_AST_Identifier*) member_access->member;
             Ad_Function_Object *parentMethod = (Ad_Function_Object*) parentKlassEnv->Get(member->value);
-            Ad_Object *result = ApplyMethod(parentMethod, args_objs, *env.outer);
+            Ad_Object *result = ApplyMethod(parentMethod, args_objs, kw_objs, *env.outer);
             return result;
         } else {
             Ad_AST_Super_Expression *superExpression = (Ad_AST_Super_Expression*) member_access->owner;
@@ -1156,7 +1222,13 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
                 return args_objs[0];
             }
 
-            Ad_Object* result = ApplyMethod(klass_method, args_objs, *klass_environment);
+            std::unordered_map<std::string, Ad_Object*> kw_objs;
+            for (int i = 0; i < member_access->kw_args.size(); i++) {
+                Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) member_access->kw_args.at(i);
+                kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
+            }
+
+            Ad_Object* result = ApplyMethod(klass_method, args_objs, kw_objs, *klass_environment);
             klass_environment->outer = old;
             return result;
         } else {
@@ -1235,7 +1307,12 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
             Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
             if (obj->type == OBJ_FUNCTION) {
                 std::vector<Ad_Object*> args_objs = EvalExpressions(currentMemberAccess->arguments, env);
-                Ad_Object* obj2 = ApplyMethod(obj, args_objs, *(((Ad_Function_Object*) obj)->env));
+                std::unordered_map<std::string, Ad_Object*> kw_objs;
+                for (int i = 0; i < currentMemberAccess->kw_args.size(); i++) {
+                    Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) currentMemberAccess->kw_args.at(i);
+                    kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
+                }
+                Ad_Object* obj2 = ApplyMethod(obj, args_objs, kw_objs, *(((Ad_Function_Object*) obj)->env));
 
                 if (i == 0) {
                     return obj2;
@@ -1321,7 +1398,12 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
             Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
             if (obj->type == OBJ_FUNCTION) {
                 std::vector<Ad_Object*> args_objs = EvalExpressions(currentMemberAccess->arguments, *env);
-                Ad_Object* obj2 = ApplyMethod(obj, args_objs, *(((Ad_Function_Object*) obj)->env));
+                std::unordered_map<std::string, Ad_Object*> kw_objs;
+                for (int i = 0; i < currentMemberAccess->kw_args.size(); i++) {
+                    Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) currentMemberAccess->kw_args.at(i);
+                    kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, *env)));
+                }
+                Ad_Object* obj2 = ApplyMethod(obj, args_objs, kw_objs, *(((Ad_Function_Object*) obj)->env));
 
                 if (i == 0) {
                     //return obj2;
@@ -1617,7 +1699,6 @@ Ad_Object* Evaluator::EvalContinueStatement(Ad_AST_Node* node, Environment& env)
 }
 
 Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
-    //std::cout << "#";
     Ad_AST_CallExpression *callExpression = (Ad_AST_CallExpression*) node;
     Ad_Object* func = Eval(callExpression->function, *env);
     if (IsError(func)) return func;
@@ -1632,7 +1713,13 @@ Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
     if (args_objs.size() == 1 && IsError(args_objs[0])) {
         return args_objs[0];
     }
-    Ad_Object* result = ApplyFunction(func, args_objs, *env);
+    std::unordered_map<std::string, Ad_Object*> kw_args;
+    for (int i = 0; i < callExpression->kw_args.size(); i++) {
+        Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) callExpression->kw_args.at(i);
+        kw_args.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, *env)));
+        //kw_args[assignStatement->name->TokenLiteral()] = Eval(assignStatement->value, *env);
+    }
+    Ad_Object* result = ApplyFunction(func, args_objs, kw_args, *env);
     //GarbageCollectEnvironments(); // this also doesn't work, i need to document why, why is this not working?!?
     //Ad_DECREF(((Ad_Function_Object*)func)->env);
     garbageCollector->consumeScheduledDECREFEnvironments();

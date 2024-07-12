@@ -97,8 +97,8 @@ public:
     Ad_AST_Node* ParseStringLiteral();
     Ad_AST_Node* ParseListLiteral();
     Ad_AST_Node* ParseHashLiteral();
-    std::vector<Ad_AST_Node*> ParseCallArguments();
-    std::vector<Ad_AST_Node*> ParseFunctionParameters();
+    std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> ParseCallArguments();
+    std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> ParseFunctionParameters();
     std::vector<Ad_AST_Node*> ParseListExpressions();
     Ad_AST_Node* ParseIndexExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseIndexExpressionOld(Ad_AST_Node*);

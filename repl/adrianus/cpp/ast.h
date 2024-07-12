@@ -224,6 +224,7 @@ class Ad_AST_CallExpression : public Ad_AST_Node {
 public:
     Token token;
     std::vector<Ad_AST_Node*> arguments;
+    std::vector<Ad_AST_Node*> kw_args;
     Ad_AST_Node* function;
 
     Ad_AST_CallExpression();
@@ -263,6 +264,7 @@ class Ad_AST_FunctionLiteral : public Ad_AST_Node {
 public:
     Token token;
     std::vector<Ad_AST_Node*> parameters;
+    std::vector<Ad_AST_Node*> default_params;
     Ad_AST_Node* body;
 
     Ad_AST_FunctionLiteral();
@@ -343,6 +345,7 @@ public:
     Token token;
     Ad_AST_Node* name;
     std::vector<Ad_AST_Node*> parameters;
+    std::vector<Ad_AST_Node*> default_params;
     Ad_AST_Node* body;
 
     Ad_AST_Def_Statement();
@@ -385,11 +388,13 @@ public:
     Ad_AST_Node* owner;
     Ad_AST_Node* member;
     std::vector<Ad_AST_Node*> arguments;
+    std::vector<Ad_AST_Node*> kw_args;
     bool is_method;
 
     Ad_AST_MemberAccess();
     Ad_AST_MemberAccess(Token);
     Ad_AST_MemberAccess(Token, Ad_AST_Node*, Ad_AST_Node*, std::vector<Ad_AST_Node*>);
+    Ad_AST_MemberAccess(Token, Ad_AST_Node*, Ad_AST_Node*, std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>);
     ~Ad_AST_MemberAccess();
     virtual std::string TokenLiteral();
     virtual std::string ToString();

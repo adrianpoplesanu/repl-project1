@@ -347,6 +347,10 @@ Ad_AST_CallExpression::~Ad_AST_CallExpression() {
         Ad_AST_Node *node = *it;
         free_Ad_AST_Node_memory(node);
     }
+    for (std::vector<Ad_AST_Node*>::iterator it = kw_args.begin() ; it != kw_args.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        free_Ad_AST_Node_memory(node);
+    }
 }
 
 std::string Ad_AST_CallExpression::ToString() {
@@ -480,6 +484,11 @@ Ad_AST_FunctionLiteral::~Ad_AST_FunctionLiteral() {
         free_Ad_AST_Node_memory(body);
     }
     for (std::vector<Ad_AST_Node*>::iterator it = parameters.begin() ; it != parameters.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = default_params.begin() ; it != default_params.end(); ++it) {
         Ad_AST_Node *node = *it;
         Ad_DECREF(node); // asta merge si e super cool
         free_Ad_AST_Node_memory(node);
@@ -690,6 +699,11 @@ Ad_AST_Def_Statement::~Ad_AST_Def_Statement() {
         Ad_DECREF(node); // asta merge si e super cool
         free_Ad_AST_Node_memory(node);
     }
+    for (std::vector<Ad_AST_Node*>::iterator it = default_params.begin() ; it != default_params.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
 }
 
 std::string Ad_AST_Def_Statement::TokenLiteral() {
@@ -791,6 +805,16 @@ Ad_AST_MemberAccess::Ad_AST_MemberAccess(Token t, Ad_AST_Node* o, Ad_AST_Node* m
     arguments = a;
 }
 
+Ad_AST_MemberAccess::Ad_AST_MemberAccess(Token t, Ad_AST_Node* o, Ad_AST_Node* m, std::vector<Ad_AST_Node*> a, std::vector<Ad_AST_Node*> k_a) {
+    type = ST_MEMBER_ACCESS;
+    ref_count = 0;
+    token = t;
+    owner = o;
+    member = m;
+    arguments = a;
+    kw_args = k_a;
+}
+
 Ad_AST_MemberAccess::~Ad_AST_MemberAccess() {
     if (owner) {
         Ad_DECREF(owner);
@@ -801,6 +825,11 @@ Ad_AST_MemberAccess::~Ad_AST_MemberAccess() {
         free_Ad_AST_Node_memory(member);
     }
     for (std::vector<Ad_AST_Node*>::iterator it = arguments.begin() ; it != arguments.end(); ++it) {
+        Ad_AST_Node *node = *it;
+        Ad_DECREF(node); // asta merge si e super cool
+        free_Ad_AST_Node_memory(node);
+    }
+    for (std::vector<Ad_AST_Node*>::iterator it = kw_args.begin() ; it != kw_args.end(); ++it) {
         Ad_AST_Node *node = *it;
         Ad_DECREF(node); // asta merge si e super cool
         free_Ad_AST_Node_memory(node);

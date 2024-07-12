@@ -224,28 +224,41 @@ Ad_AST_Node* Parser::ParseInfixExpression(Ad_AST_Node* left) {
 
 Ad_AST_Node* Parser::ParseCallExpression(Ad_AST_Node* function) {
     Ad_AST_CallExpression* expr = new Ad_AST_CallExpression(current_token, function);
-    expr->arguments = ParseCallArguments();
+    std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> res = ParseCallArguments();
+    expr->arguments = res.first;
+    expr->kw_args = res.second;
     return expr;
 }
 
-std::vector<Ad_AST_Node*> Parser::ParseCallArguments() {
+std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> Parser::ParseCallArguments() {
     std::vector<Ad_AST_Node*> args;
+    std::vector<Ad_AST_Node*> kw_args;
     if (PeekTokenIs(TT_RPAREN)) {
         NextToken();
-        return args;
+        return std::make_pair(args, kw_args);
     }
     NextToken();
-    args.push_back(ParseExpression(PT_LOWEST));
+    Ad_AST_Node *expr1 = ParseExpression(PT_LOWEST);
+    if (expr1->type == ST_ASSIGN_STATEMENT) {
+        kw_args.push_back(expr1);
+    } else {
+        args.push_back(expr1);
+    }
     while (PeekTokenIs(TT_COMMA)) {
         NextToken();
         NextToken();
-        args.push_back(ParseExpression(PT_LOWEST));
+        Ad_AST_Node *expr1 = ParseExpression(PT_LOWEST);
+        if (expr1->type == ST_ASSIGN_STATEMENT) {
+            kw_args.push_back(expr1);
+        } else {
+            args.push_back(expr1);
+        }
     }
     if (!ExpectPeek(TT_RPAREN)) {
         std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL
-        return empty;
+        return std::make_pair(empty, empty);
     }
-    return args;
+    return std::make_pair(args, kw_args);
 }
 
 Ad_AST_Node* Parser::ParseIntegerLiteral() {
@@ -384,7 +397,9 @@ Ad_AST_Node* Parser::ParseFunctionLiteral() {
         free_Ad_AST_Node_memory(fun_lit);
         return NULL;
     }
-    fun_lit->parameters = ParseFunctionParameters();
+    std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> res = ParseFunctionParameters();
+    fun_lit->parameters = res.first;
+    fun_lit->default_params = res.second;
     if (!ExpectPeek(TT_LBRACE)) {
         //delete fun_lit;
         free_Ad_AST_Node_memory(fun_lit);
@@ -395,28 +410,47 @@ Ad_AST_Node* Parser::ParseFunctionLiteral() {
     return fun_lit;
 }
 
-std::vector<Ad_AST_Node*> Parser::ParseFunctionParameters() {
+std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> Parser::ParseFunctionParameters() {
     std::vector<Ad_AST_Node*> identifiers;
+    std::vector<Ad_AST_Node*> defaultParams;
     if (PeekTokenIs(TT_RPAREN)) {
         NextToken();
-        return identifiers;
+        return std::make_pair(identifiers, defaultParams);
     }
     NextToken();
     Ad_AST_Identifier* ident = new Ad_AST_Identifier(current_token, current_token.literal);
     identifiers.push_back(ident);
     Ad_INCREF(ident);
+    if (PeekTokenIs(TT_ASSIGN)) {
+        NextToken();
+        NextToken();
+        Ad_AST_Node *value = ParseExpression(PT_LOWEST);
+        defaultParams.push_back(value);
+        Ad_INCREF(value);
+    }
     while (PeekTokenIs(TT_COMMA)) {
         NextToken();
         NextToken();
         ident = new Ad_AST_Identifier(current_token, current_token.literal);
         identifiers.push_back(ident);
         Ad_INCREF(ident);
+        if (PeekTokenIs(TT_ASSIGN)) {
+            NextToken();
+            NextToken();
+            Ad_AST_Node *value = ParseExpression(PT_LOWEST);
+            defaultParams.push_back(value);
+            Ad_INCREF(value);
+        } else {
+            if (defaultParams.size() > 0) {
+                std::cout << "ERROR: no positional arguments allowed after defaulted params!";
+            }
+        }
     }
     if (!ExpectPeek(TT_RPAREN)) {
         std::vector<Ad_AST_Node*> empty; // i don't like this, it should be NULL
-        return empty;
+        return std::make_pair(empty, empty);
     }
-    return identifiers;
+    return std::make_pair(identifiers, defaultParams);
 }
 
 Ad_AST_Node* Parser::ParseBlockStatement() {
@@ -541,8 +575,9 @@ Ad_AST_Node* Parser::ParseDefStatement() {
         // free Ad_AST_Def_Statement
         return NULL; // this should potentially return an error AST node
     }
-    std::vector<Ad_AST_Node*> parameters = ParseFunctionParameters();
-    stmt->parameters = parameters;
+    std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> res = ParseFunctionParameters();
+    stmt->parameters = res.first;
+    stmt->default_params = res.second;
     if (!ExpectPeek(TT_LBRACE)) {
         // free As_AST_Def_Statement
         return NULL; // this hsould potentially return an error AST node
@@ -583,8 +618,9 @@ Ad_AST_Node* Parser::ParseFunExpression() {
         // free Ad_AST_Def_Statement
         return NULL; // this should potentially return an error AST node
     }
-    std::vector<Ad_AST_Node*> parameters = ParseFunctionParameters();
-    stmt->parameters = parameters;
+    std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> res = ParseFunctionParameters();
+    stmt->parameters = res.first;
+    stmt->default_params = res.second;
     if (!ExpectPeek(TT_LBRACE)) {
         // free As_AST_Def_Statement
         return NULL; // this hsould potentially return an error AST node
@@ -625,8 +661,9 @@ Ad_AST_Node* Parser::ParseFunctionExpression() {
         // free Ad_AST_Def_Statement
         return NULL; // this should potentially return an error AST node
     }
-    std::vector<Ad_AST_Node*> parameters = ParseFunctionParameters();
-    stmt->parameters = parameters;
+    std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> res = ParseFunctionParameters();
+    stmt->parameters = res.first;
+    stmt->default_params = res.second;
     if (!ExpectPeek(TT_LBRACE)) {
         // free As_AST_Def_Statement
         return NULL; // this hsould potentially return an error AST node
@@ -712,10 +749,13 @@ Ad_AST_Node* Parser::ParseMemberAccess(Ad_AST_Node* left) {
     stmt->member = right;
     if (PeekTokenIs(TT_LPAREN)) {
         NextToken();
-        stmt->arguments = ParseCallArguments();
+        std::pair<std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>> res = ParseCallArguments();
+        stmt->arguments = res.first;
+        stmt->kw_args = res.second;
         stmt->is_method = true;
     } else {
         stmt->arguments.clear();
+        stmt->kw_args.clear();
         stmt->is_method = false;
     }
     return stmt;

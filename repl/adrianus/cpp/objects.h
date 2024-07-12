@@ -183,11 +183,13 @@ class Environment; // forward declaration for Environment
 class Ad_Function_Object : public Ad_Object {
 public:
 	std::vector<Ad_AST_Node*> params; // i don't really like using AST nodes here
+	std::vector<Ad_AST_Node*> default_params;
 	Ad_AST_Node* body; // i don't really like using AST nodes here
 	Environment* env; // this works only with forward declaration
 
 	Ad_Function_Object();
 	Ad_Function_Object(std::vector<Ad_AST_Node*>, Ad_AST_Node*, Environment*);
+	Ad_Function_Object(std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>, Ad_AST_Node*, Environment*);
 	~Ad_Function_Object();
 
 	virtual std::string Inspect();
