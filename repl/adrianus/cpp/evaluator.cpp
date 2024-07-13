@@ -1644,14 +1644,20 @@ Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) 
             //executionTimeProfiling.start("garbageCollector->addObject");
             garbageCollector->addObject(result);
             //executionTimeProfiling.stop("garbageCollector->addObject");
-            ((Ad_Integer_Object*) old_obj)->value++;
+            //((Ad_Integer_Object*) old_obj)->value++;
+            Ad_Integer_Object *new_obj = new Ad_Integer_Object(((Ad_Integer_Object*) old_obj)->value + 1);
+            garbageCollector->addObject(new_obj);
+            env.Set(ident->value, new_obj);
             //executionTimeProfiling.stop("EvalPostfixIncrement");
             return result;
         }
         if ("--" == expr->_operator) {
             Ad_Integer_Object *result = new Ad_Integer_Object(value);
             garbageCollector->addObject(result);
-            ((Ad_Integer_Object*) old_obj)->value--;
+            //((Ad_Integer_Object*) old_obj)->value--;
+            Ad_Integer_Object *new_obj = new Ad_Integer_Object(((Ad_Integer_Object*) old_obj)->value - 1);
+            garbageCollector->addObject(new_obj);
+            env.Set(ident->value, new_obj);
             //executionTimeProfiling.stop("EvalPostfixIncrement");
             return result;
         }
