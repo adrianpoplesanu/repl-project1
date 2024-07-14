@@ -12,4 +12,6 @@ void importSource(std::string, Environment*, GarbageCollector*);
 void unescapeSource(std::string&);
 void importSource(std::string);
 
+Ad_Object* dispatchMemberAccessPerObjectType(Ad_Object*, Ad_AST_Identifier*, std::vector<Ad_Object*>, GarbageCollector*);
+
 #endif

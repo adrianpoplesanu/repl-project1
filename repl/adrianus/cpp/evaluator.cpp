@@ -1199,38 +1199,46 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             }
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
             Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
-            Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
+            Ad_Object* target = env.Get(owner->value);
+            if (target->type == OBJ_INSTANCE) {
+                Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
 
-            if (klass_instance == NULL) {
-                return NULL;
+                if (klass_instance == NULL) {
+                    return NULL;
+                }
+
+                Environment* klass_environment = klass_instance->instance_environment;
+                Environment* old = klass_environment->outer;
+                klass_environment->outer = &env;
+                //klass_environment->outer = NULL;
+
+                Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
+                if (klass_method == NULL) {
+                    //return &NULLOBJECT;
+                    Ad_Error_Object *obj = new Ad_Error_Object("method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
+                    garbageCollector->addObject(obj);
+                    return obj;
+                }
+                std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
+                if (args_objs.size() == 1 && IsError(args_objs[0])) {
+                    return args_objs[0];
+                }
+
+                std::unordered_map<std::string, Ad_Object*> kw_objs;
+                for (int i = 0; i < member_access->kw_args.size(); i++) {
+                    Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) member_access->kw_args.at(i);
+                    kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
+                }
+
+                Ad_Object* result = ApplyMethod(klass_method, args_objs, kw_objs, *klass_environment);
+                klass_environment->outer = old;
+                return result;
+            } else {
+                std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
+                Ad_Object* result = dispatchMemberAccessPerObjectType(target, member, args_objs, garbageCollector);
+                garbageCollector->addObject(result);
+                return result;
             }
-
-            Environment* klass_environment = klass_instance->instance_environment;
-            Environment* old = klass_environment->outer;
-            klass_environment->outer = &env;
-            //klass_environment->outer = NULL;
-
-            Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
-            if (klass_method == NULL) {
-                //return &NULLOBJECT;
-                Ad_Error_Object *obj = new Ad_Error_Object("method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
-                garbageCollector->addObject(obj);
-                return obj;
-            }
-            std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
-            if (args_objs.size() == 1 && IsError(args_objs[0])) {
-                return args_objs[0];
-            }
-
-            std::unordered_map<std::string, Ad_Object*> kw_objs;
-            for (int i = 0; i < member_access->kw_args.size(); i++) {
-                Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) member_access->kw_args.at(i);
-                kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
-            }
-
-            Ad_Object* result = ApplyMethod(klass_method, args_objs, kw_objs, *klass_environment);
-            klass_environment->outer = old;
-            return result;
         } else {
             if (member_access->owner->type == ST_IDENTIFIER) {
                 Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
@@ -1300,11 +1308,25 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
     }
     // end initialize env
 
+    Ad_Object_Type *previousMemberType = NULL;
     for (int i = chainedMemberAccesses.size() - 1; i >= 0; i--) {
         Ad_AST_MemberAccess* currentMemberAccess = (Ad_AST_MemberAccess*) chainedMemberAccesses.at(i);
         if (currentMemberAccess->is_method) {
             // am de a face cu un call
+			if (previousMemberType != NULL && *previousMemberType == OBJ_LIST) {
+				// TODO: maybe add some logic here for primitive data types
+				if (currentMemberAccess->member->TokenLiteral() == "size") {
+					// TODO: maybe like this, but it needs to preserve recursive access
+					Ad_AST_Node* owner = currentMemberAccess->owner;
+					Ad_AST_MemberAccess* ownerMemberAccess = (Ad_AST_MemberAccess*) owner;
+					Ad_Object* obj = Eval(ownerMemberAccess->member, *currentEnvironment);
+					Ad_List_Object* listObject = (Ad_List_Object*) obj;
+					return new Ad_Integer_Object(listObject->elements.size());
+				}
+			}
+
             Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
+            previousMemberType = &obj->type;
             if (obj->type == OBJ_FUNCTION) {
                 std::vector<Ad_Object*> args_objs = EvalExpressions(currentMemberAccess->arguments, env);
                 std::unordered_map<std::string, Ad_Object*> kw_objs;
@@ -1325,7 +1347,12 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
             }
         } else {
             // am de a face cu un identificator
+			if (previousMemberType != NULL && *previousMemberType == OBJ_LIST) {
+				// TODO: maybe add some logic here for primitive data types
+			}
+
             Ad_Object* obj = Eval(currentMemberAccess->member, *currentEnvironment);
+            previousMemberType = &obj->type;
 
             if (i == 0) {
                 return obj;
