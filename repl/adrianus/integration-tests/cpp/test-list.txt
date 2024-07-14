@@ -227,3 +227,6 @@ examples/test250.ad
 examples/test251.ad
 examples/test252.ad
 examples/test253.ad
+examples/test254.ad
+examples/test255.ad
+examples/test256.ad
