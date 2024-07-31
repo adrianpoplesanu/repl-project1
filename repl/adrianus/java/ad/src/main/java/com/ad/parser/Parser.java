@@ -26,7 +26,8 @@ public class Parser {
         statementParseFns.put(TokenTypeEnum.IF, this::parseIfExpression);
         statementParseFns.put(TokenTypeEnum.DEF, this::parseDefStatement);
 
-        prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier); // equivalent to: () -> parseIdentifier()
+        //prefixParseFns.put(TokenTypeEnum.IDENT, this::parseIdentifier); // equivalent to: () -> parseIdentifier()
+        prefixParseFns.put(TokenTypeEnum.IDENT, () -> parseIdentifier());
         prefixParseFns.put(TokenTypeEnum.INT, this::parseIntegerLiteral);
         prefixParseFns.put(TokenTypeEnum.FLOAT, this::parseFloatLiteral);
         prefixParseFns.put(TokenTypeEnum.BANG, this::parsePrefixExpression);
@@ -51,7 +52,8 @@ public class Parser {
         prefixParseFns.put(TokenTypeEnum.THIS, this::parseThisExpression);
         prefixParseFns.put(TokenTypeEnum.SUPER, this::parseSuperExpression);
 
-        infixParseFns.put(TokenTypeEnum.PLUS, this::parseInfixExpression);
+        //infixParseFns.put(TokenTypeEnum.PLUS, this::parseInfixExpression); // equivalent to: (x) ->  parseInfixExpression(x)
+        infixParseFns.put(TokenTypeEnum.PLUS, (x) ->  parseInfixExpression(x));
         infixParseFns.put(TokenTypeEnum.MINUS, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.ASTERISK, this::parseInfixExpression);
         infixParseFns.put(TokenTypeEnum.SLASH, this::parseInfixExpression);
