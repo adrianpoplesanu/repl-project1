@@ -19,7 +19,7 @@ class Ad_Null_Object(Ad_Object):
         return "null"
 
     def hash_key(self):
-        return HashKey(type=type, value=Hash(self.value))
+        return HashKey(type=type, value=hash(None))
 
 
 class Ad_Integer_Object(Ad_Object):
@@ -51,7 +51,7 @@ class Ad_Float_Object(Ad_Object):
         return str(self.value)
 
     def hash_key(self):
-        return HashMap(type=type, value=hash(self.value))
+        return HashKey(type=type, value=hash(self.value))
 
 
 class Ad_Boolean_Object(Ad_Object):
