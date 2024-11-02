@@ -585,6 +585,11 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         garbageCollector->addEnvironment(extendedEnv);
         garbageCollector->scheduleEnvironmentToDECREF(extendedEnv);
         Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
+        if (evaluated == NULL) {
+            // TODO: vet this agains python and java versions
+            // TODO: maybe this check need to be added in ApplyMethod also
+            return &NULLOBJECT;
+        }
         return UnwrapReturnValue(evaluated, extendedEnv);
     }
     if (func->type == OBJ_BUILTIN) {
