@@ -629,6 +629,7 @@ public class Evaluator {
 
     private AdObject unwrapReturnValue(AdObject evaluated) {
     	if (evaluated == null) return null;
+		//if (evaluated == null) return NULLOBJECT; // TODO: this is so we're in line c++ - python - java, but is this really what we want?
     	if (evaluated.getType() == ObjectTypeEnum.RETURN_VALUE) {
     		AdReturnValueObject returnValue = (AdReturnValueObject) evaluated;
     		return returnValue.getReturnValue();
