@@ -450,6 +450,8 @@ class Evaluator(object):
     def unwrap_return_value(self, obj):
         if obj and obj.type == ObjectType.RETURN_VALUE:
             return obj.value
+        #if not obj:
+        #    return NULLOBJECT
         return obj
 
     def extend_function_env(self, func, args_objs):
