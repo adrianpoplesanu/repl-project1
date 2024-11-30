@@ -1,0 +1,12 @@
+class Dog {
+    a = 5
+    def n() {
+         return a + 6
+    }
+}
+
+dog = Dog()
+println(getattrs(dog))
+println(getattr(dog, "a"))
+println(getattr(dog, "n"))
+getattr(dog, "n")()
