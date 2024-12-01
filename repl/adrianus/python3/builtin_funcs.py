@@ -146,7 +146,14 @@ def hasattr_builtin(args, env):
     pass
 
 def getattr_builtin(args, env):
-    pass
+    target = args[0]
+    attr_name = args[1].value
+    if target.type == ObjectType.INSTANCE:
+        return target.instance_environment.lookup_only_in_store(attr_name)
+    elif target.type == ObjectType.CLASS:
+        # TODO: should i evaluate the ast node and return an un-bound attribute?
+        pass
+    return None
 
 def setattr_builtin(args, env):
     pass
