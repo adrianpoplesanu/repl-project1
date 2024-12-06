@@ -1,0 +1,10 @@
+class Elev {
+   a = 5
+   def b() {
+       print(a + c + 6)
+   }
+}
+
+elev = Elev()
+setattr(elev, "c", 51)
+elev.b()
