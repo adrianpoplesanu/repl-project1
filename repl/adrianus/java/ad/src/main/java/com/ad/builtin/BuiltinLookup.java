@@ -34,7 +34,7 @@ public class BuiltinLookup {
 			put("hash", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("hasattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
 			put("getattr", new AdBuiltinObject(new GetattrBuiltin()));
-			put("setattr", new AdBuiltinObject(new ContextBuiltin())); // TODO: update this
+			put("setattr", new AdBuiltinObject(new SetattrBuiltin())); // TODO: update this
 			put("getattrs", new AdBuiltinObject(new GetattrsBuiltin()));
 			put("__thread", new AdBuiltinObject(new ThreadBuiltin()));
 			put("import", new AdBuiltinObject(new ImportBuiltin()));
