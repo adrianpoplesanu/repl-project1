@@ -156,7 +156,17 @@ def getattr_builtin(args, env):
     return None
 
 def setattr_builtin(args, env):
-    pass
+    if len(args) == 3:
+        target = args[0]
+        if target.type == ObjectType.INSTANCE:
+            name = args[1]
+            value = args[2]
+            if value.type == ObjectType.FUNCTION:
+                value.env = target.instance_environment
+                target.instance_environment.store[name.value] = value
+            else:
+                target.instance_environment.store[name.value] = value
+    return None
 
 def getattrs_builtin(args, env):
     if len(args) == 1:
