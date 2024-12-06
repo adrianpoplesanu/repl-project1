@@ -1,0 +1,16 @@
+class Elev {
+   a = 5
+   def b() {
+       c()
+   }
+   def d() {
+       e()
+   }
+}
+
+elev = Elev()
+setattr(elev, "c", func() { println("aaa") })
+elev.b()
+
+setattr(elev, "e", func() { println(a) })
+elev.d()
