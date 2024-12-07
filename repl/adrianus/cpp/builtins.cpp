@@ -335,6 +335,19 @@ Ad_Object* getattr_builtin(std::vector<Ad_Object*> args, Environment *env, Garba
 }
 
 Ad_Object* setattr_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    if (args.size() == 3) {
+        Ad_Object* target = args.at(0);
+        if (target->type == OBJ_INSTANCE) {
+            Ad_String_Object* name = (Ad_String_Object*) args.at(1);
+            Ad_Object* value = args.at(2);
+            if (value->type == OBJ_FUNCTION) {
+                ((Ad_Function_Object*) value)->env = ((Ad_Class_Instance*) target)->instance_environment;
+                ((Ad_Class_Instance*) target)->instance_environment->store[name->value] = value;
+            } else {
+                ((Ad_Class_Instance*) target)->instance_environment->store[name->value] = value;
+            }
+        }
+    }
     return NULL;
 }
 
