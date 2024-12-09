@@ -1,0 +1,4 @@
+\['a', 'n'\]
+5
+<function at memory address: (.*)>
+11
