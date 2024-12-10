@@ -60,7 +60,7 @@ class Repl(object):
             self.evaluator.eval(self.program, env)
         #self.program.debug()
 
-    def read_line():
+    def read_line(self):
         # i need to construct the source input line, one char at a time in order to check for arrow keys
         # unable to do it for now, there's no smart way of differentiating between the arrow keys, not ever readchar from pypi knows how to do it
         # still needs more investigating into char-by-char keyboard reading

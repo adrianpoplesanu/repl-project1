@@ -5,8 +5,8 @@ from parser import Parser
 from ast import ASTProgram
 from evaluator import Evaluator
 from test_parser import test_parser, test_parser2, test_parser3
-from compiler import Compiler
-from vm import VM
+from vm.compiler import Compiler
+from vm.vm import VM
 
 DEBUG = False
 SHOW_RUNNING_TIME = False
