@@ -1,6 +1,6 @@
-from instructions import Instructions
-from opcode_ad import OpcodeEnum
-from code_ad import Code
+from vm.instructions import Instructions
+from vm.ad_opcode import OpcodeEnum
+from vm.ad_code import Code
 from objects import Ad_Integer_Object
 
 class VM:

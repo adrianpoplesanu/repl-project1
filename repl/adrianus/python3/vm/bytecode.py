@@ -1,4 +1,4 @@
-from instructions import Instructions
+from vm.instructions import Instructions
 
 
 class Bytecode:

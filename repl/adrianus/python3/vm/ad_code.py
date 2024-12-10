@@ -1,6 +1,6 @@
-from definition import Definition
-from instructions import Instructions
-from opcode_ad import Opcode, OpcodeEnum
+from vm.definition import Definition
+from vm.instructions import Instructions
+from vm.ad_opcode import Opcode, OpcodeEnum
 
 
 class Code:

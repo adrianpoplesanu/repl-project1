@@ -1,11 +1,11 @@
-from instructions import Instructions
-from bytecode import Bytecode
+from vm.instructions import Instructions
+from vm.bytecode import Bytecode
 from objects import Ad_Integer_Object
 from parser import Parser
-from code_ad import Code
+from vm.ad_code import Code
 from ast import ASTProgram
 from ast import StatementType
-from opcode_ad import OpConstant, OpAdd, OpPop, OpSub, OpMul, OpDiv
+from vm.ad_opcode import OpConstant, OpAdd, OpPop, OpSub, OpMul, OpDiv
 
 
 class Compiler:
