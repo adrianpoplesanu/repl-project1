@@ -1,0 +1,4 @@
+#ifndef __COMPILATION_SCOPE_H
+#define __COMPILATION_SCOPE_H
+
+#endif

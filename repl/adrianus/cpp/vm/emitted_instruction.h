@@ -1,0 +1,4 @@
+#ifndef __EMITTED_INSTRUCTION_H
+#define __EMITTED_INSTRUCTION_H
+
+#endif
