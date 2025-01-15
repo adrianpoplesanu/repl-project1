@@ -1,6 +1,7 @@
-from code_ad import Code
-from opcode_ad import Opcode
-from opcode_ad import OpcodeEnum
+from vm.ad_code import Code
+from vm.ad_opcode import Opcode
+from vm.ad_opcode import OpcodeEnum
+
 
 def simple_test():
     code = Code()
@@ -9,7 +10,7 @@ def simple_test():
                     code.make(Opcode(OpcodeEnum.OP_CONSTANT), [65534]),
                     code.make(Opcode(OpcodeEnum.OP_SUB), []),
                     code.make(Opcode(OpcodeEnum.OP_MUL), []),
-                    code.make(Opcode(OpcodeEnum.OP_DIV), [])]
+                    code.make(Opcode(OpcodeEnum.OP_DIVIDE), [])]
     for instruction in instructions:
         for i in instruction:
             code.instructions.instructions.append(i)
@@ -18,16 +19,17 @@ def simple_test():
 0004 OpConstant 65534
 0007 OpSub
 0008 OpMul
-0009 OpDiv
+0009 OpDivide
 """
     output = code.to_string()
     if output == expected:
-        print ("success")
-        print (output)
+        print("success")
+        print(output)
     else:
-        print ("FAILED!!!")
-        print ("expected: ", expected)
-        print ("actual: ", output)
+        print("FAILED!!!")
+        print("expected: ", expected)
+        print("actual: ", output)
+
 
 if __name__ == '__main__':
     simple_test()

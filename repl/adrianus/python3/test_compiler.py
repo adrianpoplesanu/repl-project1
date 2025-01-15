@@ -1,6 +1,7 @@
-from compiler import Compiler
+from vm.compiler import Compiler
 from parser import Parser
 from ast import ASTProgram
+
 
 def simple_test():
     compiler = Compiler()
@@ -20,12 +21,13 @@ def simple_test():
 0007 OpPop
 """
     if out == expected:
-        print ('success')
-        print (out)
+        print('success')
+        print(out)
     else:
-        print ('FAILED!!!')
-        print ('expected: ', expected)
-        print ('actual: ', out)
+        print('FAILED!!!')
+        print('expected: ', expected)
+        print('actual: ', out)
+
 
 def test_arithmetic_expressions():
     compiler = Compiler()
@@ -45,12 +47,13 @@ def test_arithmetic_expressions():
 0007 OpPop
 """
     if out == expected:
-        print ('success')
-        print (out)
+        print('success')
+        print(out)
     else:
-        print ('FAILED!!!')
-        print ('expected: ', expected)
-        print ('actual: ', out)
+        print('FAILED!!!')
+        print('expected: ', expected)
+        print('actual: ', out)
+
 
 def sub_test():
     compiler = Compiler()
@@ -70,12 +73,12 @@ def sub_test():
 0007 OpPop
 """
     if out == expected:
-        print ('success')
-        print (out)
+        print('success')
+        print(out)
     else:
-        print ('FAILED!!!')
-        print ('expected: ', expected)
-        print ('actual: ', out)
+        print('FAILED!!!')
+        print('expected: ', expected)
+        print('actual: ', out)
 
 
 if __name__ == '__main__':
