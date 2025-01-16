@@ -3,6 +3,7 @@ from vm.ad_opcode import OpcodeEnum
 from vm.ad_code import Code
 from objects import Ad_Integer_Object
 
+
 class VM:
     def __init__(self):
         self.constants = []
@@ -12,7 +13,7 @@ class VM:
         self.code = Code()
 
     def load(self, bytecode):
-        #print (bytecode) # useful print for seeing the actual bytecode
+        # print (bytecode) # useful print for seeing the actual bytecode
         self.constants = bytecode.constants
         self.instructions = bytecode.instructions
         self.stack = [None] * 2048
@@ -51,7 +52,7 @@ class VM:
                 left = self.pop()
                 result = left.value * right.value
                 self.push(Ad_Integer_Object(result))
-            elif op == OpcodeEnum.OP_DIV:
+            elif op == OpcodeEnum.OP_DIVIDE:
                 right = self.pop()
                 left = self.pop()
                 result = left.value / right.value
@@ -59,7 +60,7 @@ class VM:
             elif op == OpcodeEnum.OP_POP:
                 self.pop()
             else:
-                print ("error: unknow opcode in vm.run()")
+                print("error: unknown opcode in vm.run()")
             ip += 1
 
     def push(self, obj):
