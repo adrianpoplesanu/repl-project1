@@ -15,6 +15,29 @@
 #include "thread_utils.cpp"
 #include "thread_workers.cpp"
 
+#include "vm/bytecode.h"
+#include "vm/bytecode.cpp"
+#include "vm/code.h"
+#include "vm/code.cpp"
+#include "vm/compilation_scope.h"
+#include "vm/compilation_scope.cpp"
+#include "vm/compiler.h"
+#include "vm/compiler.cpp"
+#include "vm/definition.h"
+#include "vm/definition.cpp"
+#include "vm/emitted_instruction.h"
+#include "vm/emitted_instruction.cpp"
+#include "vm/frame.h"
+#include "vm/frame.cpp"
+#include "vm/instructions.h"
+#include "vm/instructions.cpp"
+#include "vm/opcode.h"
+#include "vm/opcode.cpp"
+#include "vm/symbol_table.h"
+#include "vm/symbol_table.cpp"
+#include "vm/vm.h"
+#include "vm/vm.cpp"
+
 // 0 - no test is being run ar startinme, 1 - all tests are run at startime
 #define RUN_TESTS 0
 // 0 - parser test is not run, 1 - run and print AST structure
