@@ -1,9 +1,9 @@
 class OpcodeEnum:
-    OP_CONSTANT = 0  # "OP_CONSTANT"
-    OP_ADD = 1  # "OP_ADD"
-    OP_SUB = 2  # "OP_SUB"
-    OP_MUL = 3  # "OP_MUL"
-    OP_DIVIDE = 4  # "OP_DIVIDE"
+    OP_CONSTANT = 0             # "OP_CONSTANT"
+    OP_ADD = 1                  # "OP_ADD"
+    OP_SUB = 2                  # "OP_SUB"
+    OP_MUL = 3                  # "OP_MUL"
+    OP_DIVIDE = 4               # "OP_DIVIDE"
     OP_POP = 5
     OP_TRUE = 6
     OP_FALSE = 7
@@ -37,19 +37,14 @@ class Opcode:
         self.byte_code = byte_code
 
 
-class OpAdd(Opcode):
-    def __init__(self):
-        super().__init__(OpcodeEnum.OP_ADD)
-
-
 class OpConstant(Opcode):
     def __init__(self):
         super().__init__(OpcodeEnum.OP_CONSTANT)
 
 
-class OpPop(Opcode):
+class OpAdd(Opcode):
     def __init__(self):
-        super().__init__(OpcodeEnum.OP_POP)
+        super().__init__(OpcodeEnum.OP_ADD)
 
 
 class OpSub(Opcode):
@@ -63,5 +58,20 @@ class OpMul(Opcode):
 
 
 class OpDiv(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_DIVIDE)
+
+
+class OpPop(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_DIVIDE)
+
+
+class OpTrue(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_DIVIDE)
+
+
+class OpFalse(Opcode):
     def __init__(self):
         super().__init__(OpcodeEnum.OP_DIVIDE)
