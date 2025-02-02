@@ -6,4 +6,11 @@ public class OpCode {
     public OpCode(byte code) {
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return "OpCode{" +
+                "code=" + code +
+                '}';
+    }
 }
