@@ -1,0 +1,12 @@
+class Elev() {
+    method constructor(age) {
+        this.age = age
+    }
+    method print() {
+        println(age)
+    }
+}
+
+elev = Elev(45)
+println(elev.age)
+elev.print()
