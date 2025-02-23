@@ -23,6 +23,8 @@ class Parser(object):
         self.errors = []
         self.statement_parse_functions[TokenType.IF] = self.parse_if_statement
         self.statement_parse_functions[TokenType.DEF] = self.parse_def_statement
+        # self.statement_parse_functions[TokenType.METHOD] = self.parse_def_statement # if this is not commented then
+        # method keyword outside class creates a function
 
         self.prefix_parse_functions[TokenType.IDENT] = self.parse_identifier
         self.prefix_parse_functions[TokenType.INT] = self.parse_integer_literal
@@ -38,7 +40,7 @@ class Parser(object):
         self.prefix_parse_functions[TokenType.WHILE] = self.parse_while_expression
         self.prefix_parse_functions[TokenType.FOR] = self.parse_for_expression
         self.prefix_parse_functions[TokenType.FUNC] = self.parse_func_literal
-        self.prefix_parse_functions[TokenType.METHOD] = self.parse_func_literal
+        #self.prefix_parse_functions[TokenType.METHOD] = self.parse_func_literal
         self.prefix_parse_functions[TokenType.STRING] = self.parse_string_literal
         self.prefix_parse_functions[TokenType.LBRACKET] = self.parse_list_literal
         self.prefix_parse_functions[TokenType.LBRACE] = self.parse_hash_literal
@@ -468,6 +470,9 @@ class Parser(object):
                 stmt = self.parse_def_statement()
                 expr.methods.append(stmt)
             if self.current_token_is(TokenType.FUN):
+                stmt = self.parse_def_statement()
+                expr.methods.append(stmt)
+            if self.current_token_is(TokenType.METHOD):
                 stmt = self.parse_def_statement()
                 expr.methods.append(stmt)
             elif self.current_token_is(TokenType.IDENT):
