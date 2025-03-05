@@ -1,0 +1,5 @@
+method test3() {
+    println("running test3()")
+}
+
+test3()
