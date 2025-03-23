@@ -6,13 +6,14 @@ from vm.ad_opcode import Opcode, OpcodeEnum
 class Code:
     def __init__(self):
         self.instructions = Instructions()
-        self.definitions = {}
-        self.definitions[OpcodeEnum.OP_CONSTANT] = Definition("OpConstant", [2])
-        self.definitions[OpcodeEnum.OP_ADD] = Definition("OpAdd", [])
-        self.definitions[OpcodeEnum.OP_SUB] = Definition("OpSub", [])
-        self.definitions[OpcodeEnum.OP_MUL] = Definition("OpMul", [])
-        self.definitions[OpcodeEnum.OP_DIVIDE] = Definition("OpDivide", [])
-        self.definitions[OpcodeEnum.OP_POP] = Definition("OpPop", [])
+        self.definitions = {
+            OpcodeEnum.OP_CONSTANT: Definition("OpConstant", 1, [2]),
+            OpcodeEnum.OP_ADD: Definition("OpAdd", 0, []),
+            OpcodeEnum.OP_SUB: Definition("OpSub", 0, []),
+            OpcodeEnum.OP_MUL: Definition("OpMul", 0, []),
+            OpcodeEnum.OP_DIVIDE: Definition("OpDivide", 0, []),
+            OpcodeEnum.OP_POP: Definition("OpPop", 0, [])
+        }
 
     def lookup(self, op_bytecode):
         if op_bytecode in self.definitions:
