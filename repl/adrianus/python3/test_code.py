@@ -9,7 +9,7 @@ def simple_test():
                     code.make(Opcode(OpcodeEnum.OP_CONSTANT), [2]),
                     code.make(Opcode(OpcodeEnum.OP_CONSTANT), [65534]),
                     code.make(Opcode(OpcodeEnum.OP_SUB), []),
-                    code.make(Opcode(OpcodeEnum.OP_MUL), []),
+                    code.make(Opcode(OpcodeEnum.OP_MULTIPLY), []),
                     code.make(Opcode(OpcodeEnum.OP_DIVIDE), [])]
     for instruction in instructions:
         for i in instruction:

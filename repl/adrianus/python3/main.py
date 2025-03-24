@@ -17,7 +17,7 @@ def main(args):
     filename = ''
 
     if len(args) > 2:
-        print ("wrong number of arguments")
+        print("wrong number of arguments")
         return
     if len(args) == 2:
         if args[0] == '--vm':
@@ -25,7 +25,7 @@ def main(args):
         elif args[0] == '--eval':
             use_vm = False
         else:
-            print ("first argument one of --vm or --eval")
+            print("first argument one of --vm or --eval")
         filename = args[1]
     if len(args) == 1:
         if args[0] == '--vm':
@@ -50,7 +50,7 @@ def main(args):
         try:
             data = open(filename, "r")
         except FileNotFoundError as err:
-            print ("empty or missing ad source file")
+            print("empty or missing ad source file")
             sys.exit(0)
         source = data.read()
         repl.execute_file(source=source, use_vm=use_vm)

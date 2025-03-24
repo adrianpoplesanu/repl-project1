@@ -54,8 +54,14 @@ class Repl(object):
             self.compiler.reset()
             self.compiler.compile(self.program)
             bytecode = self.compiler.get_bytecode()
+            self.compiler.code.instructions = bytecode.instructions
+            self.compiler.code.instructions.size = len(bytecode.instructions.bytes)
+            print(bytecode)
+            print(self.compiler.code.to_string(), end='')
             self.vm.load(bytecode)
             self.vm.run()
+            result = self.vm.last_popped_stack_elem()
+            print(result.inspect())
         else:
             self.evaluator.eval(self.program, env)
         #self.program.debug()
