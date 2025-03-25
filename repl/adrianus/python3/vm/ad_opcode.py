@@ -2,7 +2,7 @@ class OpcodeEnum:
     OP_CONSTANT = 0             # "OP_CONSTANT"
     OP_ADD = 1                  # "OP_ADD"
     OP_SUB = 2                  # "OP_SUB"
-    OP_MUL = 3                  # "OP_MUL"
+    OP_MULTIPLY = 3             # "OP_MUL"
     OP_DIVIDE = 4               # "OP_DIVIDE"
     OP_POP = 5                  # "OP_POP"
     OP_TRUE = 6                 # "OP_TRUE"
@@ -25,7 +25,7 @@ class OpcodeEnum:
     OP_RETURN_VALUE = 23        # "OP_RETURN_VALUE"
     OP_RETURN = 24              # "OP_RETURN"
     OP_GET_LOCAL = 25           # "OP_GET_LOCAL"
-    OP_SET_LOCAL = 26           # "OP_SET_LOCL"
+    OP_SET_LOCAL = 26           # "OP_SET_LOCAL"
     OP_GET_BUILTIN = 27         # "OP_GET_BUILTIN"
     OP_CLOSURE = 28             # "OP_CLOSURE"
     OP_GET_FREE = 29            # "OP_GET_FREE"
@@ -54,24 +54,34 @@ class OpSub(Opcode):
 
 class OpMul(Opcode):
     def __init__(self):
-        super().__init__(OpcodeEnum.OP_MUL)
+        super().__init__(OpcodeEnum.OP_MULTIPLY)
 
 
-class OpDiv(Opcode):
+class OpDivide(Opcode):
     def __init__(self):
         super().__init__(OpcodeEnum.OP_DIVIDE)
 
 
 class OpPop(Opcode):
     def __init__(self):
-        super().__init__(OpcodeEnum.OP_DIVIDE)
+        super().__init__(OpcodeEnum.OP_POP)
 
 
 class OpTrue(Opcode):
     def __init__(self):
-        super().__init__(OpcodeEnum.OP_DIVIDE)
+        super().__init__(OpcodeEnum.OP_TRUE)
 
 
 class OpFalse(Opcode):
     def __init__(self):
-        super().__init__(OpcodeEnum.OP_DIVIDE)
+        super().__init__(OpcodeEnum.OP_FALSE)
+
+
+class OpEqual(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_EQUAL)
+
+
+class OpNotEqual(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_NOTEQUAL)

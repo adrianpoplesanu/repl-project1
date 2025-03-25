@@ -5,7 +5,7 @@ from parser import Parser
 from vm.ad_code import Code
 from ast import ASTProgram
 from ast import StatementType
-from vm.ad_opcode import OpConstant, OpAdd, OpPop, OpSub, OpMul, OpDiv
+from vm.ad_opcode import OpConstant, OpAdd, OpPop, OpSub, OpMul, OpDivide
 
 
 class Compiler:
@@ -36,7 +36,7 @@ class Compiler:
             if node.operator == '*':
                 self.emit(OpMul(), [])
             if node.operator == '/':
-                self.emit(OpDiv(), [])
+                self.emit(OpDivide(), [])
         elif node.type == StatementType.INTEGER:
             integer = Ad_Integer_Object(node.value)
             self.emit(OpConstant(), [self.add_constant(integer)])
@@ -55,7 +55,7 @@ class Compiler:
         return pos
 
     def add_instruction(self, instructions):
-        pos_new_instruction = self.instructions.size()
+        pos_new_instruction = self.instructions.size
         for instruction in instructions:
             self.instructions.add(instruction)
         return pos_new_instruction

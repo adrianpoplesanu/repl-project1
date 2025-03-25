@@ -10,9 +10,34 @@ class Code:
             OpcodeEnum.OP_CONSTANT: Definition("OpConstant", 1, [2]),
             OpcodeEnum.OP_ADD: Definition("OpAdd", 0, []),
             OpcodeEnum.OP_SUB: Definition("OpSub", 0, []),
-            OpcodeEnum.OP_MUL: Definition("OpMul", 0, []),
+            OpcodeEnum.OP_MULTIPLY: Definition("OpMul", 0, []),
             OpcodeEnum.OP_DIVIDE: Definition("OpDivide", 0, []),
-            OpcodeEnum.OP_POP: Definition("OpPop", 0, [])
+            OpcodeEnum.OP_POP: Definition("OpPop", 0, []),
+            OpcodeEnum.OP_TRUE: Definition("OpTrue", 0, []),
+            OpcodeEnum.OP_FALSE: Definition("OpFalse", 0, []),
+            OpcodeEnum.OP_EQUAL: Definition("OpEqual", 0, []),
+            OpcodeEnum.OP_NOTEQUAL: Definition("OpNotEqual", 0, []),
+            OpcodeEnum.OP_GREATERTHAN: Definition("OpGreaterThan", 0, []),
+            OpcodeEnum.OP_GREATERTHAN_EQUAL: Definition("OpGreaterThanEqual", 0, []),
+            OpcodeEnum.OP_MINUS: Definition("OpMinus", 0, []),
+            OpcodeEnum.OP_BANG: Definition("OpBang", 0, []),
+            OpcodeEnum.OP_JUMP_NOT_TRUTHY: Definition("OpJumpNotTruthy", 1, [2]),
+            OpcodeEnum.OP_JUMP: Definition("OpJump", 1, [2]),
+            OpcodeEnum.OP_NULL: Definition("OpNull", 0, []),
+            OpcodeEnum.OP_GET_GLOBAL: Definition("OpGetGlobal", 1, [2]),
+            OpcodeEnum.OP_SET_GLOBAL: Definition("OpSetGlobal", 1, [2]),
+            OpcodeEnum.OP_ARRAY: Definition("OpArray", 1, [2]),
+            OpcodeEnum.OP_HASH: Definition("OpHash", 1, [2]),
+            OpcodeEnum.OP_INDEX: Definition("OpIndex", 0, []),
+            OpcodeEnum.OP_CALL: Definition("OpCall", 1, [1]),
+            OpcodeEnum.OP_RETURN_VALUE: Definition("OpReturnValue", 0, []),
+            OpcodeEnum.OP_RETURN: Definition("OpReturn", 0, []),
+            OpcodeEnum.OP_GET_LOCAL: Definition("OpGetLocal", 1, [1]),
+            OpcodeEnum.OP_SET_LOCAL: Definition("OpSetLocal", 1, [1]),
+            OpcodeEnum.OP_GET_BUILTIN: Definition("OpGetBuiltin", 1, [1]),
+            OpcodeEnum.OP_CLOSURE: Definition("OpClosure", 2, [2, 1]),
+            OpcodeEnum.OP_GET_FREE: Definition("OpGetFree", 1, [1]),
+            OpcodeEnum.OP_CURRENT_CLOSURE: Definition("OpCurrentClosure", 0, [])
         }
 
     def lookup(self, op_bytecode):
@@ -45,7 +70,7 @@ class Code:
     def to_string(self):
         out = ""
         i = 0
-        while i < self.instructions.size():
+        while i < self.instructions.size:
             definition = self.lookup(self.instructions.get(i))
             res = self.read_operands(definition, self.instructions, i + 1)
             operands = res[0]

@@ -1,20 +1,20 @@
 class Instructions:
+    size = 0
+
     def __init__(self):
         # a list of bytes
         # List<Byte>
-        self.instructions = []
-
-    def size(self):
-        return len(self.instructions)
+        self.bytes = []
 
     def get(self, i):
-        return self.instructions[i]
+        return self.bytes[i]
 
     def add(self, ins):
-        self.instructions.append(ins)
+        self.size += 1
+        self.bytes.append(ins)
 
     def __str__(self):
         out = ""
-        for instruction in self.instructions:
+        for instruction in self.bytes:
             out += str(instruction) + "\n"
         return out

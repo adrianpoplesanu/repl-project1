@@ -1,7 +1,9 @@
+from typing import Optional
+
 from vm.instructions import Instructions
 from vm.ad_opcode import OpcodeEnum
 from vm.ad_code import Code
-from objects import Ad_Integer_Object
+from objects import Ad_Integer_Object, Ad_Object
 
 
 class VM:
@@ -31,7 +33,7 @@ class VM:
 
     def run(self):
         ip = 0
-        while ip < self.instructions.size():
+        while ip < self.instructions.size:
             op = self.instructions.get(ip)
             if op == OpcodeEnum.OP_CONSTANT:
                 const_index = self.code.read_uint16(self.instructions, ip + 1)
@@ -47,7 +49,7 @@ class VM:
                 left = self.pop()
                 result = left.value - right.value
                 self.push(Ad_Integer_Object(result))
-            elif op == OpcodeEnum.OP_MUL:
+            elif op == OpcodeEnum.OP_MULTIPLY:
                 right = self.pop()
                 left = self.pop()
                 result = left.value * right.value
@@ -73,3 +75,6 @@ class VM:
         res = self.stack[self.sp - 1]
         self.sp -= 1
         return res
+
+    def last_popped_stack_elem(self) -> Optional[Ad_Object]:
+        return self.stack[self.sp]
