@@ -138,4 +138,39 @@ public:
     }
 };
 
+class OpJumpNotTruthy : public OpCode {
+public:
+    OpJumpNotTruthy() {
+        byteCode = OP_JUMP_NOT_TRUTHY;
+    }
+};
+
+class OpJump : public OpCode {
+public:
+    OpJump() {
+        byteCode = OP_JUMP;
+    }
+};
+
+class OpNull : public OpCode {
+public:
+    OpNull() {
+        byteCode = OP_NULL;
+    }
+};
+
+class OpGetGlobal : public OpCode {
+public:
+    OpGetGlobal() {
+        byteCode = OP_GET_GLOBAL;
+    }
+};
+
+class OpSetGlobal : public OpCode {
+public:
+    OpSetGlobal() {
+        byteCode = OP_SET_GLOBAL;
+    }
+};
+
 #endif
