@@ -215,13 +215,17 @@ Ad_Object* __iosocket_builtin(std::vector<Ad_Object*> args, Environment* env, Ga
     Ad_Socket_Object* socketObject = new Ad_Socket_Object();
     gc->addObject(socketObject);
     Ad_String_Object* nameObject = (Ad_String_Object*) args[0];
-    Ad_Integer_Object* portObject = (Ad_Integer_Object*) args[1];
-    Ad_Boolean_Object* isActiveObject = (Ad_Boolean_Object*) args[2];
-    Ad_Boolean_Object* isForeverObject = (Ad_Boolean_Object*) args[3];
-    Ad_Boolean_Object* isClientObject = (Ad_Boolean_Object*) args[4];
-    Ad_Boolean_Object* isServerObject = (Ad_Boolean_Object*) args[5];
+    Ad_String_Object* hostObject = (Ad_String_Object*) args[1];
+    Ad_Integer_Object* portObject = (Ad_Integer_Object*) args[2];
+    Ad_Boolean_Object* isActiveObject = (Ad_Boolean_Object*) args[3];
+    Ad_Boolean_Object* isForeverObject = (Ad_Boolean_Object*) args[4];
+    Ad_Boolean_Object* isClientObject = (Ad_Boolean_Object*) args[5];
+    Ad_Boolean_Object* isServerObject = (Ad_Boolean_Object*) args[6];
 
+    //std::cout << "[ INTERNAL ] builtin __iosocket name: " << nameObject->value << "\n";
     socketObject->name = nameObject->value;
+    socketObject->host = hostObject->value;
+    //std::cout << "[ INTERNAL ] builtin __iosocket port: " << portObject->value << "\n";
     socketObject->port = portObject->value;
     socketObject->isActive = isActiveObject->value;
     socketObject->isForever = isForeverObject->value;
@@ -448,7 +452,8 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"getattrs", new Ad_Builtin_Object(&getattrs_builtin)},
     {"__thread", new Ad_Builtin_Object(&thread_builtin)},
     {"import", new Ad_Builtin_Object(&import_builtin)},
-    {"sleep", new Ad_Builtin_Object(&sleep_builtin)}
+    {"sleep", new Ad_Builtin_Object(&sleep_builtin)},
+    {"delay", new Ad_Builtin_Object(&sleep_builtin)}
     // eval
     // first
     // input
