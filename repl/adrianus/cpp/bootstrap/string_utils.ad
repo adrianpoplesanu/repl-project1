@@ -1,4 +1,4 @@
-class __StringUtils {
+class _StringUtils {
     def substring(target, start, end) {
         result = ""
         for (i = start; i < end; i++) {
@@ -24,6 +24,32 @@ class __StringUtils {
         }
         return -1
     }
+
+    def split(target, delim) {
+        result = []
+        original = target
+        found = indexOf(target, delim)
+        while(found != -1) {
+            value = substring(target, 0, found)
+            __append(result, value)
+            target = substring(target, found + len(delim), len(target))
+            found = indexOf(target, delim)
+        }
+        __append(result, target)
+        return result
+    }
+
+    def startsWith(target, lookup) {
+        size_target = len(target)
+        size_lookup = len(lookup)
+        if (size_lookup > size_target) {
+            return false
+        }
+        for (i = 0; i < size_lookup; i++) {
+            if (target[i] != lookup[i]) return false
+        }
+        return true
+    }
 }
 
-StringUtils = __StringUtils()
+StringUtils = _StringUtils()

@@ -1,4 +1,4 @@
-class __AdMatrixLibrary {
+class _AdMatrixLibrary {
     def generateMatrix(n, m, obj) {
         result = list(n, list(m, obj))
         return result
@@ -17,4 +17,4 @@ class __AdMatrixLibrary {
     }
 }
 
-AdMatrixLibrary = __AdMatrixLibrary()
+AdMatrixLibrary = _AdMatrixLibrary()

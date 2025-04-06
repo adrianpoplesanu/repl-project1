@@ -5,6 +5,7 @@ class ServerSocket {
 
     def constructor(_port) {
         port = _port
+        //println(port)
         sock = __iosocket("server", "localhost", port, true, false, false, true)
         sock.create_server()
     }
@@ -42,6 +43,7 @@ class ForeverEchoServer {
 
     def start() {
         while(true) {
+            println("[ LOG ] waiting on port: " + port)
             server.accept()
 
             server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
