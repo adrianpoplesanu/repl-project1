@@ -1522,27 +1522,30 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
             if (member_ident->value == "create_server") {
                 create_server(owner_obj_raw);
             }
-            if (member_ident->value == "create_client") {
+            else if (member_ident->value == "create_client") {
                 create_client(owner_obj_raw);
             }
-            if (member_ident->value == "accept") {
+            else if (member_ident->value == "accept") {
                 Ad_Object* result = accept(owner_obj_raw);
                 garbageCollector->addObject(result);
                 return result;
             }
-            if (member_ident->value == "send") {
+            else if (member_ident->value == "send") {
                 std::vector<Ad_Object*> args_obj = EvalExpressions(args, env);
                 send(owner_obj_raw, args_obj.at(0));
             }
-            if (member_ident->value == "read") {
+            else if (member_ident->value == "read") {
                 Ad_Object* result = read(owner_obj_raw);
                 garbageCollector->addObject(result);
                 return result;
             }
-            if (member_ident->value == "close") {
+            else if (member_ident->value == "close") {
                 close(owner_obj_raw);
+            } else {
+                std::cout << "[ Ad ][ sock ] unknown method called on sock object\n";
             }
         } else {
+            std::cout << "[ Ad ][ sock ] tried to retrieve field of primitive thread object\n";
             //...
         }
         return &NULLOBJECT;

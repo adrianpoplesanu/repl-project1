@@ -23,7 +23,9 @@ void create_server(Ad_Object* rawSocket) {
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(5003); // socketObject->port
+    //serv_addr.sin_port = htons(5003); // socketObject->port
+    //std::cout << "[ INTERNAL ][ create_server ] port: " << socketObject->port << "\n";
+    serv_addr.sin_port = htons(socketObject->port);
 
     bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
     listen(listenfd, 10);
@@ -40,7 +42,8 @@ void create_client(Ad_Object* rawSocket) {
     socketObject->connfd = socket(AF_INET, SOCK_STREAM, 0);
     memset(&serv_addr, '0', sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(5003); // socketObject->port
+    //serv_addr.sin_port = htons(5003); // socketObject->port
+    serv_addr.sin_port = htons(socketObject->port);
     inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
 
     connect(socketObject->connfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
