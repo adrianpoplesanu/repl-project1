@@ -32,5 +32,5 @@ class AsyncEchoServer {
     }
 }
 
-asyncEchoServer = AsyncEchoServer(5003, "<html><title>Some title here</title><body><h1>Bebe Dex</h1>catel frumos si scump</body></html>")
+asyncEchoServer = AsyncEchoServer(5003, '<html><title>AsyncEchoServer</title><body style="background-color: black"><font color="grey"><h1>Bebe Dex</h1>catel frumos si scump</font></body></html>')
 asyncEchoServer.start()
