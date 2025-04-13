@@ -50,6 +50,20 @@ class _StringUtils {
         }
         return true
     }
+
+    def endsWith(target, lookup) {
+        size_target = len(target)
+        size_lookup = len(lookup)
+        if (size_lookup > size_target) {
+            return false
+        }
+        for (i = 0; i < size_lookup; i++) {
+            if (target[size_target - size_lookup + i] != lookup[i]) {
+                return false
+            }
+        }
+        return true
+    }
 }
 
 StringUtils = _StringUtils()
