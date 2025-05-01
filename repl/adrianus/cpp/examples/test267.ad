@@ -1,0 +1,12 @@
+class Person {
+    name = "default name"
+
+    fun greet() {
+        println(this.name)
+    }
+}
+
+person = Person()
+person.greet()
+person.name = "custom name"
+person.greet()

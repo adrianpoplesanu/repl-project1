@@ -1,0 +1,16 @@
+class Person {
+    name = "default name"
+
+    fun constructor(name) {
+        this.name = name
+    }
+
+    fun greet() {
+        print(this.name)
+    }
+}
+
+person = Person()
+person.greet()
+person.name = "custom name"
+person.greet()
