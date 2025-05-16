@@ -10,7 +10,7 @@ class _StringUtils {
     def indexOf(target, lookFor) {
         sizeTarget = len(target)
         sizeLookFor = len(lookFor)
-        for (i = 0; i < sizeTarget - sizeLookFor; i++) {
+        for (i = 0; i < sizeTarget - sizeLookFor + 1; i++) {
             found = true
             for (j = 0; j < sizeLookFor; j++) {
                 if (target[i + j] != lookFor[j]) {
@@ -63,6 +63,23 @@ class _StringUtils {
             }
         }
         return true
+    }
+
+    def replace(source, lookup, value) {
+        startingPos = indexOf(source, lookup)
+        sizeSource = len(source)
+        sizeLookup = len(lookup)
+        sizeValue = len(value)
+
+        if (startingPos == -1) {
+            return source
+        }
+
+        result = source[:startingPos]
+        result = result + value
+        result = result + replace(source[startingPos + sizeLookup:sizeSource], lookup, value)
+
+        return result
     }
 }
 
