@@ -1,0 +1,55 @@
+{
+  "scopeName": "source.adlang",
+  "name": "AdLang",
+  "patterns": [
+    {
+      "name": "keyword.control.adlang",
+      "match": "\\b(def|fun|let|func|class|this|super|if|else|return|while|for)\\b"
+    },
+    {
+      "name": "constant.language.boolean.adlang",
+      "match": "\\b(true|false)\\b"
+    },
+    {
+      "name": "support.function.builtin.adlang",
+      "match": "\\b(__socket|__utils)\\b"
+    },
+    {
+      "name": "comment.line.double-slash.adlang",
+      "match": "//.*$"
+    },
+    {
+      "name": "string.quoted.double.adlang",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.adlang",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "string.quoted.single.adlang",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "name": "constant.character.escape.adlang",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "constant.numeric.adlang",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    {
+      "name": "variable.adlang",
+      "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+    }
+  ],
+  "repository": {},
+  "fileTypes": ["ad"],
+  "uuid": "c1c1aaee-0000-4000-aaaa-123456789abc"
+}

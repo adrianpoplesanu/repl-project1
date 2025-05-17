@@ -1,0 +1,28 @@
+{
+  "name": "adlang",
+  "displayName": "AdLang",
+  "description": "Custom syntax highlighting for AdLang",
+  "version": "0.0.1",
+  "publisher": "adrianus.ro",
+  "engines": {
+    "vscode": "^1.50.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "adlang",
+        "aliases": ["AD", "adlang"],
+        "extensions": [".ad"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "adlang",
+        "scopeName": "source.adlang",
+        "path": "./syntaxes/adlang.tmLanguage.json"
+      }
+    ]
+  }
+}
