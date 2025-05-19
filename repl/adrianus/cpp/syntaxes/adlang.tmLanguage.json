@@ -4,11 +4,44 @@
   "patterns": [
     {
       "name": "keyword.control.adlang",
-      "match": "\\b(def|fun|let|func|class|this|super|if|else|return|while|for)\\b"
+      "match": "\\b(def|fun|function|let|func|class|this|super|if|else|return|while|for)\\b"
     },
     {
-      "name": "constant.language.boolean.adlang",
-      "match": "\\b(true|false)\\b"
+      "name": "entity.name.def.adlang",
+      "match": "(?<=\\bdef\\s+)\\w+"
+    },
+    {
+      "name": "entity.name.fun.adlang",
+      "match": "(?<=\\bfun\\s+)\\w+"
+    },
+    {
+      "name": "entity.name.function.adlang",
+      "match": "(?<=\\bfunction\\s+)\\w+"
+    },
+    {
+      "name": "support.function.call.adlang",
+      "match": "\\b\\w+(?=\\s*\\()"
+    },
+    {
+      "name": "entity.name.class.adlang",
+      "match": "(?<=\\bclass\\s+)\\w+"
+    },
+    {
+      "name": "constant.language.boolean.true.adlang",
+      "match": "\\btrue\\b"
+    },
+    {
+      "name": "constant.language.boolean.false.adlang",
+      "match": "\\bfalse\\b"
+    },
+    {
+      "name": "comment.line.double-slash.adlang",
+      "match": "//.*$"
+    },
+    {
+      "name": "comment.block.adlang",
+      "begin": "/\\*",
+      "end": "\\*/"
     },
     {
       "name": "support.function.builtin.adlang",

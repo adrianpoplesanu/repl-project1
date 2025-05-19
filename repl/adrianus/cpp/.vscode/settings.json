@@ -80,7 +80,62 @@
         "numeric": "cpp",
         "random": "cpp",
         "regex": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "*.ad": "adlang"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+            "scope": "constant.language.boolean.true.adlang",
+            "settings": {
+                "foreground": "#48f782",  // or any color you want
+                "fontStyle": "italic"
+                }
+            },
+            {
+            "scope": "constant.language.boolean.false.adlang",
+            "settings": {
+                "foreground": "#f63943",  // or any color you want
+                "fontStyle": "italic"
+                }
+            },
+            {
+            "scope": "entity.name.def.adlang",
+            "settings": {
+                "foreground": "#f65b14",  // or any color you want
+                "fontStyle": "bold"
+                }
+            },
+            {
+            "scope": "entity.name.fun.adlang",
+            "settings": {
+                "foreground": "#f65b14",  // or any color you want
+                "fontStyle": "bold"
+                }
+            },
+            {
+            "scope": "entity.name.function.adlang",
+            "settings": {
+                "foreground": "#f65b14",  // or any color you want
+                "fontStyle": "bold"
+                }
+            },
+            {
+            "scope": "support.function.call.adlang",
+            "settings": {
+                "foreground": "#f4f159",  // or any color you want
+                "fontStyle": "italic"
+                }
+            },
+            {
+            "scope": "entity.name.class.adlang",
+            "settings": {
+                "foreground": "#f65b14",  // or any color you want
+                "fontStyle": "italic"
+                }
+            }
+        ]
+    },
+    "C_Cpp.errorSquiggles": "Disabled",
+    "C_Cpp.dimInactiveRegions": false
 }
