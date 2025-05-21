@@ -81,6 +81,12 @@ class _StringUtils {
 
         return result
     }
+
+    def isEmpty(source) {
+        if (source == null) return true
+        if (source == "") return true
+        return false
+    }
 }
 
 StringUtils = _StringUtils()

@@ -256,7 +256,8 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
     }
     if (left->Type() == OBJ_NULL || right->Type() == OBJ_NULL) {
         //return new Ad_Null_Object();
-        return &NULLOBJECT;
+        //return &NULLOBJECT;
+        return EvalNullInfixExpression(_operator, left, right);
     }
     if (left->Type() == OBJ_INT && right->Type() == OBJ_INT) {
         return EvalIntegerInfixExpression(_operator, left, right);
@@ -434,6 +435,22 @@ Ad_Object* Evaluator::EvalFloatInfixExpression(std::string _operator, Ad_Object*
         return NativeBoolToBooleanObject(left_val != right_val);
     }
     return NULL;
+}
+
+Ad_Object* Evaluator::EvalNullInfixExpression(std::string _operator, Ad_Object* left, Ad_Object* right) {
+    if (_operator == "==") {
+        if (left->Type() == OBJ_NULL && right->Type() == OBJ_NULL) {
+            return &TRUE;
+        }
+        return &FALSE;
+    }
+    if (_operator == "!=") {
+        if (left->Type() == OBJ_NULL && right->Type() == OBJ_NULL) {
+            return &FALSE;
+        }
+        return &TRUE;
+    }
+    return &NULLOBJECT;
 }
 
 Ad_Object* Evaluator::EvalPrefixExpression(std::string _operator, Ad_Object* right) {
