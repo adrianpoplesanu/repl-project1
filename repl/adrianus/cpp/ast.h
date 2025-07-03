@@ -1,5 +1,5 @@
-#ifndef __AST_H
-#define __AST_H
+#ifndef __AD_AST_H
+#define __AD_AST_H
 
 #include "token.h"
 #include "settings.h"
@@ -95,8 +95,8 @@ public:
 
     Ad_AST_Program();
     ~Ad_AST_Program();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
     void reset();
 };
 
@@ -107,9 +107,9 @@ public:
 
     Ad_AST_Identifier();
     Ad_AST_Identifier(Token, std::string);
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
-    virtual Ad_AST_Node* copy();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
+    Ad_AST_Node* copy() override;
 };
 
 class Ad_AST_LetStatement : public Ad_AST_Node {
@@ -134,8 +134,8 @@ public:
     Ad_AST_AssignStatement();
     Ad_AST_AssignStatement(Token);
     ~Ad_AST_AssignStatement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_ReturnStatement : public Ad_AST_Node {
@@ -146,8 +146,8 @@ public:
     Ad_AST_ReturnStatement();
     Ad_AST_ReturnStatement(Token);
     ~Ad_AST_ReturnStatement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_ExpressionStatement : public Ad_AST_Node {
@@ -158,9 +158,9 @@ public:
     Ad_AST_ExpressionStatement();
     Ad_AST_ExpressionStatement(Token);
     ~Ad_AST_ExpressionStatement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
-    virtual Ad_AST_Node* copy();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
+    Ad_AST_Node* copy() override;
 };
 
 class Ad_AST_Integer : public Ad_AST_Node {
@@ -171,7 +171,7 @@ public:
     Ad_AST_Integer();
     Ad_AST_Integer(Token, int);
     ~Ad_AST_Integer();
-    virtual std::string ToString();
+    std::string ToString() override;
 };
 
 class Ad_AST_Float : public Ad_AST_Node {
@@ -182,7 +182,7 @@ public:
     Ad_AST_Float();
     Ad_AST_Float(Token, float);
     ~Ad_AST_Float();
-    virtual std::string ToString();
+    std::string ToString() override;
 };
 
 class Ad_AST_Boolean : public Ad_AST_Node {
@@ -193,7 +193,7 @@ public:
     Ad_AST_Boolean();
     Ad_AST_Boolean(Token, bool);
     ~Ad_AST_Boolean();
-    virtual std::string ToString();
+    std::string ToString() override;
 };
 
 class Ad_AST_InfixExpression : public Ad_AST_Node {
@@ -205,7 +205,7 @@ public:
 
     Ad_AST_InfixExpression();
     ~Ad_AST_InfixExpression();
-    virtual std::string ToString();
+    std::string ToString() override;
 };
 
 class Ad_AST_PrefixExpression : public Ad_AST_Node {
@@ -217,7 +217,7 @@ public:
     Ad_AST_PrefixExpression();
     Ad_AST_PrefixExpression(Token, std::string);
     ~Ad_AST_PrefixExpression();
-    virtual std::string ToString();
+    std::string ToString() override;
 };
 
 class Ad_AST_CallExpression : public Ad_AST_Node {
@@ -231,8 +231,8 @@ public:
     Ad_AST_CallExpression(Token);
     Ad_AST_CallExpression(Token, Ad_AST_Node*);
     ~Ad_AST_CallExpression();
-    virtual std::string ToString();
-    virtual Ad_AST_Node* copy();
+    std::string ToString() override;
+    Ad_AST_Node* copy() override;
 };
 
 class Ad_AST_IfExpression : public Ad_AST_Node {
@@ -245,7 +245,7 @@ public:
     Ad_AST_IfExpression();
     Ad_AST_IfExpression(Token);
     ~Ad_AST_IfExpression();
-    virtual std::string ToString();
+    std::string ToString() override;
 };
 
 class Ad_AST_BlockStatement : public Ad_AST_Node {
@@ -256,8 +256,8 @@ public:
     Ad_AST_BlockStatement();
     Ad_AST_BlockStatement(Token);
     ~Ad_AST_BlockStatement();
-    virtual std::string ToString();
-    virtual Ad_AST_Node* copy();
+    std::string ToString() override;
+    Ad_AST_Node* copy() override;
 };
 
 class Ad_AST_FunctionLiteral : public Ad_AST_Node {
@@ -270,7 +270,7 @@ public:
     Ad_AST_FunctionLiteral();
     Ad_AST_FunctionLiteral(Token);
     ~Ad_AST_FunctionLiteral();
-    virtual std::string ToString();
+    std::string ToString() override;
 };
 
 class Ad_AST_WhileExpression : public Ad_AST_Node {
@@ -282,8 +282,8 @@ public:
     Ad_AST_WhileExpression();
     Ad_AST_WhileExpression(Token);
     ~Ad_AST_WhileExpression();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_String : public Ad_AST_Node {
@@ -294,9 +294,9 @@ public:
     Ad_AST_String();
     Ad_AST_String(Token);
     ~Ad_AST_String();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
-    virtual Ad_AST_Node* copy();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
+    Ad_AST_Node* copy() override;
 };
 
 class Ad_AST_ListLiteral : public Ad_AST_Node {
@@ -307,8 +307,8 @@ public:
     Ad_AST_ListLiteral();
     Ad_AST_ListLiteral(Token);
     ~Ad_AST_ListLiteral();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_IndexExpression : public Ad_AST_Node {
@@ -323,8 +323,8 @@ public:
     Ad_AST_IndexExpression(Token);
     Ad_AST_IndexExpression(Token, Ad_AST_Node*);
     ~Ad_AST_IndexExpression();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_HashLiteral : public Ad_AST_Node {
@@ -336,8 +336,8 @@ public:
     Ad_AST_HashLiteral(Token);
     Ad_AST_HashLiteral(Token, std::unordered_map<Ad_AST_Node*, Ad_AST_Node*>);
     ~Ad_AST_HashLiteral();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_Def_Statement : public Ad_AST_Node {
@@ -351,8 +351,8 @@ public:
     Ad_AST_Def_Statement();
     Ad_AST_Def_Statement(Token);
     ~Ad_AST_Def_Statement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_Comment : public Ad_AST_Node {
@@ -362,9 +362,9 @@ public:
     Ad_AST_Comment();
     Ad_AST_Comment(Token);
     ~Ad_AST_Comment();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
-    virtual Ad_AST_Node* copy();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
+    Ad_AST_Node* copy() override;
 };
 
 class Ad_AST_Class : public Ad_AST_Node {
@@ -378,8 +378,8 @@ public:
     Ad_AST_Class();
     Ad_AST_Class(Token);
     ~Ad_AST_Class();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_MemberAccess : public Ad_AST_Node {
@@ -396,8 +396,8 @@ public:
     Ad_AST_MemberAccess(Token, Ad_AST_Node*, Ad_AST_Node*, std::vector<Ad_AST_Node*>);
     Ad_AST_MemberAccess(Token, Ad_AST_Node*, Ad_AST_Node*, std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>);
     ~Ad_AST_MemberAccess();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_PrefixIncrement : public Ad_AST_Node {
@@ -410,8 +410,8 @@ public:
     Ad_AST_PrefixIncrement(Token);
     Ad_AST_PrefixIncrement(Token, Ad_AST_Node*);
     ~Ad_AST_PrefixIncrement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_PostfixIncrement : public Ad_AST_Node {
@@ -424,8 +424,8 @@ public:
     Ad_AST_PostfixIncrement(Token);
     Ad_AST_PostfixIncrement(Token, Ad_AST_Node*);
     ~Ad_AST_PostfixIncrement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_ForExprssion : public Ad_AST_Node {
@@ -440,8 +440,8 @@ public:
     Ad_AST_ForExprssion(Token);
     Ad_AST_ForExprssion(Token, Ad_AST_Node*, Ad_AST_Node*, Ad_AST_Node*, Ad_AST_Node*);
     ~Ad_AST_ForExprssion();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_BreakStatement : public Ad_AST_Node {
@@ -451,8 +451,8 @@ public:
     Ad_AST_BreakStatement();
     Ad_AST_BreakStatement(Token);
     ~Ad_AST_BreakStatement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_ContinueStatement : public Ad_AST_Node {
@@ -462,8 +462,8 @@ public:
     Ad_AST_ContinueStatement();
     Ad_AST_ContinueStatement(Token);
     ~Ad_AST_ContinueStatement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_Null_Expression : public Ad_AST_Node {
@@ -504,8 +504,8 @@ public:
     Ad_AST_Plus_Equals_Statement(Token);
     Ad_AST_Plus_Equals_Statement(Token, Ad_AST_Node*, Ad_AST_Node*);
     ~Ad_AST_Plus_Equals_Statement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_Minus_Equals_Statement : public Ad_AST_Node {
