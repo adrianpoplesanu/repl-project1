@@ -119,10 +119,10 @@ public:
     Ad_AST_Node* value;
 
     Ad_AST_LetStatement();
-    Ad_AST_LetStatement(Token);
+    Ad_AST_LetStatement(Token token);
     ~Ad_AST_LetStatement();
-    virtual std::string TokenLiteral();
-    virtual std::string ToString();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 class Ad_AST_AssignStatement : public Ad_AST_Node {

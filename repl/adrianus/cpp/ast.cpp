@@ -10,8 +10,8 @@ std::string Ad_AST_Node::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_Node::copy() {
-    std::cout << "ERROR: copy() not implementend for this type of ast node: " << statement_type_map[type] << "\n";
-    return NULL;
+    std::cout << "ERROR: copy() not implemented for this type of ast node: " << statement_type_map[type] << "\n";
+    return nullptr;
 }
 
 Ad_AST_Program::Ad_AST_Program() {
@@ -20,8 +20,7 @@ Ad_AST_Program::Ad_AST_Program() {
 }
 
 Ad_AST_Program::~Ad_AST_Program() {
-    for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-        Ad_AST_Node *node = *it;
+    for (auto node : statements) {
         free_Ad_AST_Node_memory(node);
     }
 }
@@ -31,9 +30,8 @@ std::string Ad_AST_Program::TokenLiteral() {
 }
 
 std::string Ad_AST_Program::ToString() {
-    std::string out = "";
-    for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-        Ad_AST_Node *stmt = *it;
+    std::string out;
+    for (auto stmt : statements) {
         if (stmt) {
             std::cout << stmt->ToString() << "\n";
         }
@@ -42,8 +40,7 @@ std::string Ad_AST_Program::ToString() {
 }
 
 void Ad_AST_Program::reset() {
-    for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
-        Ad_AST_Node *node = *it;
+    for (auto node : statements) {
         free_Ad_AST_Node_memory(node);
     }
     statements.clear();
@@ -52,7 +49,7 @@ void Ad_AST_Program::reset() {
 Ad_AST_LetStatement::Ad_AST_LetStatement() {
     type = ST_LET_STATEMENT;
     ref_count = 0;
-    value = NULL;
+    value = nullptr;
 }
 
 Ad_AST_LetStatement::Ad_AST_LetStatement(Token t) {
@@ -60,7 +57,7 @@ Ad_AST_LetStatement::Ad_AST_LetStatement(Token t) {
     ref_count = 0;
     token = t;
     name = Ad_AST_Identifier();
-    value = NULL;
+    value = nullptr;
 }
 
 Ad_AST_LetStatement::~Ad_AST_LetStatement() {
@@ -88,7 +85,7 @@ std::string Ad_AST_LetStatement::ToString() {
 Ad_AST_AssignStatement::Ad_AST_AssignStatement() {
     type = ST_ASSIGN_STATEMENT;
     ref_count = 0;
-    value = NULL;
+    value = nullptr;
 }
 
 Ad_AST_AssignStatement::Ad_AST_AssignStatement(Token t) {
@@ -96,8 +93,8 @@ Ad_AST_AssignStatement::Ad_AST_AssignStatement(Token t) {
     ref_count = 0;
     token = t;
     //name = new Ad_AST_Identifier();
-    name = NULL;
-    value = NULL;
+    name = nullptr;
+    value = nullptr;
 }
 
 Ad_AST_AssignStatement::~Ad_AST_AssignStatement() {
@@ -128,14 +125,14 @@ std::string Ad_AST_AssignStatement::ToString() {
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement() {
     type = ST_RETURN_STATEMENT;
     ref_count = 0;
-    value = NULL;
+    value = nullptr;
 }
 
 Ad_AST_ReturnStatement::Ad_AST_ReturnStatement(Token t) {
     type = ST_RETURN_STATEMENT;
     ref_count = 0;
     token = t;
-    value = NULL;
+    value = nullptr;
 }
 
 Ad_AST_ReturnStatement::~Ad_AST_ReturnStatement() {
@@ -155,14 +152,14 @@ std::string Ad_AST_ReturnStatement::ToString() {
 Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement() {
     type = ST_EXPRESSION_STATEMENT;
     ref_count = 0;
-    expression = NULL;
+    expression = nullptr;
 }
 
 Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
     type = ST_EXPRESSION_STATEMENT;
     ref_count = 0;
     token = t;
-    expression = NULL;
+    expression = nullptr;
 }
 
 Ad_AST_ExpressionStatement::~Ad_AST_ExpressionStatement() {
@@ -189,7 +186,7 @@ std::string Ad_AST_ExpressionStatement::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_ExpressionStatement::copy() {
-    Ad_AST_ExpressionStatement *result = new Ad_AST_ExpressionStatement();
+    auto *result = new Ad_AST_ExpressionStatement();
     result->expression = expression->copy();
     return result;
 }
@@ -215,7 +212,7 @@ std::string Ad_AST_Identifier::ToString() {
 }
 
 Ad_AST_Node* Ad_AST_Identifier::copy() {
-    Ad_AST_Identifier *result = new Ad_AST_Identifier();
+    auto *result = new Ad_AST_Identifier();
     result->value = value;
     return result;
 }
