@@ -89,6 +89,41 @@ Ad_Object* read(Ad_Object* rawSocket) {
     return result;
 }
 
+Ad_Object* readHTTP(Ad_Object* rawSocket) {
+    auto* socketObject = (Ad_Socket_Object*) rawSocket;
+
+    std::string message;
+    int n;
+
+    while (true) {
+        n = read(socketObject->connfd, socketObject->recvBuff, sizeof(socketObject->recvBuff) - 1);
+        if (n <= 0) {
+            break;
+        }
+
+        socketObject->recvBuff[n] = '\0';
+        message += socketObject->recvBuff;
+
+        if (message.find("\r\n\r\n") != std::string::npos) {
+            break;
+        }
+    }
+
+    std::string formatted_message = message;
+    size_t pos = 0;
+    while ((pos = formatted_message.find("\r\n", pos)) != std::string::npos) {
+        formatted_message.replace(pos, 2, "\n");
+        pos += 1;
+    }
+
+    std::istringstream request_stream(message);
+    std::string method, path, version;
+    request_stream >> method >> path >> version;
+
+    auto* result = new Ad_String_Object(formatted_message);
+    return result;
+}
+
 void close(Ad_Object* rawSocket) {
     Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
 
