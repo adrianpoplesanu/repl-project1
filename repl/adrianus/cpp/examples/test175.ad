@@ -12,9 +12,9 @@ class AsyncEchoServer {
 
     def process(client) {
         println('handling request')
-        println(client)
+        //println(client)
 
-        request_message = client.read()
+        request_message = client.readHTTP()
         println(request_message)
 
         client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
@@ -28,9 +28,25 @@ class AsyncEchoServer {
 
             th1.callback(this.process, server.client)
             th1.runAsync()
+            //process(server.client)
         }
     }
 }
 
 asyncEchoServer = AsyncEchoServer(5003, '<html><title>AsyncEchoServer</title><body style="background-color: black"><font color="grey"><h1>Bebe Dex</h1>catel frumos si scump</font></body></html>')
 asyncEchoServer.start()
+
+/*
+GET request
+
+curl localhost:5003
+*/
+
+/*
+POST request
+
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"username":"xyz","password":"xyz"}' \
+  http://localhost:5003/api/login
+*/
