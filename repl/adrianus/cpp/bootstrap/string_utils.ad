@@ -87,6 +87,11 @@ class _StringUtils {
         if (source == "") return true
         return false
     }
+
+    def toString(obj) {
+        // TODO: this needs to be updated
+        return type(obj)
+    }
 }
 
 StringUtils = _StringUtils()

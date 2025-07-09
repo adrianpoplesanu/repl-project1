@@ -419,6 +419,13 @@ Ad_Object* sleep_builtin(std::vector<Ad_Object*> args, Environment *env, Garbage
     return NULL;
 }
 
+Ad_Object* str_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    Ad_Object* target = args[0];
+    auto* result = new Ad_String_Object(target->Inspect());
+    gc->addObject(result);
+    return result;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -453,7 +460,8 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"__thread", new Ad_Builtin_Object(&thread_builtin)},
     {"import", new Ad_Builtin_Object(&import_builtin)},
     {"sleep", new Ad_Builtin_Object(&sleep_builtin)},
-    {"delay", new Ad_Builtin_Object(&sleep_builtin)}
+    {"delay", new Ad_Builtin_Object(&sleep_builtin)},
+    {"str", new Ad_Builtin_Object(&str_builtin)}
     // eval
     // first
     // input

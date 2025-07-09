@@ -8,6 +8,7 @@
 
 std::vector<std::string> bootstrap_files {
     "bootstrap/file.ad",
+    "bootstrap/logger.ad",
     "bootstrap/test.ad",
     "bootstrap/mat.ad",
     "bootstrap/string_utils.ad",
