@@ -1556,6 +1556,11 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
                 garbageCollector->addObject(result);
                 return result;
             }
+            else if (member_ident->value == "readHTTP"){
+                Ad_Object* result = readHTTP(owner_obj_raw);
+                garbageCollector->addObject(result);
+                return result;
+            }
             else if (member_ident->value == "close") {
                 close(owner_obj_raw);
             } else {
