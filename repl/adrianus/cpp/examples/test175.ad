@@ -3,6 +3,7 @@ class AsyncEchoServer {
     port = null
     server = null
     message = ""
+    logger = AdLogger("AD", "AsyncEchoServer")
 
     def constructor(_port, _message) {
         port = _port
@@ -11,11 +12,13 @@ class AsyncEchoServer {
     }
 
     def process(client) {
-        println('handling request')
+        //println('handling request')
+        logger.info('handling request')
         //println(client)
 
         request_message = client.readHTTP()
-        println(request_message)
+        //println(request_message)
+        logger.info(request_message)
 
         client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
     }
@@ -23,7 +26,8 @@ class AsyncEchoServer {
     def start() {
         while(true) {
             server.accept()
-            println(server.client)
+            //println(server.client)
+            logger.info(str(server.client))
             th1 = __thread("thread 1")
 
             th1.callback(this.process, server.client)
