@@ -31,6 +31,8 @@
 #include "vm/frame.cpp"
 #include "vm/instructions.h"
 #include "vm/instructions.cpp"
+#include "vm/objects.h"
+#include "vm/objects.cpp"
 #include "vm/opcode.h"
 #include "vm/opcode.cpp"
 #include "vm/symbol_table.h"
@@ -71,7 +73,7 @@ int main(int argc, char *argv[]) {
 	}
 	Repl repl;
 	if (argc == 1) {
-		std::cout << "Ad interpreter [C++]... v1.0\n";
+		std::cout << "Ad interpreter [C++]... v3.0.1\n";
 	    repl.Loop();
     } else {
 		for (int i = 1; i < argc; i++) {
