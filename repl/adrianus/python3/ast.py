@@ -75,16 +75,17 @@ class ASTNode(object):
         pass
 
     def token_literal(self):
-        print ('token_literal unimplemented in subclass')
+        print('token_literal unimplemented in subclass')
 
     def __str__(self):
-        print ('__str__ not implmented in subclass')
+        print('__str__ not implmented in subclass')
 
 
 class ASTProgram(ASTNode):
     type = StatementType.PROGRAM
 
     def __init__(self):
+        super().__init__()
         self.statements = []
 
     def reset(self):
@@ -102,6 +103,7 @@ class ASTLetStatement(ASTNode):
     type = StatementType.LET_STATEMENT
 
     def __init__(self, token=None, name=None, value=None):
+        super().__init__()
         self.token = token
         self.name = name
         self.value = value
@@ -117,6 +119,7 @@ class ASTAssignStatement(ASTNode):
     type = StatementType.ASSIGN_STATEMENT
 
     def __init__(self, token=None, name=None, value=None):
+        super().__init__()
         self.token = token
         self.name = name
         self.value = value
@@ -132,6 +135,7 @@ class ASTPlusEqualsStatement(ASTNode):
     type = StatementType.PLUS_EQUALS_STATEMENT
 
     def __init__(self, token=None, name=None, value=None):
+        super().__init__()
         self.token = token
         self.name = name
         self.value = value
@@ -147,6 +151,7 @@ class ASTReturnStatement(ASTNode):
     type = StatementType.RETURN_STATEMENT
 
     def __init__(self, token=None, value=None):
+        super().__init__()
         self.token = token
         self.value = value
 
@@ -161,6 +166,7 @@ class ASTExpressionStatement(ASTNode):
     type = StatementType.EXPRESSION_STATEMENT
 
     def __init__(self, token=None, expression=None):
+        super().__init__()
         self.token = token
         self.expression = expression
 
@@ -181,6 +187,7 @@ class ASTIdentifier(ASTNode):
         @param token: the node's token
         @param value: string the name of the "variable"
         """
+        super().__init__()
         self.token = token
         self.value = value
 
@@ -199,6 +206,7 @@ class ASTInteger(ASTNode):
         @param token: the node's token
         @param value: native int value
         """
+        super().__init__()
         self.token = token
         self.value = value
 
@@ -219,6 +227,7 @@ class ASTFloat(ASTNode):
         @param token: the node's token
         @param value: native float value
         """
+        super().__init__()
         self.token = token
         self.value = value
 
@@ -237,6 +246,7 @@ class ASTBoolean(ASTNode):
         @param token: the node's token
         @param value: native bool value
         """
+        super().__init__()
         self.token = token
         self.value = value
 
@@ -257,6 +267,7 @@ class ASTInfixExpression(ASTNode):
         @param left: ASTNode subclass, the left operand
         @param right: ASTNode subclass, the right operand
         """
+        super().__init__()
         self.token = token
         self.operator = operator
         self.left = left
@@ -278,6 +289,7 @@ class ASTPrefixExpression(ASTNode):
         @param operator: string, the operator
         @param right: the node(ASTNode subclass) that gets "minused" or "banged"
         """
+        super().__init__()
         self.token = token
         self.operator = operator
         self.right = right
@@ -299,6 +311,7 @@ class ASTCallExpression(ASTNode):
         arguments: the list of arguments in the call
         @:param default_params: map of params
         """
+        super().__init__()
         self.token = token
         self.func = func
         self.arguments = None
@@ -321,6 +334,7 @@ class ASTIfExpression(ASTNode):
         @param consequence: ASTBlockStatement
         @param alternative: ASTBlockStatement
         """
+        super().__init__()
         self.token = token
         self.condition = condition
         self.consequence = consequence
@@ -341,6 +355,7 @@ class ASTBlockStatement(ASTNode):
         @param token: the node's token
         @param statements: list
         """
+        super().__init__()
         self.token = token
         if statements:
             self.statements = statements
@@ -367,6 +382,7 @@ class ASTFunctionLiteral(ASTNode):
         @:param default_params: list of default params
         @param body: ASTBlockStatement
         """
+        super().__init__()
         self.token = token
         self.parameters = parameters
         self.default_params = default_params
@@ -388,6 +404,7 @@ class ASTWhileExpression(ASTNode):
         @param condition: expression???
         @param block: ASTBlockStatement
         """
+        super().__init__()
         self.token = token
         self.condition = condition
         self.block = block
@@ -407,6 +424,7 @@ class ASTStringLiteral(ASTNode):
         @param token: the node's token
         @param value: string
         """
+        super().__init__()
         self.token = token
         self.value = value
 
@@ -425,6 +443,7 @@ class ASTListLiteral(ASTNode):
         @param token: the node's token
         @param elements: the list of Ad objects
         """
+        super().__init__()
         self.token = token
         self.elements = elements
 
@@ -444,6 +463,7 @@ class ASTIndexExpression(ASTNode):
         @param left: ASTListLiteral
         @param index: int, which element is indexed
         """
+        super().__init__()
         self.token = token
         self.left = left
         self.index = index
@@ -463,6 +483,7 @@ class ASTHashLiteral(ASTNode):
         @param token: the node's token
         @param pairs: map [Expression] => Expression
         """
+        super().__init__()
         self.token = token
         self.pairs = pairs
 
@@ -483,6 +504,7 @@ class ASTDefStatement(ASTNode):
         @:param default_params: default params when missing argument
         @param body: AstNode block statement that is the body of the function
         """
+        super().__init__()
         self.name = name
         self.token = token
         self.parameters = parameters
@@ -504,6 +526,7 @@ class ASTComment(ASTNode):
         @param token: the node's token
         no need for other params, this just has to be ingnored by the evaluator
         """
+        super().__init__()
         self.token = token
 
     def token_literal(self):
@@ -524,6 +547,7 @@ class ASTClassStatement(ASTNode):
         @param attributes: list of ASTAssignStatement
         @param inherit_from: list of parents the class inherits from
         """
+        super().__init__()
         self.token = token
         self.name = name
         self.methods = methods
@@ -548,6 +572,7 @@ class ASTMemberAccess(ASTNode):
         @param member:
         @param is_method: boolean, indicates is this member access is a method call or an attribute access
         """
+        super().__init__()
         self.token = token
         self.arguments = arguments
         self.kw_args = kw_args
@@ -570,6 +595,7 @@ class ASTPrefixIncrement(ASTNode):
         @param token: the node's token
         @param name: AstNode, Identifier that is the target of the ++ operation
         """
+        super().__init__()
         self.token = token
         self.name = name
         self.operator = operator
@@ -588,6 +614,7 @@ class ASTPostfixIncrement(ASTNode):
         """
         @param token: the node's token
         """
+        super().__init__()
         self.token = token
         self.name = name
         self.operator = operator
@@ -606,6 +633,7 @@ class ASTForExpression(ASTNode):
         """
         @param token: the node's token
         """
+        super().__init__()
         self.token = token
         self.initialization = initialization
         self.condition = condition
@@ -626,6 +654,7 @@ class ASTNullExpression(ASTNode):
         """
         @param token: the node's token
         """
+        super().__init__()
         self.token = token
 
     def token_literal(self):
@@ -642,6 +671,7 @@ class ASTThisExpression(ASTNode):
         """
         @param token: the node's token
         """
+        super().__init__()
         self.token = token
 
     def token_literal(self):
@@ -658,6 +688,7 @@ class ASTSuperExpression(ASTNode):
         """
         @param token: the node's token
         """
+        super().__init__()
         self.token = token
 
     def token_literal(self):
@@ -674,6 +705,7 @@ class ASTBrakeStatement(ASTNode):
         """
         @param token: the node's token
         """
+        super().__init__()
         self.token = token
 
     def token_literal(self):
@@ -690,6 +722,7 @@ class ASTContinueStatement(ASTNode):
         """
         @param token: the node's token
         """
+        super().__init__()
         self.token = token
 
     def token_literal(self):

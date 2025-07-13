@@ -85,3 +85,63 @@ class OpEqual(Opcode):
 class OpNotEqual(Opcode):
     def __init__(self):
         super().__init__(OpcodeEnum.OP_NOTEQUAL)
+
+
+class OpGreaterThan(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_GREATERTHAN)
+
+
+class OpGreaterThanEqual(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_GREATERTHAN_EQUAL)
+
+
+class OpBang(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_BANG)
+
+
+class OpMinus(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_MINUS)
+
+
+class OpJumpNotTruthy(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_JUMP_NOT_TRUTHY)
+
+
+class OpJump(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_JUMP)
+
+
+class OpNull(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_NULL)
+
+
+class OpGetGlobal(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_GET_GLOBAL)
+
+
+class OpSetGlobal(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_SET_GLOBAL)
+
+
+class OpArray(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_ARRAY)
+
+
+class OpHash(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_HASH)
+
+
+class OpIndex(Opcode):
+    def __init__(self):
+        super().__init__(OpcodeEnum.OP_INDEX)

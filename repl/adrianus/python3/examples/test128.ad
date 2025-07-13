@@ -1,0 +1,12 @@
+class Person {
+    name = "aaa"
+    age = 55
+
+    def test() {
+        println(this.name)
+        println(this.age)
+    }
+}
+
+person = Person()
+person.test()
