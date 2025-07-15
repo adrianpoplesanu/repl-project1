@@ -11,6 +11,11 @@ std::string Ad_Object::Inspect() {
     return "not implemented Inspect() in subclass\n";
 }
 
+std::string Ad_Object::repr() {
+    std::cout << "not implemented repl() in subclass\n";
+    return "not implemented repl() in subclass\n";
+}
+
 void Ad_Object::Print() {
     std::cout << "not implemented Print() in subclass\n";
 }
@@ -40,6 +45,10 @@ Ad_Null_Object::~Ad_Null_Object() {
 }
 
 std::string Ad_Null_Object::Inspect() {
+    return "null";
+}
+
+std::string Ad_Null_Object::repr() {
     return "null";
 }
 
@@ -76,6 +85,10 @@ std::string Ad_Integer_Object::Inspect() {
     std::string out = "";
     out = std::to_string(value);
     return out;
+}
+
+std::string Ad_Integer_Object::repr() {
+    return std::to_string(value);
 }
 
 void Ad_Integer_Object::Print() {
@@ -119,6 +132,10 @@ std::string Ad_Float_Object::Inspect() {
     return out;
 }
 
+std::string Ad_Float_Object::repr() {
+    return std::to_string(value);
+}
+
 void Ad_Float_Object::Print() {
     std::cout << value;
 }
@@ -156,6 +173,10 @@ std::string Ad_ReturnValue_Object::Inspect() {
     return "WARNING: return outside function";
 }
 
+std::string Ad_ReturnValue_Object::repr() {
+    return "WARNING: return outside function";
+}
+
 void Ad_ReturnValue_Object::Print() {
     std::cout << value;
 }
@@ -189,6 +210,11 @@ std::string Ad_Boolean_Object::Inspect() {
         out = "false"; // this needs to be the token literal for false, i should do: out = token_type_map[TT_FALSE] and lower it
     }
     return out;
+}
+
+std::string Ad_Boolean_Object::repr() {
+    if (value) return "true";
+    return "false";
 }
 
 void Ad_Boolean_Object::Print() {
@@ -272,6 +298,12 @@ std::string Ad_Function_Object::Inspect() {
     return "<function at memory address: " + ss.str() + ">";
 }
 
+std::string Ad_Function_Object::repr() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<function at memory address: " + ss.str() + ">";
+}
+
 void Ad_Function_Object::Print() {
     std::cout << "todo: implement Print in Ad_Function_Object\n";
 }
@@ -315,6 +347,10 @@ std::string Ad_String_Object::Inspect() {
     return "'" + value + "'";
 }
 
+std::string Ad_String_Object::repr() {
+    return value;
+}
+
 void Ad_String_Object::Print() {
     std::cout << "todo Ad string Print()";
 }
@@ -350,6 +386,10 @@ std::string Ad_Error_Object::Inspect() {
     std::string out;
     out = "ERROR: " + message;
     return out;
+}
+
+std::string Ad_Error_Object::repr() {
+    return "ERROR: " + message;
 }
 
 void Ad_Error_Object::Print() {
@@ -395,6 +435,12 @@ std::string Ad_Builtin_Object::Inspect() {
     return "<built-in at memory address: " + ss.str() + ">";
 }
 
+std::string Ad_Builtin_Object::repr() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<built-in at memory address: " + ss.str() + ">";
+}
+
 void Ad_Builtin_Object::Print() {
     std::cout << "todo: implement Ad_Builtin_Object::Print()\n";
 }
@@ -431,6 +477,10 @@ std::string Ad_Signal_Object::Hash() {
     return object_type_map[type] + Inspect();
 }
 
+std::string Ad_Signal_Object::repr() {
+    return object_type_map[type] + Inspect();
+}
+
 Ad_List_Object::Ad_List_Object() {
     type = OBJ_LIST;
     ref_count = 0;
@@ -455,6 +505,18 @@ Ad_List_Object::~Ad_List_Object() {
 }
 
 std::string Ad_List_Object::Inspect() {
+    std::string out = "[";
+    int idx = 0;
+    for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
+        Ad_Object *obj = *it;
+        if (idx++ > 0) out += ", ";
+        out += obj->Inspect();
+    }
+    out += "]";
+    return out;
+}
+
+std::string Ad_List_Object::repr() {
     std::string out = "[";
     int idx = 0;
     for (std::vector<Ad_Object*>::iterator it = elements.begin() ; it != elements.end(); ++it) {
@@ -515,6 +577,18 @@ Ad_Hash_Object::~Ad_Hash_Object() {
 }
 
 std::string Ad_Hash_Object::Inspect() {
+    std::string out = "{";
+    bool displayed_first = false;
+    for(std::unordered_map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+        if (displayed_first) out += ", ";
+        else displayed_first = true;
+        out += it->second.key->Inspect() + ": " + it->second.value->Inspect();
+    }
+    out += "}";
+    return out;
+}
+
+std::string Ad_Hash_Object::repr() {
     std::string out = "{";
     bool displayed_first = false;
     for(std::unordered_map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
@@ -668,6 +742,12 @@ std::string Ad_Class_Object::Inspect() {
     return "<class object at memory address: " + ss.str() + ">";
 }
 
+std::string Ad_Class_Object::repr() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<class object at memory address: " + ss.str() + ">";
+}
+
 void Ad_Class_Object::Print() {
     std::cout << "ClassObject\n";
     //std::cout << methods.size();
@@ -713,6 +793,12 @@ Ad_Class_Instance::~Ad_Class_Instance() {
 }
 
 std::string Ad_Class_Instance::Inspect() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<class instance at memory address: " + ss.str() + ">";
+}
+
+std::string Ad_Class_Instance::repr() {
     std::stringstream ss;
     ss << std::hex << this;
     return "<class instance at memory address: " + ss.str() + ">";
@@ -766,6 +852,12 @@ std::string Ad_File_Object::Inspect() {
     return "<file object at memory address: " + ss.str() + ">";
 }
 
+std::string Ad_File_Object::repr() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<file object at memory address: " + ss.str() + ">";
+}
+
 void Ad_File_Object::Print() {
     std::cout << "todo: implement Print() in Ad_File_Object\n";
 }
@@ -792,6 +884,10 @@ std::string Ad_Break_Object::Inspect() {
     return NULL;
 }
 
+std::string Ad_Break_Object::repr() {
+    return "<break object>";
+}
+
 void Ad_Break_Object::Print() {
 
 }
@@ -816,6 +912,10 @@ Ad_Continue_Object::~Ad_Continue_Object() {
 
 std::string Ad_Continue_Object::Inspect() {
     return NULL;
+}
+
+std::string Ad_Continue_Object::repr() {
+    return "<continue object>";
 }
 
 void Ad_Continue_Object::Print() {
@@ -875,6 +975,12 @@ std::string Ad_Socket_Object::Inspect() {
     return "<socket instance at memory address: " + ss.str() + ">";
 }
 
+std::string Ad_Socket_Object::repr() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<socket instance at memory address: " + ss.str() + ">";
+}
+
 void Ad_Socket_Object::Print() {
     std::cout << "SocketObject\n";
 }
@@ -907,6 +1013,12 @@ Ad_Thread_Object::~Ad_Thread_Object() {
 }
 
 std::string Ad_Thread_Object::Inspect() {
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<thread instance at memory address: " + ss.str() + ">";
+}
+
+std::string Ad_Thread_Object::repr() {
     std::stringstream ss;
     ss << std::hex << this;
     return "<thread instance at memory address: " + ss.str() + ">";

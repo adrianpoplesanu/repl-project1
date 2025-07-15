@@ -67,6 +67,7 @@ public:
 	Ad_Object* next;
 	Ad_Object* prev;
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -80,6 +81,7 @@ public:
 	Ad_Null_Object();
 	~Ad_Null_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -94,6 +96,7 @@ public:
 	Ad_Integer_Object(int);
 	~Ad_Integer_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -108,6 +111,7 @@ public:
 	Ad_Float_Object(float);
 	~Ad_Float_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -122,6 +126,7 @@ public:
 	Ad_Boolean_Object();
 	Ad_Boolean_Object(bool);
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -135,6 +140,7 @@ public:
 	Ad_String_Object();
 	Ad_String_Object(std::string);
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -150,6 +156,7 @@ public:
 	~Ad_ReturnValue_Object();
 
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -162,6 +169,7 @@ public:
 	~Ad_Break_Object();
 
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -173,6 +181,7 @@ public:
 	~Ad_Continue_Object();
 
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();	
@@ -193,6 +202,7 @@ public:
 	~Ad_Function_Object();
 
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -206,6 +216,7 @@ public:
 	Ad_Error_Object();
 	Ad_Error_Object(std::string);
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -224,6 +235,7 @@ public:
 	Ad_Builtin_Object(BuiltinFunction, std::vector<int>);
 	~Ad_Builtin_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -236,6 +248,7 @@ public:
 
 	Ad_Signal_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -253,6 +266,7 @@ public:
 	Ad_List_Object(std::vector<Ad_Object*>);
 	~Ad_List_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -267,6 +281,7 @@ public:
 	Ad_Hash_Object(std::unordered_map<std::string, HashPair>);
 	~Ad_Hash_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -288,6 +303,7 @@ public:
 	Ad_Class_Object(Ad_AST_Node*, std::vector<Ad_AST_Node*>, std::vector<Ad_AST_Node*>, Ad_AST_Node*);
 	~Ad_Class_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -307,6 +323,7 @@ public:
 	Ad_Class_Instance(std::string, Ad_Object*, Environment*);
 	~Ad_Class_Instance();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -325,6 +342,7 @@ public:
 	Ad_File_Object(std::string, std::string);
 	~Ad_File_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -349,6 +367,7 @@ public:
 	Ad_Socket_Object(std::string, std::string, int, bool, bool, bool, bool);
 	~Ad_Socket_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
@@ -367,6 +386,7 @@ public:
 	Ad_Thread_Object();
 	~Ad_Thread_Object();
 	virtual std::string Inspect();
+    virtual std::string repr();
 	virtual void Print();
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
