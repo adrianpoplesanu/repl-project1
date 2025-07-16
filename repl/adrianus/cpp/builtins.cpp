@@ -58,7 +58,7 @@ Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
         return NULL;
     }
     // std::cout << obj->Inspect() << "\n"; // old print builtin
-    std::cout << obj->Inspect();
+    std::cout << obj->repr();
     free_builtin_arguments(args);
     return NULL;
 }
@@ -70,7 +70,7 @@ Ad_Object* println_builtin(std::vector<Ad_Object*> args, Environment* env, Garba
         free_builtin_arguments(args);
         return NULL;
     }
-    std::cout << obj->Inspect() << "\n";
+    std::cout << obj->repr() << "\n";
     free_builtin_arguments(args);
     return NULL;
 }
