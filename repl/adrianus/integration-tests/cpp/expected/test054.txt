@@ -1,2 +1,3 @@
+\[ Ad \]\[ sock \] unknown method called on sock object
 <socket instance at memory address: (.*)>
 <socket instance at memory address: (.*)>
