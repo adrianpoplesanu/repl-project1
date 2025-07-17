@@ -1,0 +1,8 @@
+class AdHTTPParser {
+    logger = AdLogger("AD", "AdHTTPParser")
+    version = "0.1"
+
+    def constructor() {
+        logger.info("init AdHTTPParser version " + version + " ...")
+    }
+}
