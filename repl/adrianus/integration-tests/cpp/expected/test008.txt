@@ -1,2 +1,2 @@
 {'server': <class instance at memory address: (.*)>, 'Server': <class object at memory address: (.*)>}
-'end script'
+end script

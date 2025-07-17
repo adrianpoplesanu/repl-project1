@@ -1,6 +1,6 @@
 {'a': 5}
 8080
-'listening...'
-'aaa'
-'bbb'
+listening...
+aaa
+bbb
 {'a': 5, 'server': <class instance at memory address: (.*)>, 'Server': <class object at memory address: (.*)>}
