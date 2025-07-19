@@ -19,9 +19,12 @@ public:
     int cycle1;
     int cycle2;
     int cycle3;
-    int maxCycle1 = 100;
-    int maxCycle2 = 100;
-    int maxCycle3 = 100;
+    //int maxCycle1 = 100;
+    //int maxCycle2 = 100;
+    //int maxCycle3 = 100;
+    int maxCycle1 = 0;
+    int maxCycle2 = 0;
+    int maxCycle3 = 0;
 
     GarbageCollector();
     ~GarbageCollector();
