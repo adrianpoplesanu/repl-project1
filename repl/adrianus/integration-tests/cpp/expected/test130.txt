@@ -1,1 +1,1 @@
-'Test bultin method'
+Test bultin method
