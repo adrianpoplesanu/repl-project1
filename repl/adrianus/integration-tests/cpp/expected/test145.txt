@@ -1,1 +1,1 @@
-'neatza'
+neatza
