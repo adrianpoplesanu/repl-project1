@@ -1,2 +1,2 @@
 <class instance at memory address: (.*)>
-'aaa'
+aaa
