@@ -1,9 +1,9 @@
-'aaa'
-'bbb'
-'ccc'
-'ddd'
-'eee'
+aaa
+bbb
+ccc
+ddd
+eee
 5
-'fff'
-'ggg'
+fff
+ggg
 5
