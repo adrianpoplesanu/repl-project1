@@ -1,2 +1,2 @@
-'initialized'
-1''
+initialized
+1
