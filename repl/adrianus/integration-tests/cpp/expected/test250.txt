@@ -1,4 +1,4 @@
-'bebe dex'
+bebe dex
 14
-'bedus'
+bedus
 13
