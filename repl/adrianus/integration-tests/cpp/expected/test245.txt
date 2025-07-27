@@ -1,4 +1,4 @@
-'aaa'
+aaa
 <function at memory address: (.*)>
 18
 16
