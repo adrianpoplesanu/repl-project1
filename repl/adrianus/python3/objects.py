@@ -18,6 +18,9 @@ class Ad_Null_Object(Ad_Object):
     def inspect(self):
         return "null"
 
+    def repr(self):
+        return "null"
+
     def hash_key(self):
         return HashKey(type=type, value=hash(None))
 
@@ -34,6 +37,9 @@ class Ad_Integer_Object(Ad_Object):
     def inspect(self):
         return str(self.value)
 
+    def repr(self):
+        return str(self.value)
+
     def hash_key(self):
         return HashKey(type=type, value=hash(self.value))
 
@@ -48,6 +54,9 @@ class Ad_Float_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
+        return str(self.value)
+
+    def repr(self):
         return str(self.value)
 
     def hash_key(self):
@@ -69,6 +78,12 @@ class Ad_Boolean_Object(Ad_Object):
         else:
             return 'false' # this might be ties with the keyword mapping, would make it easier to change in the future
 
+    def repr(self):
+        if self.value:
+            return 'true' # this might be tied with the keyword mapping, would make it easier to change in the future
+        else:
+            return 'false' # this might be ties with the keyword mapping, would make it easier to change in the future
+
     def hash_key(self):
         return HashKey(type=type, value=hash(self.value))
 
@@ -83,6 +98,9 @@ class Ad_ReturnValue_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
+        return self.value.inspect()
+
+    def repr(self):
         return self.value.inspect()
 
 
@@ -123,6 +141,9 @@ class Ad_Function_Object(Ad_Object):
     def inspect(self):
         return "<function at memory address: " + str(hex(id(self))) + ">"
 
+    def repr(self):
+        return "<function at memory address: " + str(hex(id(self))) + ">"
+
 
 class Ad_String_Object(Ad_Object):
     type = ObjectType.STRING
@@ -135,6 +156,9 @@ class Ad_String_Object(Ad_Object):
 
     def inspect(self):
         return "'" + self.value + "'"
+
+    def repr(self):
+        return str(self.value)
 
     def hash_key(self):
         return HashKey(type=type, value=hash(self.value))
@@ -150,6 +174,9 @@ class Ad_Error_Object(Ad_Object):
         self.message = message
 
     def inspect(self):
+        return "ERROR: " + self.message
+
+    def repr(self):
         return "ERROR: " + self.message
 
 
@@ -171,6 +198,9 @@ class Ad_Builtin_Object(Ad_Object):
     def inspect(self):
         return str(self.builtin_function)
 
+    def repr(self):
+        return str(self.builtin_function)
+
 
 class Ad_List_Object(Ad_Object):
     type = ObjectType.LIST
@@ -182,6 +212,12 @@ class Ad_List_Object(Ad_Object):
         self.elements = elements
 
     def inspect(self):
+        out = "["
+        out += ', '.join([element.inspect() for element in self.elements])
+        out += "]"
+        return out
+
+    def repr(self):
         out = "["
         out += ', '.join([element.inspect() for element in self.elements])
         out += "]"
@@ -212,6 +248,12 @@ class Ad_Hash_Object(Ad_Object):
         out += "}"
         return out
 
+    def repr(self):
+        out = "{"
+        out += ', '.join(['{0}: {1}'.format(pair.key.inspect(), pair.value.inspect()) for pair in self.pairs.values()])
+        out += "}"
+        return out
+
 
 class Ad_Class_Object(Ad_Object):
     type = ObjectType.CLASS
@@ -229,6 +271,10 @@ class Ad_Class_Object(Ad_Object):
         self.inherit_from = inherit_from
 
     def inspect(self):
+        out = "<class object at memory address: " + str(hex(id(self))) + ">"
+        return out
+
+    def repr(self):
         out = "<class object at memory address: " + str(hex(id(self))) + ">"
         return out
 
@@ -253,6 +299,10 @@ class Ad_Class_Instance(Ad_Object):
         out = "<class instance at memory address: " + str(hex(id(self))) + ">"
         return out
 
+    def repr(self):
+        out = "<class instance at memory address: " + str(hex(id(self))) + ">"
+        return out
+
 
 class Ad_File_Object(Ad_Object):
     type = ObjectType.FILE
@@ -269,6 +319,10 @@ class Ad_File_Object(Ad_Object):
         self.file_descriptor = open(self.filename, self.operator)
 
     def inspect(self):
+        out = "<file object at memory address: " + str(hex(id(self))) + ">"
+        return out
+
+    def repr(self):
         out = "<file object at memory address: " + str(hex(id(self))) + ">"
         return out
 
@@ -306,6 +360,10 @@ class Ad_Socket_Object(Ad_Object):
         out = "<socket instance at memory address: " + str(hex(id(self))) + ">"
         return out
 
+    def repr(self):
+        out = "<socket instance at memory address: " + str(hex(id(self))) + ">"
+        return out
+
 
 class Ad_Thread_Object(Ad_Object):
     type = ObjectType.THREAD
@@ -325,5 +383,9 @@ class Ad_Thread_Object(Ad_Object):
         self.result = result
 
     def inspect(self):
+        out = "<thread instance at memory address: " + str(hex(id(self))) + ">"
+        return out
+
+    def repr(self):
         out = "<thread instance at memory address: " + str(hex(id(self))) + ">"
         return out
