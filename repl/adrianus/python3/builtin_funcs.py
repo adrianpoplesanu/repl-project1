@@ -28,12 +28,12 @@ def first_builtin(args, env):
 def print_builtin(args, env):
     for obj in args:
         if obj:
-            print (obj.inspect(), end='')
+            print(obj.repr(), end='')
 
 def println_builtin(args, env):
     for obj in args:
         if obj:
-            print (obj.inspect())
+            print(obj.repr())
 
 def exit_builtin(args, env):
     sys.exit(0)
