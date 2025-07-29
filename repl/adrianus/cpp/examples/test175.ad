@@ -1,11 +1,13 @@
-class AsyncEchoServer {
+class AsyncSimpleResponseServer {
 
     port = null
     server = null
     message = ""
-    logger = AdLogger("AD", "AsyncEchoServer")
+    logger = AdLogger("AD", "AsyncSimpleResponseServer")
+    httpParser = AdHTTPParser()
 
     def constructor(_port, _message) {
+        logger.info('instantiating server...')
         port = _port
         message = _message
         server = ServerSocket(port)
@@ -19,11 +21,13 @@ class AsyncEchoServer {
         request_message = client.readHTTP()
         //println(request_message)
         logger.info(request_message)
+        sleep(5000)
 
         client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
     }
 
     def start() {
+        logger.info('server stated!')
         while(true) {
             server.accept()
             //println(server.client)
@@ -37,8 +41,8 @@ class AsyncEchoServer {
     }
 }
 
-asyncEchoServer = AsyncEchoServer(5003, '<html><title>AsyncEchoServer</title><body style="background-color: black"><font color="grey"><h1>Bebe Dex</h1>catel frumos si scump</font></body></html>')
-asyncEchoServer.start()
+asyncSimpleResponseServer = AsyncSimpleResponseServer(5003, '<html><title>AsyncSimpleResponseServer</title><body style="background-color: black"><font color="grey"><h1>Bebe Dex</h1>ham ham ham again</font></body></html>')
+asyncSimpleResponseServer.start()
 
 /*
 GET request

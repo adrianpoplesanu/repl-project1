@@ -1,0 +1,16 @@
+class Dog {
+    name = "bebe"
+    address = "craiova"
+
+    def set2() {
+        let name = "aaa"
+        let address = "bbb"
+        println(name)
+        println(address)
+    }
+}
+
+dog = Dog()
+dog.set2()
+println(dog.name)
+println(dog.address)
