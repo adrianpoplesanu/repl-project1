@@ -1,7 +1,7 @@
 class Elev {
    a = 5
    def b() {
-       print(a + c + 6)
+       println(a + c + 6)
    }
 }
 
