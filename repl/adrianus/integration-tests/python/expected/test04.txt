@@ -1,4 +1,4 @@
-\'start test\'
-\'end class declaration\'
+start test
+end class declaration
 {'offset2': 34}
 46

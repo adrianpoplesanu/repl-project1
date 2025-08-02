@@ -2,5 +2,5 @@
 2
 3
 4
-'valoarea lui a:'
+valoarea lui a:
 5
