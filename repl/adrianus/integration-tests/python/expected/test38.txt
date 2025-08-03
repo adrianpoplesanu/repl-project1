@@ -1,3 +1,3 @@
-'buna dimineata!'
-'display_service'
-'buna dimineata!'
+buna dimineata!
+display_service
+buna dimineata!
