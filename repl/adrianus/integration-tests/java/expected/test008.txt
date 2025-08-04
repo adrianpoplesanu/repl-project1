@@ -1,2 +1,2 @@
 55
-'test string'
+test string

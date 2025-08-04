@@ -1,4 +1,4 @@
-'listening'
+listening
 8081
 {}
 {'Server': <class object at memory address: (.*)>, 'server': <class instance at memory address: (.*)>}
