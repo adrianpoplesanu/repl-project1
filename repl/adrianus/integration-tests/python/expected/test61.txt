@@ -1,13 +1,13 @@
-'North America'
-'USA'
+North America
+USA
 \['red', 'white', 'yellow'\]
 \['red', 'white', 'yellow'\]
-'Asia'
-'USA'
+Asia
+USA
 \['red', 'white', 'yellow'\]
 \['red', 'white', 'yellow'\]
-'North America'
-'USA'
+North America
+USA
 \['red', 'white', 'yellow'\]
 \['red', 'white', 'yellow'\]
 \['red', 'red', 'wine'\]

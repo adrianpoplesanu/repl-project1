@@ -1,2 +1,2 @@
-'e mic'
-'e mare'
+e mic
+e mare
