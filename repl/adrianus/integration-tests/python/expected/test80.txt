@@ -1,1 +1,1 @@
-'starting thread'(.|\n)*'finishing thread'
+starting thread(.|\n)*finishing thread
