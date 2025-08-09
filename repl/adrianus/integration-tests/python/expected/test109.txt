@@ -1,3 +1,3 @@
-'hamutz hamutz hamutz'
-'hamic hamic hamic'
-'hamuletz hamuletz hamuletz'
+hamutz hamutz hamutz
+hamic hamic hamic
+hamuletz hamuletz hamuletz
