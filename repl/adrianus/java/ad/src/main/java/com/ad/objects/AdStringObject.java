@@ -21,6 +21,11 @@ public class AdStringObject extends AdObject {
 	}
 
 	@Override
+	public String repr() {
+		return value;
+	}
+
+	@Override
 	public void print() {
 		// TODO Auto-generated method stub
 		

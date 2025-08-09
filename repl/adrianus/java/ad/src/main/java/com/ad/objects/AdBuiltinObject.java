@@ -21,6 +21,11 @@ public class AdBuiltinObject extends AdObject {
 	}
 
 	@Override
+	public String repr() {
+		return "<built-in at memory address: 0x" + Integer.toHexString(this.hashCode()) + ">";
+	}
+
+	@Override
 	public void print() {
 		System.out.println("TODO: implement print() in AdBuiltinObject");
 	}

@@ -14,6 +14,11 @@ public class AdErrorObject extends AdObject {
 	}
 
 	@Override
+	public String repr() {
+		return "ERROR: " + msg;
+	}
+
+	@Override
 	public void print() {
 		System.out.println("ERROR: " + msg);
 	}

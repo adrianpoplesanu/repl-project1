@@ -31,6 +31,11 @@ public class AdClassInstance extends AdObject {
     }
 
     @Override
+    public String repr() {
+        return "<class instance at memory address: 0x" + Integer.toHexString(this.hashCode()) + ">";
+    }
+
+    @Override
     public void print() {
         System.out.println("ClassInstance object");
     }

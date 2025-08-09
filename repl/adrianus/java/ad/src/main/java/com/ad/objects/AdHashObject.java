@@ -31,6 +31,19 @@ public class AdHashObject extends AdObject {
     }
 
     @Override
+    public String repr() {
+        String out = "{";
+        boolean first = true;
+        for (Map.Entry<String, HashPair<AdObject>> e : elements.entrySet()) {
+            if (!first) out += ", ";
+            out += e.getValue().getKey().inspect() + ": " + e.getValue().getValue().inspect();
+            first = false;
+        }
+        out += "}";
+        return out;
+    }
+
+    @Override
     public void print() {
 
     }

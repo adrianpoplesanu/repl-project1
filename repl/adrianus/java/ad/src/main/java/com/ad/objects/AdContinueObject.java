@@ -12,6 +12,12 @@ public class AdContinueObject extends AdObject {
     }
 
     @Override
+    public String repr() {
+        return null;
+    }
+
+
+    @Override
     public void print() {
 
     }

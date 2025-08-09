@@ -12,6 +12,11 @@ public class AdNullObject extends AdObject {
     }
 
     @Override
+    public String repr() {
+        return "null";
+    }
+
+    @Override
     public void print() {
         System.out.println("NullObject");
     }

@@ -20,6 +20,11 @@ public class AdReturnValueObject extends AdObject {
 	}
 
 	@Override
+	public String repr() {
+		return "WARNING: return outside function";
+	}
+
+	@Override
 	public void print() {
 		// TODO Auto-generated method stub
 		

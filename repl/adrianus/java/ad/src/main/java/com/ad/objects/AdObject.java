@@ -4,6 +4,7 @@ public abstract class AdObject {
 	protected ObjectTypeEnum type;
 	
 	public abstract String inspect();
+	public abstract String repr();
 	public abstract void print();
 	public abstract String hash();
 	// public abstract String repr();

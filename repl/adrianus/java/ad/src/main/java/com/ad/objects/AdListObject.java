@@ -29,6 +29,19 @@ public class AdListObject extends AdObject {
     }
 
     @Override
+    public String repr() {
+        String out = "[";
+        boolean first = true;
+        for (AdObject obj : elements) {
+            if (!first) out += ", ";
+            out += obj.inspect();
+            first = false;
+        }
+        out += "]";
+        return out;
+    }
+
+    @Override
     public void print() {
         System.out.println("TODO: implement print() in AdListObject");
     }

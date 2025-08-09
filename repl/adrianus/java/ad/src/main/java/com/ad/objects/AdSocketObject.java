@@ -133,6 +133,11 @@ public class AdSocketObject extends AdObject {
     }
 
     @Override
+    public String repr() {
+        return "<socket object at address: 0x" + Integer.toHexString(this.hashCode()) + ">";
+    }
+
+    @Override
     public void print() {
 
     }

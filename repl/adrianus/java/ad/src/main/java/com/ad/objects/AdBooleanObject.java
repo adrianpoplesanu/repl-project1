@@ -14,6 +14,11 @@ public class AdBooleanObject extends AdObject {
 	}
 
 	@Override
+	public String repr() {
+		return String.valueOf(value);
+	}
+
+	@Override
 	public void print() {
 		System.out.println(value);
 	}

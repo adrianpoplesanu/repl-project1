@@ -20,6 +20,11 @@ public class AdFileObject extends AdObject {
     }
 
     @Override
+    public String repr() {
+        return "<file object at address: 0x" + Integer.toHexString(this.hashCode()) + ">";
+    }
+
+    @Override
     public void print() {
 
     }
