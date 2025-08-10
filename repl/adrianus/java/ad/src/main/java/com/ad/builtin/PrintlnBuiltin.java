@@ -10,7 +10,7 @@ public class PrintlnBuiltin extends AbstractBuiltin {
     public AdObject call(List<AdObject> args, Environment env) {
         AdObject obj = args.get(0);
         if (obj != null) {
-            System.out.println(obj.inspect());
+            System.out.println(obj.repr());
         }
         return null;
     }
