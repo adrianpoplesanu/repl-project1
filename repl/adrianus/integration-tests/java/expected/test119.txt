@@ -1,4 +1,4 @@
-'starting thread'
+starting thread
 0
 1
 2
@@ -99,8 +99,8 @@
 97
 98
 99
-'finishing thread'
-'starting thread'
+finishing thread
+starting thread
 0
 1
 2
@@ -301,8 +301,8 @@
 197
 198
 199
-'finishing thread'
-'starting thread'
+finishing thread
+starting thread
 0
 1
 2
@@ -603,4 +603,4 @@
 297
 298
 299
-'finishing thread'
+finishing thread

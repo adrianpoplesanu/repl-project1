@@ -1,5 +1,5 @@
-'constructor Executor'
-'#framework that checks example\/testXX\.ad output versus desired output
+constructor Executor
+#framework that checks example\/testXX\.ad output versus desired output
 
 ##Requirements:
 ###cpp
@@ -11,5 +11,5 @@ python3
 ###java
 ```mvn
 python3
-```'
-'end constructor Executor'
+```
+end constructor Executor
