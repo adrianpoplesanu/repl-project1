@@ -1,4 +1,4 @@
-'12aaa'
-'bbb23'
-'STRING'
-'STRING'
+12aaa
+bbb23
+STRING
+STRING
