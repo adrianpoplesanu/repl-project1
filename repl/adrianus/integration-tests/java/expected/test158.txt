@@ -1,6 +1,6 @@
 'b'
-'bcd'
-'fg'
-'fgh'
-'fedcb'
-''
+bcd
+fg
+fgh
+fedcb
+

@@ -1,2 +1,2 @@
-'abcba'
+abcba
 true
