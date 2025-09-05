@@ -30,7 +30,8 @@ class Evaluator(object):
             return self.eval_program(node, env)
         elif node.type == StatementType.LET_STATEMENT:
             obj = self.eval(node.value, env)
-            env.set(node.name.value, obj)
+            #env.set(node.name.value, obj)
+            env.set_local_param(node.name.value, obj)
             return None
         elif node.type == StatementType.ASSIGN_STATEMENT:
             return self.eval_assign_statement(node, env)
