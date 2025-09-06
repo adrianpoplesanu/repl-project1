@@ -12,7 +12,7 @@ std::string cleanupUnescapedCharaters(std::string text) {
 }
 
 void create_server(Ad_Object* rawSocket) {
-    Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
+    auto* socketObject = (Ad_Socket_Object*) rawSocket;
 
     int listenfd = 0, connfd = 0;
     struct sockaddr_in serv_addr;
@@ -34,7 +34,7 @@ void create_server(Ad_Object* rawSocket) {
 }
 
 void create_client(Ad_Object* rawSocket) {
-    Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
+    auto* socketObject = (Ad_Socket_Object*) rawSocket;
 
     struct sockaddr_in serv_addr;
 
@@ -49,7 +49,7 @@ void create_client(Ad_Object* rawSocket) {
     connect(socketObject->connfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 }
 
-Ad_Object* accept(Ad_Object* rawSocket) {
+Ad_Object* accept_socket(Ad_Object* rawSocket) {
     Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
 
     int connfd = accept(socketObject->listenfd, (struct sockaddr*)NULL, NULL);
@@ -58,7 +58,7 @@ Ad_Object* accept(Ad_Object* rawSocket) {
     return clientSocket;
 }
 
-void send(Ad_Object* rawSocket, Ad_Object* rawString) {
+void send_socket(Ad_Object* rawSocket, Ad_Object* rawString) {
     Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
     Ad_String_Object* stringObject = (Ad_String_Object*) rawString;
 
@@ -69,7 +69,7 @@ void send(Ad_Object* rawSocket, Ad_Object* rawString) {
     }
 }
 
-Ad_Object* read(Ad_Object* rawSocket) {
+Ad_Object* read_socket(Ad_Object* rawSocket) {
     Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
 
     std::string message = "";
@@ -124,8 +124,8 @@ Ad_Object* readHTTP(Ad_Object* rawSocket) {
     return result;
 }
 
-void close(Ad_Object* rawSocket) {
-    Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
+void close_socket(Ad_Object* rawSocket) {
+    auto* socketObject = (Ad_Socket_Object*) rawSocket;
 
     close(socketObject->connfd);
 }
