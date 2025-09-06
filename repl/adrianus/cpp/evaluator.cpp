@@ -20,7 +20,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_LET_STATEMENT: {
             Ad_Object* obj = Eval(((Ad_AST_LetStatement*)node)->value, env);
-            env.Set(((Ad_AST_LetStatement*)node)->name.value, obj);
+            env.setLocalParam(((Ad_AST_LetStatement*)node)->name.value, obj);
+            //env.Set(((Ad_AST_LetStatement*)node)->name.value, obj);
             return NULL;
         }
         break;
@@ -1543,16 +1544,16 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
                 create_client(owner_obj_raw);
             }
             else if (member_ident->value == "accept") {
-                Ad_Object* result = accept(owner_obj_raw);
+                Ad_Object* result = accept_socket(owner_obj_raw);
                 garbageCollector->addObject(result);
                 return result;
             }
             else if (member_ident->value == "send") {
                 std::vector<Ad_Object*> args_obj = EvalExpressions(args, env);
-                send(owner_obj_raw, args_obj.at(0));
+                send_socket(owner_obj_raw, args_obj.at(0));
             }
             else if (member_ident->value == "read") {
-                Ad_Object* result = read(owner_obj_raw);
+                Ad_Object* result = read_socket(owner_obj_raw);
                 garbageCollector->addObject(result);
                 return result;
             }
@@ -1562,7 +1563,7 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
                 return result;
             }
             else if (member_ident->value == "close") {
-                close(owner_obj_raw);
+                close_socket(owner_obj_raw);
             } else {
                 std::cout << "[ Ad ][ sock ] unknown method called on sock object\n";
             }
