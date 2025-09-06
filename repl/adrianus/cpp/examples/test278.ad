@@ -3,8 +3,8 @@ class Dog {
     address = "craiova"
 
     def set2() {
-        let name = "aaa"
-        let address = "bbb"
+        let name = "dex"
+        let address = "berceni"
         println(name)
         println(address)
     }
