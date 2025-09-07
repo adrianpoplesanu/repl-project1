@@ -1,0 +1,7 @@
+for (i = 0; i < 10; i++) {
+    print("a\n")
+    //print("loading " + i + "\r")
+}
+
+println("")
+println("done")

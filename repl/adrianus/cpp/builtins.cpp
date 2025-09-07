@@ -50,6 +50,47 @@ Ad_Object* exit_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageC
     return signal;
 }
 
+std::string decodeEscapes(const std::string& raw) {
+    std::string result;
+    result.reserve(raw.size());
+
+    for (size_t i = 0; i < raw.size(); ++i) {
+        if (raw[i] == '\\' && i + 1 < raw.size()) {
+            char next = raw[i + 1];
+            switch (next) {
+                case 'n': result.push_back('\n'); break;
+                case 't': result.push_back('\t'); break;
+                case 'r': result.push_back('\r'); break;
+                case '\\': result.push_back('\\'); break;
+                case '"': result.push_back('"'); break;
+                case '\'': result.push_back('\''); break;
+                case '0': result.push_back('\0'); break;
+                    // (optional) handle hex: \x41
+                case 'x': {
+                    if (i + 2 < raw.size()) {
+                        std::string hex = raw.substr(i + 2, 2);
+                        char ch = static_cast<char>(std::stoi(hex, nullptr, 16));
+                        result.push_back(ch);
+                        i += 2;
+                    } else {
+                        throw std::runtime_error("Invalid \\x escape");
+                    }
+                    break;
+                }
+                    // (optional) handle Unicode: \uXXXX, \UXXXXXXXX
+                default:
+                    result.push_back(raw[i]);
+                    result.push_back(next);
+                    break;
+            }
+            i++; // skip the escaped char
+        } else {
+            result.push_back(raw[i]);
+        }
+    }
+    return result;
+}
+
 Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_Object* obj = args[0];
     if (obj == NULL) {
@@ -58,7 +99,7 @@ Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
         return NULL;
     }
     // std::cout << obj->Inspect() << "\n"; // old print builtin
-    std::cout << obj->repr();
+    std::cout << decodeEscapes(obj->repr());
     free_builtin_arguments(args);
     return NULL;
 }
@@ -70,7 +111,7 @@ Ad_Object* println_builtin(std::vector<Ad_Object*> args, Environment* env, Garba
         free_builtin_arguments(args);
         return NULL;
     }
-    std::cout << obj->repr() << "\n";
+    std::cout << decodeEscapes(obj->repr()) << "\n";
     free_builtin_arguments(args);
     return NULL;
 }
