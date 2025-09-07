@@ -3,7 +3,7 @@ socket.create_server()
 
 while(true) {
     client = socket.accept()
-    client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 92\r\nConnection: close\r\n\r\n<html>this is a <b>http bebe dex</b> response from Ad Server cpp with better escaping</html>")
+    client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: 98\r\nConnection: close\r\n\r\n<html>this is a <b>http bebe dex</b> response from Ad Server cpp with better escaping again</html>")
     /*client.send("server: buna dimineata!")*/
     client.close()
 }

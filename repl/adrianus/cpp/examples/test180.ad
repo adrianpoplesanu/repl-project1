@@ -1,7 +1,9 @@
 socket = __iosocket("server", "localhost", 5003, true, false, false, true)
 socket.create_server()
 client = socket.accept()
-client.send("bla bla bli")
+/*client.send("bla bla bli")*/
 /*client.send("server: buna dimineata!")*/
+message = "bla bla bli blu"
+client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
 client.close()
 socket.close()
