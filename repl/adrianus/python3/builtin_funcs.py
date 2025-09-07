@@ -1,5 +1,8 @@
+import codecs
+import copy
 import sys
 import time
+import subprocess
 
 from objects import (Ad_Builtin_Object, Ad_Integer_Object, Ad_Null_Object, Ad_String_Object, Ad_File_Object,
                      Ad_Error_Object, Ad_List_Object, Ad_Hash_Object, Ad_Thread_Object, Ad_Socket_Object)
@@ -28,12 +31,12 @@ def first_builtin(args, env):
 def print_builtin(args, env):
     for obj in args:
         if obj:
-            print(obj.repr(), end='')
+            print(codecs.decode(obj.repr(), "unicode_escape"), end='')
 
 def println_builtin(args, env):
     for obj in args:
         if obj:
-            print(obj.repr())
+            print(codecs.decode(obj.repr(), "unicode_escape"))
 
 def exit_builtin(args, env):
     sys.exit(0)
@@ -87,13 +90,24 @@ def iofile_builtin(args, env):
     file_obj = Ad_File_Object(filename=filename.value, operator=operator.value)
     return file_obj
 
+
 def syssystem_builtin(args, env):
-    pass
+    proc = subprocess.Popen(args[0].value, stdout=subprocess.PIPE, shell=True)
+    output = proc.communicate()[0].decode("utf-8").strip()
+    result = Ad_String_Object(output)
+    return result
+
 
 def iosocket_builtin(args, env):
     socket_obj = Ad_Socket_Object(name=args[0], port=args[1], is_active=args[2],
                                   is_forever=args[3], is_client=args[4], is_server=args[5])
     return socket_obj
+
+
+def memory_address_builtin(args, env):
+    target = args[0]
+    result = Ad_String_Object(str(hex(id(target))))
+    return result
 
 def eval_builtin(args, env):
     unescaped_source = args[0]
@@ -107,7 +121,9 @@ def map_builtin(args, env):
     pass
 
 def input_builtin(args, env):
-    pass
+    value = input()
+    result = Ad_String_Object(value)
+    return result
 
 def list_builtin(args, env):
     if len(args) == 0:
@@ -130,7 +146,7 @@ def list_builtin(args, env):
             list_object = Ad_List_Object()
             list_object.elements = []
             for i in range(number_elements):
-                list_object.elements.append(default_object)
+                list_object.elements.append(copy.deepcopy(default_object))
             return list_object
 
 def mat_builtin(args, env):
@@ -218,6 +234,7 @@ builtins_map = {
     "__iofile": Ad_Builtin_Object(builtin_function=iofile_builtin),
     "__syssystem": Ad_Builtin_Object(builtin_function=syssystem_builtin),
     "__iosocket": Ad_Builtin_Object(builtin_function=iosocket_builtin),
+    "__memory_address": Ad_Builtin_Object(builtin_function=memory_address_builtin),
     "eval": Ad_Builtin_Object(builtin_function=eval_builtin),
     "__first": Ad_Builtin_Object(builtin_function=first_builtin),
     "__last": Ad_Builtin_Object(builtin_function=last_builtin),
