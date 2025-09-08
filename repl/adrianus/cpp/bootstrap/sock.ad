@@ -29,26 +29,58 @@ class ServerSocket {
     }
 }
 
+class ClientSocket {
+    // TODO: this needs more work
+    sock = null
+    port = null
+    host = null
+    server = null
+
+    def constructor(_host, _port) {
+        host = _host
+        port = _port
+        sock = __iosocket("client", host, port, true, false, false, true)
+    }
+
+    def connect() { // maybe this should be called something else
+    }
+
+    def send() { // sounds good, let's check
+    }
+
+    def receive() { // maybe not needed
+    }
+
+    def close() {
+        server.close()
+        sock.close()
+    }
+}
+
+/*
+    Simple echo server, mono-thread, does not close connextion
+*/
 class ForeverEchoServer {
 
     port = null
-    server = null
+    serverSocket = null
     message = ""
 
     def constructor(_port, _message) {
         port = _port
         message = _message
-        server = ServerSocket(port)
+        serverSocket = ServerSocket(port)
     }
 
     def start() {
+        println("[ LOG ] waiting on port: " + port)
         while(true) {
-            println("[ LOG ] waiting on port: " + port)
-            server.accept()
+            serverSocket.accept()
+            println("[ LOG ] handling request")
 
-            server.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+            serverSocket.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
 
-            /*server.close()*/
+            /*serverSocket.close()*/
         }
     }
 }

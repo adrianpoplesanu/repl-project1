@@ -3,6 +3,18 @@ class AdHTTPParser {
     version = "0.1"
 
     def constructor() {
-        logger.info("init AdHTTPParser version " + version + " ...")
+        logger.info("init AdHTTPParser version " + version + " ... done")
+    }
+
+    def getBody() {
+        return ""
+    }
+
+    def getHeaders() {
+        return ""
+    }
+
+    def getUri() {
+        return ""
     }
 }
