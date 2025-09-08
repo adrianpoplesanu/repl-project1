@@ -1,0 +1,86 @@
+class ServerSocket {
+    sock = null
+    port = null
+    client = null
+
+    def constructor(_port) {
+        port = _port
+        //println(port)
+        sock = __iosocket("server", "localhost", port, true, false, false, true)
+        sock.create_server()
+    }
+
+    def accept() {
+        client = sock.accept()
+    }
+
+    def read() {
+        response_message = client.read()
+        return response_message
+    }
+
+    def send(message) {
+        client.send(message)
+    }
+
+    def close() {
+        client.close()
+        sock.close()
+    }
+}
+
+class ClientSocket {
+    // TODO: this needs more work
+    sock = null
+    port = null
+    host = null
+    server = null
+
+    def constructor(_host, _port) {
+        host = _host
+        port = _port
+        sock = __iosocket("client", host, port, true, false, false, true)
+    }
+
+    def connect() { // maybe this should be called something else
+    }
+
+    def send() { // sounds good, let's check
+    }
+
+    def receive() { // maybe not needed
+    }
+
+    def close() {
+        server.close()
+        sock.close()
+    }
+}
+
+/*
+    Simple echo server, mono-thread, does not close connextion
+*/
+class ForeverEchoServer {
+
+    port = null
+    serverSocket = null
+    message = ""
+
+    def constructor(_port, _message) {
+        port = _port
+        message = _message
+        serverSocket = ServerSocket(port)
+    }
+
+    def start() {
+        println("[ LOG ] waiting on port: " + port)
+        while(true) {
+            serverSocket.accept()
+            println("[ LOG ] handling request")
+
+            serverSocket.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+
+            /*serverSocket.close()*/
+        }
+    }
+}

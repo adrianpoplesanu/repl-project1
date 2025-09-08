@@ -1,0 +1,21 @@
+class AdLogger {
+    top_level_descriptor = "AD"
+    low_level_descriptor = "default"
+
+    def constructor(_top_level_descriptor, _low_level_descriptor) {
+        top_level_descriptor = _top_level_descriptor
+        low_level_descriptor = _low_level_descriptor
+    }
+
+    def warning(message) {
+        println("[ " + top_level_descriptor + " ][ " + low_level_descriptor + " ][ WARN ] " + message)
+    }
+
+    def error(message) {
+        println("[ " + top_level_descriptor + " ][ " + low_level_descriptor + " ][ ERROR ] " + message)
+    }
+
+    def info(message) {
+        println("[ " + top_level_descriptor + " ][ " + low_level_descriptor + " ][ INFO ] " + message)
+    }
+}

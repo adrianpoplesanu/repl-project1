@@ -1,5 +1,5 @@
 class Test {
     def a() {
-        print ("Test bultin method")
+        println("Test bultin method")
     }
 }
