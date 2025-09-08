@@ -1,6 +1,16 @@
 from environment import new_environment
 
-bootstrap_files = ('bootstrap/file.ad', "bootstrap/test.ad", "bootstrap/string_utils.ad", "bootstrap/mat.ad", "bootstrap/sys.ad", )
+bootstrap_files = (
+    "bootstrap/file.ad",
+    "bootstrap/logger.ad",
+    "bootstrap/test.ad",
+    "bootstrap/mat.ad",
+    "bootstrap/string_utils.ad",
+    "bootstrap/sys.ad",
+    "bootstrap/test2.ad",
+    "bootstrap/sock.ad",
+    "bootstrap/net_utils.ad"
+)
 
 def load_bootstrap(program, parser, evaluator):
     #program.reset()
