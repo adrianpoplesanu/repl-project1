@@ -467,6 +467,8 @@ class ASTIndexExpression(ASTNode):
         self.token = token
         self.left = left
         self.index = index
+        self.index_end = None
+        self.step = None
 
     def token_literal(self):
         return self.token.literal

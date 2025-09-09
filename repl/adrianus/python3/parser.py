@@ -152,8 +152,9 @@ class Parser(object):
         stmt.value = self.parse_expression(PrecedenceType.LOWEST)
         if self.peek_token_is(TokenType.SEMICOLON) or self.peek_token_is(TokenType.RBRACE) or self.peek_token_is(TokenType.EOF):
             return stmt
-        while not self.current_token_is(TokenType.SEMICOLON) and not self.current_token_is(TokenType.RBRACE) and not self.current_token_is(TokenType.EOF):
-            self.next_token()
+        #while not self.current_token_is(TokenType.SEMICOLON) and not self.current_token_is(TokenType.RBRACE) and not self.current_token_is(TokenType.EOF):
+        #    self.next_token()
+        #self.next_token()
         return stmt
 
     def parse_break_statement(self):
@@ -400,12 +401,56 @@ class Parser(object):
             return None
         return elements
 
-    def parse_index_expression(self, left):
+    def parse_index_expression_old(self, left):
         expr = ASTIndexExpression(token=self.current_token, left=left)
         self.next_token()
         expr.index = self.parse_expression(PrecedenceType.LOWEST)
         if not self.expect_peek(TokenType.RBRACKET):
             return None
+        return expr
+
+    def parse_index_expression(self, left):
+        expr = ASTIndexExpression(token=self.current_token, left=left)
+        self.next_token()
+
+        if self.current_token_is(TokenType.COLON):
+            index = ASTNullExpression()
+            expr.index = index
+        else:
+            index = self.parse_expression(PrecedenceType.LOWEST)
+            expr.index = index
+            self.next_token()
+            if self.current_token_is(TokenType.RBRACKET):
+                return expr
+
+        self.next_token()
+
+        if self.current_token_is(TokenType.COLON):
+            index_end = ASTNullExpression()
+            expr.index_end = index_end
+        else:
+            index_end = self.parse_expression(PrecedenceType.LOWEST)
+            expr.index_end = index_end
+            self.next_token()
+            if self.current_token_is(TokenType.RBRACKET):
+                step = ASTInteger(self.current_token, 1)
+                expr.step = step
+                return expr
+
+        self.next_token()
+
+        if self.current_token_is(TokenType.RBRACKET):
+            step = ASTInteger(self.current_token, 1)
+            expr.step = step
+            return expr
+        else:
+            step = self.parse_expression(PrecedenceType.LOWEST)
+            self.next_token()
+            expr.step = step
+
+        if not self.current_token_is(TokenType.RBRACKET):
+            return None
+
         return expr
 
     def parse_hash_literal(self):
