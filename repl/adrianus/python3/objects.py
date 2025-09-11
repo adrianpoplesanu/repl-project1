@@ -98,10 +98,12 @@ class Ad_ReturnValue_Object(Ad_Object):
         self.value = value
 
     def inspect(self):
-        return self.value.inspect()
+        # return self.value.inspect()
+        return 'WARNING: return outside function'
 
     def repr(self):
-        return self.value.inspect()
+        # return self.value.inspect()
+        return 'WARNING: return outside function'
 
 
 class Ad_Break_Object(Ad_Object):
