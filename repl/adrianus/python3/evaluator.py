@@ -12,7 +12,7 @@ from builtin_funcs import builtins_map
 from utils import print_ast_nodes
 from handlers.file import read_file_content, write_file_content, append_file_content
 from thread_utils import thread_callback, thread_async_run, thread_blocking_run, thread_await
-from socket_utils import create_server, create_client, accept_socket, send_socket, read_socket, close_socket
+from socket_utils import create_server, create_client, accept_socket, send_socket, read_socket, close_socket, read_http
 
 NULLOBJECT = Ad_Null_Object()
 TRUE = Ad_Boolean_Object(value=True)
@@ -88,13 +88,7 @@ class Evaluator(object):
             list_obj = Ad_List_Object(elements=elements)
             return list_obj
         elif node.type == StatementType.INDEX_EXPRESSION:
-            left = self.eval(node.left, env)
-            if self.is_error(left):
-                return left
-            index = self.eval(node.index, env)
-            if self.is_error(index):
-                return index
-            return self.eval_index_expression(left, index)
+            return self.eval_index_expression(node, env)
         elif node.type == StatementType.HASH_LITERAL:
             return self.eval_hash_literal(node, env)
         elif node.type == StatementType.DEF_STATEMENT:
@@ -514,7 +508,82 @@ class Evaluator(object):
             return obj.type == ObjectType.ERROR
         return False
 
-    def eval_index_expression(self, left, index):
+    def eval_index_expression(self, node, env):
+        left = self.eval(node.left, env)
+        if self.is_error(left):
+            return left
+        index = self.eval(node.index, env)
+        if self.is_error(index):
+            return index
+
+        if node.index_end is not None:
+            index_end = self.eval(node.index_end, env)
+            step = None
+            if node.step is not None:
+                step = self.eval(node.step, env)
+
+                if (left.type == ObjectType.LIST and
+                        index.type == ObjectType.INTEGER and
+                        index_end.type == ObjectType.INTEGER and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_list_index_expression(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.LIST and
+                        index.type == ObjectType.NULL and
+                        index_end.type == ObjectType.INTEGER and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_list_index_expression_with_index_start_missing(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.LIST and
+                        index.type == ObjectType.INTEGER and
+                        index_end.type == ObjectType.NULL and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_list_index_expression_with_index_end_missing(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.LIST and
+                        index.type == ObjectType.NULL and
+                        index_end.type == ObjectType.NULL and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_list_index_expression_with_index_start_and_index_end_missing(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.LIST and
+                        index.type == ObjectType.NULL and
+                        index_end.type == ObjectType.NULL and
+                        (step is None or step.type == ObjectType.NULL)):
+                    result = self.eval_sub_list_index_expression_with_all_missing(left, index, index_end, step)
+                    return result
+
+                if (left.type == ObjectType.STRING and
+                        index.type == ObjectType.INTEGER and
+                        index_end.type == ObjectType.INTEGER and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_string_index_expression(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.STRING and
+                        index.type == ObjectType.NULL and
+                        index_end.type == ObjectType.INTEGER and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_string_index_expression_with_index_start_missing(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.STRING and
+                        index.type == ObjectType.INTEGER and
+                        index_end.type == ObjectType.NULL and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_string_index_expression_with_index_end_missing(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.STRING and
+                        index.type == ObjectType.NULL and
+                        index_end.type == ObjectType.NULL and
+                        (step is None or step.type == ObjectType.INTEGER)):
+                    result = self.eval_sub_string_index_expression_with_index_start_and_index_end_missing(left, index, index_end, step)
+                    return result
+                if (left.type == ObjectType.STRING and
+                        index.type == ObjectType.NULL and
+                        index_end.type == ObjectType.NULL and
+                        (step is None or step.type == ObjectType.NULL)):
+                    result = self.eval_sub_string_index_expression_with_all_missing(left, index, index_end, step)
+                    return result
+
         if left.type == ObjectType.LIST and index.type == ObjectType.INTEGER:
             return self.eval_list_index_expression(left, index)
         if left.type == ObjectType.HASH:
@@ -675,8 +744,8 @@ class Evaluator(object):
         #    return None
         evaluated = None
         evaluated = self.eval_file_object_method(node, env)
-        if evaluated and evaluated == NULLOBJECT:
-            return None
+        #if evaluated and evaluated == NULLOBJECT:
+        #    return None
         if evaluated:
             # this needs re-written, looks crappy
             return evaluated
@@ -937,8 +1006,13 @@ class Evaluator(object):
                 elif node.member.value == 'read':
                     result = read_socket(owner)
                     return result
+                elif node.member.value == 'readHTTP':
+                    result = read_http(owner)
+                    return result
                 elif node.member.value == 'close':
                     close_socket(owner)
+                else:
+                    print('[ Ad ][ sock ] unknown method called on sock object')
             else:
                 pass
             return NULLOBJECT
@@ -998,6 +1072,11 @@ class Evaluator(object):
                     left_obj.elements[i] = new_obj
                     returned_obj = Ad_Integer_Object(value)
                     return returned_obj
+                if left_obj.type == ObjectType.HASH:
+                    hashed = index_obj.hash_key()
+                    left_obj.pairs[hashed.value] = Hash_Pair(key=index_obj, value=new_obj)
+                    returned_obj = Ad_Integer_Object(value)
+                    return returned_obj
 
         # treat this as un identifier
         old_obj = env.get(node.name.value)
@@ -1045,3 +1124,63 @@ class Evaluator(object):
 
     def eval_null_expression(self, node, env):
         return NULLOBJECT
+
+    def eval_sub_list_index_expression(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        elements = left.elements[index.value:index_end.value:step.value]
+        result = Ad_List_Object(elements=elements)
+        return result
+
+    def eval_sub_list_index_expression_with_index_start_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        elements = left.elements[:index_end.value:step.value]
+        result = Ad_List_Object(elements=elements)
+        return result
+
+    def eval_sub_list_index_expression_with_index_end_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        elements = left.elements[index.value::step.value]
+        result = Ad_List_Object(elements=elements)
+        return result
+
+    def eval_sub_list_index_expression_with_index_start_and_index_end_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        elements = left.elements[::step.value]
+        result = Ad_List_Object(elements=elements)
+        return result
+
+    def eval_sub_list_index_expression_with_all_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        elements = left.elements[::1]
+        result = Ad_List_Object(elements=elements)
+        return result
+
+    def eval_sub_string_index_expression(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        value = left.value[index.value:index_end.value:step.value]
+        result = Ad_String_Object(value=value)
+        return result
+
+    def eval_sub_string_index_expression_with_index_start_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        value = left.value[:index_end.value:step.value]
+        result = Ad_String_Object(value=value)
+        return result
+
+    def eval_sub_string_index_expression_with_index_end_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        value = left.value[index.value::step.value]
+        result = Ad_String_Object(value=value)
+        return result
+
+    def eval_sub_string_index_expression_with_index_start_and_index_end_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        value = left.value[::step.value]
+        result = Ad_String_Object(value=value)
+        return result
+
+    def eval_sub_string_index_expression_with_all_missing(self, left, index, index_end, step):
+        # HINT: simplified form of function based on out-of-the-box python functionality
+        value = left.value[::1]
+        result = Ad_String_Object(value=value)
+        return result
