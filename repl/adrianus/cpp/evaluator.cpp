@@ -1509,14 +1509,12 @@ Ad_Object* Evaluator::EvalFileObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST
         }
         if (method_name == "write") {
             if (owner->_operator.find("w") != std::string::npos) {
-                std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env); // this needs consolidated somehow, looks like crap
-                // inspect on Ad_Object_String is bad, it needs to be printed out without "" in file writings
-                write_file_content(owner->filename, args_objs[0]->Inspect());
+                std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
+                write_file_content(owner->filename, args_objs[0]->repr());
                 return &NULLOBJECT;
             } else if (owner->_operator.find("a") != std::string::npos) {
-                std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env); // this needs consolidated somehow, looks like crap
-                // inspect on Ad_Object_String is bad, it needs to be printed out without "" in file writings
-                append_file_content(owner->filename, args_objs[0]->Inspect());
+                std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
+                append_file_content(owner->filename, args_objs[0]->repr());
                 return &NULLOBJECT;
             }
         }
