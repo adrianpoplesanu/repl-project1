@@ -1,4 +1,4 @@
-#ifndef __DEFINITION_H
-#define __DEFINITION_H
+#ifndef AD_VM_DEFINITION_H
+#define AD_VM_DEFINITION_H
 
 #endif

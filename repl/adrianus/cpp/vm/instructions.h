@@ -1,5 +1,5 @@
-#ifndef __INSTRUCTIONS_H
-#define __INSTRUCTIONS_H
+#ifndef AD_VM_INSTRUCTIONS_H
+#define AD_VM_INSTRUCTIONS_H
 
 class Instructions {
 public:

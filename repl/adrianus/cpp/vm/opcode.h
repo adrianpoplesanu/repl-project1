@@ -1,5 +1,5 @@
-#ifndef __OPCODE_H
-#define __OPCODE_H
+#ifndef AD_VM_OPCODE_H
+#define AD_VM_OPCODE_H
 
 enum OpCodeType {
     OP_CONSTANT,
@@ -55,280 +55,280 @@ public:
 
 class OpConstant : public OpCode {
 public:
-    OpConstant() {
+    OpConstant() : OpCode() {
         byteCode = OP_CONSTANT;
     }
 };
 
 class OpAdd : public OpCode {
 public:
-    OpAdd() {
+    OpAdd() : OpCode() {
         byteCode = OP_ADD;
     }
 };
 
 class OpSub : public OpCode {
 public:
-    OpSub() {
+    OpSub() : OpCode() {
         byteCode = OP_SUB;
     }
 };
 
 class OpMultiply : public OpCode {
 public:
-    OpMultiply() {
+    OpMultiply() : OpCode() {
         byteCode = OP_MULTIPLY;
     }
 };
 
 class OpDivide : public OpCode {
 public:
-    OpDivide() {
+    OpDivide() : OpCode() {
         byteCode = OP_DIVIDE;
     }
 };
 
 class OpPop : public OpCode {
 public:
-    OpPop() {
+    OpPop() : OpCode() {
         byteCode = OP_POP;
     }
 };
 
 class OpTrue : public OpCode {
 public:
-    OpTrue() {
+    OpTrue() : OpCode() {
         byteCode = OP_TRUE;
     }
 };
 
 class OpFalse : public OpCode {
 public:
-    OpFalse() {
+    OpFalse() : OpCode() {
         byteCode = OP_FALSE;
     }
 };
 
 class OpEquals : public OpCode {
 public:
-    OpEquals() {
+    OpEquals() : OpCode() {
         byteCode = OP_EQUALS;
     }
 };
 
 class OpNotEquals : public OpCode {
 public:
-    OpNotEquals() {
+    OpNotEquals() : OpCode() {
         byteCode = OP_NOTEQUALS;
     }
 };
 
 class OpGreaterThan : public OpCode {
 public:
-    OpGreaterThan() {
+    OpGreaterThan() : OpCode() {
         byteCode = OP_GREATERTHAN;
     }
 };
 
 class OpGreaterThanEqual : public OpCode {
 public:
-    OpGreaterThanEqual() {
+    OpGreaterThanEqual() : OpCode() {
         byteCode = OP_GREATERTHANEQUAL;
     }
 };
 
 class OpMinus : public OpCode {
 public:
-    OpMinus() {
+    OpMinus() : OpCode() {
         byteCode = OP_MINUS;
     }
 };
 
 class OpBang : public OpCode {
 public:
-    OpBang() {
+    OpBang() : OpCode() {
         byteCode = OP_BANG;
     }
 };
 
 class OpJumpNotTruthy : public OpCode {
 public:
-    OpJumpNotTruthy() {
+    OpJumpNotTruthy() : OpCode() {
         byteCode = OP_JUMP_NOT_TRUTHY;
     }
 };
 
 class OpJump : public OpCode {
 public:
-    OpJump() {
+    OpJump() : OpCode() {
         byteCode = OP_JUMP;
     }
 };
 
 class OpNull : public OpCode {
 public:
-    OpNull() {
+    OpNull() : OpCode() {
         byteCode = OP_NULL;
     }
 };
 
 class OpGetGlobal : public OpCode {
 public:
-    OpGetGlobal() {
+    OpGetGlobal() : OpCode() {
         byteCode = OP_GET_GLOBAL;
     }
 };
 
 class OpSetGlobal : public OpCode {
 public:
-    OpSetGlobal() {
+    OpSetGlobal() : OpCode() {
         byteCode = OP_SET_GLOBAL;
     }
 };
 
 class OpArray : public OpCode {
 public:
-    OpArray() {
+    OpArray() : OpCode() {
         byteCode = OP_ARRAY;
     }
 };
 
 class OpHash : public OpCode {
 public:
-    OpHash() {
+    OpHash() : OpCode() {
         byteCode = OP_HASH;
     }
 };
 
 class OpIndexExpression : public OpCode {
 public:
-    OpIndexExpression() {
+    OpIndexExpression() : OpCode() {
         byteCode = OP_INDEX_EXPRESSION;
     }
 };
 
 class OpCall : public OpCode {
 public:
-    OpCall() {
+    OpCall() : OpCode() {
         byteCode = OP_CALL;
     }
 };
 
 class OpReturnValue : public OpCode {
 public:
-    OpReturnValue() {
+    OpReturnValue() : OpCode() {
         byteCode = OP_RETURN_VALUE;
     }
 };
 
 class OpReturn : public OpCode {
 public:
-    OpReturn() {
+    OpReturn() : OpCode() {
         byteCode = OP_RETURN;
     }
 };
 
 class OpGetLocal : public OpCode {
 public:
-    OpGetLocal() {
+    OpGetLocal() : OpCode() {
         byteCode = OP_GET_LOCAL;
     }
 };
     
 class OpSetLocal : public OpCode {
 public:
-    OpSetLocal() {
+    OpSetLocal() : OpCode() {
         byteCode = OP_SET_LOCAL;
     }
 };
 
 class OpGetBuiltin : public OpCode {
 public:
-    OpGetBuiltin() {
+    OpGetBuiltin() : OpCode() {
         byteCode = OP_GET_BUILTIN;
     }
 };
 
 class OpClosure : public OpCode {
 public:
-    OpClosure() {
+    OpClosure() : OpCode() {
         byteCode = OP_CLOSURE;
     }
 };
 
 class OpGetFree : public OpCode {
 public:
-    OpGetFree() {
+    OpGetFree() : OpCode() {
         byteCode = OP_GET_FREE;
     }
 };
 
 class OpCurrentClosure : public OpCode {
 public:
-    OpCurrentClosure() {
+    OpCurrentClosure() : OpCode() {
         byteCode = OP_CURRENT_CLOSURE;
     }
 };
 
 class OpClass : public OpCode {
 public:
-    OpClass() {
+    OpClass() : OpCode() {
         byteCode = OP_CLASS;
     }
 };
 
 class OpSetMethod : public OpCode {
 public:
-    OpSetMethod() {
+    OpSetMethod() : OpCode() {
         byteCode = OP_SET_METHOD;
     }
 };
 
 class OpInstantiate : public OpCode {
 public:
-    OpInstantiate() {
+    OpInstantiate() : OpCode() {
         byteCode = OP_INSTANTIATE;
     }
 };
 
 class OpGetProperty : public OpCode {
 public:
-    OpGetProperty() {
+    OpGetProperty() : OpCode() {
         byteCode = OP_GET_PROPERTY;
     }
 };
     
 class OpSetProperty : public OpCode {
 public:
-    OpSetProperty() {
+    OpSetProperty() : OpCode() {
         byteCode = OP_SET_PROPERTY;
     }
 };
 
 class OpGetMethod : public OpCode {
 public:
-    OpGetMethod() {
+    OpGetMethod() : OpCode() {
         byteCode = OP_GET_METHOD;
     }
 };
     
 class OpInvoke : public OpCode {
 public:
-    OpInvoke() {
+    OpInvoke() : OpCode() {
         byteCode = OP_INVOKE;
     }
 };
 
 class OpSetPropertySym : public OpCode {
 public:
-    OpSetPropertySym() {
+    OpSetPropertySym() : OpCode() {
         byteCode = OP_SET_PROPERTY_SYM;
     }
 };
 
 class OpGetPropertySym : public OpCode {
 public:
-    OpGetPropertySym() {
+    OpGetPropertySym() : OpCode() {
         byteCode = OP_GET_PROPERTY_SYM;
     }
 };

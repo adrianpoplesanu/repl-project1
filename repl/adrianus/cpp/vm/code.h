@@ -1,4 +1,4 @@
-#ifndef __CODE_H
-#define __CODE_H
+#ifndef AD_VM_CODE_H
+#define AD_VM_CODE_H
 
 #endif

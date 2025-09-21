@@ -1,4 +1,4 @@
-#ifndef __SYMBOL_TABLE_H
-#define __SYMBOL_TABLE_H
+#ifndef AD_VM_SYMBOL_TABLE_H
+#define AD_VM_SYMBOL_TABLE_H
 
 #endif

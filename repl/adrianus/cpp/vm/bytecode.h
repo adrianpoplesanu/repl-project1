@@ -1,5 +1,5 @@
-#ifndef __BYTECODE_H
-#define __BYTECODE_H
+#ifndef AD_VM_BYTECODE_H
+#define AD_VM_BYTECODE_H
 
 #include "instructions.h"
 #include "../objects.h"

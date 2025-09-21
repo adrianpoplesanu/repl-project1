@@ -1,4 +1,4 @@
-#ifndef __FRAME_H
-#define __FRAME_H
+#ifndef AD_VM_FRAME_H
+#define AD_VM_FRAME_H
 
 #endif

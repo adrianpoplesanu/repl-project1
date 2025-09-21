@@ -1,54 +1,54 @@
-#ifndef __VM_OBJECTS_H
-#define __VM_OBJECTS_H
+#ifndef AD_VM_OBJECTS_H
+#define AD_VM_OBJECTS_H
 
 class AdCompiledFunction : public Ad_Object {
 public:
     AdCompiledFunction();
-    virtual std::string Inspect();
-	virtual void Print();
-	virtual Ad_Object_Type Type();
-	virtual std::string Hash();
-	virtual Ad_Object* copy(GarbageCollector*);
+    std::string Inspect() override;
+	void Print() override;
+	Ad_Object_Type Type() override;
+	std::string Hash() override;
+	Ad_Object* copy(GarbageCollector*) override;
 };
 
 class AdClosureObject : public Ad_Object {
 public:
 	AdClosureObject();
-    virtual std::string Inspect();
-	virtual void Print();
-	virtual Ad_Object_Type Type();
-	virtual std::string Hash();
-	virtual Ad_Object* copy(GarbageCollector*);
+    std::string Inspect() override;
+	void Print() override;
+	Ad_Object_Type Type() override;
+	std::string Hash() override;
+	Ad_Object* copy(GarbageCollector*) override;
 };
 
 class AdCompiledClass : public Ad_Object {
 public:
     AdCompiledClass();
-    virtual std::string Inspect();
-	virtual void Print();
-	virtual Ad_Object_Type Type();
-	virtual std::string Hash();
-	virtual Ad_Object* copy(GarbageCollector*);
+    std::string Inspect() override;
+	void Print() override;
+	Ad_Object_Type Type() override;
+	std::string Hash() override;
+	Ad_Object* copy(GarbageCollector*) override;
 };
 
 class AdCompiledInstance : public Ad_Object {
 public:
     AdCompiledInstance();
-    virtual std::string Inspect();
-	virtual void Print();
-	virtual Ad_Object_Type Type();
-	virtual std::string Hash();
-	virtual Ad_Object* copy(GarbageCollector*);
+    std::string Inspect() override;
+	void Print() override;
+	Ad_Object_Type Type() override;
+	std::string Hash() override;
+	Ad_Object* copy(GarbageCollector*) override;
 };
 
 class AdBoundMethod : public Ad_Object {
 public:
     AdBoundMethod();
-    virtual std::string Inspect();
-	virtual void Print();
-	virtual Ad_Object_Type Type();
-	virtual std::string Hash();
-	virtual Ad_Object* copy(GarbageCollector*);
+    std::string Inspect() override;
+	void Print() override;
+	Ad_Object_Type Type() override;
+	std::string Hash() override;
+	Ad_Object* copy(GarbageCollector*) override;
 };
 
 #endif
