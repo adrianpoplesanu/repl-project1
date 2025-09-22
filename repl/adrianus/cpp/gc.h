@@ -37,6 +37,7 @@ public:
     void sweepEnvironments();
     void markObjects();
     void markObject(Ad_Object*);
+    void markObjects(Ad_Object *stack[2048], int sp);
     void unmarkAllObjects();
     void sweepObjects();
     void sweepAstNodes();

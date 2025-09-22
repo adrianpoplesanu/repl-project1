@@ -13,6 +13,8 @@
 Repl::Repl() {
     garbageCollector = new GarbageCollector();
     evaluator.setGarbageCollector(garbageCollector);
+    compiler.gc = garbageCollector;
+    vm.gc = garbageCollector;
 }
 
 Repl::~Repl() {
@@ -35,7 +37,7 @@ void Repl::Loop() {
         std::string line;
         std::cout << ">> ";
         std::getline(std::cin, line);
-        bool end_singal = ParseLine(line);
+        bool end_singal = ExecuteLine(line);
         if (end_singal) {
             break;
         }
@@ -46,6 +48,18 @@ void Repl::Loop() {
     }
     evaluator.garbageCollector->forceFreeObjects(); // TODO: maybe have a wrapper in evaluator for this
     free_builtin_map();
+}
+
+void Repl::LoopVM() {
+    while (1) {
+        std::string line;
+        std::cout << ">> ";
+        std::getline(std::cin, line);
+        bool end_singal = ExecuteLineVM(line);
+        if (end_singal) {
+            break;
+        }
+    }
 }
 
 void Repl::ExecuteFile(std::ifstream &target) {
@@ -98,7 +112,11 @@ void Repl::ExecuteFile(std::ifstream &target) {
     free_builtin_map();
 }
 
-bool Repl::ParseLine(std::string line) {
+void Repl::ExecuteFileVM(std::ifstream &target) {
+    // TODO: implement this
+}
+
+bool Repl::ExecuteLine(std::string line) {
     parser.Load(line);
     program.reset();
     parser.ParseProgram(program);
@@ -107,5 +125,32 @@ bool Repl::ParseLine(std::string line) {
     if (res && res->Type() == OBJ_SIGNAL) {
         return true;
     }
+    return false;
+}
+
+bool Repl::ExecuteLineVM(std::string line) {
+    parser.Load(line);
+    program.reset();
+    parser.ParseProgram(program);
+
+    compiler.reset();
+    compiler.compile(program);
+
+    Bytecode bytecode = compiler.getBytecode();
+    compiler.code.instructions = bytecode.instructions;
+    std::cout << compiler.code.toString(); // asta pare ca functioneaza cum trebuie
+
+    vm.load(bytecode);
+    vm.run();
+
+    garbageCollector->unmarkAllObjects();
+    garbageCollector->markObjects(vm.stack, vm.sp);
+    garbageCollector->sweepObjects();
+
+    Ad_Object* result = vm.last_popped_stack_element();
+    if (result != NULL) {
+        std::cout << result->Inspect() << "\n";
+    }
+
     return false;
 }

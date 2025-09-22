@@ -292,3 +292,7 @@ void GarbageCollector::forceFreeObjects() {
     unmarkAllObjects();
     sweepObjects();
 }
+
+void GarbageCollector::markObjects(Ad_Object **stack, int sp) {
+
+}

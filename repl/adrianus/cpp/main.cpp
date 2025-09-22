@@ -73,13 +73,30 @@ int main(int argc, char *argv[]) {
 	}
 	Repl repl;
 	if (argc == 1) {
-		std::cout << "Ad interpreter [C++]... v3.0.1\n";
+		std::cout << "Ad interpreter [C++]... v4.0.1\n";
 	    repl.Loop();
     } else {
-		for (int i = 1; i < argc; i++) {
-			std::ifstream target(argv[i]);
-			repl.ExecuteFile(target);
-		}
+        if (argc == 2) {
+            if (argv[1] == std::string("-vm")) {
+                std::cout << "Ad interpreter [C++][vm]... v4.0.1\n";
+                repl.LoopVM();
+            } else {
+                std::ifstream target(argv[1]);
+                repl.ExecuteFile(target);
+            }
+        } else {
+            if (argv[1] == std::string("-vm")) {
+                for (int i = 2; i < argc; i++) {
+                    std::ifstream target(argv[i]);
+                    repl.ExecuteFileVM(target);
+                }
+            } else {
+                for (int i = 1; i < argc; i++) {
+                    std::ifstream target(argv[i]);
+                    repl.ExecuteFile(target);
+                }
+            }
+        }
 	}
 	if (SHOW_RUNNING_TIME) {
         executionTimeProfiling.stop();
