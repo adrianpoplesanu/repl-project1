@@ -1,10 +1,10 @@
 
 #include "definition.h"
 
-Definition::Definition(std::string name, int size, int *operandWidths) {
-
+Definition::Definition(std::string n, int s, int *ow) {
+    name = n;
+    size = s;
+    operandWidths = ow;
 }
 
-Definition::~Definition() {
-
-}
+Definition::~Definition() = default;

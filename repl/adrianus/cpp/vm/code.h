@@ -8,6 +8,7 @@ public:
     Instructions instructions;
     std::map<unsigned char, Definition*> definitionsMap;
 
+    Code();
     std::string toString();
 };
 
