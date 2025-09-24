@@ -7,4 +7,6 @@ Definition::Definition(std::string n, int s, int *ow) {
     operandWidths = ow;
 }
 
-Definition::~Definition() = default;
+Definition::~Definition() {
+    delete[] operandWidths;
+}

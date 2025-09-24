@@ -9,6 +9,7 @@ public:
     std::map<unsigned char, Definition*> definitionsMap;
 
     Code();
+    ~Code();
     std::string toString();
 };
 
