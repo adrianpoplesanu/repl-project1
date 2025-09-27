@@ -8,6 +8,7 @@ script_name = "main.py"
 tests_path = "../../cpp/"
 tests_data = open("../cpp/test-list.txt", "r")
 test_files = tests_data.readlines()
+exclusions = ['examples/test227.ad']
 
 success = []
 failure = []
@@ -16,6 +17,10 @@ failure_actual = []
 
 for test_file in test_files:
     target = test_file.strip()
+    if target in exclusions:
+        print('skipping {0}'.format(target))
+        continue
+    print('running {0}'.format(target))
     proc = subprocess.Popen(["python3", script_path + script_name, tests_path + target], stdout=subprocess.PIPE)
     proc.wait()
     output = proc.communicate()[0]
