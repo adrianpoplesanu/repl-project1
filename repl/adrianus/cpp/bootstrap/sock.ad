@@ -30,7 +30,6 @@ class ServerSocket {
 }
 
 class ClientSocket {
-    // TODO: this needs more work
     sock = null
     port = null
     host = null
@@ -39,16 +38,17 @@ class ClientSocket {
     def constructor(_host, _port) {
         host = _host
         port = _port
-        sock = __iosocket("client", host, port, true, false, false, true)
+        sock = __iosocket("client", host, port, true, false, true, false)
+        sock.create_client()
     }
 
-    def connect() { // maybe this should be called something else
+    def send(message) {
+        sock.send(message)
     }
 
-    def send() { // sounds good, let's check
-    }
-
-    def receive() { // maybe not needed
+    def read() {
+        response_message = sock.read()
+        return response_message
     }
 
     def close() {

@@ -1,0 +1,3 @@
+client = ClientSocket("localhost", 5003)
+message = client.read()
+println(message)
