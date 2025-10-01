@@ -1,0 +1,31 @@
+class Requests {
+    def get(host=null, payload=null) {
+        //println("aaa")
+        //port = 443
+        //println("bbb")
+        //if (StringUtils.startsWith(host, "http://")) {
+        //    port = 80
+        //}
+        port = 80
+        //println("ccc")
+        client = ClientSocket(host, port)
+        //println("ddd")
+        a = "GET / HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n"
+        println(a)
+        client.send(a)
+        //println("eee")
+        message = client.read()
+        //println("fff")
+        return message
+        //return "caca"
+    }
+
+    /*def get(host=null, port=null, payload=null) {
+        client = ClientSocket(host, port)
+        client.send(payload)
+        message = client.read()
+        return message
+    }*/
+}
+
+requests = Requests()
