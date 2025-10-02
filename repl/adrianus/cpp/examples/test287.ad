@@ -1,0 +1,5 @@
+httpParser = AdHTTPParser()
+
+println("====")
+println(httpParser.mapToQueryParams({"aaa": "bbb"}))
+println("====")

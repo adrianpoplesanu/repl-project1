@@ -1,0 +1,4 @@
+response = requests.get("adrianus.ro", "?aaa=bbb")
+println("=== BEGIN RESPONSE =================================")
+println(response)
+println("=== END RESPONSE ===================================")
