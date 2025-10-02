@@ -39,6 +39,19 @@ class _StringUtils {
         return result
     }
 
+    def splitFirst(target, delim) {
+        result = []
+        original = target
+        found = indexOf(target, delim)
+        if (found != -1) {
+            value = substring(target, 0, found)
+            __append(result, value)
+            value = substring(target, found + len(delim), len(target))
+            __append(result, value)
+        }
+        return result
+    }
+
     def startsWith(target, lookup) {
         size_target = len(target)
         size_lookup = len(lookup)

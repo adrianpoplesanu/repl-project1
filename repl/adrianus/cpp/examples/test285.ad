@@ -1,0 +1,6 @@
+println(StringUtils.splitFirst("aaa/bbb/ccc", "/"))
+println(StringUtils.splitFirst("", "/"))
+println(StringUtils.splitFirst("/", "/"))
+println(StringUtils.splitFirst("/aaa", "/"))
+println(StringUtils.splitFirst("/aaa/bbb", "/"))
+println(StringUtils.splitFirst("/aaa/bbb/ccc/", "/"))
