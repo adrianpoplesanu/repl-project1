@@ -1539,7 +1539,8 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
                 create_server(owner_obj_raw);
             }
             else if (member_ident->value == "create_client") {
-                create_client(owner_obj_raw);
+                //create_client(owner_obj_raw);
+                create_client2(owner_obj_raw);
             }
             else if (member_ident->value == "accept") {
                 Ad_Object* result = accept_socket(owner_obj_raw);
@@ -1555,8 +1556,14 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
                 garbageCollector->addObject(result);
                 return result;
             }
-            else if (member_ident->value == "readHTTP"){
+            else if (member_ident->value == "readHTTP") {
                 Ad_Object* result = readHTTP(owner_obj_raw);
+                garbageCollector->addObject(result);
+                return result;
+            }
+            else if (member_ident->value == "sendAndReadBackHTTP") {
+                std::vector<Ad_Object*> args_obj = EvalExpressions(args, env);
+                Ad_Object* result = sendAndReadBackHTTP(owner_obj_raw, args_obj.at(0));
                 garbageCollector->addObject(result);
                 return result;
             }
