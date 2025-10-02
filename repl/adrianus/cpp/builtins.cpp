@@ -175,6 +175,16 @@ Ad_Object* type_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageC
     return obj; // TODO: check for potential memory leak
 }
 
+Ad_Object* keys_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    Ad_Hash_Object *target = (Ad_Hash_Object*) args[0];
+    Ad_List_Object *result = new Ad_List_Object();
+    for (auto pair : target->pairs) {
+        result->elements.push_back(pair.second.GetKey()->copy(gc));
+    }
+    gc->addObject(result);
+    return result;
+}
+
 Ad_Object* append_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_List_Object* target = (Ad_List_Object*)args[0];
     Ad_Object* obj = args[1];
@@ -467,6 +477,13 @@ Ad_Object* str_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCo
     return result;
 }
 
+Ad_Object* repr_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    Ad_Object* target = args[0];
+    auto* result = new Ad_String_Object(target->repr());
+    gc->addObject(result);
+    return result;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -475,6 +492,7 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"println", new Ad_Builtin_Object(&println_builtin)},
     {"ref_count", new Ad_Builtin_Object(&ref_count)},
     {"type", new Ad_Builtin_Object(&type_builtin)},
+    {"__keys", new Ad_Builtin_Object(&keys_builtin)},
     {"__append", new Ad_Builtin_Object(&append_builtin)},
     {"__pop", new Ad_Builtin_Object(&pop_builtin)},
     {"__remove", new Ad_Builtin_Object(&remove_builtin)},
@@ -502,7 +520,8 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"import", new Ad_Builtin_Object(&import_builtin)},
     {"sleep", new Ad_Builtin_Object(&sleep_builtin)},
     {"delay", new Ad_Builtin_Object(&sleep_builtin)},
-    {"str", new Ad_Builtin_Object(&str_builtin)}
+    {"str", new Ad_Builtin_Object(&str_builtin)},
+    {"repr", new Ad_Builtin_Object(&repr_builtin)}
     // eval
     // first
     // input
