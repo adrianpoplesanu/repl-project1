@@ -1,31 +1,79 @@
-class Requests {
-    def get(host=null, payload=null) {
-        //println("aaa")
-        //port = 443
-        //println("bbb")
-        //if (StringUtils.startsWith(host, "http://")) {
-        //    port = 80
-        //}
-        port = 80
-        //println("ccc")
-        client = ClientSocket(host, port)
-        //println("ddd")
-        a = "GET / HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n"
-        println(a)
-        client.send(a)
-        //println("eee")
-        message = client.read()
-        //println("fff")
-        return message
-        //return "caca"
+class _Requests {
+    httpParser = null
+    logger = null
+
+    def constructor() {
+        httpParser = AdHTTPParser()
+        logger = AdLogger("BOOT", "requests")
     }
 
-    /*def get(host=null, port=null, payload=null) {
+    def get(host=null, payload=null) {
+        port = 80
         client = ClientSocket(host, port)
-        client.send(payload)
+        req = "GET / HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n"
+        //println(req)
+        client.send(req) // combine this send and read in one method
         message = client.read()
         return message
-    }*/
+    }
+
+    def get2(host=null, payload=null) {
+        port = 80
+        valid = false
+        if (StringUtils.startsWith(host, "http://")) {
+            valid = true
+        }
+        if (StringUtils.startsWith(host, "https://")) {
+            valid = true
+            port = 443
+        }
+        if (!valid) {
+            println("[ BOOT ][ request.get2 ] missing schema, maybe add http:// or https://")
+            return null
+        }
+        client = ClientSocket(host, port)
+        req = "GET / HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n"
+        //println(req)
+        //println(type(client))
+        message = client.sendAndReadBackHTTP(req)
+        return message
+    }
+
+    def get3(url=null, payload=null) {
+        if (!httpParser.isValidHost(url)) {
+            logger.error(url + " is missing schema, maybe add http:// or https://")
+            return null
+        }
+
+        port = 80
+        is_https_call = httpParser.isHTTPS(url)
+        if (is_https_call) {
+            port = 443
+        }
+
+        url_without_protocol = httpParser.removeProtocol(url)
+        domain = httpParser.getDomain(url_without_protocol)
+        uri = httpParser.getUri(url_without_protocol)
+        if (!StringUtils.startsWith(uri, "/")) {
+            uri = "/" + uri
+        }
+
+        queryParams = httpParser.mapToQueryParams(payload)
+
+        request = "GET " + uri + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+        if (queryParams != "") {
+            request = "GET " + uri + queryParams + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+        }
+
+        client = ClientSocket(domain, port)
+        message = null
+        if (is_https_call) {
+            message = client.sendAndReadBackHTTPS(request)
+        } else {
+            message = client.sendAndReadBackHTTP(request)
+        }
+        return message
+    }
 }
 
-requests = Requests()
+requests = _Requests()

@@ -14,7 +14,59 @@ class AdHTTPParser {
         return ""
     }
 
-    def getUri() {
-        return ""
+    def getUri(path_without_protocol) {
+        tokens = StringUtils.splitFirst(path_without_protocol, "/")
+        if (len(tokens) < 2) {
+            return "/"
+        }
+        uri = tokens[1]
+
+        if (uri == "") {
+            uri = "/"
+        }
+        return uri
+    }
+
+    def getDomain(path_without_protocol) {
+        tokens = StringUtils.splitFirst(path_without_protocol, "/")
+        if (len(tokens) < 1) {
+            return "127.0.0.1" // TODO: check this
+        }
+        domain = tokens[0]
+        return domain
+    }
+
+    def isValidHost(path) {
+        return StringUtils.startsWith(path, "http://") or StringUtils.startsWith(path, "https://")
+    }
+
+    def isHTTPS(path) {
+        return StringUtils.startsWith(path, "https://")
+    }
+
+    def removeProtocol(path) {
+        if (StringUtils.startsWith(path, "http://")) {
+            return StringUtils.substring(path, 7, len(path))
+        }
+
+        if (StringUtils.startsWith(path, "https://")) {
+            return StringUtils.substring(path, 8, len(path))
+        }
+
+        return path
+    }
+
+    def mapToQueryParams(source) {
+        result = ""
+        keys = __keys(source)
+        for (i = 0; i < len(keys); i++) {
+            if (result == "") {
+                result = "?"
+            } else {
+                result = result + "&"
+            }
+            result = result + repr(keys[i]) + "=" + repr(source[keys[i]])
+        }
+        return result
     }
 }

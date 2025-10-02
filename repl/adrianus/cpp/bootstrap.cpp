@@ -15,7 +15,8 @@ std::vector<std::string> bootstrap_files {
     "bootstrap/sys.ad",
     "bootstrap/test2.ad",
     "bootstrap/sock.ad",
-    "bootstrap/net_utils.ad"
+    "bootstrap/net_utils.ad",
+    "bootstrap/requests.ad"
 };
 
 void add_bootstrap_code(Ad_AST_Program &program, Parser parser, Evaluator *evaluator, Environment& env, std::string source) {

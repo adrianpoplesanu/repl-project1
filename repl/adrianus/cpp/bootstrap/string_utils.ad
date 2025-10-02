@@ -48,6 +48,8 @@ class _StringUtils {
             __append(result, value)
             value = substring(target, found + len(delim), len(target))
             __append(result, value)
+        } else {
+            __append(result, original)
         }
         return result
     }

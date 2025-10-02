@@ -51,6 +51,16 @@ class ClientSocket {
         return response_message
     }
 
+    def sendAndReadBackHTTP(req) {
+        response_message = sock.sendAndReadBackHTTP(req)
+        return response_message
+    }
+
+    def sendAndReadBackHTTPS(req) {
+        response_message = sock.sendAndReadBackHTTPS(req)
+        return response_message
+    }
+
     def close() {
         server.close()
         sock.close()
