@@ -4,6 +4,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 std::string cleanupUnescapedCharaters(std::string text) {
     std::string result;
@@ -221,11 +223,56 @@ Ad_Object* sendAndReadBackHTTP(Ad_Object* rawSocket, Ad_Object* rawString) {
     return result;
 }
 
-void sendAndReadBackHTTPS(Ad_Object* rawSocket, Ad_Object* rawString) {
+Ad_Object* sendAndReadBackHTTPS(Ad_Object* rawSocket, Ad_Object* rawString) {
     Ad_Socket_Object* socketObject = (Ad_Socket_Object*) rawSocket;
     Ad_String_Object* stringObject = (Ad_String_Object*) rawString;
 
-    // TODO write this
+    std::string payload = stringObject->value;
+
+    SSL_library_init();
+    SSL_load_error_strings();
+    const SSL_METHOD* method = TLS_client_method();
+    SSL_CTX* ctx = SSL_CTX_new(method);
+    if (!ctx) {
+        ERR_print_errors_fp(stderr);
+        return nullptr;
+    }
+
+    SSL* ssl = SSL_new(ctx);
+    SSL_set_fd(ssl, socketObject->connfd);
+
+    // Step 3: TLS handshake
+    if (SSL_connect(ssl) != 1) {
+        ERR_print_errors_fp(stderr);
+        SSL_free(ssl);
+        SSL_CTX_free(ctx);
+        close(socketObject->connfd);
+        return nullptr;
+    }
+
+    std::string request = cleanupUnescapedCharaters(payload);
+
+    // Step 5: Send request via SSL
+    if (SSL_write(ssl, request.c_str(), request.size()) <= 0) {
+        ERR_print_errors_fp(stderr);
+    }
+
+    // Step 6: Read response into a string
+    std::string response;
+    char buffer[4096];
+    int bytes;
+    while ((bytes = SSL_read(ssl, buffer, sizeof(buffer))) > 0) {
+        response.append(buffer, bytes);
+    }
+
+    // Cleanup
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+    SSL_CTX_free(ctx);
+    close(socketObject->connfd);
+
+    Ad_String_Object* result = new Ad_String_Object(response);
+    return result;
 }
 
 void send_socket(Ad_Object* rawSocket, Ad_Object* rawString) {
