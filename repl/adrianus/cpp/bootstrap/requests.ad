@@ -32,14 +32,54 @@ class _Requests {
             return null
         }
         client = ClientSocket(host, port)
-        req = "GET / HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n"
+        //req = "GET / HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n" // this does not, domain needs to be extracted
+        req = "GET / HTTP/1.1\r\nHost: adrianus.ro\r\nConnection: close\r\n\r\n" // this works
         //println(req)
         //println(type(client))
         message = client.sendAndReadBackHTTP(req)
         return message
     }
 
-    def get3(url=null, payload=null) {
+    def get3(url=null, payload=null, headers=null) {
+        if (!httpParser.isValidHost(url)) {
+            logger.error(url + " is missing schema, maybe add http:// or https://")
+            return null
+        }
+
+        port = 80
+        is_https_call = httpParser.isHTTPS(url)
+        if (is_https_call) {
+            port = 443
+        }
+
+        url_without_protocol = httpParser.removeProtocol(url)
+        domain = httpParser.getDomain(url_without_protocol)
+        uri = httpParser.getUri(url_without_protocol)
+        if (!StringUtils.startsWith(uri, "/")) {
+            uri = "/" + uri
+        }
+
+        queryParams = ""
+        if ((payload != null) and (type(payload) == 'HASH')) {
+            queryParams = httpParser.mapToQueryParams(payload)
+        }
+
+        request = "GET " + uri + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+        if (queryParams != "") {
+            request = "GET " + uri + queryParams + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+        }
+
+        client = ClientSocket(domain, port)
+        message = null
+        if (is_https_call) {
+            message = client.sendAndReadBackHTTPS(request)
+        } else {
+            message = client.sendAndReadBackHTTP(request)
+        }
+        return message
+    }
+
+    def post(url=null, payload=null, headers=null) {
         if (!httpParser.isValidHost(url)) {
             logger.error(url + " is missing schema, maybe add http:// or https://")
             return null
@@ -60,9 +100,9 @@ class _Requests {
 
         queryParams = httpParser.mapToQueryParams(payload)
 
-        request = "GET " + uri + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+        request = "POST " + uri + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
         if (queryParams != "") {
-            request = "GET " + uri + queryParams + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+            request = "POST " + uri + queryParams + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
         }
 
         client = ClientSocket(domain, port)
