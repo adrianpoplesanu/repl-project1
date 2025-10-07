@@ -1,0 +1,59 @@
+''' Metoda asta pusa in socket_utils si apelata face un GET la adrianus.ro'''
+
+int test_send() {
+    const char* host = "adrianus.ro";
+    const char* port = "80";
+    const char* path = "/";
+
+    // Resolve hostname
+    addrinfo hints{}, *res;
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    if (getaddrinfo(host, port, &hints, &res) != 0) {
+        perror("getaddrinfo");
+        return 1;
+    }
+
+    // Create socket
+    int sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (sock < 0) {
+        perror("socket");
+        freeaddrinfo(res);
+        return 1;
+    }
+
+    // Connect
+    if (connect(sock, res->ai_addr, res->ai_addrlen) < 0) {
+        perror("connect");
+        close(sock);
+        freeaddrinfo(res);
+        return 1;
+    }
+    freeaddrinfo(res);
+
+    // Build HTTP GET request
+    std::string request =
+            "GET " + std::string(path) + " HTTP/1.1\r\n"
+                                         "Host: " + std::string(host) + "\r\n"
+                                                                        "Connection: close\r\n"
+                                                                        "\r\n";
+
+    // Send request
+    ssize_t sent = write(sock, request.c_str(), request.size());
+    if (sent < 0) {
+        perror("write");
+        close(sock);
+        return 1;
+    }
+
+    // Read response
+    char buffer[4096];
+    ssize_t bytes;
+    while ((bytes = read(sock, buffer, sizeof(buffer))) > 0) {
+        std::cout.write(buffer, bytes);
+    }
+
+    close(sock);
+    return 0;
+}
