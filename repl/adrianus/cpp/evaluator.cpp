@@ -278,7 +278,7 @@ Ad_Object* Evaluator::EvalInfixExpression(std::string _operator, Ad_Object* left
     if (left->Type() == OBJ_FLOAT && right->Type() == OBJ_FLOAT) {
         return EvalFloatInfixExpression(_operator, left, right);
     }
-    std::cout << "eval infix expression will return NULL\n";
+    std::cout << "[ INTERNAL] eval infix expression will return NULL: " << left->Inspect() << " " << _operator << " " << right->Inspect() << "\n";
     return NULL;
 }
 
@@ -1564,6 +1564,12 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
             else if (member_ident->value == "sendAndReadBackHTTP") {
                 std::vector<Ad_Object*> args_obj = EvalExpressions(args, env);
                 Ad_Object* result = sendAndReadBackHTTP(owner_obj_raw, args_obj.at(0));
+                garbageCollector->addObject(result);
+                return result;
+            }
+            else if (member_ident->value == "sendAndReadBackHTTPS") {
+                std::vector<Ad_Object*> args_obj = EvalExpressions(args, env);
+                Ad_Object* result = sendAndReadBackHTTPS(owner_obj_raw, args_obj.at(0));
                 garbageCollector->addObject(result);
                 return result;
             }
