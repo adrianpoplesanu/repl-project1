@@ -10,10 +10,10 @@ enum OpCodeType {
     OP_POP,
     OP_TRUE,
     OP_FALSE,
-    OP_EQUALS,
-    OP_NOTEQUALS,
+    OP_EQUAL,
+    OP_NOTEQUAL,
     OP_GREATERTHAN,
-    OP_GREATERTHANEQUAL,
+    OP_GREATERTHAN_EQUAL,
     OP_MINUS,
     OP_BANG,
     OP_JUMP_NOT_TRUTHY,
@@ -23,7 +23,7 @@ enum OpCodeType {
     OP_SET_GLOBAL,
     OP_ARRAY,
     OP_HASH,
-    OP_INDEX_EXPRESSION,
+    OP_INDEX,
     OP_CALL,
     OP_RETURN_VALUE,
     OP_RETURN,
@@ -45,7 +45,9 @@ enum OpCodeType {
     OP_INVOKE,
 
     OP_SET_PROPERTY_SYM,
-    OP_GET_PROPERTY_SYM
+    OP_GET_PROPERTY_SYM,
+
+    OP_PATCH_PROPERTY_SYM
 };
 
 class OpCode {
@@ -109,17 +111,17 @@ public:
     }
 };
 
-class OpEquals : public OpCode {
+class OpEqual : public OpCode {
 public:
-    OpEquals() : OpCode() {
-        byteCode = OP_EQUALS;
+    OpEqual() : OpCode() {
+        byteCode = OP_EQUAL;
     }
 };
 
-class OpNotEquals : public OpCode {
+class OpNotEqual : public OpCode {
 public:
-    OpNotEquals() : OpCode() {
-        byteCode = OP_NOTEQUALS;
+    OpNotEqual() : OpCode() {
+        byteCode = OP_NOTEQUAL;
     }
 };
 
@@ -133,7 +135,7 @@ public:
 class OpGreaterThanEqual : public OpCode {
 public:
     OpGreaterThanEqual() : OpCode() {
-        byteCode = OP_GREATERTHANEQUAL;
+        byteCode = OP_GREATERTHAN_EQUAL;
     }
 };
 
@@ -200,10 +202,10 @@ public:
     }
 };
 
-class OpIndexExpression : public OpCode {
+class OpIndex : public OpCode {
 public:
-    OpIndexExpression() : OpCode() {
-        byteCode = OP_INDEX_EXPRESSION;
+    OpIndex() : OpCode() {
+        byteCode = OP_INDEX;
     }
 };
 
@@ -330,6 +332,13 @@ class OpGetPropertySym : public OpCode {
 public:
     OpGetPropertySym() : OpCode() {
         byteCode = OP_GET_PROPERTY_SYM;
+    }
+};
+
+class OpPatchPropertySym : public OpCode {
+public:
+    OpPatchPropertySym() : OpCode() {
+        byteCode = OP_PATCH_PROPERTY_SYM;
     }
 };
 
