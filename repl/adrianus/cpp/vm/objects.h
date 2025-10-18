@@ -1,6 +1,10 @@
 #ifndef AD_VM_OBJECTS_H
 #define AD_VM_OBJECTS_H
 
+#include <string>
+#include "../objects.h"
+#include "../gc.h"
+
 class AdCompiledFunction : public Ad_Object {
 public:
     AdCompiledFunction();

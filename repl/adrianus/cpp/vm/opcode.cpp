@@ -1,3 +1,5 @@
+#include "opcode.h"
+
 OpConstant opConstant;
 OpAdd opAdd;
 OpSub opSub;

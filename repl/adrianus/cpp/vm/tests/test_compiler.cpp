@@ -4,12 +4,8 @@
 #include <vector>
 #include "../compiler.h"
 #include "../opcode.h"
-
-// Forward declarations to avoid complex dependencies
-class GarbageCollector {
-public:
-    // Minimal implementation for testing
-};
+#include "../objects.h"
+#include "../../gc.h"
 
 void test_compiler_constructor() {
     std::cout << "running test_compiler_constructor...\n";
