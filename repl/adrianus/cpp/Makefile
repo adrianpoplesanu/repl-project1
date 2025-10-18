@@ -6,5 +6,13 @@ clean:
 	find . -type f ! -name "*.h" ! -name "*.cpp" ! -name "README.md" ! -name "Makefile" ! -name "*.*" -delete
 	find . -name "*.o" -delete
 
+test-code:
+	g++ -std=c++17 -g vm/tests/test_code.cpp vm/code.cpp vm/definition.cpp vm/instructions.cpp -o test_code
+	./test_code
+
+test-compiler:
+	g++ -std=c++17 -g vm/tests/test_compiler_simple.cpp vm/code.cpp vm/definition.cpp vm/instructions.cpp -o test_compiler_simple
+	./test_compiler_simple
+
 clean-win:
 	del token.o lexer.o ast.o parser.o objects.o evaluator.o repl.o main.o main.exe
