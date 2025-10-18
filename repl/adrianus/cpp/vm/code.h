@@ -2,6 +2,10 @@
 #define AD_VM_CODE_H
 
 #include "definition.h"
+#include "instructions.h"
+#include <sstream>
+#include <iomanip>
+#include <map>
 
 class Code {
 public:
@@ -11,6 +15,10 @@ public:
     Code();
     ~Code();
     std::string toString();
+
+private:
+    std::string disassembleInstruction(int offset);
+    int getInstructionWidth(int offset);
 };
 
 #endif
