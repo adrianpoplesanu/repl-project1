@@ -3,11 +3,22 @@
 #include <iostream>
 
 Compiler::Compiler() {
-    //...
+    constants.clear();
+    gc = nullptr;
+    scopeIndex = 0;
+    // bytecode, instructions, and scopes are initialized by their default constructors
+}
+
+Compiler::Compiler(GarbageCollector* gc) {
+    constants.clear();
+    this->gc = gc;
+    scopeIndex = 0;
+    // bytecode, instructions, and scopes are initialized by their default constructors
 }
 
 void Compiler::reset() {
-    //...
+    instructions = Instructions();
+    bytecode = Bytecode();
 }
 
 void Compiler::compile(Ad_AST_Program node) {
@@ -15,7 +26,10 @@ void Compiler::compile(Ad_AST_Program node) {
 }
 
 Bytecode Compiler::getBytecode() {
-    return Bytecode(); // TODO: fix this
+    Bytecode bytecode;
+    bytecode.instructions = code.instructions;
+    bytecode.constants = constants;
+    return bytecode;
 }
 
 Definition* Compiler::lookup(OpCodeType op) {
@@ -93,5 +107,25 @@ int Compiler::addInstruction(int size, std::vector<unsigned char> instruction) {
 void Compiler::setLastInstruction(OpCodeType op, int pos) {
     // TODO: Implement last instruction tracking if needed
     // This might be used for jump instruction backpatching or other optimizations
+}
+
+// Constants management implementation
+int Compiler::addConstant(Ad_Object* obj) {
+    constants.push_back(obj);
+    return constants.size() - 1; // Return the index of the added constant
+}
+
+Ad_Object* Compiler::getConstant(int index) {
+    if (index >= 0 && index < constants.size()) {
+        return constants[index];
+    }
+    return nullptr; // Return nullptr for invalid index
+}
+
+Instructions Compiler::currentInstructions() {
+    if (scopeIndex >= 0 && scopeIndex < scopes.size()) {
+        return scopes[scopeIndex].instructions;
+    }
+    return Instructions(); // Return empty instructions if scope index is invalid
 }
 
