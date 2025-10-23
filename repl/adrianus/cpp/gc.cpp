@@ -1,4 +1,7 @@
 #include "gc.h"
+#include "environment.h"
+#include "objects.h"
+#include "ast.h"
 
 GarbageCollector::GarbageCollector() {
     head = NULL;

@@ -1,9 +1,11 @@
 #ifndef __GC_H
 #define __GC_H
 
-#include "environment.h"
-#include "objects.h"
-#include "ast.h"
+#include <vector>
+
+class Environment;
+class Ad_Object;
+class Ad_AST_Node;
 
 class GarbageCollector {
 public:
