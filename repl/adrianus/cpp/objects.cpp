@@ -1,10 +1,35 @@
 #include "objects.h"
+#include "gc.h"
 #include "environment.h"
 #include "listobject.h"
 #include "listobject.cpp"
 #include <sstream>
 
 #define VERBOSE_MEMORY_CLEANUP 0
+
+std::unordered_map<Ad_Object_Type, std::string> object_type_map = {
+        {OBJ_NULL, "NULL"},
+        {OBJ_INT, "INTEGER"},
+        {OBJ_FLOAT, "FLOAT"},
+        {OBJ_BOOL, "BOOLEAN"},
+        {OBJ_STRING, "STRING"},
+        {OBJ_RETURN_VALUE, "RETURN_VALUE"},
+        {OBJ_FUNCTION, "FUNCTION"},
+        {OBJ_ERROR, "ERROR"},
+        {OBJ_BUILTIN, "BUILTIN"},
+        {OBJ_SIGNAL, "SIGNAL"},
+        {OBJ_LIST, "LIST"},
+        {OBJ_HASH, "HASH"},
+        {OBJ_CLASS, "CLASS"},
+        {OBJ_INSTANCE, "INSTANCE"},
+        {OBJ_FILE, "FILE"},
+        {OBJ_SOCKET, "SOCKET"},
+        {OBJ_THREAD, "THREAD"},
+        {OBJ_BREAK, "BREAK"},
+        {OBJ_CONTINUE, "CONTINUE"}
+};
+
+Ad_Null_Object NULLOBJECT;
 
 std::string Ad_Object::Inspect() {
     std::cout << "not implemented Inspect() in subclass\n";
