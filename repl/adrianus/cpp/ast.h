@@ -43,42 +43,7 @@ enum StatementType {
     ST_MINUS_EQUALS
 };
 
-std::unordered_map<StatementType, std::string> statement_type_map = {
-    {ST_PROGRAM, "Program"},
-    {ST_LET_STATEMENT, "LetStatement"},
-    {ST_RETURN_STATEMENT, "ReturnStatement"},
-    {ST_EXPRESSION_STATEMENT, "ExpressionStatement"},
-    {ST_IDENTIFIER, "Identifier"},
-    {ST_INTEGER, "Integer"},
-    {ST_FLOAT, "Float"},
-    {ST_BOOLEAN, "Boolean"},
-    {ST_INFIX_EXPRESSION, "InfixExpression"},
-    {ST_PREFIX_EXPRESSION, "PrefixExpression"},
-    {ST_CALL_EXPRESSION, "CallExpression"},
-    {ST_IF_EXPRESSION, "IfExpression"},
-    {ST_BLOCK_STATEMENT, "BlockStatement"},
-    {ST_FUNCTION_LITERAL, "FunctionLiteral"},
-    {ST_WHILE_EXPRESSION, "WhileExpression"},
-    {ST_STRING_LITERAL, "StringLiteral"},
-    {ST_LIST_LITERAL, "ListLiteral"},
-    {ST_INDEX_EXPRESSION, "IndexExpression"},
-    {ST_HASH_LITERAL, "HashLiteral"},
-    {ST_ASSIGN_STATEMENT, "AssignStatement"},
-    {ST_DEF_STATEMENT, "DefStatement"},
-    {ST_CLASS_STATEMENT, "ClassStatement"},
-    {ST_MEMBER_ACCESS, "MemberAccess"},
-    {ST_COMMENT, "Comment"},
-    {ST_PREFIX_INCREMENT, "PrefixIncrement"},
-    {ST_POSTFIX_INCREMENT, "PostfixIncrement"},
-    {ST_FOR_EXPRESSION, "ForExpression"},
-    {ST_BREAK_STATEMENT, "BreakStatement"},
-    {ST_CONTINUE_STATEMENT, "ContinueStatement"},
-    {ST_NULL_EXPRESSION, "NullExpression"},
-    {ST_THIS_EXPRESSION, "ThisExpression"},
-    {ST_SUPER_EXPRESSION, "SuperExpression"},
-    {ST_PLUS_EQUALS, "PlusEquals"},
-    {ST_MINUS_EQUALS, "MinusEquals"}
-};
+extern std::unordered_map<StatementType, std::string> statement_type_map;
 
 class Ad_AST_Node {
 public:
@@ -513,9 +478,6 @@ public:
     Token token;
 };
 
-bool StatementIs(Ad_AST_Node *stmt, StatementType st) {
-    return stmt->type == st;
-}
 
 void Ad_INCREF(Ad_AST_Node*);
 void Ad_DECREF(Ad_AST_Node*);
