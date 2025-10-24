@@ -288,12 +288,37 @@ void test_set_last_instruction() {
     
     Compiler compiler;
     
-    // setLastInstruction is currently a no-op, but should not crash
+    // Initialize with a scope to test instruction tracking
+    CompilationScope scope;
+    compiler.scopes.push_back(scope);
+    compiler.scopeIndex = 0;
+    
+    // Test setting first instruction
     compiler.setLastInstruction(OP_ADD, 0);
+    
+    // Verify the last instruction was set
+    assert(compiler.scopes[0].lastInstruction.getOpcode() == OP_ADD);
+    assert(compiler.scopes[0].lastInstruction.getPosition() == 0);
+    
+    // Test setting another instruction
     compiler.setLastInstruction(OP_CONSTANT, 5);
     
-    // If we implement last instruction tracking in the future,
-    // we can add more specific assertions here
+    // Verify the previous instruction was preserved
+    assert(compiler.scopes[0].previousInstruction.getOpcode() == OP_ADD);
+    assert(compiler.scopes[0].previousInstruction.getPosition() == 0);
+    
+    // Verify the new last instruction
+    assert(compiler.scopes[0].lastInstruction.getOpcode() == OP_CONSTANT);
+    assert(compiler.scopes[0].lastInstruction.getPosition() == 5);
+    
+    // Test with a third instruction to verify chaining
+    compiler.setLastInstruction(OP_MULTIPLY, 10);
+    
+    // Verify the previous instruction chain
+    assert(compiler.scopes[0].previousInstruction.getOpcode() == OP_CONSTANT);
+    assert(compiler.scopes[0].previousInstruction.getPosition() == 5);
+    assert(compiler.scopes[0].lastInstruction.getOpcode() == OP_MULTIPLY);
+    assert(compiler.scopes[0].lastInstruction.getPosition() == 10);
     
     std::cout << "✓ Set last instruction test passed\n";
 }
