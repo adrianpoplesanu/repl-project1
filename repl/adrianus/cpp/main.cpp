@@ -10,7 +10,7 @@
 // #include "lexer.cpp" TODO: remove .cpp imports from other files and fix imports, use only .h
 #include "repl.h"
 #include "repl.cpp"
-#include "settings.h"
+#include "settings.cpp"
 #include "socket_utils.cpp"
 #include "thread_utils.cpp"
 #include "thread_workers.cpp"
