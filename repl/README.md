@@ -12,3 +12,14 @@ How to run make commands in Windows:
 
 Important! Running valgrind will save your life. After installing it with "sudo apt install valgrinf" or whatever, run this:
 valgrind --tool=memcheck --leak-check=full ./main
+
+Important! VSCode Ad syntax highlight
+cd /cpp
+vsce package
+code --install-extension adlang-0.0.1.vsix
+
+files:
+/adrianus/cpp/package.json
+/adrianus/cpp/language-configuration.json
+/adrianus/cpp/syntaxes/adlang.tmLanguage.json
+are used to generate adlang-0.0.1.vsix VSC extension for ad code highlighting
