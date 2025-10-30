@@ -105,8 +105,15 @@ int Compiler::addInstruction(int size, std::vector<unsigned char> instruction) {
 }
 
 void Compiler::setLastInstruction(OpCodeType op, int pos) {
-    // TODO: Implement last instruction tracking if needed
-    // This might be used for jump instruction backpatching or other optimizations
+    // Get the previous instruction from current scope
+    EmittedInstruction previous = scopes[scopeIndex].lastInstruction;
+
+    // Create new last instruction
+    EmittedInstruction last(op, pos);
+
+    // Update the current scope with previous and last instructions
+    scopes[scopeIndex].previousInstruction = previous;
+    scopes[scopeIndex].lastInstruction = last;
 }
 
 // Constants management implementation
