@@ -1,6 +1,10 @@
 #ifndef AD_VM_H
 #define AD_VM_H
 
+#include "bytecode.h"
+#include "../objects.h"
+#include "../gc.h"
+
 class VM {
 public:
     int stackSize = 2048;
