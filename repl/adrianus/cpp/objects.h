@@ -36,7 +36,14 @@ enum Ad_Object_Type {
 	OBJ_SOCKET,
 	OBJ_THREAD,
 	OBJ_BREAK,
-	OBJ_CONTINUE
+	OBJ_CONTINUE,
+
+	// VM objects
+	OBJ_COMPILED_FUNCTION,
+	OBJ_CLOSURE,
+	OBJ_COMPILED_CLASS,
+	OBJ_COMPILED_INSTANCE,
+	OBJ_BOUND_METHOD,
 };
 
 extern std::unordered_map<Ad_Object_Type, std::string> object_type_map;
