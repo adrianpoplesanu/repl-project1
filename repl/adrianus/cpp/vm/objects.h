@@ -4,9 +4,12 @@
 #include <string>
 #include "../objects.h"
 #include "../gc.h"
+#include "instructions.h"
 
 class AdCompiledFunction : public Ad_Object {
 public:
+    Instructions* instructions;
+
     AdCompiledFunction();
     std::string Inspect() override;
 	void Print() override;
@@ -17,6 +20,8 @@ public:
 
 class AdClosureObject : public Ad_Object {
 public:
+    AdCompiledFunction* fn;
+
 	AdClosureObject();
     std::string Inspect() override;
 	void Print() override;
