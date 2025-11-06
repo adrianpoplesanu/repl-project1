@@ -1,5 +1,6 @@
 #include "code.h"
 #include "opcode.h"
+#include <iostream>
 
 Code::Code() {
     definitionsMap.insert(std::make_pair(OP_CONSTANT, new Definition("OpConstant", 1, new int[1] {2})));
@@ -80,6 +81,7 @@ int Code::getInstructionWidth(int offset) {
 
 int Code::read_uint16(const Instructions& instructions, int offset) {
     if (offset < 0 || offset + 1 >= instructions.size) {
+        std::cerr << "Error: failed to process instructions with offset " << offset << " in read_uint16\n";
         return 0;
     }
     int high = static_cast<int>(instructions.bytes[offset]);
@@ -89,6 +91,7 @@ int Code::read_uint16(const Instructions& instructions, int offset) {
 
 int Code::read_uint8(const Instructions& instructions, int offset) {
     if (offset < 0 || offset >= instructions.size) {
+        std::cerr << "Error: failed to process instructions with offset " << offset << " in read_uint8\n";
         return 0;
     }
     return static_cast<int>(instructions.bytes[offset]);
