@@ -78,6 +78,22 @@ int Code::getInstructionWidth(int offset) {
     return width;
 }
 
+int Code::read_uint16(const Instructions& instructions, int offset) {
+    if (offset < 0 || offset + 1 >= instructions.size) {
+        return 0;
+    }
+    int high = static_cast<int>(instructions.bytes[offset]);
+    int low = static_cast<int>(instructions.bytes[offset + 1]);
+    return (high << 8) | low;
+}
+
+int Code::read_uint8(const Instructions& instructions, int offset) {
+    if (offset < 0 || offset >= instructions.size) {
+        return 0;
+    }
+    return static_cast<int>(instructions.bytes[offset]);
+}
+
 std::string Code::disassembleInstruction(int offset) {
     std::ostringstream out;
     
