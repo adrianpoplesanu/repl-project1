@@ -7,6 +7,9 @@
 #include <iomanip>
 #include <map>
 
+int read_uint16(const Instructions& instructions, int offset);
+int read_uint8(const Instructions& instructions, int offset);
+
 class Code {
 public:
     Instructions instructions;
@@ -15,8 +18,6 @@ public:
     Code();
     ~Code();
     std::string toString();
-    static int read_uint16(const Instructions& instructions, int offset);
-    static int read_uint8(const Instructions& instructions, int offset);
 
 private:
     std::string disassembleInstruction(int offset);

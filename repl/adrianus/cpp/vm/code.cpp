@@ -2,6 +2,24 @@
 #include "opcode.h"
 #include <iostream>
 
+int read_uint16(const Instructions& instructions, int offset) {
+    if (offset < 0 || offset + 1 >= instructions.size) {
+        std::cerr << "Error: failed to process instructions with offset " << offset << " in read_uint16\n";
+        return 0;
+    }
+    int high = static_cast<int>(instructions.bytes[offset]);
+    int low = static_cast<int>(instructions.bytes[offset + 1]);
+    return (high << 8) | low;
+}
+
+int read_uint8(const Instructions& instructions, int offset) {
+    if (offset < 0 || offset >= instructions.size) {
+        std::cerr << "Error: failed to process instructions with offset " << offset << " in read_uint8\n";
+        return 0;
+    }
+    return static_cast<int>(instructions.bytes[offset]);
+}
+
 Code::Code() {
     definitionsMap.insert(std::make_pair(OP_CONSTANT, new Definition("OpConstant", 1, new int[1] {2})));
     definitionsMap.insert(std::make_pair(OP_ADD, new Definition("OpAdd", 0, new int)));
@@ -77,24 +95,6 @@ int Code::getInstructionWidth(int offset) {
         width += def->operandWidths[i];
     }
     return width;
-}
-
-int Code::read_uint16(const Instructions& instructions, int offset) {
-    if (offset < 0 || offset + 1 >= instructions.size) {
-        std::cerr << "Error: failed to process instructions with offset " << offset << " in read_uint16\n";
-        return 0;
-    }
-    int high = static_cast<int>(instructions.bytes[offset]);
-    int low = static_cast<int>(instructions.bytes[offset + 1]);
-    return (high << 8) | low;
-}
-
-int Code::read_uint8(const Instructions& instructions, int offset) {
-    if (offset < 0 || offset >= instructions.size) {
-        std::cerr << "Error: failed to process instructions with offset " << offset << " in read_uint8\n";
-        return 0;
-    }
-    return static_cast<int>(instructions.bytes[offset]);
 }
 
 std::string Code::disassembleInstruction(int offset) {
