@@ -2,6 +2,50 @@
 #include "opcode.h"
 #include <iostream>
 
+std::vector<int> int_to_bytes(int param_int) {
+    std::cout << param_int << std::endl;
+    return {0, 0, 0, 0};
+}
+
+int read_operands(const Definition& definition, const Instructions& instructions, int start, std::vector<int>& operands) {
+    int offset = 0;
+
+    for (int w = 0; w < definition.size; ++w) {
+        int width = definition.operandWidths[w];
+        if (width == 2) {
+            operands.push_back(read_uint16(instructions, start + offset));
+        } else if (width == 1) {
+            operands.push_back(read_uint8(instructions, start + offset));
+        }
+        offset += width;
+    }
+
+    return offset;
+}
+
+std::string format_int(int n) {
+    std::ostringstream out;
+    out << std::setfill('0') << std::setw(4) << n;
+    return out.str();
+}
+
+std::string format_instruction(const Definition& definition, const std::vector<int>& operands) {
+    int operand_count = definition.size + 1;
+    std::ostringstream out;
+
+    if (operand_count == 1) {
+        out << definition.name;
+    } else if (operand_count == 2 && !operands.empty()) {
+        out << definition.name << " " << operands[0];
+    } else if (operand_count == 3 && operands.size() >= 2) {
+        out << definition.name << " " << operands[0] << " " << operands[1];
+    } else {
+        std::cout << "unknowm instruction format" << std::endl;
+    }
+
+    return out.str();
+}
+
 int read_uint16(const Instructions& instructions, int offset) {
     if (offset < 0 || offset + 1 >= instructions.size) {
         std::cerr << "Error: failed to process instructions with offset " << offset << " in read_uint16\n";
