@@ -9,8 +9,8 @@ clean:
 	find . -type f ! -name "*.h" ! -name "*.cpp" ! -name "README.md" ! -name "Makefile" ! -name "*.*" -delete
 	find . -name "*.o" -delete
 
-test-code:
-	g++ -std=c++17 -g vm/tests/test_code.cpp vm/code.cpp vm/definition.cpp vm/instructions.cpp -o test_code
+test_code:
+	g++ $(CFLAGS) vm/tests/test_code.cpp vm/code.cpp vm/definition.cpp vm/instructions.cpp -o test_code $(LDFLAGS)
 	./test_code
 
 test-compiler:
