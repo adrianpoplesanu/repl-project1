@@ -3,10 +3,12 @@
 
 #include "definition.h"
 #include "instructions.h"
+#include "opcode.h"
 #include <sstream>
 #include <iomanip>
 #include <map>
 #include <vector>
+#include <utility>
 
 int read_uint16(const Instructions& instructions, int offset);
 int read_uint8(const Instructions& instructions, int offset);
@@ -23,6 +25,8 @@ public:
     Code();
     ~Code();
     std::string toString();
+    std::pair<int, std::vector<unsigned char>> make(OpCodeType opcode, int n, const std::vector<int>& args);
+    Definition* lookup(unsigned char byteCode);
 
 private:
     std::string disassembleInstruction(int offset);

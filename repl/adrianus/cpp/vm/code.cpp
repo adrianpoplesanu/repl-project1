@@ -3,8 +3,12 @@
 #include <iostream>
 
 std::vector<int> int_to_bytes(int param_int) {
-    std::cout << param_int << std::endl;
-    return {0, 0, 0, 0};
+    std::vector<int> bytes(4, 0);
+    bytes[0] = (param_int >> 24) & 0xFF;
+    bytes[1] = (param_int >> 16) & 0xFF;
+    bytes[2] = (param_int >> 8) & 0xFF;
+    bytes[3] = param_int & 0xFF;
+    return bytes;
 }
 
 int read_operands(const Definition& definition, const Instructions& instructions, int start, std::vector<int>& operands) {
@@ -112,18 +116,28 @@ Code::~Code() {
 }
 
 std::string Code::toString() {
-    std::string result;
+    std::ostringstream out;
     int offset = 0;
-    
+
     while (offset < instructions.size) {
-        result += disassembleInstruction(offset);
-        offset += getInstructionWidth(offset);
+        Definition* definition = lookup(instructions.bytes[offset]);
+        if (definition == nullptr) {
+            out << "ERROR: unknown opcode " << static_cast<int>(instructions.bytes[offset]) << " at offset " << offset;
+            break;
+        }
+
+        std::vector<int> operands;
+        int read = read_operands(*definition, instructions, offset + 1, operands);
+
+        out << format_int(offset) << " " << format_instruction(*definition, operands);
+
+        offset += 1 + read;
         if (offset < instructions.size) {
-            result += "\n";
+            out << "\n";
         }
     }
-    
-    return result;
+
+    return out.str();
 }
 
 int Code::getInstructionWidth(int offset) {
@@ -188,4 +202,66 @@ std::string Code::disassembleInstruction(int offset) {
     }
     
     return out.str();
+}
+
+Definition* Code::lookup(unsigned char byteCode) {
+    auto it = definitionsMap.find(byteCode);
+    if (it != definitionsMap.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+std::pair<int, std::vector<unsigned char>> Code::make(OpCodeType opcode, int n, const std::vector<int>& args) {
+    Definition* definition = lookup(static_cast<unsigned char>(opcode));
+    if (definition == nullptr) {
+        std::cerr << "Unknown opcode: " << static_cast<int>(opcode) << std::endl;
+        return std::make_pair(0, std::vector<unsigned char>());
+    }
+
+    if (n != definition->size) {
+        std::cerr << "Operand count mismatch for opcode: " << static_cast<int>(opcode) << std::endl;
+        return std::make_pair(0, std::vector<unsigned char>());
+    }
+
+    if (args.size() < static_cast<size_t>(n)) {
+        std::cerr << "Not enough operands provided for opcode: " << static_cast<int>(opcode) << std::endl;
+        return std::make_pair(0, std::vector<unsigned char>());
+    }
+
+    int instructionLen = 1;
+    for (int i = 0; i < definition->size; ++i) {
+        instructionLen += definition->operandWidths[i];
+    }
+
+    std::vector<unsigned char> instruction(instructionLen);
+    instruction[0] = static_cast<unsigned char>(opcode);
+
+    int offset = 1;
+    for (int j = 0; j < n; ++j) {
+        int width = definition->operandWidths[j];
+        int argument = args[j];
+
+        if (width == 2) {
+            if (argument < 0 || argument > 0xFFFF) {
+                std::cerr << "Operand out of range for 2-byte width: " << argument << std::endl;
+                return std::make_pair(0, std::vector<unsigned char>());
+            }
+            instruction[offset] = static_cast<unsigned char>((argument >> 8) & 0xFF);
+            instruction[offset + 1] = static_cast<unsigned char>(argument & 0xFF);
+        } else if (width == 1) {
+            if (argument < 0 || argument > 0xFF) {
+                std::cerr << "Operand out of range for 1-byte width: " << argument << std::endl;
+                return std::make_pair(0, std::vector<unsigned char>());
+            }
+            instruction[offset] = static_cast<unsigned char>(argument & 0xFF);
+        } else {
+            std::cerr << "severe error: unknown width " << width << std::endl;
+            return std::make_pair(0, std::vector<unsigned char>());
+        }
+
+        offset += width;
+    }
+
+    return std::make_pair(instructionLen, instruction);
 }
