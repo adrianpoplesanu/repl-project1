@@ -193,6 +193,26 @@ Token Lexer::NextToken() {
                 token.literal = current_char;
             }
         break;
+        case '&':
+            if (PeekChar() == '&') {
+                ReadChar();
+                token.type = TT_AND;
+                token.literal = "&&";
+            } else {
+                token.type = TT_ILLEGAL;
+                token.literal = current_char;
+            }
+        break;
+        case '|':
+            if (PeekChar() == '|') {
+                ReadChar();
+                token.type = TT_OR;
+                token.literal = "||";
+            } else {
+                token.type = TT_ILLEGAL;
+                token.literal = current_char;
+            }
+        break;
         case ',':
             token.type = TT_COMMA;
             token.literal = current_char;

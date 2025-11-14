@@ -352,6 +352,12 @@ Ad_Object* Evaluator::EvalBooleanInfixExpression(std::string _operator, Ad_Objec
     if (_operator == "or") {
         return NativeBoolToBooleanObject(left_val || right_val);
     }
+    if (_operator == "&&") {
+        return NativeBoolToBooleanObject(left_val && right_val);
+    }
+    if (_operator == "||") {
+        return NativeBoolToBooleanObject(left_val || right_val);
+    }
     return NULL;
 }
 
