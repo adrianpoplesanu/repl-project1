@@ -5,6 +5,30 @@
 //#include "lexer.h" // ^^^
 #include "ast.cpp"
 
+std::unordered_map<TokenType, PrecedenceType> precedences = {
+    {TT_ASSIGN, PT_ASSIGN},
+    {TT_EQ, PT_EQUALS},
+    {TT_NOT_EQ, PT_EQUALS},
+    {TT_LT, PT_LESSGREATER},
+    {TT_GT, PT_LESSGREATER},
+    {TT_LTE, PT_LESSGREATER},
+    {TT_GTE, PT_LESSGREATER},
+    {TT_AND, PT_CONDITIONAL},
+    {TT_OR, PT_CONDITIONAL},
+    {TT_PLUS, PT_SUM},
+    {TT_MINUS, PT_SUM},
+    {TT_SLASH, PT_PRODUCT},
+    {TT_MODULUS, PT_PRODUCT},
+    {TT_ASTERISK, PT_PRODUCT},
+    {TT_LPAREN, PT_CALL},
+    {TT_LBRACKET, PT_INDEX},
+    {TT_DOT, PT_MEMBERACCESS},
+    {TT_PLUSPLUS, PT_PLUSPLUS},
+    {TT_MINUSMINUS, PT_PLUSPLUS},
+    {TT_PLUS_EQ, PT_ASSIGN},
+    {TT_MINUS_EQ, PT_ASSIGN}
+};
+
 Parser::Parser() {
     statementParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfStatement));
     statementParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefStatement));
