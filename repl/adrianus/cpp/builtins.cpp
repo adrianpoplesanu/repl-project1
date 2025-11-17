@@ -484,6 +484,20 @@ Ad_Object* repr_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageC
     return result;
 }
 
+Ad_Object* assert_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    // TODO: assert expression is true, retrieve actual expression from calling params
+    Ad_Object* expression = args[0];
+    if (expression->type == OBJ_BOOL) {
+        auto* boolean_object = (Ad_Boolean_Object*) expression;
+        if (!boolean_object->value) {
+            auto* error_object = new Ad_Error_Object("AssertionError: expression is false");
+            gc->addObject(error_object);
+            return error_object;
+        }
+    }
+    return nullptr;
+}
+
 // TODO: Ad_Builtin_Object needs a function pointer in the constructor, which in case of len, will point to len_builtin
 std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"len", new Ad_Builtin_Object(&len_builtin)},
@@ -521,7 +535,8 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"sleep", new Ad_Builtin_Object(&sleep_builtin)},
     {"delay", new Ad_Builtin_Object(&sleep_builtin)},
     {"str", new Ad_Builtin_Object(&str_builtin)},
-    {"repr", new Ad_Builtin_Object(&repr_builtin)}
+    {"repr", new Ad_Builtin_Object(&repr_builtin)},
+    {"assert", new Ad_Builtin_Object(&assert_builtin)},
     // eval
     // first
     // input
