@@ -1,7 +1,7 @@
 a = list(3, 0)
 
 def back(k) {
-    if (k == len(a)) print (a)
+    if (k == len(a)) println(a)
     else {
         a[k] = 0
         while (a[k] < len(a)) {
