@@ -1,6 +1,5 @@
 #include "lexer.h"
 #include "token.cpp"
-#include <iostream>
 
 Lexer::Lexer() {
 

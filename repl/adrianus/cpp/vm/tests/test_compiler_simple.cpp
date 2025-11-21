@@ -8,7 +8,6 @@
 #include "../compiler.h"
 #include "../compilation_scope.h"
 #include "../emitted_instruction.h"
-#include "test_commons.h"
 
 void test_lookup_valid_opcode() {
     std::cout << "running test_lookup_valid_opcode...\n";

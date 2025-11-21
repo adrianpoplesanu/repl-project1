@@ -1,7 +1,6 @@
 #include "objects.h"
 #include "gc.h"
 #include "environment.h"
-#include "listobject.h"
 #include "listobject.cpp"
 #include <sstream>
 
