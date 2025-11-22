@@ -25,7 +25,7 @@ public:
     Code();
     ~Code();
     std::string toString();
-    std::pair<int, std::vector<unsigned char>> make(OpCodeType opcode, int n, const std::vector<int>& args);
+    std::pair<int, std::vector<unsigned char>> make(OpCode opcode, int n, const std::vector<int>& args);
     Definition* lookup(unsigned char byteCode);
 
 private:

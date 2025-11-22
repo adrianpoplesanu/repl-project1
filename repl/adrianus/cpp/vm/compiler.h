@@ -6,6 +6,7 @@
 #include "opcode.h"
 #include "compilation_scope.h"
 #include "../objects.h"
+#include "../ast.h"
 #include <vector>
 
 class Compiler {
@@ -21,15 +22,15 @@ public:
     Compiler();
     Compiler(GarbageCollector* gc);
     void reset();
-    void compile(Ad_AST_Program node);
+    void compile(Ad_AST_Node* node);
     Bytecode getBytecode();
     
     // New methods for instruction emission
-    int emit(OpCodeType op, int n = 0, std::vector<int> args = {});
+    int emit(OpCode op, int n = 0, std::vector<int> args = {});
     Definition* lookup(OpCodeType op);
-    std::pair<int, std::vector<unsigned char>> make(OpCodeType op, int n, std::vector<int> args);
+    std::pair<int, std::vector<unsigned char>> make(OpCode opcode, int n, std::vector<int> args);
     int addInstruction(int size, std::vector<unsigned char> instruction);
-    void setLastInstruction(OpCodeType op, int pos);
+    void setLastInstruction(OpCode op, int pos);
     
     // Constants management
     int addConstant(Ad_Object* obj);

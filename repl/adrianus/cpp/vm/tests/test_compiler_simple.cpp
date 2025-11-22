@@ -246,14 +246,14 @@ void test_set_last_instruction() {
     compiler.scopeIndex = 0;
     
     // Test setting first instruction
-    compiler.setLastInstruction(OP_ADD, 0);
+    compiler.setLastInstruction(opAdd, 0);
     
     // Verify the last instruction was set
     assert(compiler.scopes[0].lastInstruction.getOpcode() == OP_ADD);
     assert(compiler.scopes[0].lastInstruction.getPosition() == 0);
     
     // Test setting another instruction
-    compiler.setLastInstruction(OP_CONSTANT, 5);
+    compiler.setLastInstruction(opConstant, 5);
     
     // Verify the previous instruction was preserved
     assert(compiler.scopes[0].previousInstruction.getOpcode() == OP_ADD);
@@ -264,7 +264,7 @@ void test_set_last_instruction() {
     assert(compiler.scopes[0].lastInstruction.getPosition() == 5);
     
     // Test with a third instruction to verify chaining
-    compiler.setLastInstruction(OP_MULTIPLY, 10);
+    compiler.setLastInstruction(opMultiply, 10);
     
     // Verify the previous instruction chain
     assert(compiler.scopes[0].previousInstruction.getOpcode() == OP_CONSTANT);

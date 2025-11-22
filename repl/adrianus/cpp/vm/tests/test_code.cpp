@@ -148,7 +148,7 @@ void test_make_no_operands() {
     std::cout << "running test_make_no_operands...\n";
 
     Code code;
-    auto result = code.make(OP_ADD, 0, {});
+    auto result = code.make(opAdd, 0, {});
 
     assert(result.first == 1);
     assert(result.second.size() == 1);
@@ -160,7 +160,7 @@ void test_make_single_operand() {
     std::cout << "running test_make_single_operand...\n";
 
     Code code;
-    auto result = code.make(OP_CONSTANT, 1, {42});
+    auto result = code.make(opConstant, 1, {42});
 
     assert(result.first == 3);
     assert(result.second.size() == 3);
@@ -174,7 +174,7 @@ void test_make_multiple_operands() {
     std::cout << "running test_make_multiple_operands...\n";
 
     Code code;
-    auto result = code.make(OP_CLOSURE, 2, {256, 1});
+    auto result = code.make(opClosure, 2, {256, 1});
 
     assert(result.first == 4);
     assert(result.second.size() == 4);
@@ -189,7 +189,7 @@ void test_make_invalid_opcode() {
     std::cout << "running test_make_invalid_opcode...\n";
 
     Code code;
-    auto result = code.make(static_cast<OpCodeType>(255), 0, {});
+    auto result = code.make(OpCode(static_cast<OpCodeType>(255)), 0, {});
 
     assert(result.first == 0);
     assert(result.second.empty());

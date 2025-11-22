@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include "gc.h"
 
 class ExecutionTimeProfiling {
 private:
@@ -42,5 +43,8 @@ public:
     void incrementFreed();
     void showTotalResidualGCObjects(GarbageCollector*);
 };
+
+extern ExecutionTimeProfiling executionTimeProfiling;
+extern MemoryProfiling memoryProfiling;
 
 #endif //AD_PROFILING_H

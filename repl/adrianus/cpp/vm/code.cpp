@@ -212,20 +212,20 @@ Definition* Code::lookup(unsigned char byteCode) {
     return nullptr;
 }
 
-std::pair<int, std::vector<unsigned char>> Code::make(OpCodeType opcode, int n, const std::vector<int>& args) {
-    Definition* definition = lookup(static_cast<unsigned char>(opcode));
+std::pair<int, std::vector<unsigned char>> Code::make(OpCode opcode, int n, const std::vector<int>& args) {
+    Definition* definition = lookup(static_cast<unsigned char>(opcode.byteCode));
     if (definition == nullptr) {
-        std::cerr << "Unknown opcode: " << static_cast<int>(opcode) << std::endl;
+        std::cerr << "Unknown opcode: " << static_cast<int>(opcode.byteCode) << std::endl;
         return std::make_pair(0, std::vector<unsigned char>());
     }
 
     if (n != definition->size) {
-        std::cerr << "Operand count mismatch for opcode: " << static_cast<int>(opcode) << std::endl;
+        std::cerr << "Operand count mismatch for opcode: " << static_cast<int>(opcode.byteCode) << std::endl;
         return std::make_pair(0, std::vector<unsigned char>());
     }
 
     if (args.size() < static_cast<size_t>(n)) {
-        std::cerr << "Not enough operands provided for opcode: " << static_cast<int>(opcode) << std::endl;
+        std::cerr << "Not enough operands provided for opcode: " << static_cast<int>(opcode.byteCode) << std::endl;
         return std::make_pair(0, std::vector<unsigned char>());
     }
 
@@ -235,7 +235,7 @@ std::pair<int, std::vector<unsigned char>> Code::make(OpCodeType opcode, int n, 
     }
 
     std::vector<unsigned char> instruction(instructionLen);
-    instruction[0] = static_cast<unsigned char>(opcode);
+    instruction[0] = static_cast<unsigned char>(opcode.byteCode);
 
     int offset = 1;
     for (int j = 0; j < n; ++j) {

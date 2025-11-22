@@ -6,6 +6,7 @@
 #include "environment.cpp"
 #include "bootstrap.cpp"
 #include "thread_workers.h"
+#include "profiling.h"
 #include <thread>
 
 #define SHOW_RESIDUAL_GC_OBJECTS 0
@@ -134,7 +135,7 @@ bool Repl::ExecuteLineVM(std::string line) {
     parser.ParseProgram(program);
 
     compiler.reset();
-    compiler.compile(program);
+    compiler.compile(&program);
 
     Bytecode bytecode = compiler.getBytecode();
     compiler.code.instructions = bytecode.instructions;
