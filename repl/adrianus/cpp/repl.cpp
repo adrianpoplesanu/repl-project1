@@ -139,7 +139,7 @@ bool Repl::ExecuteLineVM(std::string line) {
 
     Bytecode bytecode = compiler.getBytecode();
     compiler.code.instructions = bytecode.instructions;
-    std::cout << compiler.code.toString(); // asta pare ca functioneaza cum trebuie
+    std::cout << compiler.code.toString() << '\n'; // asta pare ca functioneaza cum trebuie
 
     vm.load(bytecode);
     vm.run();

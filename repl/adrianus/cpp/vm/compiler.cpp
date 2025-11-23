@@ -6,6 +6,8 @@
 Compiler::Compiler() {
     constants.clear();
     gc = nullptr;
+    CompilationScope main_scope(code.instructions);
+    scopes = {main_scope};
     scopeIndex = 0;
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
@@ -13,6 +15,8 @@ Compiler::Compiler() {
 Compiler::Compiler(GarbageCollector* gc) {
     constants.clear();
     this->gc = gc;
+    CompilationScope main_scope(code.instructions);
+    scopes = {main_scope};
     scopeIndex = 0;
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
@@ -45,6 +49,55 @@ void Compiler::compile(Ad_AST_Node* node) {
                 emit(opPop, 0, {});
             }
         }
+    } else if (node->type == ST_PREFIX_EXPRESSION) {
+        Ad_AST_PrefixExpression* prefix_expr = (Ad_AST_PrefixExpression*)node;
+        compile(prefix_expr->right);
+        if (prefix_expr->_operator == "!") {
+            emit(opBang, 0, {});
+        } else if (prefix_expr->_operator == "-") {
+            emit(opMinus, 0, {});
+        } else {
+            std::cout << "SEVERE ERROR: prefix expression" << std::endl;
+        }
+    } else if (node->type == ST_INFIX_EXPRESSION) {
+        Ad_AST_InfixExpression* infix_expr = (Ad_AST_InfixExpression*)node;
+        if (infix_expr->_operator == "<") {
+            compile(infix_expr->right);
+            compile(infix_expr->left);
+            emit(opGreaterThan, 0, {});
+            return;
+        }
+        if (infix_expr->_operator == "<=") {
+            compile(infix_expr->right);
+            compile(infix_expr->left);
+            emit(opGreaterThanEqual, 0, {});
+            return;
+        }
+
+        compile(infix_expr->left);
+        compile(infix_expr->right);
+        if (infix_expr->_operator == "+") {
+            emit(opAdd, 0, {});
+        } else if (infix_expr->_operator == "-") {
+            emit(opSub, 0, {});
+        } else if (infix_expr->_operator == "*") {
+            emit(opMultiply, 0, {});
+        } else if (infix_expr->_operator == "/") {
+            emit(opDivide, 0, {});
+        } else if (infix_expr->_operator == "==") {
+            emit(opEqual, 0, {});
+        } else if (infix_expr->_operator == "!=") {
+            emit(opNotEqual, 0, {});
+        } else if (infix_expr->_operator == ">") {
+            emit(opGreaterThan, 0, {});
+        } else if (infix_expr->_operator == ">=") {
+            emit(opGreaterThanEqual, 0, {});
+        }
+    } else if (node->type == ST_INTEGER) {
+        Ad_AST_Integer* integer_node = (Ad_AST_Integer*)node;
+        Ad_Integer_Object* integer_obj = new Ad_Integer_Object(integer_node->value);
+        int const_index = addConstant(integer_obj);
+        emit(opConstant, 1, {const_index});
     }
     // TODO: add support for other statement types
 }
@@ -74,7 +127,7 @@ int Compiler::emit(OpCode opcode, int n, std::vector<int> args) {
     //auto result = make(op, n, args);
     int size = result.first;
     std::vector<unsigned char> instruction = result.second;
-    
+
     int pos = addInstruction(size, instruction);
     setLastInstruction(opcode, pos);
     return pos;
