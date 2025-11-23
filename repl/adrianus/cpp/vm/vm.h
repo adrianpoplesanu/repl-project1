@@ -2,8 +2,11 @@
 #define AD_VM_H
 
 #include "bytecode.h"
+#include "frame.h"
+#include "opcode.h"
 #include "../objects.h"
 #include "../gc.h"
+#include <vector>
 
 class VM {
 public:
@@ -11,11 +14,17 @@ public:
     int sp; // stack pointer
     Ad_Object *stack[2048];
     GarbageCollector *gc;
+    std::vector<Frame> frames;
+    std::vector<Ad_Object*> constants;
 
     VM();
     void load(Bytecode bytecode);
     void run();
     Ad_Object* last_popped_stack_element();
+    Frame* current_frame();
+    void push(Ad_Object* obj);
+    Ad_Object* pop();
+    void execute_binary_operation(OpCodeType opcode);
 };
 
 #endif
