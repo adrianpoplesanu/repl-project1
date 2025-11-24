@@ -5,6 +5,7 @@
 #include "code.h"
 #include "opcode.h"
 #include "compilation_scope.h"
+#include "frame.h"
 #include "../objects.h"
 #include "../ast.h"
 #include <vector>
@@ -18,6 +19,8 @@ public:
     Instructions instructions;
     std::vector<CompilationScope> scopes;
     int scopeIndex;
+    std::vector<Frame> frames;
+    int frames_index;
 
     Compiler();
     Compiler(GarbageCollector* gc);
@@ -38,6 +41,11 @@ public:
     
     // Scope management
     Instructions currentInstructions();
+
+    // Frame management
+    Frame currentFrame();
+    void pushFrame(Frame f);
+    Frame popFrame();
 
 };
 

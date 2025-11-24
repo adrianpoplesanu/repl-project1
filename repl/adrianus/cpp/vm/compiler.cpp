@@ -9,6 +9,8 @@ Compiler::Compiler() {
     CompilationScope main_scope(code.instructions);
     scopes = {main_scope};
     scopeIndex = 0;
+    frames.clear();
+    frames_index = 0;
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
 
@@ -18,6 +20,8 @@ Compiler::Compiler(GarbageCollector* gc) {
     CompilationScope main_scope(code.instructions);
     scopes = {main_scope};
     scopeIndex = 0;
+    frames.clear();
+    frames_index = 0;
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
 
@@ -173,5 +177,24 @@ Instructions Compiler::currentInstructions() {
         return scopes[scopeIndex].instructions;
     }
     return Instructions(); // Return empty instructions if scope index is invalid
+}
+
+// Frame management implementation
+Frame Compiler::currentFrame() {
+    return frames[frames_index - 1];
+}
+
+void Compiler::pushFrame(Frame f) {
+    if (frames_index >= static_cast<int>(frames.size())) {
+        frames.push_back(f);
+    } else {
+        frames[frames_index] = f;
+    }
+    frames_index += 1;
+}
+
+Frame Compiler::popFrame() {
+    frames_index -= 1;
+    return frames[frames_index];
 }
 
