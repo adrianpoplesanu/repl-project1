@@ -1,5 +1,8 @@
-method test3() {
+// problema cu method ca def sau fun
+// uita-te la test235
+// investigheaza mai mult
+/*method test3() {
     println("running test3()")
 }
 
-test3()
+test3()*/
