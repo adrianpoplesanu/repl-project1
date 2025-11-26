@@ -9,6 +9,10 @@
 #include <unordered_map>
 #include <ctime>
 
+// Global boolean objects - defined in evaluator.cpp
+extern Ad_Boolean_Object TRUE;
+extern Ad_Boolean_Object FALSE;
+
 class Evaluator {
 public:
     std::vector<Environment*> environment_garbage_collection;

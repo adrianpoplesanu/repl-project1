@@ -102,6 +102,13 @@ void Compiler::compile(Ad_AST_Node* node) {
         Ad_Integer_Object* integer_obj = new Ad_Integer_Object(integer_node->value);
         int const_index = addConstant(integer_obj);
         emit(opConstant, 1, {const_index});
+    } else if (node->type == ST_BOOLEAN) {
+        Ad_AST_Boolean* boolean_node = (Ad_AST_Boolean*)node;
+        if (boolean_node->value) {
+            emit(opTrue, 0, {});
+        } else {
+            emit(opFalse, 0, {});
+        }
     }
     // TODO: add support for other statement types
 }

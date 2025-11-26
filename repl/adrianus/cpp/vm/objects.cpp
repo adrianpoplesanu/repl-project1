@@ -1,7 +1,8 @@
 #include "objects.h"
 
 AdCompiledFunction::AdCompiledFunction() {
-    //...
+    type = OBJ_COMPILED_FUNCTION;
+    instructions = nullptr;
 }
 
 std::string AdCompiledFunction::Inspect() {
@@ -13,7 +14,7 @@ void AdCompiledFunction::Print() {
 }
 
 Ad_Object_Type AdCompiledFunction::Type() {
-    return OBJ_NULL;
+    return OBJ_COMPILED_FUNCTION;
 }
 
 std::string AdCompiledFunction::Hash() {
@@ -25,7 +26,8 @@ Ad_Object* AdCompiledFunction::copy(GarbageCollector* gc) {
 }
 
 AdClosureObject::AdClosureObject() {
-    //...
+    type = OBJ_CLOSURE;
+    fn = nullptr;
 }
 
 std::string AdClosureObject::Inspect() {
@@ -37,7 +39,7 @@ void AdClosureObject::Print() {
 }
 
 Ad_Object_Type AdClosureObject::Type() {
-    return type;
+    return OBJ_CLOSURE;
 }
 
 std::string AdClosureObject::Hash() {
