@@ -1,6 +1,7 @@
 #include "vm.h"
 #include "code.h"
 #include "objects.h"
+#include "../evaluator.h"
 #include <iostream>
 
 VM::VM() {
@@ -52,6 +53,12 @@ void VM::run() {
             execute_binary_operation(opcode);
         } else if (opcode == OP_POP) {
             pop();
+        } else if (opcode == OP_TRUE) {
+            Ad_Object* obj = native_bool_to_boolean_object(true);
+            push(obj);
+        } else if (opcode == OP_FALSE) {
+            Ad_Object* obj = native_bool_to_boolean_object(false);
+            push(obj);
         }
     }
 }
@@ -131,4 +138,11 @@ void VM::execute_binary_operation(OpCodeType opcode) {
     if (result != nullptr) {
         push(result);
     }
+}
+
+Ad_Object* VM::native_bool_to_boolean_object(bool value) {
+    if (value) {
+        return &TRUE;
+    }
+    return &FALSE;
 }
