@@ -4,6 +4,8 @@ test_code
 test_code.dSYM/
 test_compiler_simple
 test_compiler_simple.dSYM/
+test_vm
+test_vm.dSYM/
 
 .vscode/
 .idea/

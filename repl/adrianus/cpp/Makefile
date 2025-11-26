@@ -17,5 +17,9 @@ test-compiler:
 	g++ -std=c++17 -g gc.cpp objects.cpp environment.cpp hashpair.cpp ast.cpp token.cpp settings.cpp vm/tests/test_compiler_simple.cpp vm/compiler.cpp vm/code.cpp vm/definition.cpp vm/instructions.cpp vm/emitted_instruction.cpp vm/compilation_scope.cpp vm/opcode.cpp -o test_compiler_simple
 	./test_compiler_simple
 
+test-vm:
+	g++ -std=c++17 -g vm/tests/test_vm.cpp vm/vm.cpp vm/frame.cpp vm/objects.cpp vm/instructions.cpp vm/code.cpp vm/definition.cpp objects.cpp gc.cpp hashpair.cpp ast.cpp environment.cpp settings.cpp token.cpp -o test_vm
+	./test_vm
+
 clean-win:
 	del token.o lexer.o ast.o parser.o objects.o evaluator.o repl.o main.o main.exe
