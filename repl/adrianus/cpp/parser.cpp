@@ -42,7 +42,7 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_FALSE, &Parser::ParseBoolean));
     prefixParseFns.insert(std::make_pair(TT_LPAREN, &Parser::ParseGroupedExpression));
     prefixParseFns.insert(std::make_pair(TT_FUNC, &Parser::ParseFunctionLiteral));
-    prefixParseFns.insert(std::make_pair(TT_METHOD, &Parser::ParseFunctionLiteral));
+    prefixParseFns.insert(std::make_pair(TT_METHOD, &Parser::ParseMethodLiteral));
     prefixParseFns.insert(std::make_pair(TT_WHILE, &Parser::ParseWhileExpression));
     prefixParseFns.insert(std::make_pair(TT_FOR, &Parser::ParseForExpression));
     prefixParseFns.insert(std::make_pair(TT_DOUBLE_QUOTES, &Parser::ParseStringLiteral));
@@ -412,6 +412,15 @@ Ad_AST_Node* Parser::ParseIfStatement() {
         }
     }
     return expr;
+}
+
+Ad_AST_Node* Parser::ParseMethodLiteral() {
+    // this is a hack to handle the fact that method can be either a function or a def, pretty cool
+    if (PeekTokenIs(TT_LPAREN)) {
+        return ParseFunctionLiteral();
+    } else {
+        return ParseDefStatement();
+    }
 }
 
 Ad_AST_Node* Parser::ParseFunctionLiteral() {

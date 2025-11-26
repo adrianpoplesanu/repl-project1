@@ -68,6 +68,7 @@ public:
     Ad_AST_Node* ParseBlockStatement();
     Ad_AST_Node* ParseSingleBlockStatement();
     Ad_AST_Node* ParseFunctionLiteral();
+    Ad_AST_Node* ParseMethodLiteral();
     Ad_AST_Node* ParseExpression(PrecedenceType);
     Ad_AST_Node* ParseInfixExpression(Ad_AST_Node*);
     Ad_AST_Node* ParseCallExpression(Ad_AST_Node*);
