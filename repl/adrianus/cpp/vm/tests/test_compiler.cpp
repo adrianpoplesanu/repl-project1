@@ -6,6 +6,8 @@
 #include "../opcode.h"
 #include "../objects.h"
 #include "../../gc.h"
+#include "../../ast.h"
+#include "../../token.h"
 
 void test_compiler_constructor() {
     std::cout << "running test_compiler_constructor...\n";
@@ -323,6 +325,249 @@ void test_set_last_instruction() {
     std::cout << "✓ Set last instruction test passed\n";
 }
 
+void test_compile_if_expression_without_alternative() {
+    std::cout << "running test_compile_if_expression_without_alternative...\n";
+    
+    Compiler compiler;
+    
+    // Create AST nodes for: if (true) { 10 }
+    Token if_token("if", TT_IF);
+    Ad_AST_IfExpression* if_expr = new Ad_AST_IfExpression(if_token);
+    
+    // Condition: true
+    Token true_token("true", TT_TRUE);
+    Ad_AST_Boolean* condition = new Ad_AST_Boolean(true_token, true);
+    if_expr->condition = condition;
+    
+    // Consequence: 10
+    Token int_token("10", TT_INT);
+    Ad_AST_Integer* consequence = new Ad_AST_Integer(int_token, 10);
+    if_expr->consequence = consequence;
+    
+    // No alternative
+    if_expr->alternative = nullptr;
+    
+    // Compile the if expression
+    compiler.compile(if_expr);
+    
+    // Expected bytecode structure:
+    // 1. OP_TRUE (condition)
+    // 2. OP_JUMP_NOT_TRUTHY <offset> (jump to after consequence)
+    // 3. OP_CONSTANT <index> (consequence: 10)
+    // 4. OP_JUMP <offset> (jump to after alternative)
+    // 5. OP_NULL (no alternative case)
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Check that we have the expected instructions
+    assert(ins.get(0) == OP_TRUE); // Condition
+    
+    // Check for OP_JUMP_NOT_TRUTHY
+    assert(ins.get(1) == OP_JUMP_NOT_TRUTHY);
+    
+    // Check for OP_CONSTANT (consequence)
+    int const_pos = 4; // After OP_TRUE (1) + OP_JUMP_NOT_TRUTHY (3)
+    assert(ins.get(const_pos) == OP_CONSTANT);
+    
+    // Check for OP_JUMP after consequence
+    int jump_pos = const_pos + 3; // After OP_CONSTANT (3 bytes)
+    assert(ins.get(jump_pos) == OP_JUMP);
+    
+    // Check for OP_NULL at the end (no alternative)
+    int null_pos = jump_pos + 3; // After OP_JUMP (3 bytes)
+    assert(ins.get(null_pos) == OP_NULL);
+    
+    // Clean up
+    delete if_expr;
+    
+    std::cout << "✓ Compile if expression without alternative test passed\n";
+}
+
+void test_compile_if_expression_with_alternative() {
+    std::cout << "running test_compile_if_expression_with_alternative...\n";
+    
+    Compiler compiler;
+    
+    // Create AST nodes for: if (false) { 10 } else { 20 }
+    Token if_token("if", TT_IF);
+    Ad_AST_IfExpression* if_expr = new Ad_AST_IfExpression(if_token);
+    
+    // Condition: false
+    Token false_token("false", TT_FALSE);
+    Ad_AST_Boolean* condition = new Ad_AST_Boolean(false_token, false);
+    if_expr->condition = condition;
+    
+    // Consequence: 10
+    Token int_token1("10", TT_INT);
+    Ad_AST_Integer* consequence = new Ad_AST_Integer(int_token1, 10);
+    if_expr->consequence = consequence;
+    
+    // Alternative: 20
+    Token int_token2("20", TT_INT);
+    Ad_AST_Integer* alternative = new Ad_AST_Integer(int_token2, 20);
+    if_expr->alternative = alternative;
+    
+    // Compile the if expression
+    compiler.compile(if_expr);
+    
+    // Expected bytecode structure:
+    // 1. OP_FALSE (condition)
+    // 2. OP_JUMP_NOT_TRUTHY <offset> (jump to after consequence)
+    // 3. OP_CONSTANT <index> (consequence: 10)
+    // 4. OP_JUMP <offset> (jump to after alternative)
+    // 5. OP_CONSTANT <index> (alternative: 20)
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Check that we have the expected instructions
+    assert(ins.get(0) == OP_FALSE); // Condition
+    
+    // Check for OP_JUMP_NOT_TRUTHY
+    assert(ins.get(1) == OP_JUMP_NOT_TRUTHY);
+    
+    // Check for OP_CONSTANT (consequence)
+    int const_pos = 4; // After OP_FALSE (1) + OP_JUMP_NOT_TRUTHY (3)
+    assert(ins.get(const_pos) == OP_CONSTANT);
+    
+    // Check for OP_JUMP after consequence
+    int jump_pos = const_pos + 3; // After OP_CONSTANT (3 bytes)
+    assert(ins.get(jump_pos) == OP_JUMP);
+    
+    // Check for OP_CONSTANT (alternative)
+    int alt_pos = jump_pos + 3; // After OP_JUMP (3 bytes)
+    assert(ins.get(alt_pos) == OP_CONSTANT);
+    
+    // Clean up
+    delete if_expr;
+    
+    std::cout << "✓ Compile if expression with alternative test passed\n";
+}
+
+void test_compile_if_expression_with_integer_condition() {
+    std::cout << "running test_compile_if_expression_with_integer_condition...\n";
+    
+    Compiler compiler;
+    
+    // Create AST nodes for: if (5) { 10 } else { 20 }
+    Token if_token("if", TT_IF);
+    Ad_AST_IfExpression* if_expr = new Ad_AST_IfExpression(if_token);
+    
+    // Condition: 5 (integer)
+    Token int_token_cond("5", TT_INT);
+    Ad_AST_Integer* condition = new Ad_AST_Integer(int_token_cond, 5);
+    if_expr->condition = condition;
+    
+    // Consequence: 10
+    Token int_token1("10", TT_INT);
+    Ad_AST_Integer* consequence = new Ad_AST_Integer(int_token1, 10);
+    if_expr->consequence = consequence;
+    
+    // Alternative: 20
+    Token int_token2("20", TT_INT);
+    Ad_AST_Integer* alternative = new Ad_AST_Integer(int_token2, 20);
+    if_expr->alternative = alternative;
+    
+    // Compile the if expression
+    compiler.compile(if_expr);
+    
+    // Expected bytecode structure:
+    // 1. OP_CONSTANT <index> (condition: 5)
+    // 2. OP_JUMP_NOT_TRUTHY <offset> (jump to after consequence)
+    // 3. OP_CONSTANT <index> (consequence: 10)
+    // 4. OP_JUMP <offset> (jump to after alternative)
+    // 5. OP_CONSTANT <index> (alternative: 20)
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Check that we have the expected instructions
+    assert(ins.get(0) == OP_CONSTANT); // Condition
+    
+    // Check for OP_JUMP_NOT_TRUTHY after condition
+    int jump_not_truthy_pos = 3; // After OP_CONSTANT (3 bytes)
+    assert(ins.get(jump_not_truthy_pos) == OP_JUMP_NOT_TRUTHY);
+    
+    // Check for OP_CONSTANT (consequence)
+    int const_pos = jump_not_truthy_pos + 3; // After OP_JUMP_NOT_TRUTHY (3 bytes)
+    assert(ins.get(const_pos) == OP_CONSTANT);
+    
+    // Check for OP_JUMP after consequence
+    int jump_pos = const_pos + 3; // After OP_CONSTANT (3 bytes)
+    assert(ins.get(jump_pos) == OP_JUMP);
+    
+    // Check for OP_CONSTANT (alternative)
+    int alt_pos = jump_pos + 3; // After OP_JUMP (3 bytes)
+    assert(ins.get(alt_pos) == OP_CONSTANT);
+    
+    // Clean up
+    delete if_expr;
+    
+    std::cout << "✓ Compile if expression with integer condition test passed\n";
+}
+
+void test_compile_if_expression_jump_offsets() {
+    std::cout << "running test_compile_if_expression_jump_offsets...\n";
+    
+    Compiler compiler;
+    
+    // Create AST nodes for: if (true) { 10 } else { 20 }
+    Token if_token("if", TT_IF);
+    Ad_AST_IfExpression* if_expr = new Ad_AST_IfExpression(if_token);
+    
+    // Condition: true
+    Token true_token("true", TT_TRUE);
+    Ad_AST_Boolean* condition = new Ad_AST_Boolean(true_token, true);
+    if_expr->condition = condition;
+    
+    // Consequence: 10
+    Token int_token1("10", TT_INT);
+    Ad_AST_Integer* consequence = new Ad_AST_Integer(int_token1, 10);
+    if_expr->consequence = consequence;
+    
+    // Alternative: 20
+    Token int_token2("20", TT_INT);
+    Ad_AST_Integer* alternative = new Ad_AST_Integer(int_token2, 20);
+    if_expr->alternative = alternative;
+    
+    // Compile the if expression
+    compiler.compile(if_expr);
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Structure:
+    // 0: OP_TRUE (1 byte)
+    // 1: OP_JUMP_NOT_TRUTHY (1 byte) + offset (2 bytes) = 3 bytes total
+    // 4: OP_CONSTANT (1 byte) + constant index (2 bytes) = 3 bytes total
+    // 7: OP_JUMP (1 byte) + offset (2 bytes) = 3 bytes total
+    // 10: OP_CONSTANT (1 byte) + constant index (2 bytes) = 3 bytes total
+    // Total: 13 bytes
+    
+    // Verify OP_JUMP_NOT_TRUTHY offset is set (not the placeholder 9999)
+    // The offset is set to after_consequence_pos, which is the position after OP_JUMP (position 10)
+    int jump_not_truthy_pos = 1;
+    unsigned char high_byte = ins.get(jump_not_truthy_pos + 1);
+    unsigned char low_byte = ins.get(jump_not_truthy_pos + 2);
+    int jump_not_truthy_offset = (high_byte << 8) | low_byte;
+    assert(jump_not_truthy_offset != 9999); // Should be updated from placeholder
+    assert(jump_not_truthy_offset == 10); // Should jump to position 10 (after OP_JUMP, which is after consequence)
+    
+    // Verify OP_JUMP offset is set (not the placeholder 9999)
+    // The offset is set to after_alternative_pos, which is the position after the alternative (position 13)
+    int jump_pos = 7;
+    high_byte = ins.get(jump_pos + 1);
+    low_byte = ins.get(jump_pos + 2);
+    int jump_offset = (high_byte << 8) | low_byte;
+    assert(jump_offset != 9999); // Should be updated from placeholder
+    assert(jump_offset == 13); // Should jump to position 13 (after alternative)
+    
+    // Verify total instruction size
+    assert(ins.size == 13);
+    
+    // Clean up
+    delete if_expr;
+    
+    std::cout << "✓ Compile if expression jump offsets test passed\n";
+}
+
 void run_all_compiler_tests() {
     std::cout << "=== Running Compiler tests ===\n";
     
@@ -342,6 +587,12 @@ void run_all_compiler_tests() {
     test_emit_with_default_args();
     test_emit_jump_instruction();
     test_set_last_instruction();
+    
+    // ST_IF_EXPRESSION tests
+    test_compile_if_expression_without_alternative();
+    test_compile_if_expression_with_alternative();
+    test_compile_if_expression_with_integer_condition();
+    test_compile_if_expression_jump_offsets();
     
     std::cout << "=== All Compiler tests passed! ===\n\n";
 }
