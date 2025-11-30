@@ -47,6 +47,11 @@ public:
     void pushFrame(Frame f);
     Frame popFrame();
 
+    // Helper methods for control flow
+    bool lastInstructionIs(OpCode opcode);
+    void removeLastPop();
+    void changeOperand(int pos, int operand);
+
 };
 
 #endif

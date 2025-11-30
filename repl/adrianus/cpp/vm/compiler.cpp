@@ -109,6 +109,38 @@ void Compiler::compile(Ad_AST_Node* node) {
         } else {
             emit(opFalse, 0, {});
         }
+    } else if (node->type == ST_IF_EXPRESSION) {
+        Ad_AST_IfExpression* if_expr = (Ad_AST_IfExpression*)node;
+        compile(if_expr->condition);
+        // bogus 9999 value
+        std::vector<int> args = {9999};
+        int jump_not_truthy_pos = emit(opJumpNotTruthy, 1, args);
+
+        compile(if_expr->consequence);
+
+        if (lastInstructionIs(opPop)) {
+            removeLastPop();
+        }
+
+        // op_jump with bogus 9999 value
+        args = {9999};
+        int jump_pos = emit(opJump, 1, args);
+
+        int after_consequence_pos = code.instructions.size;
+        changeOperand(jump_not_truthy_pos, after_consequence_pos);
+
+        if (if_expr->alternative == nullptr) {
+            emit(opNull, 0, {});
+        } else {
+            compile(if_expr->alternative);
+
+            if (lastInstructionIs(opPop)) {
+                removeLastPop();
+            }
+        }
+
+        int after_alternative_pos = code.instructions.size;
+        changeOperand(jump_pos, after_alternative_pos);
     }
     // TODO: add support for other statement types
 }
@@ -203,5 +235,55 @@ void Compiler::pushFrame(Frame f) {
 Frame Compiler::popFrame() {
     frames_index -= 1;
     return frames[frames_index];
+}
+
+// Helper methods for control flow
+bool Compiler::lastInstructionIs(OpCode opcode) {
+    if (scopeIndex < 0 || scopeIndex >= static_cast<int>(scopes.size())) {
+        return false;
+    }
+    return scopes[scopeIndex].lastInstruction.getOpcode() == opcode.byteCode;
+}
+
+void Compiler::removeLastPop() {
+    int lastPos = scopes[scopeIndex].lastInstruction.getPosition();
+    Definition* def = code.lookup(static_cast<unsigned char>(OP_POP));
+    if (def == nullptr) {
+        return;
+    }
+    
+    int instructionWidth = 1; // opcode itself
+    for (int i = 0; i < def->size; i++) {
+        instructionWidth += def->operandWidths[i];
+    }
+    
+    // Remove the last instruction
+    for (int i = 0; i < instructionWidth; i++) {
+        code.instructions.removeLast();
+    }
+    
+    // Update last instruction to previous instruction
+    scopes[scopeIndex].lastInstruction = scopes[scopeIndex].previousInstruction;
+}
+
+void Compiler::changeOperand(int pos, int operand) {
+    if (pos < 0 || pos >= code.instructions.size) {
+        return;
+    }
+    
+    unsigned char opcode = code.instructions.get(pos);
+    Definition* def = code.lookup(opcode);
+    if (def == nullptr || def->size == 0) {
+        return;
+    }
+    
+    // For jump instructions, the operand is 2 bytes wide
+    // Write the operand at position + 1 (after the opcode)
+    if (def->operandWidths[0] == 2) {
+        if (pos + 1 < code.instructions.size && pos + 2 < code.instructions.size) {
+            code.instructions.bytes[pos + 1] = static_cast<unsigned char>((operand >> 8) & 0xFF);
+            code.instructions.bytes[pos + 2] = static_cast<unsigned char>(operand & 0xFF);
+        }
+    }
 }
 
