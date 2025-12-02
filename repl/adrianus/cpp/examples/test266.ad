@@ -10,7 +10,7 @@ class Person {
     }
 }
 
-person = Person()
+person = Person() // constructorul are un parametru, name
 person.greet()
 person.name = "custom name"
 person.greet()

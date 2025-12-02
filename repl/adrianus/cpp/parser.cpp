@@ -764,6 +764,11 @@ Ad_AST_Node* Parser::ParseClassStatement() {
             Ad_INCREF(stmt);
             expr->methods.push_back(stmt);
         }
+        if (CurrentTokenIs(TT_METHOD)) {
+            Ad_AST_Node* stmt = ParseDefStatement();
+            Ad_INCREF(stmt);
+            expr->methods.push_back(stmt);
+        }
         if (CurrentTokenIs(TT_IDENT)) {
             Ad_AST_Node* stmt = ParseExpressionStatement();
             Ad_INCREF(stmt);
