@@ -4,8 +4,6 @@
 #include <vector>
 #include "../compiler.h"
 #include "../opcode.h"
-#include "../objects.h"
-#include "../../gc.h"
 #include "../../ast.h"
 #include "../../token.h"
 

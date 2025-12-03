@@ -3,6 +3,9 @@
 #include "evaluator.h"
 #include "environment.h"
 
+int TOTAL_THREADS_RUNNING = 0;
+std::vector<Ad_Object*> threadPool;
+
 void ad_worker_async(Ad_Object* rawCallback, std::vector<Ad_Object*> params, Ad_Object* rawObject, GarbageCollector *gc, Environment* env) {
     if (rawCallback->type == OBJ_FUNCTION) {
         Evaluator evaluator;
