@@ -22,7 +22,7 @@ test-compile:
 	./test_compiler
 
 test-vm:
-	g++ -std=c++17 -g vm/tests/test_vm.cpp vm/vm.cpp vm/frame.cpp vm/objects.cpp vm/instructions.cpp vm/code.cpp vm/definition.cpp objects.cpp gc.cpp hashpair.cpp ast.cpp environment.cpp settings.cpp token.cpp -o test_vm
+	g++ $(CFLAGS) vm/tests/test_vm.cpp vm/vm.cpp vm/frame.cpp vm/objects.cpp vm/instructions.cpp vm/code.cpp vm/definition.cpp objects.cpp environment.cpp settings.cpp evaluator.cpp parser.cpp socket_utils.cpp thread_utils.cpp thread_workers.cpp utils.cpp -o test_vm $(LDFLAGS)
 	./test_vm
 
 clean-win:
