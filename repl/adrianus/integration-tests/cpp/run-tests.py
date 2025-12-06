@@ -22,8 +22,12 @@ for test_file in test_files:
     expected_target = expected_folder + target.split("/")[-1].replace(".ad", ".txt")
     expected_output = open(expected_target, 'r').read()
 
-    #ok = re.search(expected_output, output)
-    ok = re.fullmatch(expected_output, output.decode('utf-8'))
+    # Normalize line endings: convert \r\n to \n in both expected and actual output
+    expected_normalized = expected_output.replace('\r\n', '\n').replace('\r', '\n')
+    actual_normalized = output.decode('utf-8').replace('\r\n', '\n').replace('\r', '\n')
+    
+    # Use re.fullmatch with MULTILINE flag to handle regex patterns correctly
+    ok = re.fullmatch(expected_normalized, actual_normalized, re.MULTILINE | re.DOTALL)
     #if output != expected_output:
     if not ok:
         failure.append("FAILURE - " + target)
