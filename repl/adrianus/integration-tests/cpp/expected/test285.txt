@@ -1,0 +1,7 @@
+\['aaa', 'bbb/ccc'\]
+\[''\]
+\['adrianus.ro'\]
+\['', ''\]
+\['', 'aaa'\]
+\['', 'aaa/bbb'\]
+\['', 'aaa/bbb/ccc/'\]
