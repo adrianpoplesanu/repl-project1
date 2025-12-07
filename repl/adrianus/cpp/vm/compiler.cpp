@@ -141,6 +141,15 @@ void Compiler::compile(Ad_AST_Node* node) {
 
         int after_alternative_pos = code.instructions.size;
         changeOperand(jump_pos, after_alternative_pos);
+
+        emit(opPop, 0, {}); // ATENTIE! pentru ca if nu e expresie imbricata in expression statetement, din cauza parserului, aici trebuie sa pun explitic pop()
+    } else if (node->type == ST_BLOCK_STATEMENT) {
+        Ad_AST_BlockStatement* block_stmt = (Ad_AST_BlockStatement*)node;
+        for (Ad_AST_Node* stmt : block_stmt->statements) {
+            compile(stmt);
+        }
+    } else if (node->type == ST_NULL_EXPRESSION) {
+        emit(opNull, 0, {});
     }
     // TODO: add support for other statement types
 }
