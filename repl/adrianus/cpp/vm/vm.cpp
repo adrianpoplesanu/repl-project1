@@ -59,6 +59,21 @@ void VM::run() {
         } else if (opcode == OP_FALSE) {
             Ad_Object* obj = native_bool_to_boolean_object(false);
             push(obj);
+        } else if (opcode == OP_POP) {
+            pop();
+        } else if (opcode == OP_JUMP) {
+            int pos = read_uint16(*ins, ip + 1);
+            current_frame()->ip = pos - 1;
+        } else if (opcode == OP_JUMP_NOT_TRUTHY) {
+            int pos = read_uint16(*ins, ip + 1);
+            current_frame()->ip += 2;
+
+            Ad_Object* condition = pop();
+            if (!is_truthy(condition)) {
+                current_frame()->ip = pos - 1;
+            }
+        } else if (opcode == OP_NULL) {
+            push(&NULLOBJECT);
         }
     }
 }
@@ -145,4 +160,12 @@ Ad_Object* VM::native_bool_to_boolean_object(bool value) {
         return &TRUE;
     }
     return &FALSE;
+}
+
+bool VM::is_truthy(Ad_Object* obj) {
+    if (obj == nullptr) return false;
+    if (obj == &NULLOBJECT) return false;
+    if (obj == &TRUE) return true;
+    if (obj == &FALSE) return false;
+    return true;
 }
