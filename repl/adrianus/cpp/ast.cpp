@@ -67,13 +67,13 @@ std::string Ad_AST_Program::TokenLiteral() {
 }
 
 std::string Ad_AST_Program::ToString() {
-    std::string out;
+    std::string out = "";
     for (auto stmt : statements) {
         if (stmt) {
-            std::cout << stmt->ToString() << "\n";
+            out += stmt->ToString() + "\n";
         }
     }
-    return out;
+    return "ASTProgram\n" + out;
 }
 
 void Ad_AST_Program::reset() {
@@ -207,7 +207,7 @@ Ad_AST_ExpressionStatement::~Ad_AST_ExpressionStatement() {
 }
 
 std::string Ad_AST_ExpressionStatement::TokenLiteral() {
-    return "";
+    return token.GetLiteral();
 }
 
 std::string Ad_AST_ExpressionStatement::ToString() {
