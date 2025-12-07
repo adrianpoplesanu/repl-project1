@@ -30,8 +30,8 @@ std::unordered_map<TokenType, PrecedenceType> precedences = {
 };
 
 Parser::Parser() {
-    statementParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfStatement));
-    statementParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefStatement));
+    //statementParseFns.insert(std::make_pair(TT_IF, &Parser::ParseIfStatement)); // astea nu sunt folosite la nimic
+    //statementParseFns.insert(std::make_pair(TT_DEF, &Parser::ParseDefStatement)); // astea nu sunt folosite la nimic
 
     prefixParseFns.insert(std::make_pair(TT_IDENT, &Parser::ParseIdentifier));
     prefixParseFns.insert(std::make_pair(TT_INT, &Parser::ParseIntegerLiteral));

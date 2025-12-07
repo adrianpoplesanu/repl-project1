@@ -133,6 +133,7 @@ bool Repl::ExecuteLineVM(std::string line) {
     parser.Load(line);
     program.reset();
     parser.ParseProgram(program);
+    std::cout << program.ToString();
 
     compiler.reset();
     compiler.compile(&program);
