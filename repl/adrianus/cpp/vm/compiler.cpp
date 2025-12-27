@@ -1,5 +1,6 @@
 #include "compiler.h"
 #include "opcode.h"
+#include "utils.h"
 #include <cstdarg>
 #include <iostream>
 
@@ -11,6 +12,7 @@ Compiler::Compiler() {
     scopeIndex = 0;
     frames.clear();
     frames_index = 0;
+    symbol_table = new_symbol_table();
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
 
@@ -22,6 +24,7 @@ Compiler::Compiler(GarbageCollector* gc) {
     scopeIndex = 0;
     frames.clear();
     frames_index = 0;
+    symbol_table = new_symbol_table();
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
 
@@ -147,6 +150,15 @@ void Compiler::compile(Ad_AST_Node* node) {
         Ad_AST_BlockStatement* block_stmt = (Ad_AST_BlockStatement*)node;
         for (Ad_AST_Node* stmt : block_stmt->statements) {
             compile(stmt);
+        }
+    } else if (node->type == ST_LET_STATEMENT) {
+        Ad_AST_LetStatement* let_stmt = (Ad_AST_LetStatement*)node;
+        Symbol symbol = symbol_table->define(let_stmt->name.value);
+        compile(let_stmt->value);
+        if (symbol.scope == SymbolScope::GLOBAL) {
+            emit(opSetGlobal, 1, {symbol.index});
+        } else {
+            emit(opSetLocal, 1, {symbol.index});
         }
     } else if (node->type == ST_NULL_EXPRESSION) {
         emit(opNull, 0, {});
@@ -294,5 +306,58 @@ void Compiler::changeOperand(int pos, int operand) {
             code.instructions.bytes[pos + 2] = static_cast<unsigned char>(operand & 0xFF);
         }
     }
+}
+
+void Compiler::enter_scope() {
+    CompilationScope scope;
+    scope.instructions = code.instructions;
+    scope.lastInstruction = EmittedInstruction();
+    scope.previousInstruction = EmittedInstruction();
+    scopes.push_back(scope);
+    scopeIndex++;
+    symbol_table = new_enclosed_symbol_table(symbol_table);
+}
+
+void Compiler::enter_scope_class() {
+    CompilationScope scope("class");
+    scope.instructions = code.instructions;
+    scope.lastInstruction = EmittedInstruction();
+    scope.previousInstruction = EmittedInstruction();
+    scopes.push_back(scope);
+    scopeIndex++;
+    symbol_table = new_enclosed_symbol_table(symbol_table);
+}
+
+Instructions Compiler::leave_scope() {
+    Instructions instructions = currentInstructions();
+    
+    // Print instructions bytes
+    std::cout << "Instructions bytes: ";
+    for (size_t i = 0; i < instructions.bytes.size(); i++) {
+        std::cout << static_cast<int>(instructions.bytes[i]) << " ";
+    }
+    std::cout << std::endl;
+    
+    // Disassemble instructions
+    /*Code temp_code;
+    temp_code.instructions = instructions;
+    std::string disassembled = temp_code.toString();
+    std::cout << disassembled << std::endl;*/
+    std::cout << disassemble_instructions(instructions) << std::endl;
+    
+    // Remove the last scope
+    if (scopes.size() > 0) {
+        scopes.pop_back();
+    }
+    if (scopeIndex > 0) {
+        scopeIndex--;
+    }
+    
+    // Move to outer symbol table
+    if (symbol_table != nullptr) {
+        symbol_table = symbol_table->outer;
+    }
+    
+    return instructions;
 }
 

@@ -37,6 +37,8 @@
 #include "vm/opcode.cpp"
 #include "vm/symbol_table.h"
 #include "vm/symbol_table.cpp"
+#include "vm/utils.h"
+#include "vm/utils.cpp"
 #include "vm/vm.h"
 #include "vm/vm.cpp"
 

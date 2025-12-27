@@ -6,6 +6,7 @@
 #include "opcode.h"
 #include "compilation_scope.h"
 #include "frame.h"
+#include "symbol_table.h"
 #include "../objects.h"
 #include "../ast.h"
 #include <vector>
@@ -21,6 +22,7 @@ public:
     int scopeIndex;
     std::vector<Frame> frames;
     int frames_index;
+    SymbolTable* symbol_table;
 
     Compiler();
     Compiler(GarbageCollector* gc);
@@ -41,6 +43,9 @@ public:
     
     // Scope management
     Instructions currentInstructions();
+    void enter_scope();
+    void enter_scope_class();
+    Instructions leave_scope();
 
     // Frame management
     Frame currentFrame();
