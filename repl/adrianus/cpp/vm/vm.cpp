@@ -9,6 +9,7 @@ VM::VM() {
     gc = nullptr;
     frames.clear();
     constants.clear();
+    globals.clear();
 }
 
 void VM::load(Bytecode bytecode) {
@@ -74,6 +75,15 @@ void VM::run() {
             }
         } else if (opcode == OP_NULL) {
             push(&NULLOBJECT);
+        } else if (opcode == OP_SET_GLOBAL) {
+            int global_index = read_uint16(*ins, ip + 1);
+            current_frame()->ip += 2;
+
+            // Ensure globals vector is large enough
+            if (global_index >= static_cast<int>(globals.size())) {
+                globals.resize(global_index + 1, nullptr);
+            }
+            globals[global_index] = pop();
         }
     }
 }

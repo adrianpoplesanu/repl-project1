@@ -16,6 +16,7 @@ public:
     GarbageCollector *gc;
     std::vector<Frame> frames;
     std::vector<Ad_Object*> constants;
+    std::vector<Ad_Object*> globals;
 
     VM();
     void load(Bytecode bytecode);
