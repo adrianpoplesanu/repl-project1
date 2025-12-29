@@ -84,6 +84,15 @@ void VM::run() {
                 globals.resize(global_index + 1, nullptr);
             }
             globals[global_index] = pop();
+        } else if (opcode == OP_GET_GLOBAL) {
+            int global_index = read_uint16(*ins, ip + 1);
+            current_frame()->ip += 2;
+
+            if (global_index >= 0 && global_index < static_cast<int>(globals.size())) {
+                push(globals[global_index]);
+            } else {
+                std::cerr << "[ VM Error ] Global index out of bounds: " << global_index << std::endl;
+            }
         }
     }
 }

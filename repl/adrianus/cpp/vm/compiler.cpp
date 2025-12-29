@@ -151,6 +151,8 @@ void Compiler::compile(Ad_AST_Node* node) {
         for (Ad_AST_Node* stmt : block_stmt->statements) {
             compile(stmt);
         }
+    } else if (node->type == ST_NULL_EXPRESSION) {
+        emit(opNull, 0, {});
     } else if (node->type == ST_LET_STATEMENT) {
         Ad_AST_LetStatement* let_stmt = (Ad_AST_LetStatement*)node;
         Symbol symbol = symbol_table->define(let_stmt->name.value);
@@ -160,8 +162,20 @@ void Compiler::compile(Ad_AST_Node* node) {
         } else {
             emit(opSetLocal, 1, {symbol.index});
         }
-    } else if (node->type == ST_NULL_EXPRESSION) {
-        emit(opNull, 0, {});
+    } else if (node->type == ST_IDENTIFIER) {
+        Ad_AST_Identifier* identifier_node = (Ad_AST_Identifier*)node;
+        Symbol* symbol = symbol_table->resolve(identifier_node->value);
+        if (symbol != nullptr) {
+            load_symbol(*symbol, identifier_node->value);
+        } else {
+            // Handle implicit 'this' property access
+            Ad_String_Object* field = new Ad_String_Object(identifier_node->value);
+            std::vector<int> args;
+            int const_index = addConstant(field);
+            args.push_back(const_index);
+            emit(opConstant, 1, args);
+            emit(opGetPropertySym, 1, {0});
+        }
     }
     // TODO: add support for other statement types
 }
@@ -359,5 +373,26 @@ Instructions Compiler::leave_scope() {
     }
     
     return instructions;
+}
+
+void Compiler::load_symbol(const Symbol& symbol, const std::string& field_name) {
+    if (symbol.scope == SymbolScope::GLOBAL) {
+        emit(opGetGlobal, 1, {symbol.index});
+    } else if (symbol.scope == SymbolScope::LOCAL) {
+        emit(opGetLocal, 1, {symbol.index});
+    } else if (symbol.scope == SymbolScope::BUILTIN) {
+        emit(opGetBuiltin, 1, {symbol.index});
+    } else if (symbol.scope == SymbolScope::FREE) {
+        emit(opGetFree, 1, {symbol.index});
+    } else if (symbol.scope == SymbolScope::CLASS) {
+        Ad_String_Object* field = new Ad_String_Object(field_name);
+        std::vector<int> args;
+        int const_index = addConstant(field);
+        args.push_back(const_index);
+        emit(opConstant, 1, args);
+        emit(opGetPropertySym, 1, {symbol.index});
+    } else if (symbol.scope == SymbolScope::FUNCTION) {
+        emit(opCurrentClosure, 0, {});
+    }
 }
 

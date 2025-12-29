@@ -57,6 +57,9 @@ public:
     void removeLastPop();
     void changeOperand(int pos, int operand);
 
+    // Symbol loading
+    void load_symbol(const Symbol& symbol, const std::string& field_name = "");
+
 };
 
 #endif
