@@ -537,7 +537,8 @@ void test_compile_if_expression_jump_offsets() {
     // 4: OP_CONSTANT (1 byte) + constant index (2 bytes) = 3 bytes total
     // 7: OP_JUMP (1 byte) + offset (2 bytes) = 3 bytes total
     // 10: OP_CONSTANT (1 byte) + constant index (2 bytes) = 3 bytes total
-    // Total: 13 bytes
+    // 13: OP_POP (1 byte) - emitted at the end of if expression
+    // Total: 14 bytes
     
     // Verify OP_JUMP_NOT_TRUTHY offset is set (not the placeholder 9999)
     // The offset is set to after_consequence_pos, which is the position after OP_JUMP (position 10)
@@ -549,21 +550,205 @@ void test_compile_if_expression_jump_offsets() {
     assert(jump_not_truthy_offset == 10); // Should jump to position 10 (after OP_JUMP, which is after consequence)
     
     // Verify OP_JUMP offset is set (not the placeholder 9999)
-    // The offset is set to after_alternative_pos, which is the position after the alternative (position 13)
+    // The offset is set to after_alternative_pos, which is the position after the alternative (position 13, before OP_POP)
     int jump_pos = 7;
     high_byte = ins.get(jump_pos + 1);
     low_byte = ins.get(jump_pos + 2);
     int jump_offset = (high_byte << 8) | low_byte;
     assert(jump_offset != 9999); // Should be updated from placeholder
-    assert(jump_offset == 13); // Should jump to position 13 (after alternative)
+    assert(jump_offset == 13); // Should jump to position 13 (after alternative, before OP_POP)
     
-    // Verify total instruction size
-    assert(ins.size == 13);
+    // Verify OP_POP is at the end
+    assert(ins.get(13) == OP_POP);
+    
+    // Verify total instruction size (14 bytes including OP_POP)
+    assert(ins.size == 14);
     
     // Clean up
     delete if_expr;
     
     std::cout << "✓ Compile if expression jump offsets test passed\n";
+}
+
+void test_compile_let_statement() {
+    std::cout << "running test_compile_let_statement...\n";
+    
+    Compiler compiler;
+    
+    // Create AST nodes for: let x = 42
+    Token let_token("let", TT_LET);
+    Ad_AST_LetStatement* let_stmt = new Ad_AST_LetStatement(let_token);
+    
+    Token ident_token("x", TT_IDENT);
+    let_stmt->name = Ad_AST_Identifier(ident_token, "x");
+    
+    Token int_token("42", TT_INT);
+    let_stmt->value = new Ad_AST_Integer(int_token, 42);
+    
+    // Compile the let statement
+    compiler.compile(let_stmt);
+    
+    // Expected bytecode structure:
+    // 1. OP_CONSTANT <index> (value: 42)
+    // 2. OP_SET_GLOBAL <index> (global variable index)
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Check that we have OP_CONSTANT first
+    assert(ins.get(0) == OP_CONSTANT);
+    
+    // Check that we have OP_SET_GLOBAL after the constant
+    int set_global_pos = 3; // After OP_CONSTANT (3 bytes: opcode + 2-byte operand)
+    assert(ins.get(set_global_pos) == OP_SET_GLOBAL);
+    
+    // Verify the global index operand
+    unsigned char high_byte = ins.get(set_global_pos + 1);
+    unsigned char low_byte = ins.get(set_global_pos + 2);
+    int global_index = (high_byte << 8) | low_byte;
+    assert(global_index == 0); // First global variable should be at index 0
+    
+    // Verify constant was added
+    assert(compiler.constants.size() == 1);
+    assert(compiler.constants[0]->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)compiler.constants[0])->value == 42);
+    
+    // Clean up
+    delete let_stmt;
+    
+    std::cout << "✓ Compile let statement test passed\n";
+}
+
+void test_compile_identifier() {
+    std::cout << "running test_compile_identifier...\n";
+    
+    Compiler compiler;
+    
+    // First, define a global variable: let x = 42
+    Token let_token("let", TT_LET);
+    Ad_AST_LetStatement* let_stmt = new Ad_AST_LetStatement(let_token);
+    Token ident_token("x", TT_IDENT);
+    let_stmt->name = Ad_AST_Identifier(ident_token, "x");
+    Token int_token("42", TT_INT);
+    let_stmt->value = new Ad_AST_Integer(int_token, 42);
+    compiler.compile(let_stmt);
+    
+    // Now compile an identifier access: x
+    Token ident_token2("x", TT_IDENT);
+    Ad_AST_Identifier* identifier = new Ad_AST_Identifier(ident_token2, "x");
+    
+    compiler.compile(identifier);
+    
+    // Expected bytecode structure after identifier:
+    // ... (previous let statement instructions)
+    // OP_GET_GLOBAL <index>
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Find the last instruction (OP_GET_GLOBAL)
+    int get_global_pos = ins.size - 3; // OP_GET_GLOBAL is 3 bytes
+    assert(ins.get(get_global_pos) == OP_GET_GLOBAL);
+    
+    // Verify the global index operand
+    unsigned char high_byte = ins.get(get_global_pos + 1);
+    unsigned char low_byte = ins.get(get_global_pos + 2);
+    int global_index = (high_byte << 8) | low_byte;
+    assert(global_index == 0); // Should reference the same global variable
+    
+    // Clean up
+    delete let_stmt;
+    delete identifier;
+    
+    std::cout << "✓ Compile identifier test passed\n";
+}
+
+void test_compile_multiple_let_statements() {
+    std::cout << "running test_compile_multiple_let_statements...\n";
+    
+    Compiler compiler;
+    
+    // Create: let x = 10; let y = 20;
+    Token let_token("let", TT_LET);
+    
+    // First let statement: let x = 10
+    Ad_AST_LetStatement* let_stmt1 = new Ad_AST_LetStatement(let_token);
+    Token ident_token1("x", TT_IDENT);
+    let_stmt1->name = Ad_AST_Identifier(ident_token1, "x");
+    Token int_token1("10", TT_INT);
+    let_stmt1->value = new Ad_AST_Integer(int_token1, 10);
+    compiler.compile(let_stmt1);
+    
+    // Second let statement: let y = 20
+    Ad_AST_LetStatement* let_stmt2 = new Ad_AST_LetStatement(let_token);
+    Token ident_token2("y", TT_IDENT);
+    let_stmt2->name = Ad_AST_Identifier(ident_token2, "y");
+    Token int_token2("20", TT_INT);
+    let_stmt2->value = new Ad_AST_Integer(int_token2, 20);
+    compiler.compile(let_stmt2);
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Verify first let statement: OP_CONSTANT 0, OP_SET_GLOBAL 0
+    assert(ins.get(0) == OP_CONSTANT);
+    assert(ins.get(3) == OP_SET_GLOBAL);
+    int global_index1 = (ins.get(4) << 8) | ins.get(5);
+    assert(global_index1 == 0);
+    
+    // Verify second let statement: OP_CONSTANT 1, OP_SET_GLOBAL 1
+    assert(ins.get(6) == OP_CONSTANT);
+    assert(ins.get(9) == OP_SET_GLOBAL);
+    int global_index2 = (ins.get(10) << 8) | ins.get(11);
+    assert(global_index2 == 1);
+    
+    // Verify constants
+    assert(compiler.constants.size() == 2);
+    assert(((Ad_Integer_Object*)compiler.constants[0])->value == 10);
+    assert(((Ad_Integer_Object*)compiler.constants[1])->value == 20);
+    
+    // Clean up
+    delete let_stmt1;
+    delete let_stmt2;
+    
+    std::cout << "✓ Compile multiple let statements test passed\n";
+}
+
+void test_compile_let_statement_with_identifier_access() {
+    std::cout << "running test_compile_let_statement_with_identifier_access...\n";
+    
+    Compiler compiler;
+    
+    // Create: let x = 42; x
+    Token let_token("let", TT_LET);
+    Ad_AST_LetStatement* let_stmt = new Ad_AST_LetStatement(let_token);
+    Token ident_token("x", TT_IDENT);
+    let_stmt->name = Ad_AST_Identifier(ident_token, "x");
+    Token int_token("42", TT_INT);
+    let_stmt->value = new Ad_AST_Integer(int_token, 42);
+    compiler.compile(let_stmt);
+    
+    // Now access the identifier
+    Token ident_token2("x", TT_IDENT);
+    Ad_AST_Identifier* identifier = new Ad_AST_Identifier(ident_token2, "x");
+    compiler.compile(identifier);
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Verify the sequence: OP_CONSTANT, OP_SET_GLOBAL, OP_GET_GLOBAL
+    assert(ins.get(0) == OP_CONSTANT);
+    assert(ins.get(3) == OP_SET_GLOBAL);
+    assert(ins.get(6) == OP_GET_GLOBAL);
+    
+    // Verify both SET_GLOBAL and GET_GLOBAL reference the same index
+    int set_global_index = (ins.get(4) << 8) | ins.get(5);
+    int get_global_index = (ins.get(7) << 8) | ins.get(8);
+    assert(set_global_index == 0);
+    assert(get_global_index == 0);
+    assert(set_global_index == get_global_index);
+    
+    // Clean up
+    delete let_stmt;
+    delete identifier;
+    
+    std::cout << "✓ Compile let statement with identifier access test passed\n";
 }
 
 void run_all_compiler_tests() {
@@ -591,6 +776,12 @@ void run_all_compiler_tests() {
     test_compile_if_expression_with_alternative();
     test_compile_if_expression_with_integer_condition();
     test_compile_if_expression_jump_offsets();
+    
+    // ST_LET_STATEMENT and ST_IDENTIFIER tests
+    test_compile_let_statement();
+    test_compile_identifier();
+    test_compile_multiple_let_statements();
+    test_compile_let_statement_with_identifier_access();
     
     std::cout << "=== All Compiler tests passed! ===\n\n";
 }

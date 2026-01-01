@@ -482,6 +482,205 @@ void test_vm_arithmetic_precedence() {
     std::cout << "✓ VM arithmetic precedence test passed\n";
 }
 
+// Helper function to create OP_SET_GLOBAL instruction
+std::vector<unsigned char> make_set_global_instruction(int global_index) {
+    std::vector<unsigned char> instruction;
+    instruction.push_back(OP_SET_GLOBAL);
+    auto operand = encode_uint16(global_index);
+    instruction.insert(instruction.end(), operand.begin(), operand.end());
+    return instruction;
+}
+
+// Helper function to create OP_GET_GLOBAL instruction
+std::vector<unsigned char> make_get_global_instruction(int global_index) {
+    std::vector<unsigned char> instruction;
+    instruction.push_back(OP_GET_GLOBAL);
+    auto operand = encode_uint16(global_index);
+    instruction.insert(instruction.end(), operand.begin(), operand.end());
+    return instruction;
+}
+
+void test_vm_set_global_instruction() {
+    std::cout << "running test_vm_set_global_instruction...\n";
+
+    VM vm;
+
+    // Create bytecode: OP_CONSTANT 0 (42), OP_SET_GLOBAL 0
+    Ad_Integer_Object* constant = new Ad_Integer_Object(42);
+    std::vector<unsigned char> instructions;
+    auto const_inst = make_constant_instruction(0);
+    auto set_global_inst = make_set_global_instruction(0);
+    instructions.insert(instructions.end(), const_inst.begin(), const_inst.end());
+    instructions.insert(instructions.end(), set_global_inst.begin(), set_global_inst.end());
+
+    std::vector<Ad_Object*> constants = {constant};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+
+    vm.load(bytecode);
+    vm.run();
+
+    // Verify stack is empty (value was popped and stored in global)
+    assert(vm.sp == 0);
+
+    // Verify global variable was set
+    assert(vm.globals.size() == 1);
+    assert(vm.globals[0] != nullptr);
+    assert(vm.globals[0]->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)vm.globals[0])->value == 42);
+
+    std::cout << "✓ VM set global instruction test passed\n";
+}
+
+void test_vm_get_global_instruction() {
+    std::cout << "running test_vm_get_global_instruction...\n";
+
+    VM vm;
+
+    // First set a global variable
+    Ad_Integer_Object* constant = new Ad_Integer_Object(100);
+    std::vector<unsigned char> instructions;
+    auto const_inst = make_constant_instruction(0);
+    auto set_global_inst = make_set_global_instruction(0);
+    instructions.insert(instructions.end(), const_inst.begin(), const_inst.end());
+    instructions.insert(instructions.end(), set_global_inst.begin(), set_global_inst.end());
+
+    // Then get it
+    auto get_global_inst = make_get_global_instruction(0);
+    instructions.insert(instructions.end(), get_global_inst.begin(), get_global_inst.end());
+
+    std::vector<Ad_Object*> constants = {constant};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+
+    vm.load(bytecode);
+    vm.run();
+
+    // Verify stack has the global value
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)result)->value == 100);
+
+    // Verify global variable exists
+    assert(vm.globals.size() == 1);
+    assert(vm.globals[0] != nullptr);
+    assert(((Ad_Integer_Object*)vm.globals[0])->value == 100);
+
+    std::cout << "✓ VM get global instruction test passed\n";
+}
+
+void test_vm_set_and_get_global() {
+    std::cout << "running test_vm_set_and_get_global...\n";
+
+    VM vm;
+
+    // Create bytecode: OP_CONSTANT 0 (42), OP_SET_GLOBAL 0, OP_GET_GLOBAL 0
+    Ad_Integer_Object* constant = new Ad_Integer_Object(42);
+    std::vector<unsigned char> instructions;
+    auto const_inst = make_constant_instruction(0);
+    auto set_global_inst = make_set_global_instruction(0);
+    auto get_global_inst = make_get_global_instruction(0);
+    instructions.insert(instructions.end(), const_inst.begin(), const_inst.end());
+    instructions.insert(instructions.end(), set_global_inst.begin(), set_global_inst.end());
+    instructions.insert(instructions.end(), get_global_inst.begin(), get_global_inst.end());
+
+    std::vector<Ad_Object*> constants = {constant};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+
+    vm.load(bytecode);
+    vm.run();
+
+    // Verify stack has the global value
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)result)->value == 42);
+
+    // Verify global variable was set correctly
+    assert(vm.globals.size() == 1);
+    assert(vm.globals[0] != nullptr);
+    assert(((Ad_Integer_Object*)vm.globals[0])->value == 42);
+
+    std::cout << "✓ VM set and get global test passed\n";
+}
+
+void test_vm_multiple_global_variables() {
+    std::cout << "running test_vm_multiple_global_variables...\n";
+
+    VM vm;
+
+    // Create bytecode: 
+    // OP_CONSTANT 0 (10), OP_SET_GLOBAL 0
+    // OP_CONSTANT 1 (20), OP_SET_GLOBAL 1
+    // OP_GET_GLOBAL 0, OP_GET_GLOBAL 1, OP_ADD
+    Ad_Integer_Object* const1 = new Ad_Integer_Object(10);
+    Ad_Integer_Object* const2 = new Ad_Integer_Object(20);
+
+    std::vector<unsigned char> instructions;
+    auto const_inst1 = make_constant_instruction(0);
+    auto set_global_inst1 = make_set_global_instruction(0);
+    auto const_inst2 = make_constant_instruction(1);
+    auto set_global_inst2 = make_set_global_instruction(1);
+    auto get_global_inst1 = make_get_global_instruction(0);
+    auto get_global_inst2 = make_get_global_instruction(1);
+    
+    instructions.insert(instructions.end(), const_inst1.begin(), const_inst1.end());
+    instructions.insert(instructions.end(), set_global_inst1.begin(), set_global_inst1.end());
+    instructions.insert(instructions.end(), const_inst2.begin(), const_inst2.end());
+    instructions.insert(instructions.end(), set_global_inst2.begin(), set_global_inst2.end());
+    instructions.insert(instructions.end(), get_global_inst1.begin(), get_global_inst1.end());
+    instructions.insert(instructions.end(), get_global_inst2.begin(), get_global_inst2.end());
+    instructions.push_back(OP_ADD);
+
+    std::vector<Ad_Object*> constants = {const1, const2};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+
+    vm.load(bytecode);
+    vm.run();
+
+    // Verify stack has the result of addition
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)result)->value == 30); // 10 + 20 = 30
+
+    // Verify both global variables were set
+    assert(vm.globals.size() == 2);
+    assert(vm.globals[0] != nullptr);
+    assert(((Ad_Integer_Object*)vm.globals[0])->value == 10);
+    assert(vm.globals[1] != nullptr);
+    assert(((Ad_Integer_Object*)vm.globals[1])->value == 20);
+
+    std::cout << "✓ VM multiple global variables test passed\n";
+}
+
+void test_vm_get_global_before_set() {
+    std::cout << "running test_vm_get_global_before_set...\n";
+
+    VM vm;
+
+    // Create bytecode: OP_GET_GLOBAL 0 (without setting it first)
+    std::vector<unsigned char> instructions;
+    auto get_global_inst = make_get_global_instruction(0);
+    instructions.insert(instructions.end(), get_global_inst.begin(), get_global_inst.end());
+
+    std::vector<Ad_Object*> constants;
+    Bytecode bytecode = make_bytecode(instructions, constants);
+
+    vm.load(bytecode);
+    vm.run();
+
+    // The VM should handle this gracefully - it checks bounds and prints an error
+    // but doesn't push anything to the stack if the index is out of bounds
+    // Stack should be empty since nothing was pushed
+    assert(vm.sp == 0);
+    assert(vm.globals.empty());
+
+    std::cout << "✓ VM get global before set test passed\n";
+}
+
 void run_all_vm_tests() {
     std::cout << "=== Running VM tests ===\n";
 
@@ -501,6 +700,13 @@ void run_all_vm_tests() {
     test_vm_empty_instructions();
     test_vm_multiple_constants();
     test_vm_arithmetic_precedence();
+
+    // OP_SET_GLOBAL and OP_GET_GLOBAL tests
+    test_vm_set_global_instruction();
+    test_vm_get_global_instruction();
+    test_vm_set_and_get_global();
+    test_vm_multiple_global_variables();
+    test_vm_get_global_before_set();
 
     std::cout << "=== All VM tests passed! ===\n\n";
 }
