@@ -176,6 +176,11 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opConstant, 1, args);
             emit(opGetPropertySym, 1, {0});
         }
+    } else if (node->type == ST_STRING_LITERAL) {
+        Ad_AST_String* string_node = (Ad_AST_String*)node;
+        Ad_String_Object* string_obj = new Ad_String_Object(string_node->value);
+        int const_index = addConstant(string_obj);
+        emit(opConstant, 1, {const_index});
     }
     // TODO: add support for other statement types
 }
