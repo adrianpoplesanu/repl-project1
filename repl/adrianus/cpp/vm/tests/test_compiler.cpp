@@ -6,6 +6,7 @@
 #include "../opcode.h"
 #include "../../ast.h"
 #include "../../token.h"
+#include "../../objects.h"
 
 void test_compiler_constructor() {
     std::cout << "running test_compiler_constructor...\n";
@@ -751,6 +752,85 @@ void test_compile_let_statement_with_identifier_access() {
     std::cout << "✓ Compile let statement with identifier access test passed\n";
 }
 
+void test_compile_string_literal() {
+    std::cout << "running test_compile_string_literal...\n";
+    
+    Compiler compiler;
+    
+    // Create AST node for: "hello world"
+    Token string_token("\"hello world\"", TT_DOUBLE_QUOTES);
+    Ad_AST_String* string_node = new Ad_AST_String(string_token);
+    string_node->value = "hello world";
+    
+    // Compile the string literal
+    compiler.compile(string_node);
+    
+    // Expected bytecode structure:
+    // 1. OP_CONSTANT <index> (string constant)
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Check that we have OP_CONSTANT first
+    assert(ins.get(0) == OP_CONSTANT);
+    
+    // Verify the constant index operand (should be 0 for first constant)
+    unsigned char high_byte = ins.get(1);
+    unsigned char low_byte = ins.get(2);
+    int const_index = (high_byte << 8) | low_byte;
+    assert(const_index == 0);
+    
+    // Verify constant was added
+    assert(compiler.constants.size() == 1);
+    assert(compiler.constants[0]->Type() == OBJ_STRING);
+    assert(((Ad_String_Object*)compiler.constants[0])->value == "hello world");
+    
+    // Clean up
+    delete string_node;
+    
+    std::cout << "✓ Compile string literal test passed\n";
+}
+
+void test_compile_multiple_string_literals() {
+    std::cout << "running test_compile_multiple_string_literals...\n";
+    
+    Compiler compiler;
+    
+    // Create first string: "hello"
+    Token string_token1("\"hello\"", TT_DOUBLE_QUOTES);
+    Ad_AST_String* string_node1 = new Ad_AST_String(string_token1);
+    string_node1->value = "hello";
+    compiler.compile(string_node1);
+    
+    // Create second string: "world"
+    Token string_token2("\"world\"", TT_DOUBLE_QUOTES);
+    Ad_AST_String* string_node2 = new Ad_AST_String(string_token2);
+    string_node2->value = "world";
+    compiler.compile(string_node2);
+    
+    Instructions& ins = compiler.code.instructions;
+    
+    // Verify first string: OP_CONSTANT 0
+    assert(ins.get(0) == OP_CONSTANT);
+    int const_index1 = (ins.get(1) << 8) | ins.get(2);
+    assert(const_index1 == 0);
+    
+    // Verify second string: OP_CONSTANT 1
+    assert(ins.get(3) == OP_CONSTANT);
+    int const_index2 = (ins.get(4) << 8) | ins.get(5);
+    assert(const_index2 == 1);
+    
+    // Verify constants
+    assert(compiler.constants.size() == 2);
+    assert(((Ad_String_Object*)compiler.constants[0])->value == "hello");
+    assert(((Ad_String_Object*)compiler.constants[1])->value == "world");
+    
+    // Clean up
+    delete string_node1;
+    delete string_node2;
+    
+    std::cout << "✓ Compile multiple string literals test passed\n";
+}
+
 void run_all_compiler_tests() {
     std::cout << "=== Running Compiler tests ===\n";
     
@@ -782,6 +862,10 @@ void run_all_compiler_tests() {
     test_compile_identifier();
     test_compile_multiple_let_statements();
     test_compile_let_statement_with_identifier_access();
+    
+    // ST_STRING_LITERAL tests
+    test_compile_string_literal();
+    test_compile_multiple_string_literals();
     
     std::cout << "=== All Compiler tests passed! ===\n\n";
 }

@@ -681,6 +681,100 @@ void test_vm_get_global_before_set() {
     std::cout << "✓ VM get global before set test passed\n";
 }
 
+void test_vm_string_constant_instruction() {
+    std::cout << "running test_vm_string_constant_instruction...\n";
+
+    VM vm;
+
+    // Create bytecode: OP_CONSTANT 0 (load string constant at index 0)
+    Ad_String_Object* constant = new Ad_String_Object("hello world");
+    std::vector<unsigned char> instructions = make_constant_instruction(0);
+    std::vector<Ad_Object*> constants = {constant};
+
+    Bytecode bytecode = make_bytecode(instructions, constants);
+    vm.load(bytecode);
+
+    // Verify frame was created
+    assert(vm.current_frame() != nullptr);
+    Instructions* ins = vm.current_frame()->instructions();
+    assert(ins != nullptr);
+    assert(ins->bytes.size() == 3);  // OP_CONSTANT + 2 bytes for operand
+
+    vm.run();
+
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[vm.sp - 1];  // sp points to next free slot, so last element is at sp-1
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_STRING);
+    assert(((Ad_String_Object*)result)->value == "hello world");
+
+    std::cout << "✓ VM string constant instruction test passed\n";
+}
+
+void test_vm_multiple_string_constants() {
+    std::cout << "running test_vm_multiple_string_constants...\n";
+
+    VM vm;
+
+    // Create bytecode: OP_CONSTANT 0, OP_CONSTANT 1, OP_CONSTANT 2
+    Ad_String_Object* const1 = new Ad_String_Object("hello");
+    Ad_String_Object* const2 = new Ad_String_Object("world");
+    Ad_String_Object* const3 = new Ad_String_Object("!");
+
+    std::vector<unsigned char> instructions;
+    auto inst1 = make_constant_instruction(0);
+    auto inst2 = make_constant_instruction(1);
+    auto inst3 = make_constant_instruction(2);
+    instructions.insert(instructions.end(), inst1.begin(), inst1.end());
+    instructions.insert(instructions.end(), inst2.begin(), inst2.end());
+    instructions.insert(instructions.end(), inst3.begin(), inst3.end());
+
+    std::vector<Ad_Object*> constants = {const1, const2, const3};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+
+    vm.load(bytecode);
+    vm.run();
+
+    assert(vm.sp == 3);
+
+    // Check that all three string constants are on the stack
+    Ad_Object* result3 = vm.stack[2];
+    Ad_Object* result2 = vm.stack[1];
+    Ad_Object* result1 = vm.stack[0];
+
+    assert(result1->Type() == OBJ_STRING);
+    assert(((Ad_String_Object*)result1)->value == "hello");
+    assert(result2->Type() == OBJ_STRING);
+    assert(((Ad_String_Object*)result2)->value == "world");
+    assert(result3->Type() == OBJ_STRING);
+    assert(((Ad_String_Object*)result3)->value == "!");
+
+    std::cout << "✓ VM multiple string constants test passed\n";
+}
+
+void test_vm_string_empty_string() {
+    std::cout << "running test_vm_string_empty_string...\n";
+
+    VM vm;
+
+    // Create bytecode: OP_CONSTANT 0 (empty string)
+    Ad_String_Object* constant = new Ad_String_Object("");
+    std::vector<unsigned char> instructions = make_constant_instruction(0);
+    std::vector<Ad_Object*> constants = {constant};
+
+    Bytecode bytecode = make_bytecode(instructions, constants);
+    vm.load(bytecode);
+    vm.run();
+
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_STRING);
+    assert(((Ad_String_Object*)result)->value == "");
+
+    std::cout << "✓ VM string empty string test passed\n";
+}
+
 void run_all_vm_tests() {
     std::cout << "=== Running VM tests ===\n";
 
@@ -707,6 +801,11 @@ void run_all_vm_tests() {
     test_vm_set_and_get_global();
     test_vm_multiple_global_variables();
     test_vm_get_global_before_set();
+
+    // String literal tests
+    test_vm_string_constant_instruction();
+    test_vm_multiple_string_constants();
+    test_vm_string_empty_string();
 
     std::cout << "=== All VM tests passed! ===\n\n";
 }
