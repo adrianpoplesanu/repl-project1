@@ -181,6 +181,14 @@ void Compiler::compile(Ad_AST_Node* node) {
         Ad_String_Object* string_obj = new Ad_String_Object(string_node->value);
         int const_index = addConstant(string_obj);
         emit(opConstant, 1, {const_index});
+    } else if (node->type == ST_LIST_LITERAL) {
+        Ad_AST_ListLiteral* list_node = (Ad_AST_ListLiteral*)node;
+        for (Ad_AST_Node* el : list_node->elements) {
+            compile(el);
+        }
+        std::vector<int> args;
+        args.push_back(list_node->elements.size());
+        emit(opArray, 1, args);
     }
     // TODO: add support for other statement types
 }
