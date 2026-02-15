@@ -28,6 +28,7 @@ public:
     void execute_binary_operation(OpCodeType opcode);
     Ad_Object* native_bool_to_boolean_object(bool value);
     bool is_truthy(Ad_Object* obj);
+    Ad_Object* build_array(int start_index, int end_index);
 };
 
 #endif

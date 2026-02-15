@@ -3,6 +3,7 @@
 #include "objects.h"
 #include "../evaluator.h"
 #include <iostream>
+#include <vector>
 
 VM::VM() {
     sp = 0;
@@ -93,6 +94,13 @@ void VM::run() {
             } else {
                 std::cerr << "[ VM Error ] Global index out of bounds: " << global_index << std::endl;
             }
+        } else if (opcode == OP_ARRAY) {
+            int numElements = read_uint16(*ins, ip + 1);
+            current_frame()->ip += 2;
+
+            Ad_Object* array_obj = build_array(sp - numElements, sp);
+            sp = sp - numElements;
+            push(array_obj);
         }
     }
 }
@@ -187,4 +195,12 @@ bool VM::is_truthy(Ad_Object* obj) {
     if (obj == &TRUE) return true;
     if (obj == &FALSE) return false;
     return true;
+}
+
+Ad_Object* VM::build_array(int start_index, int end_index) {
+    std::vector<Ad_Object*> elements;
+    for (int i = start_index; i < end_index; i++) {
+        elements.push_back(stack[i]);
+    }
+    return new Ad_List_Object(elements);
 }
