@@ -831,6 +831,66 @@ void test_compile_multiple_string_literals() {
     std::cout << "✓ Compile multiple string literals test passed\n";
 }
 
+void test_compile_list_literal_empty() {
+    std::cout << "running test_compile_list_literal_empty...\n";
+
+    Compiler compiler;
+
+    Token bracket_token("[", TT_LBRACKET);
+    Ad_AST_ListLiteral* list_node = new Ad_AST_ListLiteral(bracket_token);
+    list_node->elements.clear();
+
+    compiler.compile(list_node);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.size == 3);  // OP_ARRAY (1) + 2-byte operand
+    assert(ins.get(0) == OP_ARRAY);
+    int num_elements = (ins.get(1) << 8) | ins.get(2);
+    assert(num_elements == 0);
+
+    delete list_node;
+    std::cout << "✓ Compile list literal empty test passed\n";
+}
+
+void test_compile_list_literal() {
+    std::cout << "running test_compile_list_literal...\n";
+
+    Compiler compiler;
+
+    Token bracket_token("[", TT_LBRACKET);
+    Ad_AST_ListLiteral* list_node = new Ad_AST_ListLiteral(bracket_token);
+
+    Token int_token1("1", TT_INT);
+    Token int_token2("2", TT_INT);
+    Ad_AST_Integer* el1 = new Ad_AST_Integer(int_token1, 1);
+    Ad_AST_Integer* el2 = new Ad_AST_Integer(int_token2, 2);
+    list_node->elements.push_back(el1);
+    list_node->elements.push_back(el2);
+
+    compiler.compile(list_node);
+
+    Instructions& ins = compiler.code.instructions;
+    // OP_CONSTANT 0 (1), OP_CONSTANT 1 (2), OP_ARRAY 2
+    assert(ins.get(0) == OP_CONSTANT);
+    int const0 = (ins.get(1) << 8) | ins.get(2);
+    assert(const0 == 0);
+    assert(ins.get(3) == OP_CONSTANT);
+    int const1 = (ins.get(4) << 8) | ins.get(5);
+    assert(const1 == 1);
+    assert(ins.get(6) == OP_ARRAY);
+    int num_elements = (ins.get(7) << 8) | ins.get(8);
+    assert(num_elements == 2);
+
+    assert(compiler.constants.size() == 2);
+    assert(compiler.constants[0]->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)compiler.constants[0])->value == 1);
+    assert(compiler.constants[1]->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)compiler.constants[1])->value == 2);
+
+    delete list_node;  // list_node owns el1, el2 as elements
+    std::cout << "✓ Compile list literal test passed\n";
+}
+
 void run_all_compiler_tests() {
     std::cout << "=== Running Compiler tests ===\n";
     
@@ -866,7 +926,11 @@ void run_all_compiler_tests() {
     // ST_STRING_LITERAL tests
     test_compile_string_literal();
     test_compile_multiple_string_literals();
-    
+
+    // ST_LIST_LITERAL tests
+    test_compile_list_literal_empty();
+    test_compile_list_literal();
+
     std::cout << "=== All Compiler tests passed! ===\n\n";
 }
 

@@ -34,6 +34,15 @@ std::vector<unsigned char> make_constant_instruction(int constant_index) {
     return instruction;
 }
 
+// Helper function to create OP_ARRAY instruction
+std::vector<unsigned char> make_array_instruction(int num_elements) {
+    std::vector<unsigned char> instruction;
+    instruction.push_back(OP_ARRAY);
+    auto operand = encode_uint16(num_elements);
+    instruction.insert(instruction.end(), operand.begin(), operand.end());
+    return instruction;
+}
+
 void test_vm_constructor() {
     std::cout << "running test_vm_constructor...\n";
 
@@ -775,6 +784,61 @@ void test_vm_string_empty_string() {
     std::cout << "✓ VM string empty string test passed\n";
 }
 
+void test_vm_array_instruction() {
+    std::cout << "running test_vm_array_instruction...\n";
+
+    VM vm;
+
+    // Bytecode: push two constants then build array of 2 elements
+    Ad_Integer_Object* const1 = new Ad_Integer_Object(10);
+    Ad_Integer_Object* const2 = new Ad_Integer_Object(20);
+    std::vector<unsigned char> instructions;
+    auto inst1 = make_constant_instruction(0);
+    auto inst2 = make_constant_instruction(1);
+    auto inst_array = make_array_instruction(2);
+    instructions.insert(instructions.end(), inst1.begin(), inst1.end());
+    instructions.insert(instructions.end(), inst2.begin(), inst2.end());
+    instructions.insert(instructions.end(), inst_array.begin(), inst_array.end());
+
+    std::vector<Ad_Object*> constants = {const1, const2};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+    vm.load(bytecode);
+    vm.run();
+
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_LIST);
+    Ad_List_Object* list_obj = (Ad_List_Object*)result;
+    assert(list_obj->elements.size() == 2);
+    assert(list_obj->elements[0]->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)list_obj->elements[0])->value == 10);
+    assert(list_obj->elements[1]->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)list_obj->elements[1])->value == 20);
+
+    std::cout << "✓ VM array instruction test passed\n";
+}
+
+void test_vm_array_empty() {
+    std::cout << "running test_vm_array_empty...\n";
+
+    VM vm;
+
+    std::vector<unsigned char> instructions = make_array_instruction(0);
+    Bytecode bytecode = make_bytecode(instructions, {});
+    vm.load(bytecode);
+    vm.run();
+
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_LIST);
+    Ad_List_Object* list_obj = (Ad_List_Object*)result;
+    assert(list_obj->elements.size() == 0);
+
+    std::cout << "✓ VM array empty test passed\n";
+}
+
 void run_all_vm_tests() {
     std::cout << "=== Running VM tests ===\n";
 
@@ -806,6 +870,10 @@ void run_all_vm_tests() {
     test_vm_string_constant_instruction();
     test_vm_multiple_string_constants();
     test_vm_string_empty_string();
+
+    // OP_ARRAY tests
+    test_vm_array_instruction();
+    test_vm_array_empty();
 
     std::cout << "=== All VM tests passed! ===\n\n";
 }
