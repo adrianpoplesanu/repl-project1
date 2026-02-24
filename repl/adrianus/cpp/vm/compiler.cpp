@@ -1,6 +1,7 @@
 #include "compiler.h"
 #include "opcode.h"
 #include "utils.h"
+#include <algorithm>
 #include <cstdarg>
 #include <iostream>
 
@@ -189,6 +190,22 @@ void Compiler::compile(Ad_AST_Node* node) {
         std::vector<int> args;
         args.push_back(list_node->elements.size());
         emit(opArray, 1, args);
+    } else if (node->type == ST_HASH_LITERAL) {
+        Ad_AST_HashLiteral* hash_node = (Ad_AST_HashLiteral*)node;
+        std::vector<Ad_AST_Node*> keys;
+        for (auto& kv : hash_node->pairs) {
+            keys.push_back(kv.first);
+        }
+        std::sort(keys.begin(), keys.end(), [](Ad_AST_Node* a, Ad_AST_Node* b) {
+            return a->ToString() < b->ToString();
+        });
+        for (Ad_AST_Node* k : keys) {
+            compile(k);
+            compile(hash_node->pairs[k]);
+        }
+        std::vector<int> args;
+        args.push_back(static_cast<int>(hash_node->pairs.size()) * 2);
+        emit(opHash, 1, args);
     }
     // TODO: add support for other statement types
 }
