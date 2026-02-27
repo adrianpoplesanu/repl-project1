@@ -4,6 +4,7 @@
 #include "../evaluator.h"
 #include <iostream>
 #include <vector>
+#include <functional>
 
 VM::VM() {
     sp = 0;
@@ -101,6 +102,13 @@ void VM::run() {
             Ad_Object* array_obj = build_array(sp - numElements, sp);
             sp = sp - numElements;
             push(array_obj);
+        } else if (opcode == OP_HASH) {
+            int numElements = read_uint16(*ins, ip + 1);
+            current_frame()->ip += 2;
+
+            Ad_Object* hash_obj = build_hash(sp - numElements, sp);
+            sp = sp - numElements;
+            push(hash_obj);
         }
     }
 }
@@ -203,4 +211,17 @@ Ad_Object* VM::build_array(int start_index, int end_index) {
         elements.push_back(stack[i]);
     }
     return new Ad_List_Object(elements);
+}
+
+Ad_Object* VM::build_hash(int start_index, int end_index) {
+    std::unordered_map<std::string, HashPair> hashed_pairs;
+    std::hash<std::string> hash_string;
+    for (int i = start_index; i < end_index; i += 2) {
+        Ad_Object* key = stack[i];
+        Ad_Object* value = stack[i + 1];
+        HashPair pair(key, value);
+        std::string hash_key = std::to_string(hash_string(key->Hash()));
+        hashed_pairs[hash_key] = pair;
+    }
+    return new Ad_Hash_Object(hashed_pairs);
 }
