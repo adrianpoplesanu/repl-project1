@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
+#include <string>
 #include "../vm.h"
 #include "../bytecode.h"
 #include "../opcode.h"
@@ -38,6 +39,15 @@ std::vector<unsigned char> make_constant_instruction(int constant_index) {
 std::vector<unsigned char> make_array_instruction(int num_elements) {
     std::vector<unsigned char> instruction;
     instruction.push_back(OP_ARRAY);
+    auto operand = encode_uint16(num_elements);
+    instruction.insert(instruction.end(), operand.begin(), operand.end());
+    return instruction;
+}
+
+// Helper function to create OP_HASH instruction
+std::vector<unsigned char> make_hash_instruction(int num_elements) {
+    std::vector<unsigned char> instruction;
+    instruction.push_back(OP_HASH);
     auto operand = encode_uint16(num_elements);
     instruction.insert(instruction.end(), operand.begin(), operand.end());
     return instruction;
@@ -839,6 +849,126 @@ void test_vm_array_empty() {
     std::cout << "✓ VM array empty test passed\n";
 }
 
+void test_vm_hash_empty() {
+    std::cout << "running test_vm_hash_empty...\n";
+
+    VM vm;
+
+    std::vector<unsigned char> instructions = make_hash_instruction(0);
+    Bytecode bytecode = make_bytecode(instructions, {});
+    vm.load(bytecode);
+    vm.run();
+
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_HASH);
+    Ad_Hash_Object* hash_obj = (Ad_Hash_Object*)result;
+    assert(hash_obj->pairs.empty());
+
+    std::cout << "✓ VM hash empty test passed\n";
+}
+
+void test_vm_hash_instruction() {
+    std::cout << "running test_vm_hash_instruction...\n";
+
+    VM vm;
+
+    // Bytecode: push key 1, value 10, key 2, value 20, then build hash of 4 elements (2 pairs)
+    Ad_Integer_Object* key_1 = new Ad_Integer_Object(1);
+    Ad_Integer_Object* val_10 = new Ad_Integer_Object(10);
+    Ad_Integer_Object* key_2 = new Ad_Integer_Object(2);
+    Ad_Integer_Object* val_20 = new Ad_Integer_Object(20);
+
+    std::vector<unsigned char> instructions;
+    auto c0 = make_constant_instruction(0);
+    auto c1 = make_constant_instruction(1);
+    auto c2 = make_constant_instruction(2);
+    auto c3 = make_constant_instruction(3);
+    auto h4 = make_hash_instruction(4);
+    instructions.insert(instructions.end(), c0.begin(), c0.end());
+    instructions.insert(instructions.end(), c1.begin(), c1.end());
+    instructions.insert(instructions.end(), c2.begin(), c2.end());
+    instructions.insert(instructions.end(), c3.begin(), c3.end());
+    instructions.insert(instructions.end(), h4.begin(), h4.end());
+
+    std::vector<Ad_Object*> constants = {key_1, val_10, key_2, val_20};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+    vm.load(bytecode);
+    vm.run();
+
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_HASH);
+    Ad_Hash_Object* hash_obj = (Ad_Hash_Object*)result;
+    assert(hash_obj->pairs.size() == 2);
+
+    for (auto& kv : hash_obj->pairs) {
+        const HashPair& p = kv.second;
+        Ad_Object* k = p.key;
+        Ad_Object* v = p.value;
+        assert(k != nullptr && v != nullptr);
+        assert(k->Type() == OBJ_INT);
+        assert(v->Type() == OBJ_INT);
+        int key_int = ((Ad_Integer_Object*)k)->value;
+        int val_int = ((Ad_Integer_Object*)v)->value;
+        assert((key_int == 1 && val_int == 10) || (key_int == 2 && val_int == 20));
+    }
+
+    std::cout << "✓ VM hash instruction test passed\n";
+}
+
+void test_vm_hash_string_keys() {
+    std::cout << "running test_vm_hash_string_keys...\n";
+
+    VM vm;
+
+    // Bytecode: push key "a", value 1, key "b", value 2, then build hash of 4 elements (2 pairs)
+    Ad_String_Object* key_a = new Ad_String_Object("a");
+    Ad_Integer_Object* val_1 = new Ad_Integer_Object(1);
+    Ad_String_Object* key_b = new Ad_String_Object("b");
+    Ad_Integer_Object* val_2 = new Ad_Integer_Object(2);
+
+    std::vector<unsigned char> instructions;
+    auto c0 = make_constant_instruction(0);
+    auto c1 = make_constant_instruction(1);
+    auto c2 = make_constant_instruction(2);
+    auto c3 = make_constant_instruction(3);
+    auto h4 = make_hash_instruction(4);
+    instructions.insert(instructions.end(), c0.begin(), c0.end());
+    instructions.insert(instructions.end(), c1.begin(), c1.end());
+    instructions.insert(instructions.end(), c2.begin(), c2.end());
+    instructions.insert(instructions.end(), c3.begin(), c3.end());
+    instructions.insert(instructions.end(), h4.begin(), h4.end());
+
+    std::vector<Ad_Object*> constants = {key_a, val_1, key_b, val_2};
+    Bytecode bytecode = make_bytecode(instructions, constants);
+    vm.load(bytecode);
+    vm.run();
+
+    assert(vm.sp == 1);
+    Ad_Object* result = vm.stack[0];
+    assert(result != nullptr);
+    assert(result->Type() == OBJ_HASH);
+    Ad_Hash_Object* hash_obj = (Ad_Hash_Object*)result;
+    assert(hash_obj->pairs.size() == 2);
+
+    for (auto& kv : hash_obj->pairs) {
+        const HashPair& p = kv.second;
+        Ad_Object* k = p.key;
+        Ad_Object* v = p.value;
+        assert(k != nullptr && v != nullptr);
+        assert(k->Type() == OBJ_STRING);
+        assert(v->Type() == OBJ_INT);
+        std::string key_str = ((Ad_String_Object*)k)->value;
+        int val_int = ((Ad_Integer_Object*)v)->value;
+        assert((key_str == "a" && val_int == 1) || (key_str == "b" && val_int == 2));
+    }
+
+    std::cout << "✓ VM hash string keys test passed\n";
+}
+
 void run_all_vm_tests() {
     std::cout << "=== Running VM tests ===\n";
 
@@ -874,6 +1004,11 @@ void run_all_vm_tests() {
     // OP_ARRAY tests
     test_vm_array_instruction();
     test_vm_array_empty();
+
+    // OP_HASH tests
+    test_vm_hash_empty();
+    test_vm_hash_instruction();
+    test_vm_hash_string_keys();
 
     std::cout << "=== All VM tests passed! ===\n\n";
 }
