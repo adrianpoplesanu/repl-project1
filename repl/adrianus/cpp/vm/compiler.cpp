@@ -206,6 +206,12 @@ void Compiler::compile(Ad_AST_Node* node) {
         std::vector<int> args;
         args.push_back(static_cast<int>(hash_node->pairs.size()) * 2);
         emit(opHash, 1, args);
+    } else if (node->type == ST_INDEX_EXPRESSION) {
+        Ad_AST_IndexExpression* index_expr = (Ad_AST_IndexExpression*)node;
+        compile(index_expr->left);
+        compile(index_expr->index);
+        std::vector<int> args;
+        emit(opIndex, 0, args);
     }
     // TODO: add support for other statement types
 }
