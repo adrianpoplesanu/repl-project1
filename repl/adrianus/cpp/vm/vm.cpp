@@ -109,6 +109,10 @@ void VM::run() {
             Ad_Object* hash_obj = build_hash(sp - numElements, sp);
             sp = sp - numElements;
             push(hash_obj);
+        } else if (opcode == OP_INDEX) {
+            Ad_Object* index = pop();
+            Ad_Object* left = pop();
+            execute_index_expression(left, index);
         }
     }
 }
@@ -224,4 +228,37 @@ Ad_Object* VM::build_hash(int start_index, int end_index) {
         hashed_pairs[hash_key] = pair;
     }
     return new Ad_Hash_Object(hashed_pairs);
+}
+
+void VM::execute_index_expression(Ad_Object* left, Ad_Object* index) {
+    if (left->Type() == OBJ_LIST) {
+        execute_array_index(left, index);
+        return;
+    }
+    if (left->Type() == OBJ_HASH) {
+        execute_hash_index(left, index);
+        return;
+    }
+    push(&NULLOBJECT);
+}
+
+void VM::execute_array_index(Ad_Object* left, Ad_Object* index) {
+    int i = ((Ad_Integer_Object*)index)->value;
+    int max = static_cast<int>(((Ad_List_Object*)left)->elements.size());
+    if (i < 0 || i >= max) {
+        push(&NULLOBJECT);
+    } else {
+        push(((Ad_List_Object*)left)->elements[i]);
+    }
+}
+
+void VM::execute_hash_index(Ad_Object* left, Ad_Object* index) {
+    std::hash<std::string> hash_string;
+    std::string hash_key = std::to_string(hash_string(index->Hash()));
+    auto it = ((Ad_Hash_Object*)left)->pairs.find(hash_key);
+    if (it != ((Ad_Hash_Object*)left)->pairs.end()) {
+        push(it->second.value);
+    } else {
+        push(&NULLOBJECT);
+    }
 }

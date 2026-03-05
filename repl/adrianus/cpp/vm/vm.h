@@ -30,6 +30,9 @@ public:
     bool is_truthy(Ad_Object* obj);
     Ad_Object* build_array(int start_index, int end_index);
     Ad_Object* build_hash(int start_index, int end_index);
+    void execute_index_expression(Ad_Object* left, Ad_Object* index);
+    void execute_array_index(Ad_Object* left, Ad_Object* index);
+    void execute_hash_index(Ad_Object* left, Ad_Object* index);
 };
 
 #endif
