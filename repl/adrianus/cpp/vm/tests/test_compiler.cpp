@@ -891,6 +891,76 @@ void test_compile_list_literal() {
     std::cout << "✓ Compile list literal test passed\n";
 }
 
+void test_compile_index_expression_list() {
+    std::cout << "running test_compile_index_expression_list...\n";
+
+    Compiler compiler;
+
+    // Build [1, 2][0]: list literal left, integer index
+    Token bracket_token("[", TT_LBRACKET);
+    Ad_AST_ListLiteral* list_node = new Ad_AST_ListLiteral(bracket_token);
+    Token int_token1("1", TT_INT);
+    Token int_token2("2", TT_INT);
+    Ad_AST_Integer* el1 = new Ad_AST_Integer(int_token1, 1);
+    Ad_AST_Integer* el2 = new Ad_AST_Integer(int_token2, 2);
+    list_node->elements.push_back(el1);
+    list_node->elements.push_back(el2);
+
+    Token lbracket_token("[", TT_LBRACKET);
+    Ad_AST_IndexExpression* index_expr = new Ad_AST_IndexExpression(lbracket_token, list_node);
+    Token int_token0("0", TT_INT);
+    Ad_AST_Integer* index_val = new Ad_AST_Integer(int_token0, 0);
+    index_expr->index = index_val;
+
+    compiler.compile(index_expr);
+
+    Instructions& ins = compiler.code.instructions;
+    // Expected: OP_CONSTANT 0, OP_CONSTANT 1, OP_ARRAY 2, OP_CONSTANT 2 (index 0), OP_INDEX
+    assert(ins.get(0) == OP_CONSTANT);
+    assert(ins.get(3) == OP_CONSTANT);
+    assert(ins.get(6) == OP_ARRAY);
+    int num_elements = (ins.get(7) << 8) | ins.get(8);
+    assert(num_elements == 2);
+    assert(ins.get(9) == OP_CONSTANT);
+    int index_const = (ins.get(10) << 8) | ins.get(11);
+    assert(index_const == 2);  // third constant
+    assert(ins.get(12) == OP_INDEX);
+
+    assert(compiler.constants.size() == 3);
+    assert(((Ad_Integer_Object*)compiler.constants[2])->value == 0);
+
+    delete index_expr;  // owns list_node (and el1, el2), index_val
+    std::cout << "✓ Compile index expression (list) test passed\n";
+}
+
+void test_compile_index_expression_identifier() {
+    std::cout << "running test_compile_index_expression_identifier...\n";
+
+    Compiler compiler;
+
+    // Build a[0]: identifier left, integer index (need to define 'a' so resolve works)
+    Token ident_token("a", TT_IDENT);
+    Ad_AST_Identifier* ident_node = new Ad_AST_Identifier(ident_token, "a");
+    compiler.symbol_table->define("a");
+
+    Token lbracket_token("[", TT_LBRACKET);
+    Ad_AST_IndexExpression* index_expr = new Ad_AST_IndexExpression(lbracket_token, ident_node);
+    Token int_token0("0", TT_INT);
+    Ad_AST_Integer* index_val = new Ad_AST_Integer(int_token0, 0);
+    index_expr->index = index_val;
+
+    compiler.compile(index_expr);
+
+    Instructions& ins = compiler.code.instructions;
+    // Expected: OP_GET_LOCAL 0 (or OP_GET_GLOBAL 0), OP_CONSTANT 0 (index 0), OP_INDEX
+    assert(ins.get(0) == OP_GET_LOCAL || ins.get(0) == OP_GET_GLOBAL);
+    assert(ins.get(3) == OP_CONSTANT);
+    assert(ins.get(6) == OP_INDEX);
+
+    delete index_expr;
+    std::cout << "✓ Compile index expression (identifier) test passed\n";
+}
+
 void run_all_compiler_tests() {
     std::cout << "=== Running Compiler tests ===\n";
     
@@ -930,6 +1000,10 @@ void run_all_compiler_tests() {
     // ST_LIST_LITERAL tests
     test_compile_list_literal_empty();
     test_compile_list_literal();
+
+    // ST_INDEX_EXPRESSION tests
+    test_compile_index_expression_list();
+    test_compile_index_expression_identifier();
 
     std::cout << "=== All Compiler tests passed! ===\n\n";
 }
