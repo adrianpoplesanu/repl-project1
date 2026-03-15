@@ -201,6 +201,9 @@ Ad_AST_Node* Parser::ParseLetStatement() {
 
     NextToken();
     stmt->value = ParseExpression(PT_LOWEST);
+    if (stmt->value != nullptr && stmt->value->type == ST_FUNCTION_LITERAL) {
+        ((Ad_AST_FunctionLiteral*)stmt->value)->name = stmt->name.value;
+    }
     if (CurrentTokenIs(TT_SEMICOLON)) {
         NextToken();
     }

@@ -228,6 +228,7 @@ public:
 class Ad_AST_FunctionLiteral : public Ad_AST_Node {
 public:
     Token token;
+    std::string name;  // set by parser when RHS of let (e.g. let foo = fn() {} -> name = "foo")
     std::vector<Ad_AST_Node*> parameters;
     std::vector<Ad_AST_Node*> default_params;
     Ad_AST_Node* body;
