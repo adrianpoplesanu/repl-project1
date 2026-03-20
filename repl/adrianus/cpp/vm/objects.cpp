@@ -3,6 +3,8 @@
 AdCompiledFunction::AdCompiledFunction() {
     type = OBJ_COMPILED_FUNCTION;
     instructions = nullptr;
+    num_locals = 0;
+    num_parameters = 0;
 }
 
 std::string AdCompiledFunction::Inspect() {

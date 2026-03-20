@@ -1,5 +1,6 @@
 #include "compiler.h"
 #include "opcode.h"
+#include "objects.h"
 #include "utils.h"
 #include <algorithm>
 #include <cstdarg>
@@ -27,6 +28,14 @@ Compiler::Compiler(GarbageCollector* gc) {
     frames_index = 0;
     symbol_table = new_symbol_table();
     // bytecode, instructions, and scopes are initialized by their default constructors
+}
+
+Compiler::~Compiler() {
+    while (symbol_table != nullptr) {
+        SymbolTable* outer = symbol_table->outer;
+        delete symbol_table;
+        symbol_table = outer;
+    }
 }
 
 void Compiler::reset() {
@@ -212,6 +221,45 @@ void Compiler::compile(Ad_AST_Node* node) {
         compile(index_expr->index);
         std::vector<int> args;
         emit(opIndex, 0, args);
+    } else if (node->type == ST_FUNCTION_LITERAL) {
+        Ad_AST_FunctionLiteral* fn_lit = (Ad_AST_FunctionLiteral*)node;
+        enter_scope();
+
+        // When RHS of let (e.g. let foo = fn() {}), parser sets name so body can refer to self (recursion)
+        if (!fn_lit->name.empty()) {
+            symbol_table->define_function_name(fn_lit->name);
+        }
+
+        for (Ad_AST_Node* p : fn_lit->parameters) {
+            Ad_AST_Identifier* param = (Ad_AST_Identifier*)p;
+            symbol_table->define(param->value);
+        }
+        compile(fn_lit->body);
+        if (lastInstructionIs(opPop)) {
+            replaceLastPopWithReturn();
+        }
+        if (!lastInstructionIs(opReturnValue)) {
+            emit(opReturn, 0, {});
+        }
+        std::vector<Symbol> free_symbols = symbol_table->free_symbols;
+        int num_locals = symbol_table->num_definitions;
+        Instructions instructions = leave_scope();
+
+        for (const Symbol& s : free_symbols) {
+            load_symbol(s, s.name);
+        }
+
+        AdCompiledFunction* compiled_func = new AdCompiledFunction();
+        compiled_func->instructions = new Instructions();
+        compiled_func->instructions->bytes = instructions.bytes;
+        compiled_func->instructions->size = instructions.size;
+        compiled_func->num_locals = num_locals;
+        compiled_func->num_parameters = static_cast<int>(fn_lit->parameters.size());
+
+        std::vector<int> args;
+        args.push_back(addConstant(compiled_func));
+        args.push_back(static_cast<int>(free_symbols.size()));
+        emit(opClosure, 2, args);
     }
     // TODO: add support for other statement types
 }
@@ -337,6 +385,15 @@ void Compiler::removeLastPop() {
     scopes[scopeIndex].lastInstruction = scopes[scopeIndex].previousInstruction;
 }
 
+void Compiler::replaceLastPopWithReturn() {
+    int lastPos = scopes[scopeIndex].lastInstruction.getPosition();
+    if (lastPos < 0 || lastPos >= code.instructions.size) {
+        return;
+    }
+    code.instructions.bytes[lastPos] = static_cast<unsigned char>(OP_RETURN_VALUE);
+    scopes[scopeIndex].lastInstruction = EmittedInstruction(OP_RETURN_VALUE, lastPos);
+}
+
 void Compiler::changeOperand(int pos, int operand) {
     if (pos < 0 || pos >= code.instructions.size) {
         return;
@@ -360,6 +417,7 @@ void Compiler::changeOperand(int pos, int operand) {
 
 void Compiler::enter_scope() {
     CompilationScope scope;
+    scope.instruction_start = code.instructions.size;
     scope.instructions = code.instructions;
     scope.lastInstruction = EmittedInstruction();
     scope.previousInstruction = EmittedInstruction();
@@ -370,6 +428,7 @@ void Compiler::enter_scope() {
 
 void Compiler::enter_scope_class() {
     CompilationScope scope("class");
+    scope.instruction_start = code.instructions.size;
     scope.instructions = code.instructions;
     scope.lastInstruction = EmittedInstruction();
     scope.previousInstruction = EmittedInstruction();
@@ -379,22 +438,28 @@ void Compiler::enter_scope_class() {
 }
 
 Instructions Compiler::leave_scope() {
-    Instructions instructions = currentInstructions();
-    
+    int start = scopes[scopeIndex].instruction_start;
+    Instructions instructions;
+    for (int i = start; i < code.instructions.size; i++) {
+        instructions.bytes.push_back(code.instructions.bytes[i]);
+    }
+    instructions.size = static_cast<int>(instructions.bytes.size());
+
+    // Remove this scope's instructions from the outer code (function body lives in constant only)
+    if (start < code.instructions.size) {
+        code.instructions.bytes.erase(code.instructions.bytes.begin() + start, code.instructions.bytes.end());
+        code.instructions.size = static_cast<int>(code.instructions.bytes.size());
+    }
+
     // Print instructions bytes
     std::cout << "Instructions bytes: ";
     for (size_t i = 0; i < instructions.bytes.size(); i++) {
         std::cout << static_cast<int>(instructions.bytes[i]) << " ";
     }
     std::cout << std::endl;
-    
-    // Disassemble instructions
-    /*Code temp_code;
-    temp_code.instructions = instructions;
-    std::string disassembled = temp_code.toString();
-    std::cout << disassembled << std::endl;*/
+
     std::cout << disassemble_instructions(instructions) << std::endl;
-    
+
     // Remove the last scope
     if (scopes.size() > 0) {
         scopes.pop_back();
@@ -402,12 +467,14 @@ Instructions Compiler::leave_scope() {
     if (scopeIndex > 0) {
         scopeIndex--;
     }
-    
-    // Move to outer symbol table
+
+    // Move to outer symbol table and free the inner one we're leaving
     if (symbol_table != nullptr) {
-        symbol_table = symbol_table->outer;
+        SymbolTable* outer = symbol_table->outer;
+        delete symbol_table;
+        symbol_table = outer;
     }
-    
+
     return instructions;
 }
 

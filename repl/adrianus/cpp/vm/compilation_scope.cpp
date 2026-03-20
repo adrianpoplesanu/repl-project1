@@ -1,21 +1,21 @@
 #include "compilation_scope.h"
 
 CompilationScope::CompilationScope() 
-    : compilationType("") {
+    : instruction_start(0), compilationType("") {
 }
 
 CompilationScope::CompilationScope(const std::string& type) 
-    : compilationType(type) {
+    : instruction_start(0), compilationType(type) {
 }
 
 CompilationScope::CompilationScope(const Instructions& instr) 
-    : instructions(instr), compilationType("") {
+    : instructions(instr), instruction_start(0), compilationType("") {
 }
 
 CompilationScope::CompilationScope(const EmittedInstruction& lastInstr) 
-    : lastInstruction(lastInstr), compilationType("") {
+    : instruction_start(0), lastInstruction(lastInstr), compilationType("") {
 }
 
 CompilationScope::CompilationScope(const EmittedInstruction& lastInstr, const EmittedInstruction& prevInstr) 
-    : lastInstruction(lastInstr), previousInstruction(prevInstr), compilationType("") {
+    : instruction_start(0), lastInstruction(lastInstr), previousInstruction(prevInstr), compilationType("") {
 }

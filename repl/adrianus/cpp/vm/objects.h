@@ -9,6 +9,8 @@
 class AdCompiledFunction : public Ad_Object {
 public:
     Instructions* instructions;
+    int num_locals;
+    int num_parameters;
 
     AdCompiledFunction();
     std::string Inspect() override;

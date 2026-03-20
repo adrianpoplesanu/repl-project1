@@ -26,6 +26,7 @@ public:
 
     Compiler();
     Compiler(GarbageCollector* gc);
+    ~Compiler();
     void reset();
     void compile(Ad_AST_Node* node);
     Bytecode getBytecode();
@@ -55,6 +56,7 @@ public:
     // Helper methods for control flow
     bool lastInstructionIs(OpCode opcode);
     void removeLastPop();
+    void replaceLastPopWithReturn();
     void changeOperand(int pos, int operand);
 
     // Symbol loading

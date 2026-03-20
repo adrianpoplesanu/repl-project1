@@ -8,6 +8,7 @@
 class CompilationScope {
 public:
     Instructions instructions;
+    int instruction_start;  // index into code.instructions where this scope's emissions begin
     EmittedInstruction lastInstruction;
     EmittedInstruction previousInstruction;
     std::string compilationType;
