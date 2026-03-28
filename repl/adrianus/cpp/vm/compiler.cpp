@@ -260,6 +260,13 @@ void Compiler::compile(Ad_AST_Node* node) {
         args.push_back(addConstant(compiled_func));
         args.push_back(static_cast<int>(free_symbols.size()));
         emit(opClosure, 2, args);
+    } else if (node->type == ST_CALL_EXPRESSION) {
+        Ad_AST_CallExpression* call_expr = (Ad_AST_CallExpression*)node;
+        compile(call_expr->function);
+        for (Ad_AST_Node* argument : call_expr->arguments) {
+            compile(argument);
+        }
+        emit(opCall, 1, {static_cast<int>(call_expr->arguments.size())});
     }
     // TODO: add support for other statement types
 }

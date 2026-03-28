@@ -4,9 +4,9 @@
 #include <vector>
 #include "../compiler.h"
 #include "../opcode.h"
+#include "../objects.h"
 #include "../../ast.h"
 #include "../../token.h"
-#include "../../objects.h"
 
 void test_compiler_constructor() {
     std::cout << "running test_compiler_constructor...\n";
@@ -961,6 +961,126 @@ void test_compile_index_expression_identifier() {
     std::cout << "✓ Compile index expression (identifier) test passed\n";
 }
 
+void test_compile_function_literal_empty() {
+    std::cout << "running test_compile_function_literal_empty...\n";
+
+    Compiler compiler;
+
+    Token fn_token("fn", TT_FUNCTION);
+    Ad_AST_FunctionLiteral* fn_lit = new Ad_AST_FunctionLiteral(fn_token);
+    Token lbrace("{", TT_LBRACE);
+    Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(lbrace);
+    fn_lit->body = block;
+
+    compiler.compile(fn_lit);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.get(0) == OP_CLOSURE);
+    int closure_const_idx = (ins.get(1) << 8) | ins.get(2);
+    assert(closure_const_idx == 0);
+    assert(ins.get(3) == 0);  // free variables count
+
+    assert(compiler.constants.size() == 1);
+    assert(compiler.constants[0]->Type() == OBJ_COMPILED_FUNCTION);
+    AdCompiledFunction* cf = static_cast<AdCompiledFunction*>(compiler.constants[0]);
+    assert(cf->num_parameters == 0);
+    assert(cf->num_locals == 0);
+    assert(cf->instructions != nullptr);
+    assert(cf->instructions->size == 1);
+    assert(cf->instructions->bytes[0] == OP_RETURN);
+
+    delete fn_lit;
+    std::cout << "✓ Compile function literal (empty body) test passed\n";
+}
+
+void test_compile_function_literal_returns_integer() {
+    std::cout << "running test_compile_function_literal_returns_integer...\n";
+
+    Compiler compiler;
+
+    Token fn_token("fn", TT_FUNCTION);
+    Ad_AST_FunctionLiteral* fn_lit = new Ad_AST_FunctionLiteral(fn_token);
+    Token lbrace("{", TT_LBRACE);
+    Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(lbrace);
+
+    Token semi(";", TT_SEMICOLON);
+    Ad_AST_ExpressionStatement* expr_stmt = new Ad_AST_ExpressionStatement(semi);
+    Token int_tok("99", TT_INT);
+    Ad_AST_Integer* int_node = new Ad_AST_Integer(int_tok, 99);
+    expr_stmt->expression = int_node;
+    block->statements.push_back(expr_stmt);
+
+    fn_lit->body = block;
+
+    compiler.compile(fn_lit);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.get(0) == OP_CLOSURE);
+    int closure_const_idx = (ins.get(1) << 8) | ins.get(2);
+    assert(closure_const_idx == 1);  // compiled fn is second constant (after 99)
+
+    assert(compiler.constants.size() == 2);
+    assert(compiler.constants[0]->Type() == OBJ_INT);
+    assert(((Ad_Integer_Object*)compiler.constants[0])->value == 99);
+
+    AdCompiledFunction* cf = static_cast<AdCompiledFunction*>(compiler.constants[1]);
+    assert(cf->num_parameters == 0);
+    assert(cf->num_locals == 0);
+    assert(cf->instructions != nullptr);
+    // OP_CONSTANT idx0, OP_RETURN_VALUE
+    assert(cf->instructions->size == 4);
+    assert(cf->instructions->bytes[0] == OP_CONSTANT);
+    int inner_k = (cf->instructions->bytes[1] << 8) | cf->instructions->bytes[2];
+    assert(inner_k == 0);
+    assert(cf->instructions->bytes[3] == OP_RETURN_VALUE);
+
+    delete fn_lit;
+    std::cout << "✓ Compile function literal (return integer) test passed\n";
+}
+
+void test_compile_function_literal_with_parameters() {
+    std::cout << "running test_compile_function_literal_with_parameters...\n";
+
+    Compiler compiler;
+
+    Token fn_token("fn", TT_FUNCTION);
+    Ad_AST_FunctionLiteral* fn_lit = new Ad_AST_FunctionLiteral(fn_token);
+
+    Token a_tok("a", TT_IDENT);
+    Token b_tok("b", TT_IDENT);
+    fn_lit->parameters.push_back(new Ad_AST_Identifier(a_tok, "a"));
+    fn_lit->parameters.push_back(new Ad_AST_Identifier(b_tok, "b"));
+
+    Token lbrace("{", TT_LBRACE);
+    Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(lbrace);
+    Token semi(";", TT_SEMICOLON);
+    Ad_AST_ExpressionStatement* expr_stmt = new Ad_AST_ExpressionStatement(semi);
+    Ad_AST_Identifier* use_a = new Ad_AST_Identifier(a_tok, "a");
+    expr_stmt->expression = use_a;
+    block->statements.push_back(expr_stmt);
+    fn_lit->body = block;
+
+    compiler.compile(fn_lit);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.get(0) == OP_CLOSURE);
+    int closure_const_idx = (ins.get(1) << 8) | ins.get(2);
+    assert(closure_const_idx == 0);
+
+    assert(compiler.constants.size() == 1);
+    AdCompiledFunction* cf = static_cast<AdCompiledFunction*>(compiler.constants[0]);
+    assert(cf->num_parameters == 2);
+    assert(cf->num_locals == 2);
+    assert(cf->instructions != nullptr);
+    assert(cf->instructions->size == 3);
+    assert(cf->instructions->bytes[0] == OP_GET_LOCAL);
+    assert(cf->instructions->bytes[1] == 0);
+    assert(cf->instructions->bytes[2] == OP_RETURN_VALUE);
+
+    delete fn_lit;
+    std::cout << "✓ Compile function literal (parameters) test passed\n";
+}
+
 void run_all_compiler_tests() {
     std::cout << "=== Running Compiler tests ===\n";
     
@@ -1004,6 +1124,11 @@ void run_all_compiler_tests() {
     // ST_INDEX_EXPRESSION tests
     test_compile_index_expression_list();
     test_compile_index_expression_identifier();
+
+    // ST_FUNCTION_LITERAL tests
+    test_compile_function_literal_empty();
+    test_compile_function_literal_returns_integer();
+    test_compile_function_literal_with_parameters();
 
     std::cout << "=== All Compiler tests passed! ===\n\n";
 }
