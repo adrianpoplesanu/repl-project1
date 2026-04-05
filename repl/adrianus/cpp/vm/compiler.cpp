@@ -267,6 +267,14 @@ void Compiler::compile(Ad_AST_Node* node) {
             compile(argument);
         }
         emit(opCall, 1, {static_cast<int>(call_expr->arguments.size())});
+    } else if (node->type == ST_RETURN_STATEMENT) {
+        Ad_AST_ReturnStatement* ret_stmt = static_cast<Ad_AST_ReturnStatement*>(node);
+        if (ret_stmt->value != nullptr) {
+            compile(ret_stmt->value);
+        } else {
+            emit(opNull, 0, {});
+        }
+        emit(opReturnValue, 0, {});
     }
     // TODO: add support for other statement types
 }

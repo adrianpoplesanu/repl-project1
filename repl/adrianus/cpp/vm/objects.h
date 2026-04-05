@@ -2,6 +2,8 @@
 #define AD_VM_OBJECTS_H
 
 #include <string>
+#include <unordered_map>
+#include <vector>
 #include "../objects.h"
 #include "../gc.h"
 #include "instructions.h"
@@ -34,6 +36,9 @@ public:
 
 class AdCompiledClass : public Ad_Object {
 public:
+    std::unordered_map<std::string, AdClosureObject*> methods;
+    std::vector<AdCompiledFunction*> field_initializers;
+
     AdCompiledClass();
     std::string Inspect() override;
 	void Print() override;
@@ -44,6 +49,9 @@ public:
 
 class AdCompiledInstance : public Ad_Object {
 public:
+    AdCompiledClass* klass;
+    int definition_num_args;
+
     AdCompiledInstance();
     std::string Inspect() override;
 	void Print() override;
@@ -54,7 +62,11 @@ public:
 
 class AdBoundMethod : public Ad_Object {
 public:
+    AdCompiledInstance* owner;
+    AdClosureObject* bound_method;
+
     AdBoundMethod();
+    AdBoundMethod(AdCompiledInstance* owner, AdClosureObject* bound_method);
     std::string Inspect() override;
 	void Print() override;
 	Ad_Object_Type Type() override;

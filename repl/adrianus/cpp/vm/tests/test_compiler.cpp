@@ -961,6 +961,96 @@ void test_compile_index_expression_identifier() {
     std::cout << "✓ Compile index expression (identifier) test passed\n";
 }
 
+void test_compile_return_statement_integer() {
+    std::cout << "running test_compile_return_statement_integer...\n";
+
+    Compiler compiler;
+    Token ret_tok("return", TT_RETURN);
+    Ad_AST_ReturnStatement* ret_stmt = new Ad_AST_ReturnStatement(ret_tok);
+    Token int_tok("7", TT_INT);
+    ret_stmt->value = new Ad_AST_Integer(int_tok, 7);
+
+    compiler.compile(ret_stmt);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.size == 4);
+    assert(ins.get(0) == OP_CONSTANT);
+    int k = (ins.get(1) << 8) | ins.get(2);
+    assert(k == 0);
+    assert(ins.get(3) == OP_RETURN_VALUE);
+
+    assert(compiler.constants.size() == 1);
+    assert(compiler.constants[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(compiler.constants[0])->value == 7);
+
+    delete ret_stmt;
+    std::cout << "✓ Compile return statement (integer value) test passed\n";
+}
+
+void test_compile_return_statement_without_value() {
+    std::cout << "running test_compile_return_statement_without_value...\n";
+
+    Compiler compiler;
+    Token ret_tok("return", TT_RETURN);
+    Ad_AST_ReturnStatement* ret_stmt = new Ad_AST_ReturnStatement(ret_tok);
+    ret_stmt->value = nullptr;
+
+    compiler.compile(ret_stmt);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.size == 2);
+    assert(ins.get(0) == OP_NULL);
+    assert(ins.get(1) == OP_RETURN_VALUE);
+
+    assert(compiler.constants.empty());
+
+    delete ret_stmt;
+    std::cout << "✓ Compile return statement (no value -> null + return) test passed\n";
+}
+
+void test_compile_function_literal_with_return_statement() {
+    std::cout << "running test_compile_function_literal_with_return_statement...\n";
+
+    Compiler compiler;
+
+    Token fn_token("fn", TT_FUNCTION);
+    Ad_AST_FunctionLiteral* fn_lit = new Ad_AST_FunctionLiteral(fn_token);
+    Token lbrace("{", TT_LBRACE);
+    Ad_AST_BlockStatement* block = new Ad_AST_BlockStatement(lbrace);
+
+    Token ret_tok("return", TT_RETURN);
+    Ad_AST_ReturnStatement* ret_stmt = new Ad_AST_ReturnStatement(ret_tok);
+    Token int_tok("42", TT_INT);
+    ret_stmt->value = new Ad_AST_Integer(int_tok, 42);
+    block->statements.push_back(ret_stmt);
+
+    fn_lit->body = block;
+
+    compiler.compile(fn_lit);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.get(0) == OP_CLOSURE);
+    int closure_const_idx = (ins.get(1) << 8) | ins.get(2);
+    assert(closure_const_idx == 1);
+
+    assert(compiler.constants.size() == 2);
+    assert(compiler.constants[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(compiler.constants[0])->value == 42);
+
+    AdCompiledFunction* cf = static_cast<AdCompiledFunction*>(compiler.constants[1]);
+    assert(cf->num_parameters == 0);
+    assert(cf->num_locals == 0);
+    assert(cf->instructions != nullptr);
+    assert(cf->instructions->size == 4);
+    assert(cf->instructions->bytes[0] == OP_CONSTANT);
+    int inner_k = (cf->instructions->bytes[1] << 8) | cf->instructions->bytes[2];
+    assert(inner_k == 0);
+    assert(cf->instructions->bytes[3] == OP_RETURN_VALUE);
+
+    delete fn_lit;
+    std::cout << "✓ Compile function literal (explicit return statement) test passed\n";
+}
+
 void test_compile_function_literal_empty() {
     std::cout << "running test_compile_function_literal_empty...\n";
 
@@ -1124,6 +1214,11 @@ void run_all_compiler_tests() {
     // ST_INDEX_EXPRESSION tests
     test_compile_index_expression_list();
     test_compile_index_expression_identifier();
+
+    // ST_RETURN_STATEMENT tests
+    test_compile_return_statement_integer();
+    test_compile_return_statement_without_value();
+    test_compile_function_literal_with_return_statement();
 
     // ST_FUNCTION_LITERAL tests
     test_compile_function_literal_empty();

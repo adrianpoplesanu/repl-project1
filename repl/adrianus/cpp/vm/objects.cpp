@@ -53,7 +53,9 @@ Ad_Object* AdClosureObject::copy(GarbageCollector*) {
 }
 
 AdCompiledClass::AdCompiledClass() {
-    //...
+    type = OBJ_COMPILED_CLASS;
+    ref_count = 0;
+    marked = false;
 }
 
 std::string AdCompiledClass::Inspect() {
@@ -78,7 +80,11 @@ Ad_Object* AdCompiledClass::copy(GarbageCollector*) {
 
 
 AdCompiledInstance::AdCompiledInstance() {
-    //...
+    type = OBJ_COMPILED_INSTANCE;
+    ref_count = 0;
+    marked = false;
+    klass = nullptr;
+    definition_num_args = 0;
 }
 
 std::string AdCompiledInstance::Inspect() {
@@ -102,7 +108,19 @@ Ad_Object* AdCompiledInstance::copy(GarbageCollector*) {
 }
 
 AdBoundMethod::AdBoundMethod() {
-    //...
+    type = OBJ_BOUND_METHOD;
+    ref_count = 0;
+    marked = false;
+    owner = nullptr;
+    bound_method = nullptr;
+}
+
+AdBoundMethod::AdBoundMethod(AdCompiledInstance* o, AdClosureObject* bm) {
+    type = OBJ_BOUND_METHOD;
+    ref_count = 0;
+    marked = false;
+    owner = o;
+    bound_method = bm;
 }
 
 std::string AdBoundMethod::Inspect() {
