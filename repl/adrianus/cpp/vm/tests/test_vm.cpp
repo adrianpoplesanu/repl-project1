@@ -7,6 +7,31 @@
 #include "../opcode.h"
 #include "../instructions.h"
 #include "../../objects.h"
+#include "../objects.h"
+
+// --- Test builtins for OP_CALL / execute_call ---------------------------------
+
+static Ad_Object* vm_test_builtin_add(std::vector<Ad_Object*> args, Environment*, GarbageCollector*) {
+    if (args.size() != 2) {
+        return nullptr;
+    }
+    if (args[0]->Type() != OBJ_INT || args[1]->Type() != OBJ_INT) {
+        return nullptr;
+    }
+    int a = static_cast<Ad_Integer_Object*>(args[0])->value;
+    int b = static_cast<Ad_Integer_Object*>(args[1])->value;
+    return new Ad_Integer_Object(a + b);
+}
+
+static Ad_Object* vm_test_builtin_return_99(std::vector<Ad_Object*> args, Environment*, GarbageCollector*) {
+    (void)args;
+    return new Ad_Integer_Object(99);
+}
+
+static Ad_Object* vm_test_builtin_returns_null(std::vector<Ad_Object*> args, Environment*, GarbageCollector*) {
+    (void)args;
+    return nullptr;
+}
 
 // Helper function to create a bytecode with instructions and constants
 Bytecode make_bytecode(const std::vector<unsigned char>& instructions_bytes,
@@ -51,6 +76,20 @@ std::vector<unsigned char> make_hash_instruction(int num_elements) {
     auto operand = encode_uint16(num_elements);
     instruction.insert(instruction.end(), operand.begin(), operand.end());
     return instruction;
+}
+
+// OP_CALL: 1-byte operand (number of arguments)
+std::vector<unsigned char> make_call_instruction(int num_args) {
+    std::vector<unsigned char> instruction;
+    instruction.push_back(OP_CALL);
+    instruction.push_back(static_cast<unsigned char>(num_args & 0xFF));
+    return instruction;
+}
+
+// Minimal program so VM::run() executes at least one instruction (see loop condition ip < size - 1)
+Bytecode make_minimal_runnable_bytecode() {
+    std::vector<unsigned char> ins = {OP_NULL, OP_NULL};
+    return make_bytecode(ins, {});
 }
 
 void test_vm_constructor() {
@@ -969,6 +1008,189 @@ void test_vm_hash_string_keys() {
     std::cout << "✓ VM hash string keys test passed\n";
 }
 
+void test_vm_execute_call_builtin_two_args() {
+    std::cout << "running test_vm_execute_call_builtin_two_args...\n";
+
+    VM vm;
+    vm.load(make_minimal_runnable_bytecode());
+
+    auto* builtin = new Ad_Builtin_Object(vm_test_builtin_add);
+    vm.push(builtin);
+    vm.push(new Ad_Integer_Object(3));
+    vm.push(new Ad_Integer_Object(4));
+    vm.execute_call(2);
+
+    assert(vm.frames.size() == 1);
+    assert(vm.sp == 1);
+    assert(vm.stack[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 7);
+
+    std::cout << "✓ VM execute_call builtin (two args) test passed\n";
+}
+
+void test_vm_execute_call_builtin_returns_null_pushes_null_object() {
+    std::cout << "running test_vm_execute_call_builtin_returns_null_pushes_null_object...\n";
+
+    VM vm;
+    vm.load(make_minimal_runnable_bytecode());
+
+    auto* builtin = new Ad_Builtin_Object(vm_test_builtin_returns_null);
+    vm.push(builtin);
+    vm.execute_call(0);
+
+    assert(vm.frames.size() == 1);
+    assert(vm.sp == 1);
+    assert(vm.stack[0] == &NULLOBJECT);
+
+    std::cout << "✓ VM execute_call builtin (null result -> NULLOBJECT) test passed\n";
+}
+
+void test_vm_execute_call_closure_pushes_frame() {
+    std::cout << "running test_vm_execute_call_closure_pushes_frame...\n";
+
+    auto* innerFn = new AdCompiledFunction();
+    innerFn->num_parameters = 0;
+    innerFn->num_locals = 0;
+    auto* innerIns = new Instructions();
+    innerIns->bytes = {};
+    innerIns->size = 0;
+    innerFn->instructions = innerIns;
+
+    auto* closure = new AdClosureObject();
+    closure->fn = innerFn;
+
+    VM vm;
+    vm.load(make_minimal_runnable_bytecode());
+    vm.push(closure);
+    vm.execute_call(0);
+
+    assert(vm.frames.size() == 2);
+    assert(vm.current_frame()->cl == closure);
+    assert(vm.sp == 1);
+
+    std::cout << "✓ VM execute_call closure pushes frame test passed\n";
+}
+
+void test_vm_execute_call_bound_method_pushes_frame_and_bound_instance() {
+    std::cout << "running test_vm_execute_call_bound_method_pushes_frame_and_bound_instance...\n";
+
+    auto* innerFn = new AdCompiledFunction();
+    innerFn->num_parameters = 1;
+    innerFn->num_locals = 2;
+    auto* innerIns = new Instructions();
+    innerIns->bytes = {OP_NULL, OP_NULL};
+    innerIns->size = 2;
+    innerFn->instructions = innerIns;
+
+    auto* closure = new AdClosureObject();
+    closure->fn = innerFn;
+
+    auto* instance = new AdCompiledInstance();
+    AdBoundMethod bound(instance, closure);
+
+    VM vm;
+    vm.load(make_minimal_runnable_bytecode());
+    vm.push(&bound);
+    vm.push(new Ad_Integer_Object(42));
+    vm.execute_call(1);
+
+    assert(vm.frames.size() == 2);
+    assert(vm.current_frame()->bound_instance == instance);
+    assert(vm.current_frame()->cl == closure);
+    assert(vm.sp == 3);
+
+    std::cout << "✓ VM execute_call bound method test passed\n";
+}
+
+void test_vm_op_call_builtin_via_bytecode() {
+    std::cout << "running test_vm_op_call_builtin_via_bytecode...\n";
+
+    auto* builtin = new Ad_Builtin_Object(vm_test_builtin_return_99);
+    std::vector<Ad_Object*> constants = {builtin};
+
+    std::vector<unsigned char> instructions;
+    auto c0 = make_constant_instruction(0);
+    instructions.insert(instructions.end(), c0.begin(), c0.end());
+    auto call0 = make_call_instruction(0);
+    instructions.insert(instructions.end(), call0.begin(), call0.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.sp == 1);
+    assert(vm.stack[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 99);
+
+    std::cout << "✓ VM OP_CALL builtin via bytecode test passed\n";
+}
+
+void test_vm_op_call_builtin_two_args_via_bytecode() {
+    std::cout << "running test_vm_op_call_builtin_two_args_via_bytecode...\n";
+
+    auto* builtin = new Ad_Builtin_Object(vm_test_builtin_add);
+    Ad_Integer_Object* three = new Ad_Integer_Object(3);
+    Ad_Integer_Object* five = new Ad_Integer_Object(5);
+
+    std::vector<Ad_Object*> constants = {builtin, three, five};
+
+    std::vector<unsigned char> instructions;
+    for (int i = 0; i < 3; ++i) {
+        auto c = make_constant_instruction(i);
+        instructions.insert(instructions.end(), c.begin(), c.end());
+    }
+    auto call2 = make_call_instruction(2);
+    instructions.insert(instructions.end(), call2.begin(), call2.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.sp == 1);
+    assert(vm.stack[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 8);
+
+    std::cout << "✓ VM OP_CALL builtin two args via bytecode test passed\n";
+}
+
+void test_vm_op_call_compiled_class_no_constructor() {
+    std::cout << "running test_vm_op_call_compiled_class_no_constructor...\n";
+
+    auto* cls = new AdCompiledClass();
+    std::vector<Ad_Object*> constants = {cls};
+
+    std::vector<unsigned char> instructions;
+    auto c0 = make_constant_instruction(0);
+    instructions.insert(instructions.end(), c0.begin(), c0.end());
+    auto call0 = make_call_instruction(0);
+    instructions.insert(instructions.end(), call0.begin(), call0.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.sp == 2);
+    assert(vm.stack[0]->Type() == OBJ_COMPILED_CLASS);
+    assert(vm.stack[1]->Type() == OBJ_COMPILED_INSTANCE);
+    auto* inst = static_cast<AdCompiledInstance*>(vm.stack[1]);
+    assert(inst->klass == cls);
+
+    std::cout << "✓ VM OP_CALL compiled class (no constructor) test passed\n";
+}
+
+void test_vm_execute_call_invalid_callee() {
+    std::cout << "running test_vm_execute_call_invalid_callee...\n";
+
+    VM vm;
+    vm.load(make_minimal_runnable_bytecode());
+    vm.push(new Ad_Integer_Object(123));
+    vm.execute_call(0);
+
+    assert(vm.frames.size() == 1);
+
+    std::cout << "✓ VM execute_call invalid callee (non-callable) test passed\n";
+}
+
 void run_all_vm_tests() {
     std::cout << "=== Running VM tests ===\n";
 
@@ -1009,6 +1231,16 @@ void run_all_vm_tests() {
     test_vm_hash_empty();
     test_vm_hash_instruction();
     test_vm_hash_string_keys();
+
+    // OP_CALL / execute_call
+    test_vm_execute_call_builtin_two_args();
+    test_vm_execute_call_builtin_returns_null_pushes_null_object();
+    test_vm_execute_call_closure_pushes_frame();
+    test_vm_execute_call_bound_method_pushes_frame_and_bound_instance();
+    test_vm_op_call_builtin_via_bytecode();
+    test_vm_op_call_builtin_two_args_via_bytecode();
+    test_vm_op_call_compiled_class_no_constructor();
+    test_vm_execute_call_invalid_callee();
 
     std::cout << "=== All VM tests passed! ===\n\n";
 }

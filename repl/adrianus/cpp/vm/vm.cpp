@@ -113,8 +113,121 @@ void VM::run() {
             Ad_Object* index = pop();
             Ad_Object* left = pop();
             execute_index_expression(left, index);
+        } else if (opcode == OP_CALL) {
+            int num_args = read_uint8(*ins, ip + 1);
+            current_frame()->ip += 1;
+            execute_call(num_args);
         }
     }
+}
+
+void VM::execute_call(int num_args) {
+    int callee_index = sp - 1 - num_args;
+    if (callee_index < 0) {
+        std::cerr << "[ VM Error ] OP_CALL: stack underflow (callee index)\n";
+        return;
+    }
+    Ad_Object* callee = stack[callee_index];
+    if (callee == nullptr) {
+        std::cerr << "[ VM Error ] SEVERE ERROR: calling error - callee is nullptr\n";
+        return;
+    }
+    Ad_Object_Type t = callee->Type();
+    if (t == OBJ_CLOSURE) {
+        call_closure(static_cast<AdClosureObject*>(callee), num_args);
+    } else if (t == OBJ_BUILTIN) {
+        call_builtin(static_cast<Ad_Builtin_Object*>(callee), num_args);
+    } else if (t == OBJ_COMPILED_CLASS) {
+        call_class(static_cast<AdCompiledClass*>(callee), num_args);
+    } else if (t == OBJ_BOUND_METHOD) {
+        call_bound_method(static_cast<AdBoundMethod*>(callee), num_args);
+    } else {
+        std::cerr << "[ VM Error ] SEVERE ERROR: calling error (unsupported callee type)\n";
+    }
+}
+
+void VM::call_closure(AdClosureObject* cl, int num_args) {
+    if (cl == nullptr || cl->fn == nullptr) {
+        std::cerr << "[ VM Error ] call_closure: null closure or function\n";
+        return;
+    }
+    if (num_args != cl->fn->num_parameters) {
+        std::cerr << "ERROR: wrong number of arguments expecting: " << cl->fn->num_parameters
+                  << " got: " << num_args << std::endl;
+    }
+    Frame frame(cl, -1, sp - num_args, nullptr);
+    frames.push_back(frame);
+    sp = frame.base_pointer + cl->fn->num_locals;
+}
+
+void VM::call_builtin(Ad_Builtin_Object* builtin, int num_args) {
+    std::vector<Ad_Object*> args;
+    args.reserve(static_cast<size_t>(num_args));
+    for (int i = sp - num_args; i < sp; ++i) {
+        args.push_back(stack[i]);
+    }
+    sp = sp - num_args - 1;
+    Ad_Object* result = builtin->builtin_function(args, nullptr, gc);
+    if (result != nullptr) {
+        push(result);
+    } else {
+        push(&NULLOBJECT);
+    }
+}
+
+void VM::call_class(AdCompiledClass* cl, int num_args) {
+    auto* instance = new AdCompiledInstance();
+    instance->klass = cl;
+    instance->definition_num_args = num_args;
+    bool need_to_remove = false;
+    for (AdCompiledFunction* field_initializer : cl->field_initializers) {
+        auto* closure = new AdClosureObject();
+        closure->fn = field_initializer;
+        push(closure);
+        need_to_remove = true;
+        AdBoundMethod bound_initializer(instance, closure);
+        call_bound_method(&bound_initializer, 0);
+        if (sp > 0 && stack[sp - 1] != nullptr) {
+            pop();
+        }
+    }
+    auto ctor_it = cl->methods.find("constructor");
+    if (ctor_it != cl->methods.end()) {
+        AdClosureObject* constructor = ctor_it->second;
+        if (!need_to_remove) {
+            pop();
+        }
+        AdBoundMethod bound_constructor(instance, constructor);
+        bound_constructor.owner = instance;
+        current_frame()->bound_instance = instance;
+        call_bound_method(&bound_constructor, num_args);
+    }
+    push(instance);
+}
+
+void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
+    if (bm == nullptr || bm->bound_method == nullptr || bm->bound_method->fn == nullptr) {
+        std::cerr << "[ VM Error ] call_bound_method: invalid bound method\n";
+        return;
+    }
+    if (num_args != bm->bound_method->fn->num_parameters) {
+        std::cerr << "ERROR: wrong number of arguments expecting: " << bm->bound_method->fn->num_parameters
+                  << " got: " << num_args << std::endl;
+    }
+    int old_sp = sp;
+    std::vector<Ad_Object*> popped;
+    popped.reserve(static_cast<size_t>(num_args));
+    for (int total = num_args; total > 0; --total) {
+        popped.push_back(pop());
+    }
+    push(bm->owner);
+    while (!popped.empty()) {
+        push(popped.back());
+        popped.pop_back();
+    }
+    Frame frame(bm->bound_method, -1, old_sp - num_args, bm->owner);
+    frames.push_back(frame);
+    sp = frame.base_pointer + bm->bound_method->fn->num_locals;
 }
 
 Ad_Object *VM::last_popped_stack_element() {

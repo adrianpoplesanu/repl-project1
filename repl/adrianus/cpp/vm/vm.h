@@ -33,6 +33,12 @@ public:
     void execute_index_expression(Ad_Object* left, Ad_Object* index);
     void execute_array_index(Ad_Object* left, Ad_Object* index);
     void execute_hash_index(Ad_Object* left, Ad_Object* index);
+
+    void execute_call(int num_args);
+    void call_closure(AdClosureObject* cl, int num_args);
+    void call_builtin(Ad_Builtin_Object* builtin, int num_args);
+    void call_class(AdCompiledClass* cl, int num_args);
+    void call_bound_method(AdBoundMethod* bm, int num_args);
 };
 
 #endif
