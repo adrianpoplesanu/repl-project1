@@ -1,5 +1,6 @@
 *.o
 main
+main_asan.dSYM/
 test_code
 test_code.dSYM/
 test_compiler
