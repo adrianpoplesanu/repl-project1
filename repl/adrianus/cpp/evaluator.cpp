@@ -1146,6 +1146,7 @@ void Evaluator::updateInstanceWithInheritedClasses(Ad_Object* obj, Environment& 
         std::string identifier = superKlasses.at(i)->TokenLiteral();
         adClassInstance->inheritFrom.push_back(identifier);
         Environment *parentKlassEnv = newEnvironment();
+        garbageCollector->addEnvironment(parentKlassEnv);
         Ad_Class_Object* parentAdClassObject = (Ad_Class_Object*) env.Get(identifier);
 
         for (std::vector<Ad_AST_Node*>::iterator it = parentAdClassObject->attributes.begin(); it != parentAdClassObject->attributes.end(); ++it) {

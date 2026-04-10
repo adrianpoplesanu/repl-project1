@@ -12,11 +12,10 @@ Environment::Environment() {
 }
 
 Environment::~Environment() {
-    for(std::unordered_map<std::string, Environment* >::const_iterator it = siblings.begin(); it != siblings.end(); ++it) {
-        // TODO: do this proper, maybe mark the env for sweeping using the gc?
-        Ad_DECREF(it->second);
-        delete it->second;
-    }
+    // `siblings` stores links to environments, but this instance does not
+    // have clear ownership over those pointers. Deleting them here can trigger
+    // invalid frees when a sibling is owned/lifetime-managed elsewhere.
+    siblings.clear();
 }
 
 bool Environment::Check(std::string key) {
