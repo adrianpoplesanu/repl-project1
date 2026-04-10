@@ -13,13 +13,17 @@
 
 Repl::Repl() {
     garbageCollector = new GarbageCollector();
+    env = nullptr;
     evaluator.setGarbageCollector(garbageCollector);
     compiler.gc = garbageCollector;
     vm.gc = garbageCollector;
 }
 
 Repl::~Repl() {
-    delete env; // this could be a regular env that gets deleted by the garbage collector mechanism
+    if (env != nullptr) {
+        delete env; // this could be a regular env that gets deleted by the garbage collector mechanism
+        env = nullptr;
+    }
     delete garbageCollector;
 }
 
@@ -114,7 +118,36 @@ void Repl::ExecuteFile(std::ifstream &target) {
 }
 
 void Repl::ExecuteFileVM(std::ifstream &target) {
-    // TODO: implement this
+    if (target.is_open()) {
+        std::string line;
+        std::string text;
+        while (getline(target, line)) {
+            text += line + "\n";
+        }
+        parser.Load(text);
+        program.reset();
+        parser.ParseProgram(program);
+
+        compiler.reset();
+        compiler.compile(&program);
+        Bytecode bytecode = compiler.getBytecode();
+
+        vm.load(bytecode);
+        vm.run();
+
+        garbageCollector->unmarkAllObjects();
+        garbageCollector->markObjects(vm.stack, vm.sp);
+        garbageCollector->sweepObjects();
+
+        Ad_Object* result = vm.last_popped_stack_element();
+        if (result != NULL) {
+            std::cout << result->Inspect() << "\n";
+        }
+    } else {
+        std::cout << "empty or missing ad source file\n";
+        program.reset();
+    }
+    target.close();
 }
 
 bool Repl::ExecuteLine(std::string line) {
