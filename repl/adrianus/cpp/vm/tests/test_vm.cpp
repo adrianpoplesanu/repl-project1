@@ -99,7 +99,7 @@ void test_vm_constructor() {
 
     assert(vm.sp == 0);
     assert(vm.gc == nullptr);
-    assert(vm.frames.empty());
+    assert(vm.frames_index == 0);
     assert(vm.constants.empty());
 
     std::cout << "✓ VM constructor test passed\n";
@@ -119,7 +119,7 @@ void test_vm_load() {
     vm.load(bytecode);
 
     assert(vm.constants.size() == 1);
-    assert(vm.frames.size() == 1);
+    assert(vm.frames_index == 1);
     assert(vm.current_frame() != nullptr);
 
     std::cout << "✓ VM load test passed\n";
@@ -1020,7 +1020,7 @@ void test_vm_execute_call_builtin_two_args() {
     vm.push(new Ad_Integer_Object(4));
     vm.execute_call(2);
 
-    assert(vm.frames.size() == 1);
+    assert(vm.frames_index == 1);
     assert(vm.sp == 1);
     assert(vm.stack[0]->Type() == OBJ_INT);
     assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 7);
@@ -1038,7 +1038,7 @@ void test_vm_execute_call_builtin_returns_null_pushes_null_object() {
     vm.push(builtin);
     vm.execute_call(0);
 
-    assert(vm.frames.size() == 1);
+    assert(vm.frames_index == 1);
     assert(vm.sp == 1);
     assert(vm.stack[0] == &NULLOBJECT);
 
@@ -1064,7 +1064,7 @@ void test_vm_execute_call_closure_pushes_frame() {
     vm.push(closure);
     vm.execute_call(0);
 
-    assert(vm.frames.size() == 2);
+    assert(vm.frames_index == 2);
     assert(vm.current_frame()->cl == closure);
     assert(vm.sp == 1);
 
@@ -1094,7 +1094,7 @@ void test_vm_execute_call_bound_method_pushes_frame_and_bound_instance() {
     vm.push(new Ad_Integer_Object(42));
     vm.execute_call(1);
 
-    assert(vm.frames.size() == 2);
+    assert(vm.frames_index == 2);
     assert(vm.current_frame()->bound_instance == instance);
     assert(vm.current_frame()->cl == closure);
     assert(vm.sp == 3);
@@ -1186,9 +1186,78 @@ void test_vm_execute_call_invalid_callee() {
     vm.push(new Ad_Integer_Object(123));
     vm.execute_call(0);
 
-    assert(vm.frames.size() == 1);
+    assert(vm.frames_index == 1);
 
     std::cout << "✓ VM execute_call invalid callee (non-callable) test passed\n";
+}
+
+void test_vm_op_return_value_via_closure_bytecode() {
+    std::cout << "running test_vm_op_return_value_via_closure_bytecode...\n";
+
+    auto* innerFn = new AdCompiledFunction();
+    innerFn->num_parameters = 0;
+    innerFn->num_locals = 0;
+    auto* innerIns = new Instructions();
+    auto innerConst = make_constant_instruction(1);  // points to integer constant below
+    innerIns->bytes.insert(innerIns->bytes.end(), innerConst.begin(), innerConst.end());
+    innerIns->bytes.push_back(OP_RETURN_VALUE);
+    innerIns->size = innerIns->bytes.size();
+    innerFn->instructions = innerIns;
+
+    auto* closure = new AdClosureObject();
+    closure->fn = innerFn;
+    auto* forty_two = new Ad_Integer_Object(42);
+
+    std::vector<Ad_Object*> constants = {closure, forty_two};
+    std::vector<unsigned char> instructions;
+    auto c0 = make_constant_instruction(0); // push closure
+    instructions.insert(instructions.end(), c0.begin(), c0.end());
+    auto call0 = make_call_instruction(0);
+    instructions.insert(instructions.end(), call0.begin(), call0.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.frames_index == 1);
+    assert(vm.sp == 1);
+    assert(vm.stack[0] != nullptr);
+    assert(vm.stack[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 42);
+
+    std::cout << "✓ VM OP_RETURN_VALUE via closure bytecode test passed\n";
+}
+
+void test_vm_op_return_via_closure_bytecode() {
+    std::cout << "running test_vm_op_return_via_closure_bytecode...\n";
+
+    auto* innerFn = new AdCompiledFunction();
+    innerFn->num_parameters = 0;
+    innerFn->num_locals = 0;
+    auto* innerIns = new Instructions();
+    innerIns->bytes = {OP_RETURN};
+    innerIns->size = innerIns->bytes.size();
+    innerFn->instructions = innerIns;
+
+    auto* closure = new AdClosureObject();
+    closure->fn = innerFn;
+
+    std::vector<Ad_Object*> constants = {closure};
+    std::vector<unsigned char> instructions;
+    auto c0 = make_constant_instruction(0); // push closure
+    instructions.insert(instructions.end(), c0.begin(), c0.end());
+    auto call0 = make_call_instruction(0);
+    instructions.insert(instructions.end(), call0.begin(), call0.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.frames_index == 1);
+    assert(vm.sp == 1);
+    assert(vm.stack[0] == &NULLOBJECT);
+
+    std::cout << "✓ VM OP_RETURN via closure bytecode test passed\n";
 }
 
 void run_all_vm_tests() {
@@ -1241,6 +1310,8 @@ void run_all_vm_tests() {
     test_vm_op_call_builtin_two_args_via_bytecode();
     test_vm_op_call_compiled_class_no_constructor();
     test_vm_execute_call_invalid_callee();
+    test_vm_op_return_value_via_closure_bytecode();
+    test_vm_op_return_via_closure_bytecode();
 
     std::cout << "=== All VM tests passed! ===\n\n";
 }

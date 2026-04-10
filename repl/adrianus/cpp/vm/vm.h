@@ -15,6 +15,7 @@ public:
     Ad_Object *stack[2048];
     GarbageCollector *gc;
     std::vector<Frame> frames;
+    int frames_index;
     std::vector<Ad_Object*> constants;
     std::vector<Ad_Object*> globals;
 
@@ -23,6 +24,8 @@ public:
     void run();
     Ad_Object* last_popped_stack_element();
     Frame* current_frame();
+    void push_frame(const Frame& f);
+    Frame pop_frame();
     void push(Ad_Object* obj);
     Ad_Object* pop();
     void execute_binary_operation(OpCodeType opcode);

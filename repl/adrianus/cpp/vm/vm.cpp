@@ -10,6 +10,7 @@ VM::VM() {
     sp = 0;
     gc = nullptr;
     frames.clear();
+    frames_index = 0;
     constants.clear();
     globals.clear();
 }
@@ -30,8 +31,10 @@ void VM::load(Bytecode bytecode) {
     closure->fn = compiledFn;
     
     // Create the initial frame with the closure
+    frames.clear();
+    frames_index = 0;
     Frame frame(closure, -1, 0, nullptr);
-    frames.push_back(frame);
+    push_frame(frame);
 }
 
 void VM::run() {
@@ -117,6 +120,24 @@ void VM::run() {
             int num_args = read_uint8(*ins, ip + 1);
             current_frame()->ip += 1;
             execute_call(num_args);
+        } else if (opcode == OP_RETURN_VALUE) {
+            Ad_Object* return_value = pop();
+            Frame frame = pop_frame();
+            sp = frame.base_pointer - 1;
+            push(return_value);
+            if (frames_index == 0) {
+                break;
+            }
+        } else if (opcode == OP_RETURN) {
+            Frame frame = pop_frame();
+            sp = frame.base_pointer - 1;
+            if (sp < 0) {
+                sp = 0;
+            }
+            push(&NULLOBJECT);
+            if (frames_index == 0) {
+                break;
+            }
         }
     }
 }
@@ -156,7 +177,7 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
                   << " got: " << num_args << std::endl;
     }
     Frame frame(cl, -1, sp - num_args, nullptr);
-    frames.push_back(frame);
+    push_frame(frame);
     sp = frame.base_pointer + cl->fn->num_locals;
 }
 
@@ -226,7 +247,7 @@ void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
         popped.pop_back();
     }
     Frame frame(bm->bound_method, -1, old_sp - num_args, bm->owner);
-    frames.push_back(frame);
+    push_frame(frame);
     sp = frame.base_pointer + bm->bound_method->fn->num_locals;
 }
 
@@ -235,10 +256,24 @@ Ad_Object *VM::last_popped_stack_element() {
 }
 
 Frame* VM::current_frame() {
-    if (frames.empty()) {
+    if (frames_index == 0) {
         return nullptr;
     }
-    return &frames.back();
+    return &frames[frames_index - 1];
+}
+
+void VM::push_frame(const Frame& f) {
+    if (frames_index >= static_cast<int>(frames.size())) {
+        frames.push_back(f);
+    } else {
+        frames[frames_index] = f;
+    }
+    frames_index += 1;
+}
+
+Frame VM::pop_frame() {
+    frames_index -= 1;
+    return frames[frames_index];
 }
 
 void VM::push(Ad_Object* obj) {
