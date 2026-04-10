@@ -1,0 +1,4 @@
+data = [1, 2, 3, 4]
+first = data[0]
+last = data[3]
+first + last
