@@ -1,23 +1,24 @@
 === BEGIN RESPONSE =================================
-HTTP\/1\.1 200 OK
+HTTP/1.1 200 OK
 Server: nginx
 Date: (.*), (.*) (.*) (.*) (.*):(.*):(.*) GMT
-Content-Type: text\/html; charset=UTF-8
+Content-Type: text/html; charset=UTF-8
 Transfer-Encoding: chunked
 Connection: close
+Vary: Accept-Encoding
 Vary: Accept-Encoding
 
 6b
 <html>
-<head><\/head>
+<head></head>
 <body>
 <div>
-It works!<\/div>
+It works!</div>
 <div><i>
-adrianus per scorillo<\/i>
-<\/div>
-<\/body>
-<\/html>
+adrianus per scorillo</i>
+</div>
+</body>
+</html>
 0
 
 
