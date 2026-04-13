@@ -98,6 +98,36 @@ void VM::run() {
             } else {
                 std::cerr << "[ VM Error ] Global index out of bounds: " << global_index << std::endl;
             }
+        } else if (opcode == OP_SET_LOCAL) {
+            int local_index = read_uint8(*ins, ip + 1);
+            current_frame()->ip += 1;
+
+            Frame* frame = current_frame();
+            if (frame == nullptr) {
+                std::cerr << "[ VM Error ] OP_SET_LOCAL: no current frame" << std::endl;
+                continue;
+            }
+            int slot = frame->base_pointer + local_index;
+            if (slot < 0 || slot >= stackSize) {
+                std::cerr << "[ VM Error ] OP_SET_LOCAL: local slot out of bounds: " << slot << std::endl;
+                continue;
+            }
+            stack[slot] = pop();
+        } else if (opcode == OP_GET_LOCAL) {
+            int local_index = read_uint8(*ins, ip + 1);
+            current_frame()->ip += 1;
+
+            Frame* frame = current_frame();
+            if (frame == nullptr) {
+                std::cerr << "[ VM Error ] OP_GET_LOCAL: no current frame" << std::endl;
+                continue;
+            }
+            int slot = frame->base_pointer + local_index;
+            if (slot < 0 || slot >= stackSize) {
+                std::cerr << "[ VM Error ] OP_GET_LOCAL: local slot out of bounds: " << slot << std::endl;
+                continue;
+            }
+            push(stack[slot]);
         } else if (opcode == OP_ARRAY) {
             int numElements = read_uint16(*ins, ip + 1);
             current_frame()->ip += 2;
