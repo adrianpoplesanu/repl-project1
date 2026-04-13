@@ -172,6 +172,43 @@ void Compiler::compile(Ad_AST_Node* node) {
         } else {
             emit(opSetLocal, 1, {symbol.index});
         }
+    } else if (node->type == ST_ASSIGN_STATEMENT) {
+        Ad_AST_AssignStatement* assign_stmt = static_cast<Ad_AST_AssignStatement*>(node);
+        if (assign_stmt->name->type == ST_MEMBER_ACCESS) {
+            Ad_AST_MemberAccess* member_access = static_cast<Ad_AST_MemberAccess*>(assign_stmt->name);
+            compile(member_access->owner);
+
+            std::string member_name;
+            if (member_access->member->type == ST_IDENTIFIER) {
+                member_name = static_cast<Ad_AST_Identifier*>(member_access->member)->value;
+            } else {
+                member_name = member_access->member->TokenLiteral();
+            }
+            (void)symbol_table->resolve(member_name);
+
+            compile(assign_stmt->value);
+
+            Ad_String_Object* field = new Ad_String_Object(member_name);
+            emit(opConstant, 1, {addConstant(field)});
+            emit(opSetProperty, 0, {});
+        } else if (assign_stmt->name->type == ST_IDENTIFIER) {
+            Ad_AST_Identifier* name_id = static_cast<Ad_AST_Identifier*>(assign_stmt->name);
+            Symbol symbol = symbol_table->define(name_id->value);
+            compile(assign_stmt->value);
+            if (symbol.scope == SymbolScope::GLOBAL) {
+                emit(opSetGlobal, 1, {symbol.index});
+            } else {
+                if (scopes[scopeIndex].compilationType == "class") {
+                    Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
+                    emit(opConstant, 1, {addConstant(field_name)});
+                    emit(opPatchPropertySym, 1, {symbol.index});
+                } else {
+                    emit(opSetLocal, 1, {symbol.index});
+                }
+            }
+        } else {
+            std::cerr << "[ Compiler Error ] Unsupported assign statement target\n";
+        }
     } else if (node->type == ST_IDENTIFIER) {
         Ad_AST_Identifier* identifier_node = (Ad_AST_Identifier*)node;
         Symbol* symbol = symbol_table->resolve(identifier_node->value);
@@ -275,6 +312,56 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opNull, 0, {});
         }
         emit(opReturnValue, 0, {});
+    } else if (node->type == ST_DEF_STATEMENT) {
+        // Compile `def name(...) { ... }` as a named function literal bound to a symbol,
+        // equivalent to a let-bound function for VM bytecode generation.
+        Ad_AST_Def_Statement* def_stmt = static_cast<Ad_AST_Def_Statement*>(node);
+        if (def_stmt->name == nullptr || def_stmt->name->type != ST_IDENTIFIER) {
+            std::cerr << "[ Compiler Error ] Invalid def statement name\n";
+            return;
+        }
+
+        Ad_AST_Identifier* def_name = static_cast<Ad_AST_Identifier*>(def_stmt->name);
+        Symbol symbol = symbol_table->define(def_name->value);
+
+        enter_scope();
+        // Define function name in local scope for self-recursion support.
+        symbol_table->define_function_name(def_name->value);
+        for (Ad_AST_Node* p : def_stmt->parameters) {
+            Ad_AST_Identifier* param = static_cast<Ad_AST_Identifier*>(p);
+            symbol_table->define(param->value);
+        }
+        compile(def_stmt->body);
+        if (lastInstructionIs(opPop)) {
+            replaceLastPopWithReturn();
+        }
+        if (!lastInstructionIs(opReturnValue)) {
+            emit(opReturn, 0, {});
+        }
+        std::vector<Symbol> free_symbols = symbol_table->free_symbols;
+        int num_locals = symbol_table->num_definitions;
+        Instructions inner_instructions = leave_scope();
+
+        for (const Symbol& s : free_symbols) {
+            load_symbol(s, s.name);
+        }
+
+        AdCompiledFunction* compiled_func = new AdCompiledFunction();
+        compiled_func->instructions = new Instructions();
+        compiled_func->instructions->bytes = inner_instructions.bytes;
+        compiled_func->instructions->size = inner_instructions.size;
+        compiled_func->num_locals = num_locals;
+        compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+
+        emit(opClosure, 2, {addConstant(compiled_func), static_cast<int>(free_symbols.size())});
+        if (symbol.scope == SymbolScope::GLOBAL) {
+            emit(opSetGlobal, 1, {symbol.index});
+        } else {
+            emit(opSetLocal, 1, {symbol.index});
+        }
+    } else if (node->type == ST_COMMENT) {
+        // Comments do not emit bytecode.
+        return;
     }
     // TODO: add support for other statement types
 }

@@ -40,3 +40,4 @@ OpGetMethod opGetMethod;
 OpInvoke opInvoke;
 OpSetPropertySym opSetPropertySym;
 OpGetPropertySym opGetPropertySym;
+OpPatchPropertySym opPatchPropertySym;

@@ -116,6 +116,26 @@ void VM::run() {
             Ad_Object* index = pop();
             Ad_Object* left = pop();
             execute_index_expression(left, index);
+        } else if (opcode == OP_CLOSURE) {
+            int const_index = read_uint16(*ins, ip + 1);
+            int num_free = read_uint8(*ins, ip + 3);
+            current_frame()->ip += 3;
+
+            if (const_index < 0 || const_index >= static_cast<int>(constants.size())) {
+                std::cerr << "[ VM Error ] OP_CLOSURE constant index out of bounds: " << const_index << std::endl;
+                continue;
+            }
+            if (constants[const_index] == nullptr || constants[const_index]->Type() != OBJ_COMPILED_FUNCTION) {
+                std::cerr << "[ VM Error ] OP_CLOSURE expected compiled function constant at index: " << const_index << std::endl;
+                continue;
+            }
+
+            // Free variables are not wired in this VM object model yet.
+            (void)num_free;
+
+            auto* closure = new AdClosureObject();
+            closure->fn = static_cast<AdCompiledFunction*>(constants[const_index]);
+            push(closure);
         } else if (opcode == OP_CALL) {
             int num_args = read_uint8(*ins, ip + 1);
             current_frame()->ip += 1;
