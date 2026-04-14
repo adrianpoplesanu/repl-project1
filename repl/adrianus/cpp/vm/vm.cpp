@@ -50,7 +50,6 @@ void VM::printLogs() {
 }
 
 void VM::run() {
-    printLogs();
     while (current_frame()->ip < static_cast<int>(current_frame()->instructions()->bytes.size()) - 1) {
         current_frame()->ip += 1;
         int ip = current_frame()->ip;

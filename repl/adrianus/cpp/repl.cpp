@@ -134,6 +134,7 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
         Bytecode bytecode = compiler.getBytecode();
 
         vm.load(bytecode);
+        vm.printLogs();
         vm.run();
 
         garbageCollector->unmarkAllObjects();
@@ -177,6 +178,7 @@ bool Repl::ExecuteLineVM(std::string line) {
     std::cout << compiler.code.toString() << '\n'; // asta pare ca functioneaza cum trebuie
 
     vm.load(bytecode);
+    vm.printLogs();
     vm.run();
 
     garbageCollector->unmarkAllObjects();
