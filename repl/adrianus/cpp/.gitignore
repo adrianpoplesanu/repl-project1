@@ -10,5 +10,7 @@ test_compiler_simple.dSYM/
 test_vm
 test_vm.dSYM/
 
+bytecode-logs/
+
 .vscode/
 .idea/

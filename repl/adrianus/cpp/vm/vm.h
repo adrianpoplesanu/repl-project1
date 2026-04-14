@@ -18,9 +18,12 @@ public:
     int frames_index;
     std::vector<Ad_Object*> constants;
     std::vector<Ad_Object*> globals;
+    Bytecode last_loaded_bytecode;
+    bool has_loaded_bytecode;
 
     VM();
     void load(Bytecode bytecode);
+    void printLogs();
     void run();
     Ad_Object* last_popped_stack_element();
     Frame* current_frame();

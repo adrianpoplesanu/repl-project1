@@ -1,6 +1,7 @@
 #include "vm.h"
 #include "code.h"
 #include "objects.h"
+#include "utils.h"
 #include "../evaluator.h"
 #include <iostream>
 #include <vector>
@@ -13,9 +14,13 @@ VM::VM() {
     frames_index = 0;
     constants.clear();
     globals.clear();
+    has_loaded_bytecode = false;
 }
 
 void VM::load(Bytecode bytecode) {
+    last_loaded_bytecode = bytecode;
+    has_loaded_bytecode = true;
+
     // Store constants from bytecode
     constants = bytecode.constants;
     
@@ -37,7 +42,15 @@ void VM::load(Bytecode bytecode) {
     push_frame(frame);
 }
 
+void VM::printLogs() {
+    if (!has_loaded_bytecode) {
+        return;
+    }
+    write_bytecode_log(last_loaded_bytecode);
+}
+
 void VM::run() {
+    printLogs();
     while (current_frame()->ip < static_cast<int>(current_frame()->instructions()->bytes.size()) - 1) {
         current_frame()->ip += 1;
         int ip = current_frame()->ip;

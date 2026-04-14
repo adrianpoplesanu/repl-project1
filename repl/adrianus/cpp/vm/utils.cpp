@@ -1,8 +1,113 @@
 #include "utils.h"
 #include "code.h"
 #include "opcode.h"
+#include "objects.h"
+#include <algorithm>
+#include <chrono>
+#include <ctime>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <mutex>
+#include <set>
 #include <sstream>
+
+namespace {
+std::string make_timestamp() {
+    using namespace std::chrono;
+    const auto now = system_clock::now();
+    const auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+    const std::time_t now_c = system_clock::to_time_t(now);
+    std::tm tm_snapshot{};
+#if defined(_WIN32)
+    localtime_s(&tm_snapshot, &now_c);
+#else
+    localtime_r(&now_c, &tm_snapshot);
+#endif
+    std::ostringstream out;
+    out << std::put_time(&tm_snapshot, "%Y%m%d-%H%M%S") << "-" << std::setw(3) << std::setfill('0') << ms.count();
+    return out.str();
+}
+
+void append_instruction_block(
+    std::ostream& out,
+    const std::string& section_title,
+    const Instructions* instructions
+) {
+    out << "=== " << section_title << " ===\n";
+    if (instructions == nullptr) {
+        out << "<missing instructions>\n\n";
+        return;
+    }
+    out << "size: " << instructions->size << "\n";
+    out << "bytes:";
+    for (unsigned char byte : instructions->bytes) {
+        out << " " << static_cast<int>(byte);
+    }
+    out << "\n";
+    out << disassemble_instructions(*instructions) << "\n";
+}
+
+void append_object_instructions(
+    std::ostream& out,
+    Ad_Object* object,
+    const std::string& path,
+    std::set<const Ad_Object*>& visited
+) {
+    if (object == nullptr) {
+        out << "=== " << path << " ===\n<null object>\n\n";
+        return;
+    }
+    if (visited.find(object) != visited.end()) {
+        out << "=== " << path << " ===\n<already logged>\n\n";
+        return;
+    }
+    visited.insert(object);
+
+    const Ad_Object_Type type = object->Type();
+    if (type == OBJ_COMPILED_FUNCTION) {
+        auto* fn = static_cast<AdCompiledFunction*>(object);
+        std::ostringstream title;
+        title << path << " [compiled_function] params=" << fn->num_parameters << " locals=" << fn->num_locals;
+        append_instruction_block(out, title.str(), fn->instructions);
+        return;
+    }
+
+    if (type == OBJ_CLOSURE) {
+        auto* closure = static_cast<AdClosureObject*>(object);
+        out << "=== " << path << " [closure] ===\n";
+        out << "fn: " << closure->fn << "\n\n";
+        append_object_instructions(out, closure->fn, path + ".fn", visited);
+        return;
+    }
+
+    if (type == OBJ_COMPILED_CLASS) {
+        auto* klass = static_cast<AdCompiledClass*>(object);
+        out << "=== " << path << " [compiled_class] ===\n";
+        out << "field_initializers: " << klass->field_initializers.size() << "\n";
+        out << "methods: " << klass->methods.size() << "\n\n";
+
+        for (size_t i = 0; i < klass->field_initializers.size(); ++i) {
+            append_object_instructions(
+                out,
+                klass->field_initializers[i],
+                path + ".field_initializer[" + std::to_string(i) + "]",
+                visited
+            );
+        }
+        for (const auto& entry : klass->methods) {
+            append_object_instructions(
+                out,
+                entry.second,
+                path + ".method[" + entry.first + "]",
+                visited
+            );
+        }
+        return;
+    }
+}
+} // namespace
 
 // Static function to initialize and return the definitions map
 static std::map<unsigned char, Definition*>& get_definitions_map() {
@@ -83,5 +188,64 @@ std::string disassemble_instructions(const Instructions& instructions) {
     }
     
     return out;
+}
+
+void write_bytecode_log(const Bytecode& bytecode) {
+    static std::mutex log_mutex;
+    std::lock_guard<std::mutex> lock(log_mutex);
+
+    const std::filesystem::path output_dir("bytecode-logs");
+    std::error_code fs_error;
+    std::filesystem::create_directories(output_dir, fs_error);
+    if (fs_error) {
+        std::cerr << "[ VM Log ] Failed to create bytecode-logs directory: " << fs_error.message() << std::endl;
+        return;
+    }
+
+    const std::string timestamp = make_timestamp();
+    const std::filesystem::path log_path = output_dir / ("bytecode-log-" + timestamp + ".log");
+    std::ofstream log_file(log_path);
+    if (!log_file.is_open()) {
+        std::cerr << "[ VM Log ] Failed to create log file: " << log_path.string() << std::endl;
+        return;
+    }
+
+    log_file << "timestamp: " << timestamp << "\n";
+    log_file << "constants_count: " << bytecode.constants.size() << "\n\n";
+    append_instruction_block(log_file, "main", &bytecode.instructions);
+
+    std::set<const Ad_Object*> visited;
+    for (size_t i = 0; i < bytecode.constants.size(); ++i) {
+        Ad_Object* constant = bytecode.constants[i];
+        std::string header = "constant[" + std::to_string(i) + "]";
+        if (constant == nullptr) {
+            log_file << "=== " << header << " ===\n<null>\n\n";
+            continue;
+        }
+        log_file << "=== " << header << " type=" << constant->Type() << " ===\n";
+        log_file << "inspect: " << constant->Inspect() << "\n\n";
+        append_object_instructions(log_file, constant, header, visited);
+    }
+    log_file.close();
+
+    std::vector<std::filesystem::directory_entry> log_files;
+    for (const auto& entry : std::filesystem::directory_iterator(output_dir)) {
+        if (!entry.is_regular_file()) {
+            continue;
+        }
+        const std::string file_name = entry.path().filename().string();
+        const bool has_prefix = file_name.rfind("bytecode-log-", 0) == 0;
+        const bool has_suffix = file_name.size() >= 4 && file_name.substr(file_name.size() - 4) == ".log";
+        if (has_prefix && has_suffix) {
+            log_files.push_back(entry);
+        }
+    }
+    std::sort(log_files.begin(), log_files.end(), [](const auto& left, const auto& right) {
+        return left.last_write_time() < right.last_write_time();
+    });
+    while (log_files.size() > 10) {
+        std::filesystem::remove(log_files.front().path(), fs_error);
+        log_files.erase(log_files.begin());
+    }
 }
 
