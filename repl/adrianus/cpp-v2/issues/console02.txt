@@ -1,0 +1,12 @@
+Ad interpreter [C++]... v1.0
+>> x = 4
+>> class T { x = 2 def test(x) { this.x = x } }
+>> a = T()
+>> x
+4
+>> a.x
+2
+>> a.test(7)
+main(77420,0x104a9c580) malloc: *** error for object 0x600001580000: pointer being freed was not allocated
+main(77420,0x104a9c580) malloc: *** set a breakpoint in malloc_error_break to debug
+[1]    77420 abort      ./main

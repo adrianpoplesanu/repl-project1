@@ -1,0 +1,112 @@
+class _StringUtils {
+    def substring(target, start, end) {
+        result = ""
+        for (i = start; i < end; i++) {
+            result = result + target[i]
+        }
+        return result
+    }
+
+    def indexOf(target, lookFor) {
+        sizeTarget = len(target)
+        sizeLookFor = len(lookFor)
+        for (i = 0; i < sizeTarget - sizeLookFor + 1; i++) {
+            found = true
+            for (j = 0; j < sizeLookFor; j++) {
+                if (target[i + j] != lookFor[j]) {
+                    found = false
+                    break
+                }
+            }
+            if (found) {
+                return i
+            }
+        }
+        return -1
+    }
+
+    def split(target, delim) {
+        result = []
+        original = target
+        found = indexOf(target, delim)
+        while(found != -1) {
+            value = substring(target, 0, found)
+            __append(result, value)
+            target = substring(target, found + len(delim), len(target))
+            found = indexOf(target, delim)
+        }
+        __append(result, target)
+        return result
+    }
+
+    def splitFirst(target, delim) {
+        result = []
+        original = target
+        found = indexOf(target, delim)
+        if (found != -1) {
+            value = substring(target, 0, found)
+            __append(result, value)
+            value = substring(target, found + len(delim), len(target))
+            __append(result, value)
+        } else {
+            __append(result, original)
+        }
+        return result
+    }
+
+    def startsWith(target, lookup) {
+        size_target = len(target)
+        size_lookup = len(lookup)
+        if (size_lookup > size_target) {
+            return false
+        }
+        for (i = 0; i < size_lookup; i++) {
+            if (target[i] != lookup[i]) return false
+        }
+        return true
+    }
+
+    def endsWith(target, lookup) {
+        size_target = len(target)
+        size_lookup = len(lookup)
+        if (size_lookup > size_target) {
+            return false
+        }
+        for (i = 0; i < size_lookup; i++) {
+            if (target[size_target - size_lookup + i] != lookup[i]) {
+                return false
+            }
+        }
+        return true
+    }
+
+    def replace(source, lookup, value) {
+        startingPos = indexOf(source, lookup)
+        sizeSource = len(source)
+        sizeLookup = len(lookup)
+        sizeValue = len(value)
+
+        if (startingPos == -1) {
+            return source
+        }
+
+        result = source[:startingPos]
+        result = result + value
+        result = result + replace(source[startingPos + sizeLookup:sizeSource], lookup, value)
+
+        return result
+    }
+
+    def isEmpty(source) {
+        if (source == null) return true
+        if (source == "") return true
+        return false
+    }
+
+    def toString(obj) {
+        // TODO: this needs to be updated
+        return type(obj)
+    }
+}
+
+StringUtils = _StringUtils()

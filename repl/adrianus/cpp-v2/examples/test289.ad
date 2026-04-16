@@ -1,0 +1,2 @@
+response = requests.post("http://adrianus.ro", {})
+println(response)

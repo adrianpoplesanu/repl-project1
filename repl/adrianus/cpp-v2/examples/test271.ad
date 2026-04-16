@@ -1,0 +1,10 @@
+class Worker {
+    name = "aaa"
+    def change() {
+        name = "bbb"
+    }
+}
+
+worker = Worker()
+worker.change()
+println(worker.name)

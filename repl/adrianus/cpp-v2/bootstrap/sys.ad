@@ -1,0 +1,6 @@
+class SystemCommand {
+    def execute(command) {
+        result = __syssystem(command)
+        return result
+    }
+}

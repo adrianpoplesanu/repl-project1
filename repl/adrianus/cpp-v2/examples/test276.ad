@@ -1,0 +1,16 @@
+class Dog {
+    name = "cezar"
+
+    def set() {
+        name = "dex"
+    }
+
+    def get() {
+        return name
+    }
+}
+
+dog = Dog()
+println(dog.get())
+dog.set()
+println(dog.get())

@@ -1,0 +1,9 @@
+a = "ala bala portocala"
+b = "portocala"
+
+println(StringUtils.endsWith(a, b))
+
+c = "ala bala portocala"
+d = "portocal"
+
+println(StringUtils.endsWith(c, d))

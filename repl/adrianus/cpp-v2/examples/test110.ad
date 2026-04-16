@@ -1,0 +1,34 @@
+class Scriitor {
+    name = "radu paraschivescu"
+}
+
+scriitor = Scriitor()
+
+def change_name(scriitor) {
+    scriitor.name = "mircea cartarescu"
+}
+
+println(scriitor.name)
+change_name(scriitor)
+println(scriitor.name)
+
+numbers = [1, 2, 3]
+
+def change_numbers(numbers) {
+    numbers[1] = 5
+}
+
+println(numbers)
+change_numbers(numbers)
+println(numbers)
+
+age = 11
+
+def change_age(age) {
+    /* ints are not passed in as references */
+    age = 12
+}
+
+println(age)
+change_age(age)
+println(age)

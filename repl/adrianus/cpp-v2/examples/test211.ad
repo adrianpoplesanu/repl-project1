@@ -1,0 +1,9 @@
+names = ["anca", "andreea", "antonia", "alexandra", "alina"]
+
+def change(names) {
+    names[2] = "mihaela"
+}
+
+println(names)
+change(names)
+println(names)

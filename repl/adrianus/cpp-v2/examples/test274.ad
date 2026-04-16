@@ -1,0 +1,3 @@
+println(StringUtils.isEmpty("Bedus"))
+println(StringUtils.isEmpty(""))
+println(StringUtils.isEmpty(null))

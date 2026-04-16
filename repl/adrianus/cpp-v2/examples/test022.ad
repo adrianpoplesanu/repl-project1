@@ -1,0 +1,12 @@
+x = 11
+
+def a(x) {
+    println(__locals())
+    if (3 > 1) { return x + 1001; } else { return x + 1002; }
+}
+
+__locals()
+a(100)
+x
+
+__locals()

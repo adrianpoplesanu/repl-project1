@@ -1,0 +1,15 @@
+// testing implicit vs explicit returns in ad functions
+
+def test1() {
+    return 6 + 7
+}
+
+def test2() {
+    11 + 22
+}
+
+a = test1()
+b = test2()
+
+println(a)
+println(b)

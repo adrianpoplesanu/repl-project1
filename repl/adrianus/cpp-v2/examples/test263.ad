@@ -1,0 +1,8 @@
+a = "aaa/bbb/ccc"
+b = "/"
+c = StringUtils.split(a, b)
+println(c)
+
+metadata = "aaa\nbbb\nccc\nddd"
+tokens = StringUtils.split(metadata, "\n")
+println(tokens)

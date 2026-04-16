@@ -1,0 +1,11 @@
+Ad interpreter [C++]... v1.0
+>> class T { t = 7; def test(t) { this.t = 9; } }
+>> a = T((
+>> a = T()
+>> a
+class instance at memory address 0x6000001901c0
+>> a.t
+7
+>> a.test(4)
+>> a.t
+7

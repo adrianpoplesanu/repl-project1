@@ -1,0 +1,7 @@
+a = 5
+a += 4
+println(a)
+
+b = 7
+b -= 2
+println(b)

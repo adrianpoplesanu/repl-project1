@@ -1,0 +1,17 @@
+class Elev {
+    name = "aaa bbb"
+    age = 12
+}
+
+def change_elev(e) {
+    e.med = 55
+}
+
+e = Elev()
+println(e.name)
+println(e.age)
+
+change_elev(e)
+println(e.name)
+println(e.age)
+println(e.med)

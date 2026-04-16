@@ -1,0 +1,19 @@
+let a = func() {
+    println("aaa")
+}
+
+a()
+println(a)
+
+let b = func(n) {
+    while (n > 0) {
+        println(n * 2)
+        n = n - 1
+        //func(n) // asta e seg fault in cpp
+    }
+}
+
+c = 9
+b(c)
+println(b)
+println(c)

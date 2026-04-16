@@ -1,0 +1,13 @@
+class Dog {
+    a = 5
+}
+
+dog = Dog()
+
+println(dog.a)
+
+dog.b = func() {
+    println(a + 6)
+}
+
+println(dog.b())

@@ -1,0 +1,101 @@
+diff --git a/repl/adrianus/cpp/evaluator.cpp b/repl/adrianus/cpp/evaluator.cpp
+index 437f55c..6f3edd7 100644
+--- a/repl/adrianus/cpp/evaluator.cpp
++++ b/repl/adrianus/cpp/evaluator.cpp
+@@ -90,7 +90,8 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
+                 return args_objs[0];
+             }
+             Ad_Object* result = ApplyFunction(func, args_objs, env);
+-            //GarbageCollectEnvironments(); // this also doesn't work, i need to document why
++            //GarbageCollectEnvironments(); // this also doesn't work, i need to document why, why is this not working?!?
++            //Ad_DECREF(((Ad_Function_Object*)func)->env);
+             return result;
+         }
+         break;
+@@ -195,10 +196,10 @@ void Evaluator::Init() {
+ void Evaluator::GarbageCollectEnvironments() {
+     //std::cout << "cleaning up environments\n";
+     garbageCollector.sweepEnvironments();
+-    for (Environment* env : environment_garbage_collection) {
++    //for (Environment* env : environment_garbage_collection) {
+         //delete env;
+         //free_Ad_environment_memory(env);
+-    }
++    //}
+     //environment_garbage_collection.clear();
+     garbageCollector.clearEnvironments();
+ }
+@@ -424,10 +425,13 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
+             return new Ad_Error_Object("function signature unrecognized, different number of params");
+         }
+         Environment* extendedEnv = extendFunctionEnv(func, args);
++        extendedEnv->ref_count = 1;
+         //Environment extendedEnv = ExtendFunctionEnv(func, args);
++        Ad_INCREF(func_obj->env);
+         Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
+-        environment_garbage_collection.push_back(extendedEnv);
++        //environment_garbage_collection.push_back(extendedEnv);
+         garbageCollector.addEnvironment(extendedEnv);
++        extendedEnv->ref_count = 0;
+         //std::cout << "se va returna un obiect de tipul: " << object_type_map[evaluated->type] << "\n";
+         return UnwrapReturnValue(evaluated);
+     }
+@@ -505,7 +509,7 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
+     if (func->type == OBJ_FUNCTION) {
+         Environment* extendedEnv = ExtendMethodEnv(func, args, env);
+         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
+-        environment_garbage_collection.push_back(extendedEnv);
++        //environment_garbage_collection.push_back(extendedEnv);
+         garbageCollector.addEnvironment(extendedEnv);
+         return UnwrapReturnValue(evaluated);
+     }
+diff --git a/repl/adrianus/cpp/gc.cpp b/repl/adrianus/cpp/gc.cpp
+index 4699c5b..f477b91 100644
+--- a/repl/adrianus/cpp/gc.cpp
++++ b/repl/adrianus/cpp/gc.cpp
+@@ -13,16 +13,19 @@ void GarbageCollector::addEnvironment(Environment *env) {
+ }
+ 
+ void GarbageCollector::sweepEnvironments() {
+-    //std::cout << "running sweepEnvironments()\n";
++    std::cout << "running sweepEnvironments()\n";
++    int count = 0;
+     std::vector<Environment*> referencedEnvironments;
+     for (Environment *env : gc_environments) {
+         if (env->ref_count > 0) {
+             //...
+             referencedEnvironments.push_back(env);
+         } else {
++            count++;
+             free_Ad_environment_memory(env);
+         }
+     }
++    std::cout << "freed " << count << " environments\n";
+     gc_environments = referencedEnvironments;
+ }
+ 
+diff --git a/repl/adrianus/cpp/objects.cpp b/repl/adrianus/cpp/objects.cpp
+index cbf0419..f57ff92 100644
+--- a/repl/adrianus/cpp/objects.cpp
++++ b/repl/adrianus/cpp/objects.cpp
+@@ -222,6 +222,7 @@ Ad_Function_Object::~Ad_Function_Object() {
+         Ad_DECREF(obj);
+         free_Ad_AST_Node_memory(obj);
+     }
++    Ad_DECREF(env);
+ }
+ 
+ std::string Ad_Function_Object::Inspect() {
+diff --git a/repl/adrianus/cpp/repl.cpp b/repl/adrianus/cpp/repl.cpp
+index 92a201b..4c2ff15 100644
+--- a/repl/adrianus/cpp/repl.cpp
++++ b/repl/adrianus/cpp/repl.cpp
+@@ -12,7 +12,7 @@ Repl::Repl() {
+ 
+ Repl::~Repl() {
+     //env->PrintStore(0);
+-    delete env2;
++    delete env2; // this could be a regular env that gets deleted by the garbage collector mechanism
+ }
+ 
+ void Repl::Loop() {

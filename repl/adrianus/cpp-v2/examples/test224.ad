@@ -1,0 +1,15 @@
+def teest() {
+    for (j = 0; j < 1000; j++) {
+        //print('a')
+    }
+}
+
+def main() {
+    i = 0
+    while (i < 1000) {
+        teest()
+        i++
+    }
+}
+
+main()

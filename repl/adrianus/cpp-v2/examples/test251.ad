@@ -1,0 +1,12 @@
+class Dog {
+    def test() {
+        this.test2(a = 5, b = 7)
+    }
+
+    def test2(a = 1, b = 2) {
+        println(a + b)
+    }
+}
+
+dex = Dog()
+dex.test()

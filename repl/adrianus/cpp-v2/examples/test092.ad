@@ -1,0 +1,15 @@
+def generator() {
+    def big(n) {
+        if (n > 9) {
+            println("e mare")
+        } else {
+            println("e mic")
+        }
+    }
+
+    return big
+}
+
+callback = generator()
+callback(3)
+callback(10)

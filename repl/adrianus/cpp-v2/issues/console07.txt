@@ -1,0 +1,44 @@
+[21:46:35] adrianpoplesanu:cpp git:(cpp_threading1*) $ leaks --atExit -- ./main examples/test145.ad
+null
+null
+ad_worker_async()
+evaluating function
+function at memory address 0x123e0af90
+"neatza"
+^[[AProcess 22022 is not debuggable. Due to security restrictions, leaks can only show or save contents of readonly memory of restricted processes.
+
+Process:         main [22022]
+Path:            /Users/USER/Documents/*/main
+Load Address:    0x102ee8000
+Identifier:      main
+Version:         ???
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  leaks [22021]
+
+Date/Time:       2023-04-19 21:46:36.136 +0300
+Launch Time:     2023-04-19 21:46:35.855 +0300
+OS Version:      macOS 12.0.1 (21A559)
+Report Version:  7
+Analysis Tool:   /Applications/Xcode.app/Contents/Developer/usr/bin/leaks
+Analysis Tool Version:  Xcode 13.3.1 (13E500a)
+
+Physical footprint:         7217K
+Physical footprint (peak):  7249K
+----
+
+leaks Report Version: 4.0
+Process 22022: 218 nodes malloced for 16 KB
+Process 22022: 6 leaks for 320 total leaked bytes.
+
+    6 (320 bytes) << TOTAL >>
+
+      5 (304 bytes) ROOT LEAK: 0x123e0afe0 [128]
+         2 (96 bytes) 0x123f04110 [16]
+            1 (80 bytes) 0x123f040b0 [80]
+         1 (64 bytes) <Ad_String_Object 0x123f04130> [64]
+         1 (16 bytes) 0x123f04100 [16]
+
+      1 (16 bytes) ROOT LEAK: 0x123e11450 [16]
+
+[21:46:36] adrianpoplesanu:cpp git:(cpp_threading1*) $ leaks --atExit -- ./main examples/test145.ad

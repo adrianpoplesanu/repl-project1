@@ -1,0 +1,11 @@
+class Worker {
+    name = "worker-"
+    index = 0
+
+    def run() {
+        println("running: " + this.name + this.index)
+    }
+}
+
+worker = Worker()
+worker.run()

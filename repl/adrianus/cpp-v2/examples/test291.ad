@@ -1,0 +1,9 @@
+def test3(a=5, b=3) {
+    println(a)
+    println(b)
+}
+
+test3()
+test3(7)
+test3(a=55, b=22)
+test3(b=11)

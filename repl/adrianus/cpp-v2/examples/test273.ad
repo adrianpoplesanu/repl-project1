@@ -1,0 +1,14 @@
+class Worker {
+    name = "default value"
+
+    def change(value) {
+        a = "ala bala"
+        this.name = value + " dimineata!"
+        println(a)
+        println(name)
+    }
+}
+
+worker = Worker()
+worker.change("buna")
+println(worker.name)

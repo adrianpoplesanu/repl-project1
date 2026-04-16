@@ -1,0 +1,27 @@
+class Test2 {
+    a = 5
+}
+
+println('aaa')
+
+def b() {
+    println('eee')
+    println(test.a) // this does work
+    println('fff')
+    println(a) // this does not work
+    println(this.a) // this does not work
+    println('ggg')
+}
+
+println('bbb')
+
+test = Test2()
+test.c = func() {
+    println('ddd')
+    b()
+}
+
+println('ccc')
+
+test.c()
+test.a

@@ -1,0 +1,5 @@
+def test() {
+    println("aaa")
+}
+
+println(test())

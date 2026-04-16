@@ -1,0 +1,9 @@
+def add(a, b) {
+    return a + b
+}
+
+def mul_add(x, y, z) {
+    return add(x * y, z)
+}
+
+mul_add(3, 4, 5)

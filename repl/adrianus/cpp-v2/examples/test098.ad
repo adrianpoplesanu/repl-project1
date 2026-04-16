@@ -1,0 +1,15 @@
+class Element {
+    value = 5
+}
+
+def changeElementValue(element) {
+    element.value = 6
+}
+
+element = Element()
+println(element.value)
+println(element)
+
+changeElementValue(element)
+println(element.value)
+println(element)

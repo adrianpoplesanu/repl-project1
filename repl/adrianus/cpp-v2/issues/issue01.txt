@@ -1,0 +1,12 @@
+
+issue with referencing "special hardcoded methods" in recursive member accesses
+!!! a potential fix would be to have create_server encapsulated in an intermediate entity like just: "PlainSocket" or just "Socket"
+
+this.socket.create_server
+^       ^         ^
+|       |         |
+this is just this from the containing class
+        |         |
+        a socket object within the class
+                  |
+                  this is "create_server" from evaluator, it's not a normal method (accessible through recursive member access)

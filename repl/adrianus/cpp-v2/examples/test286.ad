@@ -1,0 +1,8 @@
+httpParser = AdHTTPParser()
+
+println(httpParser.isValidHost("http://adrianus.ro"))
+println(httpParser.isValidHost("https://adrianus.ro"))
+println(httpParser.isValidHost("http://www.adrianus.ro"))
+println(httpParser.isValidHost("https://www.adrianus.ro"))
+println(httpParser.isValidHost("adrianus.ro"))
+println(httpParser.isValidHost("www.adrianus.ro"))

@@ -1,0 +1,32 @@
+for (i = 0; i < 10; i++) if (i < 5) println(i)
+
+def test() {
+    for (i = 0; i < 10; i++) if (i < 5) println(i)
+}
+
+test()
+
+def test2(k) {
+    for (i = 0; i < k; i++) if (i < 5) println(i)
+}
+
+test2(10)
+
+def test3(k) {
+    for (i = 0; i < k; i++) if (i < 5) return true
+}
+
+println(test3(10))
+
+a = [1, 2, 3]
+
+def test4(k) {
+    for (i = 0; i < 3; i++) if (a[i] == k) return true
+    return false
+}
+
+println(test4(0))
+println(test4(1))
+println(test4(2))
+println(test4(3))
+println(test4(4))

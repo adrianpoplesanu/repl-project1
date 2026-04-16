@@ -1,0 +1,14 @@
+def test() {
+    class A {
+        x = 5
+    }
+    a = A()
+    println(a.x)
+}
+
+test()
+
+t = Test()
+println(t.a)
+println(t.a())
+/* problema mai sus e ca a() din Test din bootstrap nu are return */

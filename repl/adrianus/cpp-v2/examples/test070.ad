@@ -1,0 +1,9 @@
+def t() {
+    class A {
+
+    }
+}
+
+println("inainte de apelul lui t()")
+t()
+println("dupa apelul lui t()")

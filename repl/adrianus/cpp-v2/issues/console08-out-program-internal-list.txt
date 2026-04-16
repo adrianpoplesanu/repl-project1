@@ -1,0 +1,3 @@
+eval-ul programului ran for: 5.01858sec
+ran for: 5.02233sec
+garbage collection time: 0.337987
