@@ -58,7 +58,10 @@ std::unordered_map<TokenType, std::string> token_type_map = {
     {TT_PLUS_EQ, "PLUS_EQUAL"},
     {TT_MINUS_EQ, "MINUS_EQUAL"},
     {TT_NULL, "NULL"},
-    {TT_SUPER, "SUPER"}
+    {TT_SUPER, "SUPER"},
+    {TT_SPAWN, "SPAWN"},
+    {TT_ASYNC, "ASYNC"},
+    {TT_AWAIT, "AWAIT"}
 };
 
 std::unordered_map<std::string, TokenType> keywords = {
@@ -82,7 +85,10 @@ std::unordered_map<std::string, TokenType> keywords = {
     {"class", TT_CLASS},
     {"this", TT_THIS},
     {"null", TT_NULL},
-    {"super", TT_SUPER}
+    {"super", TT_SUPER},
+    {"spawn", TT_SPAWN},
+    {"async", TT_ASYNC},
+    {"await", TT_AWAIT}
 };
 
 Token::Token() {

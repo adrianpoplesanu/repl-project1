@@ -63,7 +63,10 @@ enum TokenType {
     TT_PLUS_EQ,
     TT_MINUS_EQ,
     TT_NULL,
-    TT_SUPER
+    TT_SUPER,
+    TT_SPAWN,
+    TT_ASYNC,
+    TT_AWAIT
 };
 
 extern std::unordered_map<TokenType, std::string> token_type_map;
