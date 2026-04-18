@@ -40,7 +40,9 @@ enum StatementType {
     ST_THIS_EXPRESSION,
     ST_SUPER_EXPRESSION,
     ST_PLUS_EQUALS,
-    ST_MINUS_EQUALS
+    ST_MINUS_EQUALS,
+    ST_SPAWN_EXPRESSION,
+    ST_AWAIT_EXPRESSION
 };
 
 extern std::unordered_map<StatementType, std::string> statement_type_map;
@@ -232,6 +234,7 @@ public:
     std::vector<Ad_AST_Node*> parameters;
     std::vector<Ad_AST_Node*> default_params;
     Ad_AST_Node* body;
+    bool is_async{false};
 
     Ad_AST_FunctionLiteral();
     Ad_AST_FunctionLiteral(Token);
@@ -313,6 +316,7 @@ public:
     std::vector<Ad_AST_Node*> parameters;
     std::vector<Ad_AST_Node*> default_params;
     Ad_AST_Node* body;
+    bool is_async{false};
 
     Ad_AST_Def_Statement();
     Ad_AST_Def_Statement(Token);
@@ -477,6 +481,31 @@ public:
 class Ad_AST_Minus_Equals_Statement : public Ad_AST_Node {
 public:
     Token token;
+};
+
+class Ad_AST_SpawnExpression : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* function;
+    std::vector<Ad_AST_Node*> arguments;
+
+    Ad_AST_SpawnExpression();
+    Ad_AST_SpawnExpression(Token);
+    ~Ad_AST_SpawnExpression();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
+};
+
+class Ad_AST_AwaitExpression : public Ad_AST_Node {
+public:
+    Token token;
+    Ad_AST_Node* operand;
+
+    Ad_AST_AwaitExpression();
+    Ad_AST_AwaitExpression(Token);
+    ~Ad_AST_AwaitExpression();
+    std::string TokenLiteral() override;
+    std::string ToString() override;
 };
 
 

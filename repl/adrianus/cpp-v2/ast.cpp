@@ -35,7 +35,9 @@ std::unordered_map<StatementType, std::string> statement_type_map = {
         {ST_THIS_EXPRESSION, "ThisExpression"},
         {ST_SUPER_EXPRESSION, "SuperExpression"},
         {ST_PLUS_EQUALS, "PlusEquals"},
-        {ST_MINUS_EQUALS, "MinusEquals"}
+        {ST_MINUS_EQUALS, "MinusEquals"},
+        {ST_SPAWN_EXPRESSION, "SpawnExpression"},
+        {ST_AWAIT_EXPRESSION, "AwaitExpression"}
 };
 
 std::string Ad_AST_Node::TokenLiteral() {
@@ -1117,6 +1119,59 @@ std::string Ad_AST_Plus_Equals_Statement::ToString() {
     return "todo: implement this";
 }
 
+Ad_AST_SpawnExpression::Ad_AST_SpawnExpression() {
+    type = ST_SPAWN_EXPRESSION;
+    ref_count = 0;
+    function = nullptr;
+}
+
+Ad_AST_SpawnExpression::Ad_AST_SpawnExpression(Token t) {
+    type = ST_SPAWN_EXPRESSION;
+    ref_count = 0;
+    token = t;
+    function = nullptr;
+}
+
+Ad_AST_SpawnExpression::~Ad_AST_SpawnExpression() {
+    free_Ad_AST_Node_memory(function);
+    for (Ad_AST_Node* a : arguments) {
+        free_Ad_AST_Node_memory(a);
+    }
+}
+
+std::string Ad_AST_SpawnExpression::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_SpawnExpression::ToString() {
+    return "spawn(...)";
+}
+
+Ad_AST_AwaitExpression::Ad_AST_AwaitExpression() {
+    type = ST_AWAIT_EXPRESSION;
+    ref_count = 0;
+    operand = nullptr;
+}
+
+Ad_AST_AwaitExpression::Ad_AST_AwaitExpression(Token t) {
+    type = ST_AWAIT_EXPRESSION;
+    ref_count = 0;
+    token = t;
+    operand = nullptr;
+}
+
+Ad_AST_AwaitExpression::~Ad_AST_AwaitExpression() {
+    free_Ad_AST_Node_memory(operand);
+}
+
+std::string Ad_AST_AwaitExpression::TokenLiteral() {
+    return token.GetLiteral();
+}
+
+std::string Ad_AST_AwaitExpression::ToString() {
+    return "await ...";
+}
+
 void Ad_INCREF(Ad_AST_Node* node) {
     if (node) {
         node->ref_count++;
@@ -1235,6 +1290,12 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
         break;
         case ST_PROGRAM:
             delete (Ad_AST_Program*) node;
+        break;
+        case ST_SPAWN_EXPRESSION:
+            delete (Ad_AST_SpawnExpression*) node;
+        break;
+        case ST_AWAIT_EXPRESSION:
+            delete (Ad_AST_AwaitExpression*) node;
         break;
         default:
             std::cout << "MEMORY ERROR!!! ast: " << statement_type_map[node->type] << " node-type: " << node->type << " ref_count: " << node->ref_count << " address: " << node << "\n";
