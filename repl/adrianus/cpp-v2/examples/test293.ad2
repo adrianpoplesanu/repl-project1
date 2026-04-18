@@ -1,0 +1,13 @@
+def add1(x) {
+    return x + 1;
+}
+
+let t = spawn(add1, 41);
+println(join(t));
+
+async def async_add(a, b) {
+    return a + b;
+}
+
+let t2 = async_add(10, 32);
+println(await t2);
