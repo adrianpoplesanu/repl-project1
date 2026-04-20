@@ -2,6 +2,7 @@
 #define __ENVIRONMENT_H
 
 #include <map>
+#include <mutex>
 #include <unordered_map>
 #include "objects.h"
 #include "gc.h"
@@ -10,6 +11,7 @@ class GarbageCollector; // forward declaration for GarbageCollector
 
 class Environment {
 public:
+    mutable std::recursive_mutex mu;
     std::unordered_map<std::string, Ad_Object*> store;
     Environment* outer;
     Environment* bootstrap;

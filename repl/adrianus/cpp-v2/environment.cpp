@@ -19,6 +19,7 @@ Environment::~Environment() {
 }
 
 bool Environment::Check(std::string key) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
     if (store.find(key) == store.end()) {
         if (outer && outer->Check(key)) return true;
         if (bootstrap && bootstrap->Check(key)) return true;
@@ -28,6 +29,7 @@ bool Environment::Check(std::string key) {
 }
 
 Ad_Object* Environment::Get(std::string key) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
     if (store.find(key) == store.end() ) {
         if (outer && outer->Check(key)) {
             return outer->Get(key);
@@ -42,6 +44,7 @@ Ad_Object* Environment::Get(std::string key) {
 }
 
 Ad_Object* Environment::lookupOnlyInStore(std::string key) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
     if (store.find(key) == store.end()) {
         return NULL;
     } else {
@@ -54,6 +57,7 @@ Ad_Object* Environment::lookupConstructor() {
 }
 
 void Environment::Set(std::string key, Ad_Object* obj) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
     if (store.find(key) != store.end()) {
         store[key] = obj;
         return;
@@ -66,6 +70,7 @@ void Environment::Set(std::string key, Ad_Object* obj) {
 }
 
 void Environment::setLocalParam(std::string key, Ad_Object* obj) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
     store[key] = obj;
 }
 
