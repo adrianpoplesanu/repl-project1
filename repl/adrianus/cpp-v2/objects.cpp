@@ -24,6 +24,7 @@ std::unordered_map<Ad_Object_Type, std::string> object_type_map = {
         {OBJ_FILE, "FILE"},
         {OBJ_SOCKET, "SOCKET"},
         {OBJ_THREAD, "THREAD"},
+        {OBJ_TASK, "TASK"},
         {OBJ_BREAK, "BREAK"},
         {OBJ_CONTINUE, "CONTINUE"}
 };
@@ -257,12 +258,14 @@ Ad_Function_Object::Ad_Function_Object() {
     type = OBJ_FUNCTION;
     ref_count = 0;
     marked = false;
+    is_async = false;
 }
 
 Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, Ad_AST_Node* b, Environment* e) {
     type = OBJ_FUNCTION;
     ref_count = 0;
     marked = false;
+    is_async = false;
     params = p;
     body = b;
     env = e;
@@ -280,6 +283,7 @@ Ad_Function_Object::Ad_Function_Object(std::vector<Ad_AST_Node*> p, std::vector<
     type = OBJ_FUNCTION;
     ref_count = 0;
     marked = false;
+    is_async = false;
     params = p;
     default_params = dp;
     body = b;
@@ -349,6 +353,7 @@ Ad_Object* Ad_Function_Object::copy(GarbageCollector *gc) {
     }
     //Ad_Function_Object *result = new Ad_Function_Object(copied_params, body->copy(), env->copy(gc));
     Ad_Function_Object *result = new Ad_Function_Object(copied_params, body->copy(), env);
+    result->is_async = is_async;
     gc->addObject(result);
     return result;
     //return NULL;
@@ -1067,6 +1072,37 @@ Ad_Object* Ad_Thread_Object::copy(GarbageCollector *gc) {
     return new_obj;
 }
 
+Ad_Task_Object::Ad_Task_Object() {
+    type = OBJ_TASK;
+    ref_count = 0;
+    marked = false;
+}
+
+std::string Ad_Task_Object::Inspect() {
+    return "<task>";
+}
+
+std::string Ad_Task_Object::repr() {
+    return "<task>";
+}
+
+void Ad_Task_Object::Print() {
+    std::cout << "TaskObject\n";
+}
+
+Ad_Object_Type Ad_Task_Object::Type() {
+    return OBJ_TASK;
+}
+
+std::string Ad_Task_Object::Hash() {
+    return object_type_map[type] + Inspect();
+}
+
+Ad_Object* Ad_Task_Object::copy(GarbageCollector* gc) {
+    (void)gc;
+    return nullptr;
+}
+
 /*void Ad_INCREF(Ad_Object* obj) {
     if (obj) {
         obj->ref_count++;
@@ -1146,6 +1182,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_THREAD:
                 delete (Ad_Thread_Object*) obj;
+            break;
+            case OBJ_TASK:
+                delete (Ad_Task_Object*) obj;
             break;
             case OBJ_FLOAT:
                 delete (Ad_Float_Object*) obj;

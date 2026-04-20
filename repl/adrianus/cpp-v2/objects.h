@@ -12,6 +12,8 @@
 #include "hashpair.h"
 #include "settings.h"
 #include <thread>
+#include <memory>
+#include "task_scheduler.h"
 
 class GarbageCollector;
 class Environment;
@@ -35,6 +37,7 @@ enum Ad_Object_Type {
 	OBJ_FILE,
 	OBJ_SOCKET,
 	OBJ_THREAD,
+	OBJ_TASK,
 	OBJ_BREAK,
 	OBJ_CONTINUE,
 
@@ -187,6 +190,7 @@ public:
 	std::vector<Ad_AST_Node*> default_params;
 	Ad_AST_Node* body; // i don't really like using AST nodes here
 	Environment* env; // this works only with forward declaration
+	bool is_async{false};
 
 	Ad_Function_Object();
 	Ad_Function_Object(std::vector<Ad_AST_Node*>, Ad_AST_Node*, Environment*);
@@ -383,6 +387,19 @@ public:
 	virtual Ad_Object_Type Type();
 	virtual std::string Hash();
 	virtual Ad_Object* copy(GarbageCollector*); // TODO: implement this
+};
+
+class Ad_Task_Object : public Ad_Object {
+public:
+	std::shared_ptr<AdTaskHandle> handle;
+
+	Ad_Task_Object();
+	virtual std::string Inspect();
+	virtual std::string repr();
+	virtual void Print();
+	virtual Ad_Object_Type Type();
+	virtual std::string Hash();
+	virtual Ad_Object* copy(GarbageCollector*);
 };
 
 //void Ad_INCREF(Ad_Object*);
