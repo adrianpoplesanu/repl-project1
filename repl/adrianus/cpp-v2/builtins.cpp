@@ -1,7 +1,10 @@
 #include "objects.h"
+#include "task_scheduler.h"
 #include "signal.h"
 #include "environment.h"
 #include <stdio.h>
+#include <chrono>
+#include <thread>
 #include "gc.h"
 #include "eval_utils.h"
 #include "thread_utils.h"
@@ -466,8 +469,110 @@ Ad_Object* import_builtin(std::vector<Ad_Object*> args, Environment *env, Garbag
 }
 
 Ad_Object* sleep_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
-    sleep_builtin_executor(((Ad_Integer_Object*) args[0])->value);
+    int total_ms = ((Ad_Integer_Object*)args[0])->value;
+    if (total_ms < 0) {
+        total_ms = 0;
+    }
+    const int slice_ms = 50;
+    int remaining = total_ms;
+    while (remaining > 0) {
+        int step = remaining > slice_ms ? slice_ms : remaining;
+        sleep_builtin_executor(step);
+        remaining -= step;
+        ad_task_checkpoint();
+    }
     return NULL;
+}
+
+Ad_Object* join_task_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc) {
+    (void)env;
+    if (args.size() != 1) {
+        Ad_Error_Object* err = new Ad_Error_Object("join() expects 1 argument");
+        gc->addObject(err);
+        return err;
+    }
+    if (args[0]->type != OBJ_TASK) {
+        Ad_Error_Object* err = new Ad_Error_Object("join() requires a task");
+        gc->addObject(err);
+        return err;
+    }
+    Ad_Task_Object* t = (Ad_Task_Object*)args[0];
+    try {
+        return ad_task_join_handle(t->handle, gc);
+    } catch (const std::exception& ex) {
+        Ad_Error_Object* err = new Ad_Error_Object(std::string("join error: ") + ex.what());
+        gc->addObject(err);
+        return err;
+    }
+}
+
+Ad_Object* task_status_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc) {
+    (void)env;
+    if (args.size() != 1) {
+        Ad_Error_Object* err = new Ad_Error_Object("task_status() expects 1 argument");
+        gc->addObject(err);
+        return err;
+    }
+    if (args[0]->type != OBJ_TASK) {
+        Ad_Error_Object* err = new Ad_Error_Object("task_status() requires a task");
+        gc->addObject(err);
+        return err;
+    }
+    Ad_Task_Object* t = (Ad_Task_Object*)args[0];
+    std::string s = ad_task_status_name(t->handle->status.load());
+    Ad_String_Object* out = new Ad_String_Object(s);
+    gc->addObject(out);
+    return out;
+}
+
+Ad_Object* task_cancel_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc) {
+    (void)env;
+    if (args.size() != 1) {
+        Ad_Error_Object* err = new Ad_Error_Object("task_cancel() expects 1 argument");
+        gc->addObject(err);
+        return err;
+    }
+    if (args[0]->type != OBJ_TASK) {
+        Ad_Error_Object* err = new Ad_Error_Object("task_cancel() requires a task");
+        gc->addObject(err);
+        return err;
+    }
+    Ad_Task_Object* t = (Ad_Task_Object*)args[0];
+    t->handle->cancel_requested.store(true);
+    return &TRUE;
+}
+
+Ad_Object* task_metrics_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc) {
+    (void)env;
+    if (args.size() != 1) {
+        Ad_Error_Object* err = new Ad_Error_Object("task_metrics() expects 1 argument");
+        gc->addObject(err);
+        return err;
+    }
+    if (args[0]->type != OBJ_TASK) {
+        Ad_Error_Object* err = new Ad_Error_Object("task_metrics() requires a task");
+        gc->addObject(err);
+        return err;
+    }
+    auto h = ((Ad_Task_Object*)args[0])->handle;
+    std::vector<Ad_Object*> elems;
+    elems.push_back(new Ad_Integer_Object(static_cast<int>(h->metrics.run_slices)));
+    elems.push_back(new Ad_Integer_Object(static_cast<int>(h->metrics.yield_count)));
+    elems.push_back(new Ad_Integer_Object(static_cast<int>(h->metrics.checkpoint_count)));
+    auto now = std::chrono::steady_clock::now();
+    int64_t queued_ms = 0;
+    if (h->metrics.first_started_at == std::chrono::steady_clock::time_point{}) {
+        queued_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - h->metrics.submitted_at).count();
+    } else {
+        queued_ms = std::chrono::duration_cast<std::chrono::milliseconds>(h->metrics.first_started_at - h->metrics.submitted_at).count();
+    }
+    elems.push_back(new Ad_Integer_Object(static_cast<int>(queued_ms)));
+    for (Ad_Object* e : elems) {
+        gc->addObject(e);
+    }
+    Ad_List_Object* list = new Ad_List_Object(elems);
+    gc->addObject(list);
+    return list;
 }
 
 Ad_Object* str_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
@@ -534,6 +639,10 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"import", new Ad_Builtin_Object(&import_builtin)},
     {"sleep", new Ad_Builtin_Object(&sleep_builtin)},
     {"delay", new Ad_Builtin_Object(&sleep_builtin)},
+    {"join", new Ad_Builtin_Object(&join_task_builtin)},
+    {"task_status", new Ad_Builtin_Object(&task_status_builtin)},
+    {"task_cancel", new Ad_Builtin_Object(&task_cancel_builtin)},
+    {"task_metrics", new Ad_Builtin_Object(&task_metrics_builtin)},
     {"str", new Ad_Builtin_Object(&str_builtin)},
     {"repr", new Ad_Builtin_Object(&repr_builtin)},
     {"assert", new Ad_Builtin_Object(&assert_builtin)},
