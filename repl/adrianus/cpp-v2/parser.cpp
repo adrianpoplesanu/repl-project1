@@ -57,6 +57,9 @@ Parser::Parser() {
     prefixParseFns.insert(std::make_pair(TT_NULL, &Parser::ParseNullExpression));
     prefixParseFns.insert(std::make_pair(TT_THIS, &Parser::ParseThisExpression));
     prefixParseFns.insert(std::make_pair(TT_SUPER, &Parser::parseSuperExpression));
+    prefixParseFns.insert(std::make_pair(TT_SPAWN, &Parser::ParseSpawnExpression));
+    prefixParseFns.insert(std::make_pair(TT_AWAIT, &Parser::ParseAwaitExpression));
+    prefixParseFns.insert(std::make_pair(TT_ASYNC, &Parser::ParseAsyncPrefixExpression));
 
     infixParseFns.insert(std::make_pair(TT_PLUS, &Parser::ParseInfixExpression));
     infixParseFns.insert(std::make_pair(TT_MINUS, &Parser::ParseInfixExpression));
@@ -161,6 +164,25 @@ void Parser::PeekError(std::string msg) {
 
 Ad_AST_Node* Parser::ParseStatement() {
     // aici ar trebui sa stea toate keyword-urile, expresiile ar trebui sa fie doar aritmetice, ar fi mai frumos
+    if (current_token.type == TT_ASYNC) {
+        NextToken();
+        if (current_token.type == TT_DEF || current_token.type == TT_FUN) {
+            Ad_AST_Node* n = ParseDefStatement();
+            if (n != nullptr && n->type == ST_DEF_STATEMENT) {
+                ((Ad_AST_Def_Statement*)n)->is_async = true;
+            }
+            return n;
+        }
+        if (current_token.type == TT_FUNCTION) {
+            Ad_AST_Node* n = ParseFunctionExpression();
+            if (n != nullptr && n->type == ST_DEF_STATEMENT) {
+                ((Ad_AST_Def_Statement*)n)->is_async = true;
+            }
+            return n;
+        }
+        errors.push_back("async must be followed by def, fun, or function");
+        return nullptr;
+    }
     if (current_token.type == TT_LET)
         return ParseLetStatement();
     if (current_token.type == TT_RETURN)
@@ -731,6 +753,66 @@ Ad_AST_Node* Parser::ParseFunctionExpression() {
     return stmt;
 }
 
+Ad_AST_Node* Parser::ParseSpawnExpression() {
+    Ad_AST_SpawnExpression* expr = new Ad_AST_SpawnExpression(current_token);
+    if (!ExpectPeek(TT_LPAREN)) {
+        free_Ad_AST_Node_memory(expr);
+        return nullptr;
+    }
+    NextToken();
+    if (CurrentTokenIs(TT_RPAREN)) {
+        errors.push_back("spawn() requires a function");
+        free_Ad_AST_Node_memory(expr);
+        return nullptr;
+    }
+    expr->function = ParseExpression(PT_LOWEST);
+    while (PeekTokenIs(TT_COMMA)) {
+        NextToken();
+        NextToken();
+        Ad_AST_Node* arg = ParseExpression(PT_LOWEST);
+        expr->arguments.push_back(arg);
+    }
+    if (!ExpectPeek(TT_RPAREN)) {
+        free_Ad_AST_Node_memory(expr);
+        return nullptr;
+    }
+    return expr;
+}
+
+Ad_AST_Node* Parser::ParseAwaitExpression() {
+    Ad_AST_AwaitExpression* expr = new Ad_AST_AwaitExpression(current_token);
+    NextToken();
+    expr->operand = ParseExpression(PT_LOWEST);
+    return expr;
+}
+
+Ad_AST_Node* Parser::ParseAsyncPrefixExpression() {
+    NextToken();
+    if (current_token.type == TT_FUN) {
+        Ad_AST_Node* n = ParseFunExpression();
+        if (n != nullptr && n->type == ST_DEF_STATEMENT) {
+            ((Ad_AST_Def_Statement*)n)->is_async = true;
+        }
+        return n;
+    }
+    if (current_token.type == TT_FUNCTION) {
+        Ad_AST_Node* n = ParseFunctionExpression();
+        if (n != nullptr && n->type == ST_DEF_STATEMENT) {
+            ((Ad_AST_Def_Statement*)n)->is_async = true;
+        }
+        return n;
+    }
+    if (current_token.type == TT_FUNC) {
+        Ad_AST_Node* n = ParseFunctionLiteral();
+        if (n != nullptr && n->type == ST_FUNCTION_LITERAL) {
+            ((Ad_AST_FunctionLiteral*)n)->is_async = true;
+        }
+        return n;
+    }
+    errors.push_back("async must be followed by fun, function, or func");
+    return nullptr;
+}
+
 
 Ad_AST_Node* Parser::ParseMultiCommentStatement() {
     Ad_AST_Comment *comm = new Ad_AST_Comment(current_token);
@@ -757,22 +839,33 @@ Ad_AST_Node* Parser::ParseClassStatement() {
         }
     }
     while(!CurrentTokenIs(TT_RBRACE)) {
-        if (CurrentTokenIs(TT_DEF)) {
+        if (CurrentTokenIs(TT_ASYNC)) {
+            NextToken();
+            if (CurrentTokenIs(TT_DEF) || CurrentTokenIs(TT_FUN)) {
+                Ad_AST_Node* stmt = ParseDefStatement();
+                if (stmt != nullptr && stmt->type == ST_DEF_STATEMENT) {
+                    ((Ad_AST_Def_Statement*)stmt)->is_async = true;
+                }
+                if (stmt != nullptr) {
+                    Ad_INCREF(stmt);
+                    expr->methods.push_back(stmt);
+                }
+            } else {
+                errors.push_back("async in class body must be followed by def or fun");
+            }
+        } else if (CurrentTokenIs(TT_DEF)) {
             Ad_AST_Node* stmt = ParseDefStatement();
             Ad_INCREF(stmt);
             expr->methods.push_back(stmt);
-        }
-        if (CurrentTokenIs(TT_FUN)) {
+        } else if (CurrentTokenIs(TT_FUN)) {
             Ad_AST_Node* stmt = ParseDefStatement();
             Ad_INCREF(stmt);
             expr->methods.push_back(stmt);
-        }
-        if (CurrentTokenIs(TT_METHOD)) {
+        } else if (CurrentTokenIs(TT_METHOD)) {
             Ad_AST_Node* stmt = ParseDefStatement();
             Ad_INCREF(stmt);
             expr->methods.push_back(stmt);
-        }
-        if (CurrentTokenIs(TT_IDENT)) {
+        } else if (CurrentTokenIs(TT_IDENT)) {
             Ad_AST_Node* stmt = ParseExpressionStatement();
             Ad_INCREF(stmt);
             expr->attributes.push_back(stmt);

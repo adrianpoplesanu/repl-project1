@@ -98,6 +98,9 @@ public:
     Ad_AST_Node* ParseThisExpression();
     Ad_AST_Node* parseSuperExpression();
     Ad_AST_Node* parsePlusEqualsExpression(Ad_AST_Node*);
+    Ad_AST_Node* ParseSpawnExpression();
+    Ad_AST_Node* ParseAwaitExpression();
+    Ad_AST_Node* ParseAsyncPrefixExpression();
 };
 
 #endif
