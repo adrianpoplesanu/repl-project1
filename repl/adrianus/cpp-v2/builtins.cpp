@@ -4,7 +4,6 @@
 #include "environment.h"
 #include <stdio.h>
 #include <chrono>
-#include <thread>
 #include "gc.h"
 #include "eval_utils.h"
 #include "thread_utils.h"

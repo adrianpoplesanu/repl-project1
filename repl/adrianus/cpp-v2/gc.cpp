@@ -222,6 +222,10 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             }
             break;
         }
+        case OBJ_TASK: {
+            obj->marked = true;
+            break;
+        }
         case OBJ_BREAK: {
             obj->marked = true;
             break;
