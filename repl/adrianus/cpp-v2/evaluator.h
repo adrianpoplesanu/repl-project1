@@ -6,8 +6,11 @@
 #include "environment.h"
 #include "settings.h"
 #include "gc.h"
+#include "task_scheduler.h"
 #include <unordered_map>
 #include <ctime>
+#include <functional>
+#include <memory>
 
 // Global boolean objects - defined in evaluator.cpp
 extern Ad_Boolean_Object TRUE;
@@ -15,6 +18,9 @@ extern Ad_Boolean_Object FALSE;
 
 class Evaluator {
 public:
+    std::shared_ptr<TaskScheduler> task_scheduler_;
+    Ad_AST_Program* eval_program_root_{nullptr};
+
     std::vector<Environment*> environment_garbage_collection;
     GarbageCollector *garbageCollector;
     std::unordered_map<StatementType, double> eval_times_per_statement_type;
@@ -97,12 +103,18 @@ public:
     void GarbageCollectEnvironments();
     void addEnvironmentGarbageCollectorListener(Environment *);
     void setGarbageCollector(GarbageCollector*); // using this in eval builtin
+    void setTaskScheduler(std::shared_ptr<TaskScheduler> s) { task_scheduler_ = std::move(s); }
 
     void initRuntimeStatistics();
     void printRuntimeStatistics();
 
 private:
     bool validateNumberOfArguments(std::vector<int>, int);
+
+    AdRunSliceResult runWorkSlice(AdTaskExecutionContext& ctx, const std::function<Ad_Object*()>& work);
+    AdRunSliceResult runCallableSlice(AdTaskExecutionContext& ctx, Ad_Object* callee, std::vector<Ad_Object*> args,
+                                      Environment* call_env);
+    Ad_Object* spawnCall(Ad_Object* callee, std::vector<Ad_Object*> args, Environment* call_env);
 };
 
 

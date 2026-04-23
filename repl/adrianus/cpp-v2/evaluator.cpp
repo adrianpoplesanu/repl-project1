@@ -6,13 +6,20 @@
 #include "eval_utils.cpp"
 #include "socket_utils.h"
 #include "thread_utils.h"
+#include "stack_thread.h"
 
+#include <future>
+#include <stdexcept>
+
+static thread_local bool g_ad_apply_function_disable_async = false;
+static thread_local bool g_ad_apply_method_disable_async = false;
 
 //Ad_Null_Object NULLOBJECT;
 Ad_Boolean_Object TRUE(true);
 Ad_Boolean_Object FALSE(false);
 
 Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
+    ad_task_checkpoint();
     switch(node->type) {
         case ST_PROGRAM: {
             return EvalProgram(node, env);
@@ -89,6 +96,7 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_FUNCTION_LITERAL: {
             Ad_Function_Object* obj = new Ad_Function_Object(((Ad_AST_FunctionLiteral*)node)->parameters, ((Ad_AST_FunctionLiteral*)node)->default_params, ((Ad_AST_FunctionLiteral*)node)->body, &env);
+            obj->is_async = ((Ad_AST_FunctionLiteral*)node)->is_async;
             garbageCollector->addObject(obj);
             // TODP: add obj to gc
             return obj;
@@ -96,6 +104,44 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         break;
         case ST_CALL_EXPRESSION: {
             return evalCallExpression(node, &env);
+        }
+        break;
+        case ST_SPAWN_EXPRESSION: {
+            Ad_AST_SpawnExpression* sp = (Ad_AST_SpawnExpression*)node;
+            Ad_Object* callee = Eval(sp->function, env);
+            if (IsError(callee)) {
+                return callee;
+            }
+            std::vector<Ad_Object*> spawn_args;
+            for (size_t i = 0; i < sp->arguments.size(); i++) {
+                Ad_Object* a = Eval(sp->arguments[i], env);
+                if (IsError(a)) {
+                    return a;
+                }
+                spawn_args.push_back(a);
+            }
+            return spawnCall(callee, spawn_args, &env);
+        }
+        break;
+        case ST_AWAIT_EXPRESSION: {
+            Ad_AST_AwaitExpression* aw = (Ad_AST_AwaitExpression*)node;
+            Ad_Object* inner = Eval(aw->operand, env);
+            if (IsError(inner)) {
+                return inner;
+            }
+            if (inner->type != OBJ_TASK) {
+                Ad_Error_Object* err = new Ad_Error_Object("await requires a task (spawn result)");
+                garbageCollector->addObject(err);
+                return err;
+            }
+            Ad_Task_Object* task_obj = (Ad_Task_Object*)inner;
+            try {
+                return ad_task_join_handle(task_obj->handle, garbageCollector);
+            } catch (const std::exception& ex) {
+                Ad_Error_Object* err = new Ad_Error_Object(std::string("await/join error: ") + ex.what());
+                garbageCollector->addObject(err);
+                return err;
+            }
         }
         break;
         case ST_WHILE_EXPRESSION: {
@@ -183,6 +229,9 @@ Ad_Object* Evaluator::EvalProgram(Ad_AST_Node* node, Environment &env) {
     //if (node) {
     //    print_ast_nodes(node, 0);
     //}
+    if (node != nullptr && node->type == ST_PROGRAM) {
+        eval_program_root_ = (Ad_AST_Program*)node;
+    }
     Init();
     Ad_Object* result;
     for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_Program*)node)->statements.begin() ; it != ((Ad_AST_Program*)node)->statements.end(); ++it) {
@@ -614,6 +663,32 @@ std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> arg
 Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> args, std::unordered_map<std::string, Ad_Object*> kw_args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
+        if (func_obj->is_async && task_scheduler_ && !g_ad_apply_function_disable_async) {
+            Ad_AST_Program* prog = eval_program_root_;
+            auto sched = task_scheduler_;
+            std::shared_ptr<AdTaskHandle> h = sched->submitPreemptible(
+                [this, prog, sched, func, args, kw_args, &env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) mutable {
+                    AdTaskExecutionContext ctx;
+                    ctx.task = handle;
+                    ctx.checkpoint_budget = budget;
+                    ctx.remaining_budget = budget;
+                    GarbageCollector local_gc;
+                    Evaluator inner;
+                    inner.setGarbageCollector(&local_gc);
+                    inner.task_scheduler_ = sched;
+                    inner.eval_program_root_ = prog;
+                    return inner.runWorkSlice(ctx, [&]() {
+                        g_ad_apply_function_disable_async = true;
+                        Ad_Object* r = inner.ApplyFunction(func, args, kw_args, env);
+                        g_ad_apply_function_disable_async = false;
+                        return r;
+                    });
+                });
+            Ad_Task_Object* t = new Ad_Task_Object();
+            t->handle = std::move(h);
+            garbageCollector->addObject(t);
+            return t;
+        }
         std::vector<Ad_Object*> default_params = EvalExpressions(func_obj->default_params, env);
         int remainingParams = func_obj->params.size();
         
@@ -705,6 +780,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
         for (std::vector<Ad_AST_Node*>::iterator it = methods.begin(); it != methods.end(); ++it) {
             Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
             Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->default_params, def_stmt->body, klass_instance->instance_environment);
+            method_obj->is_async = def_stmt->is_async;
             garbageCollector->addObject(method_obj);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             //std::cout << def_ident->value << "\n";
@@ -750,6 +826,32 @@ Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::ve
 Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args, std::unordered_map<std::string, Ad_Object*> kw_args, Environment &env) {
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
+        if (func_obj->is_async && task_scheduler_ && !g_ad_apply_method_disable_async) {
+            Ad_AST_Program* prog = eval_program_root_;
+            auto sched = task_scheduler_;
+            std::shared_ptr<AdTaskHandle> h = sched->submitPreemptible(
+                [this, prog, sched, func, args, kw_args, &env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) mutable {
+                    AdTaskExecutionContext ctx;
+                    ctx.task = handle;
+                    ctx.checkpoint_budget = budget;
+                    ctx.remaining_budget = budget;
+                    GarbageCollector local_gc;
+                    Evaluator inner;
+                    inner.setGarbageCollector(&local_gc);
+                    inner.task_scheduler_ = sched;
+                    inner.eval_program_root_ = prog;
+                    return inner.runWorkSlice(ctx, [&]() {
+                        g_ad_apply_method_disable_async = true;
+                        Ad_Object* r = inner.ApplyMethod(func, args, kw_args, env);
+                        g_ad_apply_method_disable_async = false;
+                        return r;
+                    });
+                });
+            Ad_Task_Object* t = new Ad_Task_Object();
+            t->handle = std::move(h);
+            garbageCollector->addObject(t);
+            return t;
+        }
         std::vector<Ad_Object*> default_params = EvalExpressions(func_obj->default_params, env);
         int remainingParams = func_obj->params.size();
         
@@ -1117,6 +1219,7 @@ Ad_Object* Evaluator::EvalDefStatement(Ad_AST_Node* node, Environment& env) {
 
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) def_statement->name;
     Ad_Function_Object* func = new Ad_Function_Object(parameters, default_params, body, &env);
+    func->is_async = def_statement->is_async;
     garbageCollector->addObject(func);
     env.Set(ident->value, func);
     return NULL; // this is correct, i don't want to print the function memory address on its definition statement
@@ -1186,6 +1289,7 @@ void Evaluator::updateInstanceWithInheritedClasses(Ad_Object* obj, Environment& 
             // this adds everything to main class
             Ad_AST_Def_Statement* def_stmt = (Ad_AST_Def_Statement*) *it;
             Ad_Function_Object* method_obj = new Ad_Function_Object(def_stmt->parameters, def_stmt->default_params, def_stmt->body, adClassInstance->instance_environment);
+            method_obj->is_async = def_stmt->is_async;
             garbageCollector->addObject(method_obj);
             Ad_AST_Identifier* def_ident = (Ad_AST_Identifier*) def_stmt->name;
             adClassInstance->instance_environment->Set(def_ident->value, method_obj);
@@ -2241,6 +2345,8 @@ void Evaluator::initRuntimeStatistics() {
     eval_times_per_statement_type[ST_NULL_EXPRESSION] = 0;
     eval_times_per_statement_type[ST_THIS_EXPRESSION] = 0;
     eval_times_per_statement_type[ST_SUPER_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_SPAWN_EXPRESSION] = 0;
+    eval_times_per_statement_type[ST_AWAIT_EXPRESSION] = 0;
 }
 
 void Evaluator::printRuntimeStatistics() {
@@ -2248,4 +2354,123 @@ void Evaluator::printRuntimeStatistics() {
     for (const std::pair<const StatementType, double> info : eval_times_per_statement_type) {
         std::cout << statement_type_map[info.first] << " ran for " << info.second << "secs\n";
     }
+}
+
+AdRunSliceResult Evaluator::runWorkSlice(AdTaskExecutionContext& ctx, const std::function<Ad_Object*()>& work) {
+    if (ctx.checkpoint_budget == 0) {
+        ctx.checkpoint_budget = 1;
+    }
+    if (ctx.remaining_budget == 0) {
+        ctx.remaining_budget = ctx.checkpoint_budget;
+    }
+    AdTaskExecutionContext* prev = ad_tls_task_ctx();
+    ad_tls_set_task_ctx(&ctx);
+    AdRunSliceResult result;
+    try {
+        Ad_Object* computed = work();
+        if (ctx.yield_requested) {
+            result.status = AdRunSliceResult::Status::Yielded;
+            result.continuation = [computed](const std::shared_ptr<AdTaskHandle>&, size_t) mutable {
+                AdRunSliceResult resumed;
+                resumed.status = AdRunSliceResult::Status::Completed;
+                resumed.value = computed;
+                return resumed;
+            };
+        } else {
+            result.status = AdRunSliceResult::Status::Completed;
+            result.value = computed;
+        }
+        result.checkpoints = ctx.checkpoints;
+    } catch (...) {
+        ad_tls_clear_task_ctx(prev);
+        throw;
+    }
+    ad_tls_clear_task_ctx(prev);
+    return result;
+}
+
+AdRunSliceResult Evaluator::runCallableSlice(AdTaskExecutionContext& ctx, Ad_Object* callee, std::vector<Ad_Object*> args,
+                                            Environment* call_env) {
+    return runWorkSlice(ctx, [&]() { return ApplyFunction(callee, args, {}, *call_env); });
+}
+
+namespace {
+
+struct AdSpawnPthreadPayload {
+    Ad_AST_Program* prog{nullptr};
+    std::shared_ptr<std::promise<Ad_Object*>> prom;
+    Ad_Object* callee{nullptr};
+    std::vector<Ad_Object*> args;
+    Environment* call_env{nullptr};
+};
+
+void* ad_spawn_pthread_main(void* p) {
+    auto* pl = static_cast<AdSpawnPthreadPayload*>(p);
+    try {
+        GarbageCollector local_gc;
+        Evaluator eval;
+        eval.setGarbageCollector(&local_gc);
+        eval.eval_program_root_ = pl->prog;
+        g_ad_apply_function_disable_async = true;
+        Ad_Object* v = eval.ApplyFunction(pl->callee, pl->args, {}, *pl->call_env);
+        g_ad_apply_function_disable_async = false;
+        pl->prom->set_value(v);
+    } catch (...) {
+        try {
+            pl->prom->set_exception(std::current_exception());
+        } catch (...) {
+        }
+    }
+    delete pl;
+    return nullptr;
+}
+
+}  // namespace
+
+Ad_Object* Evaluator::spawnCall(Ad_Object* callee, std::vector<Ad_Object*> args, Environment* call_env) {
+    if (callee == nullptr || callee->type != OBJ_FUNCTION) {
+        Ad_Error_Object* err = new Ad_Error_Object("spawn() requires a user function");
+        garbageCollector->addObject(err);
+        return err;
+    }
+    Ad_AST_Program* prog = eval_program_root_;
+    auto sched = task_scheduler_;
+    if (sched) {
+        std::shared_ptr<AdTaskHandle> h = sched->submitPreemptible(
+            [this, prog, sched, callee, args, call_env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) mutable {
+                AdTaskExecutionContext ctx;
+                ctx.task = handle;
+                ctx.checkpoint_budget = budget;
+                ctx.remaining_budget = budget;
+                GarbageCollector local_gc;
+                Evaluator inner;
+                inner.setGarbageCollector(&local_gc);
+                inner.task_scheduler_ = sched;
+                inner.eval_program_root_ = prog;
+                return inner.runCallableSlice(ctx, callee, args, call_env);
+            });
+        Ad_Task_Object* t = new Ad_Task_Object();
+        t->handle = std::move(h);
+        garbageCollector->addObject(t);
+        return t;
+    }
+
+    auto handle = std::make_shared<AdTaskHandle>();
+    auto prom = std::make_shared<std::promise<Ad_Object*>>();
+    handle->future = prom->get_future();
+    auto pl = new AdSpawnPthreadPayload{prog, std::move(prom), callee, std::move(args), call_env};
+    pthread_t tid{};
+    constexpr size_t kStack = 8u * 1024u * 1024u;
+    if (!start_pthread_with_stack(kStack, ad_spawn_pthread_main, pl, &tid)) {
+        delete pl;
+        Ad_Error_Object* err = new Ad_Error_Object("failed to spawn thread");
+        garbageCollector->addObject(err);
+        return err;
+    }
+    handle->overflow_pthread = tid;
+    handle->has_overflow_pthread = true;
+    Ad_Task_Object* t = new Ad_Task_Object();
+    t->handle = std::move(handle);
+    garbageCollector->addObject(t);
+    return t;
 }
