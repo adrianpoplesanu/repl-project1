@@ -7,7 +7,9 @@
 #include "bootstrap.cpp"
 #include "thread_workers.h"
 #include "profiling.h"
+#include "task_scheduler.cpp"
 #include <thread>
+#include <cstdlib>
 
 #define SHOW_RESIDUAL_GC_OBJECTS 0
 
@@ -17,9 +19,25 @@ Repl::Repl() {
     evaluator.setGarbageCollector(garbageCollector);
     compiler.gc = garbageCollector;
     vm.gc = garbageCollector;
+    task_scheduler_ = std::make_shared<TaskScheduler>(0);
+    if (const char* q = std::getenv("ADLANG_QUANTUM_BUDGET")) {
+        try {
+            size_t budget = static_cast<size_t>(std::stoull(q));
+            if (budget > 0) {
+                task_scheduler_->set_quantum_budget(budget);
+            }
+        } catch (...) {
+            std::cerr << "warning: invalid ADLANG_QUANTUM_BUDGET, using default\n";
+        }
+    }
+    evaluator.setTaskScheduler(task_scheduler_);
+    ad_set_global_task_scheduler(task_scheduler_);
 }
 
 Repl::~Repl() {
+    ad_set_global_task_scheduler(nullptr);
+    evaluator.setTaskScheduler(nullptr);
+    task_scheduler_.reset();
     if (env != nullptr) {
         delete env; // this could be a regular env that gets deleted by the garbage collector mechanism
         env = nullptr;
