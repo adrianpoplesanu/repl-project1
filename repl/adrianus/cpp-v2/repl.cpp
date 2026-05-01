@@ -136,7 +136,7 @@ void Repl::ExecuteFile(std::ifstream &target) {
 }
 
 void Repl::ExecuteFileVM(std::ifstream &target) {
-    std::cout << "Executing file VM...\n";
+    //std::cout << "Executing file VM...\n"; // comment this out for now, used for debugging
     if (target.is_open()) {
         std::string line;
         std::string text;

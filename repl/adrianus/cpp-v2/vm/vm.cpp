@@ -69,6 +69,13 @@ void VM::run() {
             }
         } else if (opcode == OP_ADD || opcode == OP_SUB || opcode == OP_MULTIPLY || opcode == OP_DIVIDE) {
             execute_binary_operation(opcode);
+        } else if (opcode == OP_EQUAL || opcode == OP_NOTEQUAL ||
+                   opcode == OP_GREATERTHAN || opcode == OP_GREATERTHAN_EQUAL) {
+            execute_comparison(opcode);
+        } else if (opcode == OP_BANG) {
+            execute_bang_operator();
+        } else if (opcode == OP_MINUS) {
+            execute_minus_operator();
         } else if (opcode == OP_POP) {
             pop();
         } else if (opcode == OP_TRUE) {
@@ -369,26 +376,50 @@ void VM::execute_binary_operation(OpCodeType opcode) {
     // Perform the operation based on the opcode
     Ad_Object* result = nullptr;
     
-    if (left->Type() == OBJ_INT && right->Type() == OBJ_INT) {
-        int left_val = ((Ad_Integer_Object*)left)->value;
-        int right_val = ((Ad_Integer_Object*)right)->value;
-        
+    bool left_is_int = left->Type() == OBJ_INT;
+    bool right_is_int = right->Type() == OBJ_INT;
+    bool left_is_float = left->Type() == OBJ_FLOAT;
+    bool right_is_float = right->Type() == OBJ_FLOAT;
+
+    if ((left_is_int || left_is_float) && (right_is_int || right_is_float)) {
+        bool use_float = left_is_float || right_is_float;
+        float left_val = left_is_float ? static_cast<Ad_Float_Object*>(left)->value
+                                       : static_cast<float>(static_cast<Ad_Integer_Object*>(left)->value);
+        float right_val = right_is_float ? static_cast<Ad_Float_Object*>(right)->value
+                                         : static_cast<float>(static_cast<Ad_Integer_Object*>(right)->value);
+
         switch (opcode) {
             case OP_ADD:
-                result = new Ad_Integer_Object(left_val + right_val);
+                if (use_float) {
+                    result = new Ad_Float_Object(left_val + right_val);
+                } else {
+                    result = new Ad_Integer_Object(static_cast<int>(left_val + right_val));
+                }
                 break;
             case OP_SUB:
-                result = new Ad_Integer_Object(left_val - right_val);
+                if (use_float) {
+                    result = new Ad_Float_Object(left_val - right_val);
+                } else {
+                    result = new Ad_Integer_Object(static_cast<int>(left_val - right_val));
+                }
                 break;
             case OP_MULTIPLY:
-                result = new Ad_Integer_Object(left_val * right_val);
+                if (use_float) {
+                    result = new Ad_Float_Object(left_val * right_val);
+                } else {
+                    result = new Ad_Integer_Object(static_cast<int>(left_val * right_val));
+                }
                 break;
             case OP_DIVIDE:
-                if (right_val == 0) {
+                if (right_val == 0.0f) {
                     std::cerr << "[ VM Error ] Division by zero!" << std::endl;
                     return;
                 }
-                result = new Ad_Integer_Object(left_val / right_val);
+                if (use_float) {
+                    result = new Ad_Float_Object(left_val / right_val);
+                } else {
+                    result = new Ad_Integer_Object(static_cast<int>(left_val / right_val));
+                }
                 break;
             default:
                 std::cerr << "[ VM Error ] Unknown binary operation opcode: " << opcode << std::endl;
@@ -402,6 +433,84 @@ void VM::execute_binary_operation(OpCodeType opcode) {
     if (result != nullptr) {
         push(result);
     }
+}
+
+void VM::execute_comparison(OpCodeType opcode) {
+    if (sp < 2) {
+        std::cerr << "[ VM Error ] Not enough elements on stack for comparison" << std::endl;
+        return;
+    }
+
+    Ad_Object* right = pop();
+    Ad_Object* left = pop();
+
+    bool left_is_int = left->Type() == OBJ_INT;
+    bool right_is_int = right->Type() == OBJ_INT;
+    bool left_is_float = left->Type() == OBJ_FLOAT;
+    bool right_is_float = right->Type() == OBJ_FLOAT;
+
+    if ((left_is_int || left_is_float) && (right_is_int || right_is_float)) {
+        float left_val = left_is_float ? static_cast<Ad_Float_Object*>(left)->value
+                                       : static_cast<float>(static_cast<Ad_Integer_Object*>(left)->value);
+        float right_val = right_is_float ? static_cast<Ad_Float_Object*>(right)->value
+                                         : static_cast<float>(static_cast<Ad_Integer_Object*>(right)->value);
+        bool comparison_result = false;
+        switch (opcode) {
+            case OP_EQUAL:
+                comparison_result = left_val == right_val;
+                break;
+            case OP_NOTEQUAL:
+                comparison_result = left_val != right_val;
+                break;
+            case OP_GREATERTHAN:
+                comparison_result = left_val > right_val;
+                break;
+            case OP_GREATERTHAN_EQUAL:
+                comparison_result = left_val >= right_val;
+                break;
+            default:
+                std::cerr << "[ VM Error ] Unknown comparison opcode: " << opcode << std::endl;
+                return;
+        }
+        push(native_bool_to_boolean_object(comparison_result));
+        return;
+    }
+
+    bool result = false;
+    switch (opcode) {
+        case OP_EQUAL:
+            result = left == right;
+            break;
+        case OP_NOTEQUAL:
+            result = left != right;
+            break;
+        default:
+            std::cerr << "[ VM Error ] Unsupported types for comparison operation" << std::endl;
+            return;
+    }
+    push(native_bool_to_boolean_object(result));
+}
+
+void VM::execute_bang_operator() {
+    Ad_Object* operand = pop();
+    push(native_bool_to_boolean_object(!is_truthy(operand)));
+}
+
+void VM::execute_minus_operator() {
+    Ad_Object* operand = pop();
+    if (operand == nullptr) {
+        std::cerr << "[ VM Error ] Null operand for unary minus" << std::endl;
+        return;
+    }
+    if (operand->Type() == OBJ_INT) {
+        push(new Ad_Integer_Object(-static_cast<Ad_Integer_Object*>(operand)->value));
+        return;
+    }
+    if (operand->Type() == OBJ_FLOAT) {
+        push(new Ad_Float_Object(-static_cast<Ad_Float_Object*>(operand)->value));
+        return;
+    }
+    std::cerr << "[ VM Error ] Unsupported type for unary minus" << std::endl;
 }
 
 Ad_Object* VM::native_bool_to_boolean_object(bool value) {

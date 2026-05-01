@@ -540,6 +540,92 @@ void test_vm_arithmetic_precedence() {
     std::cout << "✓ VM arithmetic precedence test passed\n";
 }
 
+void test_vm_equal_operation_integers() {
+    std::cout << "running test_vm_equal_operation_integers...\n";
+
+    VM vm;
+    Ad_Integer_Object* const1 = new Ad_Integer_Object(10);
+    Ad_Integer_Object* const2 = new Ad_Integer_Object(10);
+
+    std::vector<unsigned char> instructions;
+    auto inst1 = make_constant_instruction(0);
+    auto inst2 = make_constant_instruction(1);
+    instructions.insert(instructions.end(), inst1.begin(), inst1.end());
+    instructions.insert(instructions.end(), inst2.begin(), inst2.end());
+    instructions.push_back(OP_EQUAL);
+
+    std::vector<Ad_Object*> constants = {const1, const2};
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.sp == 1);
+    assert(vm.stack[0]->Type() == OBJ_BOOL);
+    assert(static_cast<Ad_Boolean_Object*>(vm.stack[0])->value == true);
+    std::cout << "✓ VM equal operation integers test passed\n";
+}
+
+void test_vm_greater_than_operation() {
+    std::cout << "running test_vm_greater_than_operation...\n";
+
+    VM vm;
+    Ad_Integer_Object* const1 = new Ad_Integer_Object(11);
+    Ad_Integer_Object* const2 = new Ad_Integer_Object(7);
+
+    std::vector<unsigned char> instructions;
+    auto inst1 = make_constant_instruction(0);
+    auto inst2 = make_constant_instruction(1);
+    instructions.insert(instructions.end(), inst1.begin(), inst1.end());
+    instructions.insert(instructions.end(), inst2.begin(), inst2.end());
+    instructions.push_back(OP_GREATERTHAN);
+
+    std::vector<Ad_Object*> constants = {const1, const2};
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.sp == 1);
+    assert(vm.stack[0]->Type() == OBJ_BOOL);
+    assert(static_cast<Ad_Boolean_Object*>(vm.stack[0])->value == true);
+    std::cout << "✓ VM greater-than operation test passed\n";
+}
+
+void test_vm_bang_operation() {
+    std::cout << "running test_vm_bang_operation...\n";
+
+    VM vm;
+    std::vector<unsigned char> instructions;
+    instructions.push_back(OP_TRUE);
+    instructions.push_back(OP_BANG);
+
+    vm.load(make_bytecode(instructions, {}));
+    vm.run();
+
+    assert(vm.sp == 1);
+    assert(vm.stack[0]->Type() == OBJ_BOOL);
+    assert(static_cast<Ad_Boolean_Object*>(vm.stack[0])->value == false);
+    std::cout << "✓ VM bang operation test passed\n";
+}
+
+void test_vm_minus_operation_float() {
+    std::cout << "running test_vm_minus_operation_float...\n";
+
+    VM vm;
+    Ad_Float_Object* const1 = new Ad_Float_Object(2.5f);
+
+    std::vector<unsigned char> instructions;
+    auto inst1 = make_constant_instruction(0);
+    instructions.insert(instructions.end(), inst1.begin(), inst1.end());
+    instructions.push_back(OP_MINUS);
+
+    std::vector<Ad_Object*> constants = {const1};
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.sp == 1);
+    assert(vm.stack[0]->Type() == OBJ_FLOAT);
+    assert(static_cast<Ad_Float_Object*>(vm.stack[0])->value == -2.5f);
+    std::cout << "✓ VM minus operation float test passed\n";
+}
+
 // Helper function to create OP_SET_GLOBAL instruction
 std::vector<unsigned char> make_set_global_instruction(int global_index) {
     std::vector<unsigned char> instruction;
@@ -1279,6 +1365,10 @@ void run_all_vm_tests() {
     test_vm_empty_instructions();
     test_vm_multiple_constants();
     test_vm_arithmetic_precedence();
+    test_vm_equal_operation_integers();
+    test_vm_greater_than_operation();
+    test_vm_bang_operation();
+    test_vm_minus_operation_float();
 
     // OP_SET_GLOBAL and OP_GET_GLOBAL tests
     test_vm_set_global_instruction();
