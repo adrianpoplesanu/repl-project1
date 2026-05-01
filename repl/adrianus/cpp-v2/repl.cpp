@@ -160,7 +160,8 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
         garbageCollector->sweepObjects();
 
         Ad_Object* result = vm.last_popped_stack_element();
-        if (result != NULL) {
+        // Match evaluator file mode: no line printed when the program value is null.
+        if (result != nullptr && result != &NULLOBJECT) {
             std::cout << result->Inspect() << "\n";
         }
     } else {
@@ -204,7 +205,7 @@ bool Repl::ExecuteLineVM(std::string line) {
     garbageCollector->sweepObjects();
 
     Ad_Object* result = vm.last_popped_stack_element();
-    if (result != NULL) {
+    if (result != nullptr && result != &NULLOBJECT) {
         std::cout << result->Inspect() << "\n";
     }
 

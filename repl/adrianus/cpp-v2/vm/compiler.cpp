@@ -136,7 +136,12 @@ void Compiler::compile(Ad_AST_Node* node) {
 
         compile(if_expr->consequence);
 
-        if (lastInstructionIs(opPop)) {
+        // Match evaluator: a block body does not surface the last statement value
+        // (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS). Keep the block's trailing OP_POP
+        // so literals like `{ 10 }` are discarded, then push null as this branch's value.
+        if (if_expr->consequence != nullptr && if_expr->consequence->type == ST_BLOCK_STATEMENT) {
+            emit(opNull, 0, {});
+        } else if (lastInstructionIs(opPop)) {
             removeLastPop();
         }
 
@@ -152,7 +157,9 @@ void Compiler::compile(Ad_AST_Node* node) {
         } else {
             compile(if_expr->alternative);
 
-            if (lastInstructionIs(opPop)) {
+            if (if_expr->alternative != nullptr && if_expr->alternative->type == ST_BLOCK_STATEMENT) {
+                emit(opNull, 0, {});
+            } else if (lastInstructionIs(opPop)) {
                 removeLastPop();
             }
         }
