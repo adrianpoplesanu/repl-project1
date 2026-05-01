@@ -790,6 +790,29 @@ void test_compile_string_literal() {
     std::cout << "✓ Compile string literal test passed\n";
 }
 
+void test_compile_float_literal() {
+    std::cout << "running test_compile_float_literal...\n";
+
+    Compiler compiler;
+
+    Token float_token("3.14", TT_FLOAT);
+    Ad_AST_Float* float_node = new Ad_AST_Float(float_token, 3.14f);
+
+    compiler.compile(float_node);
+
+    Instructions& ins = compiler.code.instructions;
+    assert(ins.get(0) == OP_CONSTANT);
+    int const_index = (ins.get(1) << 8) | ins.get(2);
+    assert(const_index == 0);
+
+    assert(compiler.constants.size() == 1);
+    assert(compiler.constants[0]->Type() == OBJ_FLOAT);
+    assert(((Ad_Float_Object*)compiler.constants[0])->value == 3.14f);
+
+    delete float_node;
+    std::cout << "✓ Compile float literal test passed\n";
+}
+
 void test_compile_multiple_string_literals() {
     std::cout << "running test_compile_multiple_string_literals...\n";
     
@@ -1205,6 +1228,7 @@ void run_all_compiler_tests() {
     
     // ST_STRING_LITERAL tests
     test_compile_string_literal();
+    test_compile_float_literal();
     test_compile_multiple_string_literals();
 
     // ST_LIST_LITERAL tests

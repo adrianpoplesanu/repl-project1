@@ -115,6 +115,11 @@ void Compiler::compile(Ad_AST_Node* node) {
         Ad_Integer_Object* integer_obj = new Ad_Integer_Object(integer_node->value);
         int const_index = addConstant(integer_obj);
         emit(opConstant, 1, {const_index});
+    } else if (node->type == ST_FLOAT) {
+        Ad_AST_Float* float_node = static_cast<Ad_AST_Float*>(node);
+        Ad_Float_Object* float_obj = new Ad_Float_Object(float_node->value);
+        int const_index = addConstant(float_obj);
+        emit(opConstant, 1, {const_index});
     } else if (node->type == ST_BOOLEAN) {
         Ad_AST_Boolean* boolean_node = (Ad_AST_Boolean*)node;
         if (boolean_node->value) {
@@ -554,13 +559,13 @@ Instructions Compiler::leave_scope() {
     }
 
     // Print instructions bytes
-    std::cout << "Instructions bytes: ";
-    for (size_t i = 0; i < instructions.bytes.size(); i++) {
-        std::cout << static_cast<int>(instructions.bytes[i]) << " ";
-    }
-    std::cout << std::endl;
+    //std::cout << "Instructions bytes: "; // comment this out for now, used for debugging
+    //for (size_t i = 0; i < instructions.bytes.size(); i++) {
+    //    std::cout << static_cast<int>(instructions.bytes[i]) << " ";
+    //}
+    //std::cout << std::endl;
 
-    std::cout << disassemble_instructions(instructions) << std::endl;
+    //std::cout << disassemble_instructions(instructions) << std::endl;
 
     // Remove the last scope
     if (scopes.size() > 0) {
