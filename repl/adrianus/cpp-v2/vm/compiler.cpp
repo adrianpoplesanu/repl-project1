@@ -41,6 +41,30 @@ Compiler::~Compiler() {
 void Compiler::reset() {
     instructions = Instructions();
     bytecode = Bytecode();
+    loop_stack.clear();
+}
+
+void Compiler::emitLoopBreak() {
+    if (loop_stack.empty()) {
+        std::cerr << "[ Compiler Error ] break outside of loop\n";
+        return;
+    }
+    int pos = emit(opJump, 1, {9999});
+    loop_stack.back().pending_break_jumps.push_back(pos);
+}
+
+void Compiler::emitLoopContinue() {
+    if (loop_stack.empty()) {
+        std::cerr << "[ Compiler Error ] continue outside of loop\n";
+        return;
+    }
+    LoopCompilation& cur = loop_stack.back();
+    if (cur.is_for) {
+        int pos = emit(opJump, 1, {9999});
+        cur.pending_continue_jumps.push_back(pos);
+    } else {
+        emit(opJump, 1, {cur.loop_begin_byte});
+    }
 }
 
 void Compiler::compile(Ad_AST_Node* node) {
@@ -59,7 +83,10 @@ void Compiler::compile(Ad_AST_Node* node) {
                 compile(expr_stmt->expression);
             } else if (expr_stmt->expression->type == ST_ASSIGN_STATEMENT) {
                 compile(expr_stmt->expression);
-            } else if (expr_stmt->expression->type == ST_WHILE_EXPRESSION) {
+            } else if (expr_stmt->expression->type == ST_WHILE_EXPRESSION ||
+                       expr_stmt->expression->type == ST_FOR_EXPRESSION) {
+                compile(expr_stmt->expression);
+            } else if (expr_stmt->expression->type == ST_PLUS_EQUALS) {
                 compile(expr_stmt->expression);
             } else {
                 compile(expr_stmt->expression);
@@ -370,6 +397,95 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opSetGlobal, 1, {symbol.index});
         } else {
             emit(opSetLocal, 1, {symbol.index});
+        }
+    } else if (node->type == ST_WHILE_EXPRESSION) {
+        Ad_AST_WhileExpression* w = static_cast<Ad_AST_WhileExpression*>(node);
+        LoopCompilation lc;
+        lc.is_for = false;
+        lc.loop_begin_byte = code.instructions.size;
+        loop_stack.push_back(std::move(lc));
+
+        compile(w->condition);
+        int jmp_not_truthy_pos = emit(opJumpNotTruthy, 1, {9999});
+        compile(w->consequence);
+        emit(opJump, 1, {loop_stack.back().loop_begin_byte});
+
+        int exit_pos = code.instructions.size;
+        changeOperand(jmp_not_truthy_pos, exit_pos);
+        for (int br : loop_stack.back().pending_break_jumps) {
+            changeOperand(br, exit_pos);
+        }
+        loop_stack.pop_back();
+    } else if (node->type == ST_FOR_EXPRESSION) {
+        Ad_AST_ForExprssion* f = static_cast<Ad_AST_ForExprssion*>(node);
+        if (f->initialization != nullptr) {
+            compile(f->initialization);
+        }
+        LoopCompilation lc;
+        lc.is_for = true;
+        lc.loop_begin_byte = code.instructions.size;
+        loop_stack.push_back(std::move(lc));
+
+        compile(f->condition);
+        int jmp_not_truthy_pos = emit(opJumpNotTruthy, 1, {9999});
+        compile(f->body);
+        int continue_destination = code.instructions.size;
+        compile(f->step);
+        emit(opJump, 1, {loop_stack.back().loop_begin_byte});
+
+        int exit_pos = code.instructions.size;
+        changeOperand(jmp_not_truthy_pos, exit_pos);
+        for (int br : loop_stack.back().pending_break_jumps) {
+            changeOperand(br, exit_pos);
+        }
+        for (int ct : loop_stack.back().pending_continue_jumps) {
+            changeOperand(ct, continue_destination);
+        }
+        loop_stack.pop_back();
+    } else if (node->type == ST_BREAK_STATEMENT) {
+        emitLoopBreak();
+    } else if (node->type == ST_CONTINUE_STATEMENT) {
+        emitLoopContinue();
+    } else if (node->type == ST_PLUS_EQUALS) {
+        Ad_AST_Plus_Equals_Statement* stmt = static_cast<Ad_AST_Plus_Equals_Statement*>(node);
+        const std::string op_lit = stmt->token.GetLiteral();
+        if (stmt->name->type != ST_IDENTIFIER) {
+            std::cerr << "[ Compiler Error ] +=/-= is only supported for simple identifiers in the VM\n";
+            return;
+        }
+        auto* ident = static_cast<Ad_AST_Identifier*>(stmt->name);
+        Symbol* sym = symbol_table->resolve(ident->value);
+        if (sym == nullptr) {
+            std::cerr << "[ Compiler Error ] undefined identifier in +=/-=: " << ident->value << "\n";
+            return;
+        }
+        if (sym->scope == SymbolScope::FREE) {
+            std::cerr << "[ Compiler Error ] +=/-= for captured variables is not supported yet\n";
+            return;
+        }
+        load_symbol(*sym, ident->value);
+        compile(stmt->value);
+        if (op_lit == "+=") {
+            emit(opAdd, 0, {});
+        } else if (op_lit == "-=") {
+            emit(opSub, 0, {});
+        } else {
+            std::cerr << "[ Compiler Error ] unsupported compound assignment operator\n";
+            return;
+        }
+        if (sym->scope == SymbolScope::GLOBAL) {
+            emit(opSetGlobal, 1, {sym->index});
+        } else if (sym->scope == SymbolScope::LOCAL) {
+            emit(opSetLocal, 1, {sym->index});
+        } else if (sym->scope == SymbolScope::BUILTIN) {
+            std::cerr << "[ Compiler Error ] cannot assign to builtin\n";
+            return;
+        } else if (sym->scope == SymbolScope::CLASS) {
+            std::cerr << "[ Compiler Error ] +=/-= for class fields is not supported in the VM\n";
+            return;
+        } else if (sym->scope == SymbolScope::FUNCTION) {
+            std::cerr << "[ Compiler Error ] invalid +=/-= target\n";
+            return;
         }
     } else if (node->type == ST_COMMENT) {
         // Comments do not emit bytecode.

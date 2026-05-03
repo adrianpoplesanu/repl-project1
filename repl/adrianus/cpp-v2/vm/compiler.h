@@ -24,6 +24,18 @@ public:
     int frames_index;
     SymbolTable* symbol_table;
 
+    /// Active loops for patching break/continue jumps (innermost at back).
+    struct LoopCompilation {
+        int loop_begin_byte{0};
+        bool is_for{false};
+        std::vector<int> pending_break_jumps;
+        std::vector<int> pending_continue_jumps;
+    };
+    std::vector<LoopCompilation> loop_stack;
+
+    void emitLoopBreak();
+    void emitLoopContinue();
+
     Compiler();
     Compiler(GarbageCollector* gc);
     ~Compiler();
