@@ -1,0 +1,12 @@
+def fc() {
+  let r = 0
+  let j = 0
+  for (j = 0; j < 4; j = j + 1) {
+    if (j == 1) {
+      continue
+    }
+    r = r + j
+  }
+  return r
+}
+fc()
