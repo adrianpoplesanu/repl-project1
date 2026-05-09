@@ -2,6 +2,7 @@
 #include "code.h"
 #include "objects.h"
 #include "utils.h"
+#include "../builtins_registry.h"
 #include "../evaluator.h"
 #include <iostream>
 #include <vector>
@@ -147,6 +148,15 @@ void VM::run() {
                 continue;
             }
             push(stack[slot]);
+        } else if (opcode == OP_GET_BUILTIN) {
+            int builtin_index = read_uint8(*ins, ip + 1);
+            current_frame()->ip += 1;
+            Ad_Object* builtin_obj = vm_get_builtin_object(builtin_index);
+            if (builtin_obj != nullptr) {
+                push(builtin_obj);
+            } else {
+                std::cerr << "[ VM Error ] OP_GET_BUILTIN: invalid index " << builtin_index << std::endl;
+            }
         } else if (opcode == OP_ARRAY) {
             int numElements = read_uint16(*ins, ip + 1);
             current_frame()->ip += 2;
@@ -321,7 +331,10 @@ void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
 }
 
 Ad_Object *VM::last_popped_stack_element() {
-    return stack[sp];
+    if (sp <= 0) {
+        return nullptr;
+    }
+    return stack[sp - 1];
 }
 
 Frame* VM::current_frame() {

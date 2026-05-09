@@ -7,6 +7,9 @@
 #include "gc.h"
 #include "eval_utils.h"
 #include "thread_utils.h"
+#include "builtins_registry.h"
+#include "builtins_registry_names.h"
+#include <vector>
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
@@ -648,9 +651,26 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     // eval
     // first
     // input
-    // https://www.w3schools.com/python/python_ref_keywords.asp
+	// https://www.w3schools.com/python/python_ref_keywords.asp
 	// https://www.w3schools.com/python/python_ref_functions.asp
 };
+
+Ad_Object* vm_get_builtin_object(int index) {
+    static std::vector<Ad_Object*> cache;
+    if (cache.empty()) {
+        for (int i = 0; AD_VM_BUILTIN_NAMES[i] != nullptr; ++i) {
+            std::string name(AD_VM_BUILTIN_NAMES[i]);
+            auto it = builtins_map.find(name);
+            if (it != builtins_map.end()) {
+                cache.push_back(it->second);
+            }
+        }
+    }
+    if (index < 0 || index >= static_cast<int>(cache.size())) {
+        return nullptr;
+    }
+    return cache[index];
+}
 
 void free_builtin_arguments(std::vector<Ad_Object*> args) {
     // TODO: this method does nothing after gc implementation, remove this

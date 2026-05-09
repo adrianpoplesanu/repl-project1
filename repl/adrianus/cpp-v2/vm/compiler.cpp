@@ -2,9 +2,21 @@
 #include "opcode.h"
 #include "objects.h"
 #include "utils.h"
+#include "../builtins_registry.h"
+#include "../builtins_registry_names.h"
 #include <algorithm>
 #include <cstdarg>
 #include <iostream>
+#include <string>
+
+void vm_register_builtin_symbols(SymbolTable* symbol_table) {
+    if (symbol_table == nullptr) {
+        return;
+    }
+    for (int i = 0; AD_VM_BUILTIN_NAMES[i] != nullptr; ++i) {
+        symbol_table->define_builtin(i, std::string(AD_VM_BUILTIN_NAMES[i]));
+    }
+}
 
 Compiler::Compiler() {
     constants.clear();
@@ -15,6 +27,7 @@ Compiler::Compiler() {
     frames.clear();
     frames_index = 0;
     symbol_table = new_symbol_table();
+    vm_register_builtin_symbols(symbol_table);
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
 
@@ -27,6 +40,7 @@ Compiler::Compiler(GarbageCollector* gc) {
     frames.clear();
     frames_index = 0;
     symbol_table = new_symbol_table();
+    vm_register_builtin_symbols(symbol_table);
     // bytecode, instructions, and scopes are initialized by their default constructors
 }
 
