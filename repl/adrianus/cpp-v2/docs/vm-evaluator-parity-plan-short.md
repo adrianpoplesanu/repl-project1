@@ -49,10 +49,10 @@ Done when:
 
 ## Work Phases (Checklist)
 
-- [ ] Phase 0: Feature matrix and parity contract docs
-- [ ] Phase 1: Differential test harness (Evaluator vs VM)
-- [ ] Phase 2: Core compiler/VM gaps (`while/for/break/continue`, float, assignment updates)
-- [ ] Phase 3: Function/closure hardening
+- [x] Phase 0: Feature matrix and parity contract docs (`docs/vm-parity-matrix.md`, `docs/vm-parity-contract.md`)
+- [x] Phase 1: Differential test harness (Evaluator vs VM) (`tests/parity/run_parity.py` and fixtures)
+- [x] Phase 2: Core compiler/VM gaps (`while/for/break/continue`, float, `+=`/`-=`, top-level output aligned with `EvalProgram` via `OP_FILE_STMT_OUTPUT`; core parity fixtures green)
+- [x] Phase 3: Function/closure hardening (see `docs/vm-parity-phase3-functions-closures.md`; free variables + `OP_GET_FREE` / `OP_CURRENT_CLOSURE`, arity-too-few parity, `tests/parity/fixtures/functions/*`)
 - [ ] Phase 4: OOP parity
 - [ ] Phase 5: Slicing/index edge-case parity
 - [ ] Phase 6: Runtime object parity
