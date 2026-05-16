@@ -91,6 +91,7 @@ Code::Code() {
     definitionsMap.insert(std::make_pair(OP_ARRAY, new Definition("OpArray", 1, new int[1] {2})));
     definitionsMap.insert(std::make_pair(OP_HASH, new Definition("OpHash", 1, new int[1] {2})));
     definitionsMap.insert(std::make_pair(OP_INDEX, new Definition("OpIndex", 0, new int)));
+    definitionsMap.insert(std::make_pair(OP_SET_INDEX, new Definition("OpSetIndex", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_CALL, new Definition("OpCall", 1, new int[1] {1})));
     definitionsMap.insert(std::make_pair(OP_RETURN_VALUE, new Definition("OpReturnValue", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_RETURN, new Definition("OpReturn", 0, new int)));
@@ -107,6 +108,7 @@ Code::Code() {
     definitionsMap.insert(std::make_pair(OP_SET_PROPERTY_SYM, new Definition("OpSetPropertySym", 1, new int[1] {2}))); // TODO: this might have more operands
     definitionsMap.insert(std::make_pair(OP_GET_PROPERTY_SYM, new Definition("OpGetPropertySym", 1, new int[1] {2}))); // TODO: this might have more operands
     definitionsMap.insert(std::make_pair(OP_PATCH_PROPERTY_SYM, new Definition("OpPatchPropertySym", 1, new int[1] {2}))); // TODO: this might have more operands
+    definitionsMap.insert(std::make_pair(OP_FILE_STMT_OUTPUT, new Definition("OpFileStmtOutput", 0, new int)));
 }
 
 Code::~Code() {

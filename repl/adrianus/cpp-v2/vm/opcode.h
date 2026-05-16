@@ -24,6 +24,7 @@ enum OpCodeType {
     OP_ARRAY,
     OP_HASH,
     OP_INDEX,
+    OP_SET_INDEX,
     OP_CALL,
     OP_RETURN_VALUE,
     OP_RETURN,
@@ -47,7 +48,11 @@ enum OpCodeType {
     OP_SET_PROPERTY_SYM,
     OP_GET_PROPERTY_SYM,
 
-    OP_PATCH_PROPERTY_SYM
+    OP_PATCH_PROPERTY_SYM,
+
+    /// Pop the top-of-stack value and print it like `Evaluator::EvalProgram` does for each
+    /// top-level statement (skip only OBJ_SIGNAL). Used for VM file/REPL parity with the evaluator.
+    OP_FILE_STMT_OUTPUT
 };
 
 class OpCode {
@@ -188,6 +193,12 @@ public:
     }
 };
 
+class OpSetIndex : public OpCode {
+public:
+    OpSetIndex() : OpCode(OP_SET_INDEX) {
+    }
+};
+
 class OpCall : public OpCode {
 public:
     OpCall() : OpCode(OP_CALL) {
@@ -302,6 +313,12 @@ public:
     }
 };
 
+class OpFileStmtOutput : public OpCode {
+public:
+    OpFileStmtOutput() : OpCode(OP_FILE_STMT_OUTPUT) {
+    }
+};
+
 extern OpConstant opConstant;
 extern OpAdd opAdd;
 extern OpSub opSub;
@@ -324,6 +341,7 @@ extern OpSetGlobal opSetGlobal;
 extern OpArray opArray;
 extern OpHash opHash;
 extern OpIndex opIndex;
+extern OpSetIndex opSetIndex;
 extern OpCall opCall;
 extern OpReturnValue opReturnValue;
 extern OpReturn opReturn;
@@ -343,5 +361,6 @@ extern OpInvoke opInvoke;
 extern OpSetPropertySym opSetPropertySym;
 extern OpGetPropertySym opGetPropertySym;
 extern OpPatchPropertySym opPatchPropertySym;
+extern OpFileStmtOutput opFileStmtOutput;
 
 #endif
