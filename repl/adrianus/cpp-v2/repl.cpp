@@ -10,8 +10,19 @@
 #include "task_scheduler.cpp"
 #include <thread>
 #include <cstdlib>
+#include <cstdint>
 
 #define SHOW_RESIDUAL_GC_OBJECTS 0
+
+namespace {
+void run_vm_with_optional_instruction_limit(VM& vm) {
+    uint64_t max_ins = 0;
+    if (const char* e = std::getenv("AD_VM_MAX_INSTRUCTIONS")) {
+        max_ins = std::strtoull(e, nullptr, 10);
+    }
+    vm.run(max_ins);
+}
+} // namespace
 
 Repl::Repl() {
     garbageCollector = new GarbageCollector();
@@ -153,17 +164,12 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
 
         vm.load(bytecode);
         vm.printLogs();
-        vm.run();
+        run_vm_with_optional_instruction_limit(vm);
 
         garbageCollector->unmarkAllObjects();
         garbageCollector->markObjects(vm.stack, vm.sp);
         garbageCollector->sweepObjects();
-
-        Ad_Object* result = vm.last_popped_stack_element();
-        // Match evaluator file mode: no line printed when the program value is null.
-        if (result != nullptr && result != &NULLOBJECT) {
-            std::cout << result->Inspect() << "\n";
-        }
+        // Program output matches `Evaluator::EvalProgram` via OP_FILE_STMT_OUTPUT opcodes.
     } else {
         std::cout << "empty or missing ad source file\n";
         program.reset();
@@ -198,16 +204,11 @@ bool Repl::ExecuteLineVM(std::string line) {
 
     vm.load(bytecode);
     vm.printLogs();
-    vm.run();
+    run_vm_with_optional_instruction_limit(vm);
 
     garbageCollector->unmarkAllObjects();
     garbageCollector->markObjects(vm.stack, vm.sp);
     garbageCollector->sweepObjects();
-
-    Ad_Object* result = vm.last_popped_stack_element();
-    if (result != nullptr && result != &NULLOBJECT) {
-        std::cout << result->Inspect() << "\n";
-    }
 
     return false;
 }
