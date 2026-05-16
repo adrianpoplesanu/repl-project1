@@ -1,0 +1,8 @@
+def make_adder(n) {
+  def add(x) {
+    return x + n
+  }
+  return add
+}
+let f = make_adder(10)
+f(5)

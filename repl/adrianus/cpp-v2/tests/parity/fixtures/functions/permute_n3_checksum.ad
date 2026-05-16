@@ -1,0 +1,28 @@
+n = 3
+a = [0, 1, 2]
+perm_count = 0
+checksum = 0
+
+def swap(i, j) {
+    t = a[i]
+    a[i] = a[j]
+    a[j] = t
+}
+
+def permute(k) {
+    if (k == n) {
+        perm_count = perm_count + 1
+        checksum = checksum + a[0]
+    } else {
+        i = k
+        while (i < n) {
+            swap(k, i)
+            permute(k + 1)
+            swap(k, i)
+            i = i + 1
+        }
+    }
+}
+
+permute(0)
+sink = perm_count + checksum
