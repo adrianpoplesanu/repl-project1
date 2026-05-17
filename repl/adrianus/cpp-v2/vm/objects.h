@@ -25,6 +25,9 @@ public:
 class AdClosureObject : public Ad_Object {
 public:
     AdCompiledFunction* fn;
+    /// Captured locals/globals from enclosing scopes (VM parallels evaluator free bindings).
+    /// Index matches `SymbolScope::FREE` symbol index emitted by `OP_GET_FREE`.
+    std::vector<Ad_Object*> free_vars;
 
 	AdClosureObject();
     std::string Inspect() override;

@@ -137,6 +137,7 @@ static std::map<unsigned char, Definition*>& get_definitions_map() {
         definitions_map[OP_ARRAY] = new Definition("OpArray", 1, new int[1] {2});
         definitions_map[OP_HASH] = new Definition("OpHash", 1, new int[1] {2});
         definitions_map[OP_INDEX] = new Definition("OpIndex", 0, new int);
+        definitions_map[OP_SET_INDEX] = new Definition("OpSetIndex", 0, new int);
         definitions_map[OP_CALL] = new Definition("OpCall", 1, new int[1] {1});
         definitions_map[OP_RETURN_VALUE] = new Definition("OpReturnValue", 0, new int);
         definitions_map[OP_RETURN] = new Definition("OpReturn", 0, new int);
@@ -153,6 +154,7 @@ static std::map<unsigned char, Definition*>& get_definitions_map() {
         definitions_map[OP_SET_PROPERTY_SYM] = new Definition("OpSetPropertySym", 1, new int[1] {2});
         definitions_map[OP_GET_PROPERTY_SYM] = new Definition("OpGetPropertySym", 1, new int[1] {2});
         definitions_map[OP_PATCH_PROPERTY_SYM] = new Definition("OpPatchPropertySym", 1, new int[1] {2});
+        definitions_map[OP_FILE_STMT_OUTPUT] = new Definition("OpFileStmtOutput", 0, new int);
         initialized = true;
     }
     
