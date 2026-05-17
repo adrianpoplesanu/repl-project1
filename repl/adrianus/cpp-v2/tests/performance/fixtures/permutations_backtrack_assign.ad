@@ -1,0 +1,33 @@
+// CPU-bound: enumerate permutations by backtracking (increment branch), no I/O.
+// n=8 -> 40320 leaves; println first element at each leaf.
+//
+// Note: uses list index assignment in back(); evaluator and VM both support it.
+n = 8
+a = [0, 0, 0, 0, 0, 0, 0, 0]
+
+def check(k) {
+    i = 0
+    while (i < k) {
+        if (a[i] == a[k]) {
+            return false
+        }
+        i = i + 1
+    }
+    return true
+}
+
+def back(k) {
+    if (k == n) {
+        println(a)
+    } else {
+        a[k] = 1
+        while (a[k] <= n) {
+            if (check(k)) {
+                back(k + 1)
+            }
+            a[k] = a[k] + 1
+        }
+    }
+}
+
+back(0)
