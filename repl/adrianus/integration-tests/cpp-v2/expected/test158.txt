@@ -1,0 +1,3 @@
+6
+<class instance at memory address: (.*)>
+6
