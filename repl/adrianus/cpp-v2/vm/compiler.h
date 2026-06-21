@@ -33,6 +33,9 @@ public:
     };
     std::vector<LoopCompilation> loop_stack;
 
+    /// True only while compiling a direct child of `ST_PROGRAM` (top-level script statements).
+    bool compiling_program_direct_statement = false;
+
     void emitLoopBreak();
     void emitLoopContinue();
 

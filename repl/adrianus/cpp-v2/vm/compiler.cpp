@@ -9,6 +9,48 @@
 #include <iostream>
 #include <string>
 
+namespace {
+
+int instruction_width_at(const Instructions& ins, int offset) {
+    if (offset < 0 || offset >= ins.size) {
+        return 0;
+    }
+    Definition* def = lookup(ins.bytes[static_cast<size_t>(offset)]);
+    if (def == nullptr) {
+        return 1;
+    }
+    int width = 1;
+    for (int j = 0; j < def->size; ++j) {
+        width += def->operandWidths[j];
+    }
+    return width;
+}
+
+// Jump targets are recorded as absolute offsets in the compiler's single buffer.
+// leave_scope() slices [start, end) into a standalone function chunk; operands must
+// be rebased by subtracting `extract_start_global` so the VM interprets them 0-based.
+void rebase_jump_operands_in_extracted_chunk(Instructions& ins, int extract_start_global) {
+    int i = 0;
+    while (i < ins.size) {
+        unsigned char op = ins.bytes[static_cast<size_t>(i)];
+        if (op == static_cast<unsigned char>(OP_JUMP) || op == static_cast<unsigned char>(OP_JUMP_NOT_TRUTHY)) {
+            int target = read_uint16(ins, i + 1);
+            if (target >= extract_start_global) {
+                target -= extract_start_global;
+                ins.bytes[static_cast<size_t>(i + 1)] = static_cast<unsigned char>((target >> 8) & 0xFF);
+                ins.bytes[static_cast<size_t>(i + 2)] = static_cast<unsigned char>(target & 0xFF);
+            }
+        }
+        int w = instruction_width_at(ins, i);
+        if (w <= 0) {
+            break;
+        }
+        i += w;
+    }
+}
+
+} // namespace
+
 void vm_register_builtin_symbols(SymbolTable* symbol_table) {
     if (symbol_table == nullptr) {
         return;
@@ -56,6 +98,7 @@ void Compiler::reset() {
     instructions = Instructions();
     bytecode = Bytecode();
     loop_stack.clear();
+    compiling_program_direct_statement = false;
 }
 
 void Compiler::emitLoopBreak() {
@@ -87,7 +130,9 @@ void Compiler::compile(Ad_AST_Node* node) {
     } else if (node->type == ST_PROGRAM) {
         Ad_AST_Program* program = (Ad_AST_Program*)node;
         for (Ad_AST_Node* stmt : program->statements) {
+            compiling_program_direct_statement = true;
             compile(stmt);
+            compiling_program_direct_statement = false;
         }
     } else if (node->type == ST_EXPRESSION_STATEMENT) {
         Ad_AST_ExpressionStatement* expr_stmt = (Ad_AST_ExpressionStatement*)node;
@@ -104,7 +149,11 @@ void Compiler::compile(Ad_AST_Node* node) {
                 compile(expr_stmt->expression);
             } else {
                 compile(expr_stmt->expression);
-                emit(opPop, 0, {});
+                if (compiling_program_direct_statement) {
+                    emit(opFileStmtOutput, 0, {});
+                } else {
+                    emit(opPop, 0, {});
+                }
             }
         }
     } else if (node->type == ST_PREFIX_EXPRESSION) {
@@ -116,6 +165,77 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opMinus, 0, {});
         } else {
             std::cout << "SEVERE ERROR: prefix expression" << std::endl;
+        }
+    } else if (node->type == ST_PREFIX_INCREMENT) {
+        auto* pre = static_cast<Ad_AST_PrefixIncrement*>(node);
+        if (pre->name == nullptr || pre->name->type != ST_IDENTIFIER) {
+            std::cerr << "[ Compiler Error ] prefix ++/-- only supported for simple identifiers in the VM\n";
+            return;
+        }
+        auto* ident = static_cast<Ad_AST_Identifier*>(pre->name);
+        Symbol* sym = symbol_table->resolve(ident->value);
+        if (sym == nullptr) {
+            std::cerr << "[ Compiler Error ] undefined identifier in prefix ++/--: " << ident->value << "\n";
+            return;
+        }
+        if (sym->scope == SymbolScope::FREE) {
+            std::cerr << "[ Compiler Error ] prefix ++/-- for captured variables is not supported yet\n";
+            return;
+        }
+        load_symbol(*sym, ident->value);
+        int one_idx = addConstant(new Ad_Integer_Object(1));
+        emit(opConstant, 1, {one_idx});
+        if (pre->_operator == "++") {
+            emit(opAdd, 0, {});
+        } else if (pre->_operator == "--") {
+            emit(opSub, 0, {});
+        } else {
+            std::cerr << "[ Compiler Error ] unsupported prefix increment operator\n";
+            return;
+        }
+        if (sym->scope == SymbolScope::GLOBAL) {
+            emit(opSetGlobal, 1, {sym->index});
+        } else if (sym->scope == SymbolScope::LOCAL) {
+            emit(opSetLocal, 1, {sym->index});
+        } else {
+            std::cerr << "[ Compiler Error ] prefix ++/-- for this symbol scope is not supported in the VM\n";
+            return;
+        }
+    } else if (node->type == ST_POSTFIX_INCREMENT) {
+        auto* post = static_cast<Ad_AST_PostfixIncrement*>(node);
+        if (post->name == nullptr || post->name->type != ST_IDENTIFIER) {
+            std::cerr << "[ Compiler Error ] postfix ++/-- only supported for simple identifiers in the VM\n";
+            return;
+        }
+        auto* ident = static_cast<Ad_AST_Identifier*>(post->name);
+        Symbol* sym = symbol_table->resolve(ident->value);
+        if (sym == nullptr) {
+            std::cerr << "[ Compiler Error ] undefined identifier in postfix ++/--: " << ident->value << "\n";
+            return;
+        }
+        if (sym->scope == SymbolScope::FREE) {
+            std::cerr << "[ Compiler Error ] postfix ++/-- for captured variables is not supported yet\n";
+            return;
+        }
+        load_symbol(*sym, ident->value);
+        load_symbol(*sym, ident->value);
+        int one_idx = addConstant(new Ad_Integer_Object(1));
+        emit(opConstant, 1, {one_idx});
+        if (post->_operator == "++") {
+            emit(opAdd, 0, {});
+        } else if (post->_operator == "--") {
+            emit(opSub, 0, {});
+        } else {
+            std::cerr << "[ Compiler Error ] unsupported postfix increment operator\n";
+            return;
+        }
+        if (sym->scope == SymbolScope::GLOBAL) {
+            emit(opSetGlobal, 1, {sym->index});
+        } else if (sym->scope == SymbolScope::LOCAL) {
+            emit(opSetLocal, 1, {sym->index});
+        } else {
+            std::cerr << "[ Compiler Error ] postfix ++/-- for this symbol scope is not supported in the VM\n";
+            return;
         }
     } else if (node->type == ST_INFIX_EXPRESSION) {
         Ad_AST_InfixExpression* infix_expr = (Ad_AST_InfixExpression*)node;
@@ -175,7 +295,10 @@ void Compiler::compile(Ad_AST_Node* node) {
         std::vector<int> args = {9999};
         int jump_not_truthy_pos = emit(opJumpNotTruthy, 1, args);
 
+        bool saved_prog_stmt = compiling_program_direct_statement;
+        compiling_program_direct_statement = false;
         compile(if_expr->consequence);
+        compiling_program_direct_statement = saved_prog_stmt;
 
         // Match evaluator: a block body does not surface the last statement value
         // (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS). Keep the block's trailing OP_POP
@@ -196,7 +319,10 @@ void Compiler::compile(Ad_AST_Node* node) {
         if (if_expr->alternative == nullptr) {
             emit(opNull, 0, {});
         } else {
+            saved_prog_stmt = compiling_program_direct_statement;
+            compiling_program_direct_statement = false;
             compile(if_expr->alternative);
+            compiling_program_direct_statement = saved_prog_stmt;
 
             if (if_expr->alternative != nullptr && if_expr->alternative->type == ST_BLOCK_STATEMENT) {
                 emit(opNull, 0, {});
@@ -210,10 +336,13 @@ void Compiler::compile(Ad_AST_Node* node) {
 
         emit(opPop, 0, {}); // ATENTIE! pentru ca if nu e expresie imbricata in expression statetement, din cauza parserului, aici trebuie sa pun explitic pop()
     } else if (node->type == ST_BLOCK_STATEMENT) {
+        bool saved_prog = compiling_program_direct_statement;
+        compiling_program_direct_statement = false;
         Ad_AST_BlockStatement* block_stmt = (Ad_AST_BlockStatement*)node;
         for (Ad_AST_Node* stmt : block_stmt->statements) {
             compile(stmt);
         }
+        compiling_program_direct_statement = saved_prog;
     } else if (node->type == ST_NULL_EXPRESSION) {
         emit(opNull, 0, {});
     } else if (node->type == ST_LET_STATEMENT) {
@@ -246,19 +375,50 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opSetProperty, 0, {});
         } else if (assign_stmt->name->type == ST_IDENTIFIER) {
             Ad_AST_Identifier* name_id = static_cast<Ad_AST_Identifier*>(assign_stmt->name);
-            Symbol symbol = symbol_table->define(name_id->value);
-            compile(assign_stmt->value);
-            if (symbol.scope == SymbolScope::GLOBAL) {
-                emit(opSetGlobal, 1, {symbol.index});
-            } else {
-                if (scopes[scopeIndex].compilationType == "class") {
-                    Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
-                    emit(opConstant, 1, {addConstant(field_name)});
-                    emit(opPatchPropertySym, 1, {symbol.index});
+            Symbol* existing = symbol_table->resolve(name_id->value);
+            if (existing != nullptr) {
+                compile(assign_stmt->value);
+                if (existing->scope == SymbolScope::GLOBAL) {
+                    emit(opSetGlobal, 1, {existing->index});
+                } else if (existing->scope == SymbolScope::LOCAL) {
+                    if (scopes[scopeIndex].compilationType == "class") {
+                        Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
+                        emit(opConstant, 1, {addConstant(field_name)});
+                        emit(opPatchPropertySym, 1, {existing->index});
+                    } else {
+                        emit(opSetLocal, 1, {existing->index});
+                    }
+                } else if (existing->scope == SymbolScope::FREE) {
+                    std::cerr << "[ Compiler Error ] assignment to captured variables (free) is not supported yet\n";
+                    return;
+                } else if (existing->scope == SymbolScope::BUILTIN) {
+                    std::cerr << "[ Compiler Error ] cannot assign to builtin\n";
+                    return;
                 } else {
-                    emit(opSetLocal, 1, {symbol.index});
+                    std::cerr << "[ Compiler Error ] assignment to this symbol scope is not supported in the VM\n";
+                    return;
+                }
+            } else {
+                Symbol symbol = symbol_table->define(name_id->value);
+                compile(assign_stmt->value);
+                if (symbol.scope == SymbolScope::GLOBAL) {
+                    emit(opSetGlobal, 1, {symbol.index});
+                } else {
+                    if (scopes[scopeIndex].compilationType == "class") {
+                        Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
+                        emit(opConstant, 1, {addConstant(field_name)});
+                        emit(opPatchPropertySym, 1, {symbol.index});
+                    } else {
+                        emit(opSetLocal, 1, {symbol.index});
+                    }
                 }
             }
+        } else if (assign_stmt->name->type == ST_INDEX_EXPRESSION) {
+            auto* index_expr = static_cast<Ad_AST_IndexExpression*>(assign_stmt->name);
+            compile(index_expr->left);
+            compile(index_expr->index);
+            compile(assign_stmt->value);
+            emit(opSetIndex, 0, {});
         } else {
             std::cerr << "[ Compiler Error ] Unsupported assign statement target\n";
         }
@@ -421,7 +581,10 @@ void Compiler::compile(Ad_AST_Node* node) {
 
         compile(w->condition);
         int jmp_not_truthy_pos = emit(opJumpNotTruthy, 1, {9999});
+        bool saved_while_body = compiling_program_direct_statement;
+        compiling_program_direct_statement = false;
         compile(w->consequence);
+        compiling_program_direct_statement = saved_while_body;
         emit(opJump, 1, {loop_stack.back().loop_begin_byte});
 
         int exit_pos = code.instructions.size;
@@ -433,7 +596,10 @@ void Compiler::compile(Ad_AST_Node* node) {
     } else if (node->type == ST_FOR_EXPRESSION) {
         Ad_AST_ForExprssion* f = static_cast<Ad_AST_ForExprssion*>(node);
         if (f->initialization != nullptr) {
+            bool saved_for_init = compiling_program_direct_statement;
+            compiling_program_direct_statement = false;
             compile(f->initialization);
+            compiling_program_direct_statement = saved_for_init;
         }
         LoopCompilation lc;
         lc.is_for = true;
@@ -442,9 +608,21 @@ void Compiler::compile(Ad_AST_Node* node) {
 
         compile(f->condition);
         int jmp_not_truthy_pos = emit(opJumpNotTruthy, 1, {9999});
+        bool saved_for_body = compiling_program_direct_statement;
+        compiling_program_direct_statement = false;
         compile(f->body);
+        compiling_program_direct_statement = saved_for_body;
         int continue_destination = code.instructions.size;
-        compile(f->step);
+        bool saved_for_step = compiling_program_direct_statement;
+        compiling_program_direct_statement = false;
+        if (f->step != nullptr) {
+            compile(f->step);
+            // `EvalForExpression` discards the step result; postfix/prefix ++ leave a value on the stack.
+            if (f->step->type == ST_POSTFIX_INCREMENT || f->step->type == ST_PREFIX_INCREMENT) {
+                emit(opPop, 0, {});
+            }
+        }
+        compiling_program_direct_statement = saved_for_step;
         emit(opJump, 1, {loop_stack.back().loop_begin_byte});
 
         int exit_pos = code.instructions.size;
@@ -688,6 +866,8 @@ Instructions Compiler::leave_scope() {
         instructions.bytes.push_back(code.instructions.bytes[i]);
     }
     instructions.size = static_cast<int>(instructions.bytes.size());
+
+    rebase_jump_operands_in_extracted_chunk(instructions, start);
 
     // Remove this scope's instructions from the outer code (function body lives in constant only)
     if (start < code.instructions.size) {
