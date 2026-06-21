@@ -24,7 +24,8 @@ public:
     VM();
     void load(Bytecode bytecode);
     void printLogs();
-    void run();
+    /// Run until completion. If `max_instructions` is 0, no instruction limit is enforced.
+    void run(uint64_t max_instructions = 0);
     Ad_Object* last_popped_stack_element();
     Frame* current_frame();
     void push_frame(const Frame& f);
@@ -40,6 +41,7 @@ public:
     Ad_Object* build_array(int start_index, int end_index);
     Ad_Object* build_hash(int start_index, int end_index);
     void execute_index_expression(Ad_Object* left, Ad_Object* index);
+    void execute_set_index_expression(Ad_Object* left, Ad_Object* index, Ad_Object* value);
     void execute_array_index(Ad_Object* left, Ad_Object* index);
     void execute_hash_index(Ad_Object* left, Ad_Object* index);
 

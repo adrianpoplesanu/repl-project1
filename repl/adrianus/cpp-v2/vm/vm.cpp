@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <cstdint>
 
 VM::VM() {
     sp = 0;
@@ -50,8 +51,13 @@ void VM::printLogs() {
     write_bytecode_log(last_loaded_bytecode);
 }
 
-void VM::run() {
+void VM::run(uint64_t max_instructions) {
+    uint64_t instructions_executed = 0;
     while (current_frame()->ip < static_cast<int>(current_frame()->instructions()->bytes.size()) - 1) {
+        if (max_instructions != 0 && ++instructions_executed > max_instructions) {
+            std::cerr << "[ VM Error ] instruction budget exceeded (set AD_VM_MAX_INSTRUCTIONS to raise the cap)\n";
+            break;
+        }
         current_frame()->ip += 1;
         int ip = current_frame()->ip;
         Instructions* ins = current_frame()->instructions();
@@ -79,6 +85,16 @@ void VM::run() {
             execute_minus_operator();
         } else if (opcode == OP_POP) {
             pop();
+        } else if (opcode == OP_FILE_STMT_OUTPUT) {
+            if (sp <= 0) {
+                std::cerr << "[ VM Error ] OP_FILE_STMT_OUTPUT: stack underflow\n";
+                continue;
+            }
+            Ad_Object* result = pop();
+            // Match EvalProgram: C++ nullptr returns and void builtins do not print a line.
+            if (result != nullptr && result->Type() != OBJ_SIGNAL && result->Type() != OBJ_NULL) {
+                std::cout << result->Inspect() << "\n";
+            }
         } else if (opcode == OP_TRUE) {
             Ad_Object* obj = native_bool_to_boolean_object(true);
             push(obj);
@@ -175,6 +191,11 @@ void VM::run() {
             Ad_Object* index = pop();
             Ad_Object* left = pop();
             execute_index_expression(left, index);
+        } else if (opcode == OP_SET_INDEX) {
+            Ad_Object* value = pop();
+            Ad_Object* index = pop();
+            Ad_Object* left = pop();
+            execute_set_index_expression(left, index, value);
         } else if (opcode == OP_CLOSURE) {
             int const_index = read_uint16(*ins, ip + 1);
             int num_free = read_uint8(*ins, ip + 3);
@@ -189,12 +210,38 @@ void VM::run() {
                 continue;
             }
 
-            // Free variables are not wired in this VM object model yet.
-            (void)num_free;
-
             auto* closure = new AdClosureObject();
             closure->fn = static_cast<AdCompiledFunction*>(constants[const_index]);
+            closure->free_vars.resize(static_cast<size_t>(num_free));
+            for (int i = num_free - 1; i >= 0; --i) {
+                closure->free_vars[static_cast<size_t>(i)] = pop();
+            }
             push(closure);
+        } else if (opcode == OP_GET_FREE) {
+            int free_index = read_uint8(*ins, ip + 1);
+            current_frame()->ip += 1;
+            Frame* frame = current_frame();
+            if (frame == nullptr || frame->cl == nullptr) {
+                std::cerr << "[ VM Error ] OP_GET_FREE: no active closure frame\n";
+                continue;
+            }
+            if (free_index < 0 || free_index >= static_cast<int>(frame->cl->free_vars.size())) {
+                std::cerr << "[ VM Error ] OP_GET_FREE: index out of bounds: " << free_index << std::endl;
+                continue;
+            }
+            Ad_Object* captured = frame->cl->free_vars[static_cast<size_t>(free_index)];
+            if (captured != nullptr) {
+                push(captured);
+            } else {
+                push(&NULLOBJECT);
+            }
+        } else if (opcode == OP_CURRENT_CLOSURE) {
+            Frame* frame = current_frame();
+            if (frame == nullptr || frame->cl == nullptr) {
+                std::cerr << "[ VM Error ] OP_CURRENT_CLOSURE: no active closure\n";
+                continue;
+            }
+            push(frame->cl);
         } else if (opcode == OP_CALL) {
             int num_args = read_uint8(*ins, ip + 1);
             current_frame()->ip += 1;
@@ -213,7 +260,9 @@ void VM::run() {
             if (sp < 0) {
                 sp = 0;
             }
-            push(&NULLOBJECT);
+            // Match evaluator: implicit `return` / void completion yields a C++ null result, not `&NULLOBJECT`,
+            // so `EvalProgram` does not print a line for plain calls like `permute(0)`.
+            push(nullptr);
             if (frames_index == 0) {
                 break;
             }
@@ -251,9 +300,16 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
         std::cerr << "[ VM Error ] call_closure: null closure or function\n";
         return;
     }
-    if (num_args != cl->fn->num_parameters) {
-        std::cerr << "ERROR: wrong number of arguments expecting: " << cl->fn->num_parameters
-                  << " got: " << num_args << std::endl;
+    const int callee_index = sp - 1 - num_args;
+    if (num_args < cl->fn->num_parameters) {
+        // Match `Evaluator::ApplyFunction` too-few-args path (same error message).
+        sp = callee_index;
+        auto* err = new Ad_Error_Object("some error message here");
+        if (gc != nullptr) {
+            gc->addObject(err);
+        }
+        push(err);
+        return;
     }
     Frame frame(cl, -1, sp - num_args, nullptr);
     push_frame(frame);
@@ -271,7 +327,7 @@ void VM::call_builtin(Ad_Builtin_Object* builtin, int num_args) {
     if (result != nullptr) {
         push(result);
     } else {
-        push(&NULLOBJECT);
+        push(nullptr);
     }
 }
 
@@ -572,6 +628,32 @@ void VM::execute_index_expression(Ad_Object* left, Ad_Object* index) {
         return;
     }
     push(&NULLOBJECT);
+}
+
+void VM::execute_set_index_expression(Ad_Object* left, Ad_Object* index, Ad_Object* value) {
+    if (left == nullptr || index == nullptr) {
+        return;
+    }
+    if (left->Type() == OBJ_LIST && index->Type() == OBJ_INT) {
+        int i = static_cast<Ad_Integer_Object*>(index)->value;
+        auto* list_obj = static_cast<Ad_List_Object*>(left);
+        if (i >= 0 && i < static_cast<int>(list_obj->elements.size())) {
+            list_obj->elements[static_cast<size_t>(i)] = value;
+        }
+        return;
+    }
+    if (left->Type() == OBJ_HASH) {
+        std::hash<std::string> hash_string;
+        auto* hash_obj = static_cast<Ad_Hash_Object*>(left);
+        HashPair hash_pair(index, value);
+        std::string hash_key = std::to_string(hash_string(index->Hash()));
+        auto it = hash_obj->pairs.find(hash_key);
+        if (it == hash_obj->pairs.end()) {
+            hash_obj->pairs.insert(std::make_pair(hash_key, hash_pair));
+        } else {
+            it->second = hash_pair;
+        }
+    }
 }
 
 void VM::execute_array_index(Ad_Object* left, Ad_Object* index) {
