@@ -105,6 +105,8 @@ Code::Code() {
     definitionsMap.insert(std::make_pair(OP_SET_METHOD, new Definition("OpSetMethod", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_GET_PROPERTY, new Definition("OpGetProperty", 0, new int))); // TODO: this should have operands
     definitionsMap.insert(std::make_pair(OP_SET_PROPERTY, new Definition("OpSetProperty", 0, new int))); // TODO: this should have operands
+    definitionsMap.insert(std::make_pair(OP_GET_METHOD, new Definition("OpGetMethod", 0, new int)));
+    definitionsMap.insert(std::make_pair(OP_INVOKE, new Definition("OpInvoke", 1, new int[1] {1})));
     definitionsMap.insert(std::make_pair(OP_SET_PROPERTY_SYM, new Definition("OpSetPropertySym", 1, new int[1] {2}))); // TODO: this might have more operands
     definitionsMap.insert(std::make_pair(OP_GET_PROPERTY_SYM, new Definition("OpGetPropertySym", 1, new int[1] {2}))); // TODO: this might have more operands
     definitionsMap.insert(std::make_pair(OP_PATCH_PROPERTY_SYM, new Definition("OpPatchPropertySym", 1, new int[1] {2}))); // TODO: this might have more operands

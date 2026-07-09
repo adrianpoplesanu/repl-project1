@@ -1,6 +1,7 @@
 #include "gc.h"
 #include "environment.h"
 #include "objects.h"
+#include "vm/objects.h"
 #include "ast.h"
 
 GarbageCollector::GarbageCollector() {
@@ -232,6 +233,46 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
         case OBJ_CONTINUE: {
             obj->marked = true;
+            break;
+        }
+        case OBJ_COMPILED_FUNCTION: {
+            obj->marked = true;
+            break;
+        }
+        case OBJ_CLOSURE: {
+            obj->marked = true;
+            AdClosureObject* closure = static_cast<AdClosureObject*>(obj);
+            markObject(closure->fn);
+            for (Ad_Object* free_var : closure->free_vars) {
+                markObject(free_var);
+            }
+            break;
+        }
+        case OBJ_COMPILED_CLASS: {
+            obj->marked = true;
+            AdCompiledClass* klass = static_cast<AdCompiledClass*>(obj);
+            for (const auto& entry : klass->methods) {
+                markObject(entry.second);
+            }
+            for (AdCompiledFunction* initializer : klass->field_initializers) {
+                markObject(initializer);
+            }
+            break;
+        }
+        case OBJ_COMPILED_INSTANCE: {
+            obj->marked = true;
+            AdCompiledInstance* instance = static_cast<AdCompiledInstance*>(obj);
+            markObject(instance->klass);
+            for (Ad_Object* field : instance->fields) {
+                markObject(field);
+            }
+            break;
+        }
+        case OBJ_BOUND_METHOD: {
+            obj->marked = true;
+            AdBoundMethod* bound = static_cast<AdBoundMethod*>(obj);
+            markObject(bound->owner);
+            markObject(bound->bound_method);
             break;
         }
 

@@ -86,6 +86,30 @@ std::vector<unsigned char> make_call_instruction(int num_args) {
     return instruction;
 }
 
+std::vector<unsigned char> make_get_property_sym_instruction(int sym_index) {
+    std::vector<unsigned char> instruction;
+    instruction.push_back(OP_GET_PROPERTY_SYM);
+    auto operand = encode_uint16(sym_index);
+    instruction.insert(instruction.end(), operand.begin(), operand.end());
+    return instruction;
+}
+
+std::vector<unsigned char> make_patch_property_sym_instruction(int sym_index) {
+    std::vector<unsigned char> instruction;
+    instruction.push_back(OP_PATCH_PROPERTY_SYM);
+    auto operand = encode_uint16(sym_index);
+    instruction.insert(instruction.end(), operand.begin(), operand.end());
+    return instruction;
+}
+
+std::vector<unsigned char> make_get_property_instruction() {
+    return {OP_GET_PROPERTY};
+}
+
+std::vector<unsigned char> make_set_property_instruction() {
+    return {OP_SET_PROPERTY};
+}
+
 // Minimal program so VM::run() executes at least one instruction (see loop condition ip < size - 1)
 Bytecode make_minimal_runnable_bytecode() {
     std::vector<unsigned char> ins = {OP_NULL, OP_NULL};
@@ -1346,8 +1370,227 @@ void test_vm_op_return_via_closure_bytecode() {
     std::cout << "✓ VM OP_RETURN via closure bytecode test passed\n";
 }
 
+void test_vm_op_patch_and_get_property_sym_in_bound_method() {
+    std::cout << "running test_vm_op_patch_and_get_property_sym_in_bound_method...\n";
+
+    auto* klass = new AdCompiledClass();
+    auto* instance = new AdCompiledInstance();
+    instance->klass = klass;
+
+    Ad_Integer_Object* forty_two = new Ad_Integer_Object(42);
+    Ad_String_Object* field_name = new Ad_String_Object("x");
+
+    auto* innerFn = new AdCompiledFunction();
+    innerFn->num_parameters = 0;
+    innerFn->num_locals = 0;
+    auto* innerIns = new Instructions();
+    std::vector<unsigned char> inner_bytes;
+    auto c42 = make_constant_instruction(0);
+    inner_bytes.insert(inner_bytes.end(), c42.begin(), c42.end());
+    auto cname = make_constant_instruction(1);
+    inner_bytes.insert(inner_bytes.end(), cname.begin(), cname.end());
+    auto patch0 = make_patch_property_sym_instruction(0);
+    inner_bytes.insert(inner_bytes.end(), patch0.begin(), patch0.end());
+    auto cname2 = make_constant_instruction(1);
+    inner_bytes.insert(inner_bytes.end(), cname2.begin(), cname2.end());
+    auto get0 = make_get_property_sym_instruction(0);
+    inner_bytes.insert(inner_bytes.end(), get0.begin(), get0.end());
+    inner_bytes.push_back(OP_RETURN_VALUE);
+    innerIns->bytes = inner_bytes;
+    innerIns->size = static_cast<int>(inner_bytes.size());
+    innerFn->instructions = innerIns;
+
+    auto* closure = new AdClosureObject();
+    closure->fn = innerFn;
+    auto* bound = new AdBoundMethod(instance, closure);
+
+    std::vector<Ad_Object*> constants = {forty_two, field_name, bound};
+
+    std::vector<unsigned char> instructions;
+    auto cbound = make_constant_instruction(2);
+    instructions.insert(instructions.end(), cbound.begin(), cbound.end());
+    auto call0 = make_call_instruction(0);
+    instructions.insert(instructions.end(), call0.begin(), call0.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.frames_index == 1);
+    assert(vm.sp == 1);
+    assert(vm.stack[0] != nullptr);
+    assert(vm.stack[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 42);
+    assert(instance->fields.size() == 1);
+    assert(instance->fields[0] == forty_two);
+    assert(klass->field_name_to_index["x"] == 0);
+
+    std::cout << "✓ VM OP_PATCH/GET_PROPERTY_SYM in bound method test passed\n";
+}
+
+void test_vm_op_set_and_get_property_external() {
+    std::cout << "running test_vm_op_set_and_get_property_external...\n";
+
+    auto* klass = new AdCompiledClass();
+    auto* instance = new AdCompiledInstance();
+    instance->klass = klass;
+
+    Ad_Integer_Object* ninety_nine = new Ad_Integer_Object(99);
+    Ad_String_Object* field_name = new Ad_String_Object("count");
+
+    std::vector<Ad_Object*> constants = {instance, ninety_nine, field_name, field_name};
+
+    std::vector<unsigned char> instructions;
+    auto c0 = make_constant_instruction(0);
+    instructions.insert(instructions.end(), c0.begin(), c0.end());
+    auto c1 = make_constant_instruction(1);
+    instructions.insert(instructions.end(), c1.begin(), c1.end());
+    auto c2 = make_constant_instruction(2);
+    instructions.insert(instructions.end(), c2.begin(), c2.end());
+    instructions.push_back(OP_SET_PROPERTY);
+    auto c0b = make_constant_instruction(0);
+    instructions.insert(instructions.end(), c0b.begin(), c0b.end());
+    auto c3 = make_constant_instruction(3);
+    instructions.insert(instructions.end(), c3.begin(), c3.end());
+    instructions.push_back(OP_GET_PROPERTY);
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.sp == 1);
+    assert(vm.stack[0] != nullptr);
+    assert(vm.stack[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 99);
+    assert(instance->fields.size() == 1);
+    assert(instance->fields[0] == ninety_nine);
+    assert(klass->field_name_to_index["count"] == 0);
+
+    std::cout << "✓ VM OP_SET/GET_PROPERTY external access test passed\n";
+}
+
+void test_vm_op_get_property_sym_missing_field_returns_null() {
+    std::cout << "running test_vm_op_get_property_sym_missing_field_returns_null...\n";
+
+    auto* klass = new AdCompiledClass();
+    auto* instance = new AdCompiledInstance();
+    instance->klass = klass;
+
+    Ad_String_Object* field_name = new Ad_String_Object("missing");
+
+    auto* innerFn = new AdCompiledFunction();
+    innerFn->num_parameters = 0;
+    innerFn->num_locals = 0;
+    auto* innerIns = new Instructions();
+    std::vector<unsigned char> inner_bytes;
+    auto cname = make_constant_instruction(0);
+    inner_bytes.insert(inner_bytes.end(), cname.begin(), cname.end());
+    auto get0 = make_get_property_sym_instruction(0);
+    inner_bytes.insert(inner_bytes.end(), get0.begin(), get0.end());
+    inner_bytes.push_back(OP_RETURN_VALUE);
+    innerIns->bytes = inner_bytes;
+    innerIns->size = static_cast<int>(inner_bytes.size());
+    innerFn->instructions = innerIns;
+
+    auto* closure = new AdClosureObject();
+    closure->fn = innerFn;
+    auto* bound = new AdBoundMethod(instance, closure);
+
+    std::vector<Ad_Object*> constants = {field_name, bound};
+    std::vector<unsigned char> instructions;
+    auto cbound = make_constant_instruction(1);
+    instructions.insert(instructions.end(), cbound.begin(), cbound.end());
+    auto call0 = make_call_instruction(0);
+    instructions.insert(instructions.end(), call0.begin(), call0.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.frames_index == 1);
+    assert(vm.sp == 1);
+    assert(vm.stack[0] == &NULLOBJECT);
+
+    std::cout << "✓ VM OP_GET_PROPERTY_SYM missing field returns null test passed\n";
+}
+
+void test_vm_bound_instance_propagates_through_nested_closure() {
+    std::cout << "running test_vm_bound_instance_propagates_through_nested_closure...\n";
+
+    auto* klass = new AdCompiledClass();
+    auto* instance = new AdCompiledInstance();
+    instance->klass = klass;
+    instance->fields = {new Ad_Integer_Object(7)};
+
+    Ad_String_Object* field_name = new Ad_String_Object("x");
+
+    auto* leafFn = new AdCompiledFunction();
+    leafFn->num_parameters = 0;
+    leafFn->num_locals = 0;
+    auto* leafIns = new Instructions();
+    std::vector<unsigned char> leaf_bytes;
+    auto cname = make_constant_instruction(0);
+    leaf_bytes.insert(leaf_bytes.end(), cname.begin(), cname.end());
+    auto get0 = make_get_property_sym_instruction(0);
+    leaf_bytes.insert(leaf_bytes.end(), get0.begin(), get0.end());
+    leaf_bytes.push_back(OP_RETURN_VALUE);
+    leafIns->bytes = leaf_bytes;
+    leafIns->size = static_cast<int>(leaf_bytes.size());
+    leafFn->instructions = leafIns;
+
+    auto* leafClosure = new AdClosureObject();
+    leafClosure->fn = leafFn;
+
+    auto* outerFn = new AdCompiledFunction();
+    outerFn->num_parameters = 0;
+    outerFn->num_locals = 1;
+    auto* outerIns = new Instructions();
+    std::vector<unsigned char> outer_bytes;
+    auto cclosure = make_constant_instruction(1);
+    outer_bytes.insert(outer_bytes.end(), cclosure.begin(), cclosure.end());
+    auto call0 = make_call_instruction(0);
+    outer_bytes.insert(outer_bytes.end(), call0.begin(), call0.end());
+    outer_bytes.push_back(OP_RETURN_VALUE);
+    outerIns->bytes = outer_bytes;
+    outerIns->size = static_cast<int>(outer_bytes.size());
+    outerFn->instructions = outerIns;
+
+    auto* outerClosure = new AdClosureObject();
+    outerClosure->fn = outerFn;
+
+    auto* bound = new AdBoundMethod(instance, outerClosure);
+
+    std::vector<Ad_Object*> constants = {field_name, leafClosure, outerClosure, bound};
+    std::vector<unsigned char> instructions;
+    auto cbound = make_constant_instruction(3);
+    instructions.insert(instructions.end(), cbound.begin(), cbound.end());
+    auto main_call0 = make_call_instruction(0);
+    instructions.insert(instructions.end(), main_call0.begin(), main_call0.end());
+
+    VM vm;
+    vm.load(make_bytecode(instructions, constants));
+    vm.run();
+
+    assert(vm.frames_index == 1);
+    assert(vm.sp == 1);
+    assert(vm.stack[0] != nullptr);
+    assert(vm.stack[0]->Type() == OBJ_INT);
+    assert(static_cast<Ad_Integer_Object*>(vm.stack[0])->value == 7);
+
+    std::cout << "✓ VM bound_instance propagates through nested closure test passed\n";
+}
+
 void run_all_vm_tests() {
     std::cout << "=== Running VM tests ===\n";
+
+#if defined(RUN_M0_PROPERTY_TESTS_ONLY)
+    test_vm_op_patch_and_get_property_sym_in_bound_method();
+    test_vm_op_set_and_get_property_external();
+    test_vm_op_get_property_sym_missing_field_returns_null();
+    test_vm_bound_instance_propagates_through_nested_closure();
+    std::cout << "=== Milestone 0 property tests passed! ===\n\n";
+    return;
+#endif
 
     test_vm_constructor();
     test_vm_load();
@@ -1402,6 +1645,10 @@ void run_all_vm_tests() {
     test_vm_execute_call_invalid_callee();
     test_vm_op_return_value_via_closure_bytecode();
     test_vm_op_return_via_closure_bytecode();
+    test_vm_op_patch_and_get_property_sym_in_bound_method();
+    test_vm_op_set_and_get_property_external();
+    test_vm_op_get_property_sym_missing_field_returns_null();
+    test_vm_bound_instance_propagates_through_nested_closure();
 
     std::cout << "=== All VM tests passed! ===\n\n";
 }

@@ -26,6 +26,9 @@ public:
     void printLogs();
     /// Run until completion. If `max_instructions` is 0, no instruction limit is enforced.
     void run(uint64_t max_instructions = 0);
+    /// Run instructions until `frames_index` is at most `target_frames_index`.
+    void run_until_frames_index(int target_frames_index, uint64_t max_instructions = 0);
+    bool execute_instruction();
     Ad_Object* last_popped_stack_element();
     Frame* current_frame();
     void push_frame(const Frame& f);
@@ -50,6 +53,17 @@ public:
     void call_builtin(Ad_Builtin_Object* builtin, int num_args);
     void call_class(AdCompiledClass* cl, int num_args);
     void call_bound_method(AdBoundMethod* bm, int num_args);
+
+    AdCompiledInstance* current_bound_instance();
+    void ensure_instance_field_capacity(AdCompiledInstance* inst, int index);
+    void register_instance_field_name(AdCompiledInstance* inst, const std::string& name, int index);
+    int lookup_instance_field_index(AdCompiledInstance* inst, const std::string& name);
+    void execute_get_property_sym(int sym_index);
+    void execute_patch_property_sym(int sym_index);
+    void execute_get_property();
+    void execute_set_property();
+    void execute_get_method();
+    void execute_set_method();
 };
 
 #endif

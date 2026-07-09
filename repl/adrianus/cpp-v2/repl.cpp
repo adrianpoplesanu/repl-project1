@@ -168,6 +168,18 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
 
         garbageCollector->unmarkAllObjects();
         garbageCollector->markObjects(vm.stack, vm.sp);
+        if (vm.globals.size() > 0) {
+            for (Ad_Object* global_obj : vm.globals) {
+                if (global_obj != nullptr) {
+                    garbageCollector->markObject(global_obj);
+                }
+            }
+        }
+        for (Ad_Object* constant : vm.constants) {
+            if (constant != nullptr) {
+                garbageCollector->markObject(constant);
+            }
+        }
         garbageCollector->sweepObjects();
         // Program output matches `Evaluator::EvalProgram` via OP_FILE_STMT_OUTPUT opcodes.
     } else {

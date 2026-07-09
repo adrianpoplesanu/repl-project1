@@ -1,0 +1,10 @@
+class Box {
+    size = 0
+
+    def constructor(n) {
+        size = n
+    }
+}
+
+b = Box(5)
+println(b.size)

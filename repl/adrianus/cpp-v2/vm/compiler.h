@@ -77,6 +77,11 @@ public:
     // Symbol loading
     void load_symbol(const Symbol& symbol, const std::string& field_name = "");
 
+    bool in_class_scope() const;
+    void compile_class_statement(Ad_AST_Class* class_node);
+    AdCompiledFunction* compile_class_field_initializer(Ad_AST_AssignStatement* assign_stmt);
+    AdClosureObject* compile_class_method(Ad_AST_Def_Statement* def_stmt);
+
 };
 
 #endif

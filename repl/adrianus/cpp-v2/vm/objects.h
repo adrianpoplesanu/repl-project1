@@ -41,9 +41,12 @@ class AdCompiledClass : public Ad_Object {
 public:
     std::unordered_map<std::string, AdClosureObject*> methods;
     std::vector<AdCompiledFunction*> field_initializers;
+    /// Maps field name → slot index in `AdCompiledInstance::fields`.
+    std::unordered_map<std::string, int> field_name_to_index;
 
     AdCompiledClass();
     std::string Inspect() override;
+    std::string repr() override;
 	void Print() override;
 	Ad_Object_Type Type() override;
 	std::string Hash() override;
@@ -54,9 +57,12 @@ class AdCompiledInstance : public Ad_Object {
 public:
     AdCompiledClass* klass;
     int definition_num_args;
+    /// Instance field slots; index matches class-scope symbol index.
+    std::vector<Ad_Object*> fields;
 
     AdCompiledInstance();
     std::string Inspect() override;
+    std::string repr() override;
 	void Print() override;
 	Ad_Object_Type Type() override;
 	std::string Hash() override;

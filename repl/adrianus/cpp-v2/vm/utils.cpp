@@ -151,6 +151,8 @@ static std::map<unsigned char, Definition*>& get_definitions_map() {
         definitions_map[OP_SET_METHOD] = new Definition("OpSetMethod", 0, new int);
         definitions_map[OP_GET_PROPERTY] = new Definition("OpGetProperty", 0, new int);
         definitions_map[OP_SET_PROPERTY] = new Definition("OpSetProperty", 0, new int);
+        definitions_map[OP_GET_METHOD] = new Definition("OpGetMethod", 0, new int);
+        definitions_map[OP_INVOKE] = new Definition("OpInvoke", 1, new int[1] {1});
         definitions_map[OP_SET_PROPERTY_SYM] = new Definition("OpSetPropertySym", 1, new int[1] {2});
         definitions_map[OP_GET_PROPERTY_SYM] = new Definition("OpGetPropertySym", 1, new int[1] {2});
         definitions_map[OP_PATCH_PROPERTY_SYM] = new Definition("OpPatchPropertySym", 1, new int[1] {2});

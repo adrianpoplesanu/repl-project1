@@ -97,8 +97,19 @@ Compiler::~Compiler() {
 void Compiler::reset() {
     instructions = Instructions();
     bytecode = Bytecode();
+    code.instructions = Instructions();
+    constants.clear();
     loop_stack.clear();
     compiling_program_direct_statement = false;
+    scopes = {CompilationScope(code.instructions)};
+    scopeIndex = 0;
+    while (symbol_table != nullptr) {
+        SymbolTable* outer = symbol_table->outer;
+        delete symbol_table;
+        symbol_table = outer;
+    }
+    symbol_table = new_symbol_table();
+    vm_register_builtin_symbols(symbol_table);
 }
 
 void Compiler::emitLoopBreak() {
@@ -139,6 +150,8 @@ void Compiler::compile(Ad_AST_Node* node) {
         if (expr_stmt->expression != nullptr) {
             if (expr_stmt->expression->type == ST_DEF_STATEMENT) {
                 // hmmm, dupa multe cautari am gasit fixul asta, ce ciudat mi se pare
+                compile(expr_stmt->expression);
+            } else if (expr_stmt->expression->type == ST_CLASS_STATEMENT) {
                 compile(expr_stmt->expression);
             } else if (expr_stmt->expression->type == ST_ASSIGN_STATEMENT) {
                 compile(expr_stmt->expression);
@@ -381,13 +394,17 @@ void Compiler::compile(Ad_AST_Node* node) {
                 if (existing->scope == SymbolScope::GLOBAL) {
                     emit(opSetGlobal, 1, {existing->index});
                 } else if (existing->scope == SymbolScope::LOCAL) {
-                    if (scopes[scopeIndex].compilationType == "class") {
+                    if (in_class_scope()) {
                         Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
                         emit(opConstant, 1, {addConstant(field_name)});
                         emit(opPatchPropertySym, 1, {existing->index});
                     } else {
                         emit(opSetLocal, 1, {existing->index});
                     }
+                } else if (existing->scope == SymbolScope::CLASS) {
+                    Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
+                    emit(opConstant, 1, {addConstant(field_name)});
+                    emit(opPatchPropertySym, 1, {existing->index});
                 } else if (existing->scope == SymbolScope::FREE) {
                     std::cerr << "[ Compiler Error ] assignment to captured variables (free) is not supported yet\n";
                     return;
@@ -399,18 +416,16 @@ void Compiler::compile(Ad_AST_Node* node) {
                     return;
                 }
             } else {
-                Symbol symbol = symbol_table->define(name_id->value);
+                Symbol symbol = symbol_table->define(name_id->value, in_class_scope());
                 compile(assign_stmt->value);
                 if (symbol.scope == SymbolScope::GLOBAL) {
                     emit(opSetGlobal, 1, {symbol.index});
+                } else if (symbol.scope == SymbolScope::CLASS || in_class_scope()) {
+                    Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
+                    emit(opConstant, 1, {addConstant(field_name)});
+                    emit(opPatchPropertySym, 1, {symbol.index});
                 } else {
-                    if (scopes[scopeIndex].compilationType == "class") {
-                        Ad_String_Object* field_name = new Ad_String_Object(name_id->value);
-                        emit(opConstant, 1, {addConstant(field_name)});
-                        emit(opPatchPropertySym, 1, {symbol.index});
-                    } else {
-                        emit(opSetLocal, 1, {symbol.index});
-                    }
+                    emit(opSetLocal, 1, {symbol.index});
                 }
             }
         } else if (assign_stmt->name->type == ST_INDEX_EXPRESSION) {
@@ -427,14 +442,14 @@ void Compiler::compile(Ad_AST_Node* node) {
         Symbol* symbol = symbol_table->resolve(identifier_node->value);
         if (symbol != nullptr) {
             load_symbol(*symbol, identifier_node->value);
-        } else {
-            // Handle implicit 'this' property access
+        } else if (in_class_scope()) {
+            // Implicit instance field access inside class bodies / methods.
             Ad_String_Object* field = new Ad_String_Object(identifier_node->value);
-            std::vector<int> args;
             int const_index = addConstant(field);
-            args.push_back(const_index);
-            emit(opConstant, 1, args);
+            emit(opConstant, 1, {const_index});
             emit(opGetPropertySym, 1, {0});
+        } else {
+            std::cerr << "[ Compiler Error ] undefined identifier: " << identifier_node->value << "\n";
         }
     } else if (node->type == ST_STRING_LITERAL) {
         Ad_AST_String* string_node = (Ad_AST_String*)node;
@@ -512,6 +527,26 @@ void Compiler::compile(Ad_AST_Node* node) {
         emit(opClosure, 2, args);
     } else if (node->type == ST_CALL_EXPRESSION) {
         Ad_AST_CallExpression* call_expr = (Ad_AST_CallExpression*)node;
+        if (call_expr->function != nullptr && call_expr->function->type == ST_MEMBER_ACCESS) {
+            auto* member_access = static_cast<Ad_AST_MemberAccess*>(call_expr->function);
+            if (member_access->is_method) {
+                compile(member_access->owner);
+                std::string member_name;
+                if (member_access->member->type == ST_IDENTIFIER) {
+                    member_name = static_cast<Ad_AST_Identifier*>(member_access->member)->value;
+                } else {
+                    member_name = member_access->member->TokenLiteral();
+                }
+                Ad_String_Object* method_name = new Ad_String_Object(member_name);
+                emit(opConstant, 1, {addConstant(method_name)});
+                emit(opGetMethod, 0, {});
+                for (Ad_AST_Node* argument : call_expr->arguments) {
+                    compile(argument);
+                }
+                emit(opCall, 1, {static_cast<int>(call_expr->arguments.size())});
+                return;
+            }
+        }
         compile(call_expr->function);
         for (Ad_AST_Node* argument : call_expr->arguments) {
             compile(argument);
@@ -682,6 +717,31 @@ void Compiler::compile(Ad_AST_Node* node) {
     } else if (node->type == ST_COMMENT) {
         // Comments do not emit bytecode.
         return;
+    } else if (node->type == ST_CLASS_STATEMENT) {
+        compile_class_statement(static_cast<Ad_AST_Class*>(node));
+    } else if (node->type == ST_MEMBER_ACCESS) {
+        auto* member_access = static_cast<Ad_AST_MemberAccess*>(node);
+        std::string member_name;
+        if (member_access->member->type == ST_IDENTIFIER) {
+            member_name = static_cast<Ad_AST_Identifier*>(member_access->member)->value;
+        } else {
+            member_name = member_access->member->TokenLiteral();
+        }
+        if (member_access->is_method) {
+            compile(member_access->owner);
+            Ad_String_Object* method_name = new Ad_String_Object(member_name);
+            emit(opConstant, 1, {addConstant(method_name)});
+            emit(opGetMethod, 0, {});
+            for (Ad_AST_Node* argument : member_access->arguments) {
+                compile(argument);
+            }
+            emit(opCall, 1, {static_cast<int>(member_access->arguments.size())});
+            return;
+        }
+        compile(member_access->owner);
+        Ad_String_Object* field = new Ad_String_Object(member_name);
+        emit(opConstant, 1, {addConstant(field)});
+        emit(opGetProperty, 0, {});
     }
     // TODO: add support for other statement types
 }
@@ -920,6 +980,164 @@ void Compiler::load_symbol(const Symbol& symbol, const std::string& field_name) 
         emit(opGetPropertySym, 1, {symbol.index});
     } else if (symbol.scope == SymbolScope::FUNCTION) {
         emit(opCurrentClosure, 0, {});
+    }
+}
+
+namespace {
+
+Ad_AST_AssignStatement* class_attribute_as_assign(Ad_AST_Node* attr) {
+    if (attr == nullptr) {
+        return nullptr;
+    }
+    if (attr->type == ST_ASSIGN_STATEMENT) {
+        return static_cast<Ad_AST_AssignStatement*>(attr);
+    }
+    if (attr->type == ST_EXPRESSION_STATEMENT) {
+        auto* expr_stmt = static_cast<Ad_AST_ExpressionStatement*>(attr);
+        if (expr_stmt->expression != nullptr && expr_stmt->expression->type == ST_ASSIGN_STATEMENT) {
+            return static_cast<Ad_AST_AssignStatement*>(expr_stmt->expression);
+        }
+    }
+    return nullptr;
+}
+
+std::string assign_field_name(Ad_AST_AssignStatement* assign_stmt) {
+    if (assign_stmt == nullptr || assign_stmt->name == nullptr) {
+        return "";
+    }
+    if (assign_stmt->name->type == ST_IDENTIFIER) {
+        return static_cast<Ad_AST_Identifier*>(assign_stmt->name)->value;
+    }
+    return assign_stmt->name->TokenLiteral();
+}
+
+} // namespace
+
+bool Compiler::in_class_scope() const {
+    return scopeIndex >= 0 && scopeIndex < static_cast<int>(scopes.size()) &&
+           scopes[scopeIndex].compilationType == "class";
+}
+
+AdCompiledFunction* Compiler::compile_class_field_initializer(Ad_AST_AssignStatement* assign_stmt) {
+    const std::string field_name = assign_field_name(assign_stmt);
+    Symbol* field_sym = symbol_table->resolve(field_name);
+    if (field_sym == nullptr) {
+        std::cerr << "[ Compiler Error ] unknown class field in initializer: " << field_name << "\n";
+        return nullptr;
+    }
+
+    enter_scope();
+    compile(assign_stmt->value);
+    Ad_String_Object* field_name_obj = new Ad_String_Object(field_name);
+    emit(opConstant, 1, {addConstant(field_name_obj)});
+    emit(opPatchPropertySym, 1, {field_sym->index});
+    emit(opReturn, 0, {});
+
+    int num_locals = symbol_table->num_definitions;
+    Instructions instructions = leave_scope();
+
+    auto* compiled_func = new AdCompiledFunction();
+    compiled_func->instructions = new Instructions();
+    compiled_func->instructions->bytes = instructions.bytes;
+    compiled_func->instructions->size = instructions.size;
+    compiled_func->num_locals = num_locals;
+    compiled_func->num_parameters = 0;
+    return compiled_func;
+}
+
+AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) {
+    if (def_stmt->name == nullptr || def_stmt->name->type != ST_IDENTIFIER) {
+        std::cerr << "[ Compiler Error ] invalid class method name\n";
+        return nullptr;
+    }
+
+    enter_scope();
+    for (Ad_AST_Node* p : def_stmt->parameters) {
+        auto* param = static_cast<Ad_AST_Identifier*>(p);
+        symbol_table->define(param->value);
+    }
+    compile(def_stmt->body);
+    if (lastInstructionIs(opPop)) {
+        replaceLastPopWithReturn();
+    }
+    if (!lastInstructionIs(opReturnValue)) {
+        emit(opReturn, 0, {});
+    }
+
+    int num_locals = symbol_table->num_definitions;
+    Instructions instructions = leave_scope();
+
+    auto* compiled_func = new AdCompiledFunction();
+    compiled_func->instructions = new Instructions();
+    compiled_func->instructions->bytes = instructions.bytes;
+    compiled_func->instructions->size = instructions.size;
+    compiled_func->num_locals = num_locals;
+    compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+
+    auto* closure = new AdClosureObject();
+    closure->fn = compiled_func;
+    return closure;
+}
+
+void Compiler::compile_class_statement(Ad_AST_Class* class_node) {
+    if (class_node == nullptr || class_node->name == nullptr ||
+        class_node->name->type != ST_IDENTIFIER) {
+        std::cerr << "[ Compiler Error ] invalid class statement\n";
+        return;
+    }
+
+    auto* class_ident = static_cast<Ad_AST_Identifier*>(class_node->name);
+    Symbol class_sym = symbol_table->define(class_ident->value);
+
+    auto* klass = new AdCompiledClass();
+    enter_scope_class();
+
+    for (Ad_AST_Node* attr : class_node->attributes) {
+        Ad_AST_AssignStatement* assign_stmt = class_attribute_as_assign(attr);
+        if (assign_stmt == nullptr) {
+            continue;
+        }
+        const std::string field_name = assign_field_name(assign_stmt);
+        if (field_name.empty()) {
+            continue;
+        }
+        Symbol field_sym = symbol_table->define(field_name, true);
+        klass->field_name_to_index[field_name] = field_sym.index;
+    }
+
+    for (Ad_AST_Node* attr : class_node->attributes) {
+        Ad_AST_AssignStatement* assign_stmt = class_attribute_as_assign(attr);
+        if (assign_stmt == nullptr) {
+            continue;
+        }
+        AdCompiledFunction* initializer = compile_class_field_initializer(assign_stmt);
+        if (initializer != nullptr) {
+            klass->field_initializers.push_back(initializer);
+        }
+    }
+
+    for (Ad_AST_Node* method_node : class_node->methods) {
+        if (method_node == nullptr || method_node->type != ST_DEF_STATEMENT) {
+            continue;
+        }
+        auto* def_stmt = static_cast<Ad_AST_Def_Statement*>(method_node);
+        if (def_stmt->name == nullptr || def_stmt->name->type != ST_IDENTIFIER) {
+            continue;
+        }
+        auto* method_ident = static_cast<Ad_AST_Identifier*>(def_stmt->name);
+        AdClosureObject* method_closure = compile_class_method(def_stmt);
+        if (method_closure != nullptr) {
+            klass->methods[method_ident->value] = method_closure;
+        }
+    }
+
+    leave_scope();
+
+    emit(opConstant, 1, {addConstant(klass)});
+    if (class_sym.scope == SymbolScope::GLOBAL) {
+        emit(opSetGlobal, 1, {class_sym.index});
+    } else {
+        emit(opSetLocal, 1, {class_sym.index});
     }
 }
 

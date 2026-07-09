@@ -25,6 +25,7 @@ void VM::load(Bytecode bytecode) {
 
     // Store constants from bytecode
     constants = bytecode.constants;
+    globals.clear();
     
     // Create an AdCompiledFunction with the instructions
     AdCompiledFunction* compiledFn = new AdCompiledFunction();
@@ -51,165 +52,139 @@ void VM::printLogs() {
     write_bytecode_log(last_loaded_bytecode);
 }
 
-void VM::run(uint64_t max_instructions) {
-    uint64_t instructions_executed = 0;
-    while (current_frame()->ip < static_cast<int>(current_frame()->instructions()->bytes.size()) - 1) {
-        if (max_instructions != 0 && ++instructions_executed > max_instructions) {
-            std::cerr << "[ VM Error ] instruction budget exceeded (set AD_VM_MAX_INSTRUCTIONS to raise the cap)\n";
-            break;
+bool VM::execute_instruction() {
+    Frame* frame = current_frame();
+    if (frame == nullptr) {
+        return false;
+    }
+    if (frame->ip >= static_cast<int>(frame->instructions()->bytes.size()) - 1) {
+        return false;
+    }
+
+    frame->ip += 1;
+    int ip = frame->ip;
+    Instructions* ins = frame->instructions();
+
+    if (ip < 0 || ip >= static_cast<int>(ins->bytes.size())) {
+        return false;
+    }
+
+    OpCodeType opcode = static_cast<OpCodeType>(ins->bytes[ip]);
+
+    if (opcode == OP_CONSTANT) {
+        int const_index = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        if (const_index >= 0 && const_index < static_cast<int>(constants.size())) {
+            push(constants[const_index]);
         }
-        current_frame()->ip += 1;
-        int ip = current_frame()->ip;
-        Instructions* ins = current_frame()->instructions();
-        
-        if (ip < 0 || ip >= static_cast<int>(ins->bytes.size())) {
-            break;
-        }
-        
-        OpCodeType opcode = static_cast<OpCodeType>(ins->bytes[ip]);
-        
-        if (opcode == OP_CONSTANT) {
-            int const_index = read_uint16(*ins, ip + 1);
-            current_frame()->ip += 2;
-            if (const_index >= 0 && const_index < static_cast<int>(constants.size())) {
-                push(constants[const_index]);
-            }
-        } else if (opcode == OP_ADD || opcode == OP_SUB || opcode == OP_MULTIPLY || opcode == OP_DIVIDE) {
-            execute_binary_operation(opcode);
-        } else if (opcode == OP_EQUAL || opcode == OP_NOTEQUAL ||
-                   opcode == OP_GREATERTHAN || opcode == OP_GREATERTHAN_EQUAL) {
-            execute_comparison(opcode);
-        } else if (opcode == OP_BANG) {
-            execute_bang_operator();
-        } else if (opcode == OP_MINUS) {
-            execute_minus_operator();
-        } else if (opcode == OP_POP) {
-            pop();
-        } else if (opcode == OP_FILE_STMT_OUTPUT) {
-            if (sp <= 0) {
-                std::cerr << "[ VM Error ] OP_FILE_STMT_OUTPUT: stack underflow\n";
-                continue;
-            }
+    } else if (opcode == OP_ADD || opcode == OP_SUB || opcode == OP_MULTIPLY || opcode == OP_DIVIDE) {
+        execute_binary_operation(opcode);
+    } else if (opcode == OP_EQUAL || opcode == OP_NOTEQUAL ||
+               opcode == OP_GREATERTHAN || opcode == OP_GREATERTHAN_EQUAL) {
+        execute_comparison(opcode);
+    } else if (opcode == OP_BANG) {
+        execute_bang_operator();
+    } else if (opcode == OP_MINUS) {
+        execute_minus_operator();
+    } else if (opcode == OP_POP) {
+        pop();
+    } else if (opcode == OP_FILE_STMT_OUTPUT) {
+        if (sp <= 0) {
+            std::cerr << "[ VM Error ] OP_FILE_STMT_OUTPUT: stack underflow\n";
+        } else {
             Ad_Object* result = pop();
-            // Match EvalProgram: C++ nullptr returns and void builtins do not print a line.
             if (result != nullptr && result->Type() != OBJ_SIGNAL && result->Type() != OBJ_NULL) {
                 std::cout << result->Inspect() << "\n";
             }
-        } else if (opcode == OP_TRUE) {
-            Ad_Object* obj = native_bool_to_boolean_object(true);
-            push(obj);
-        } else if (opcode == OP_FALSE) {
-            Ad_Object* obj = native_bool_to_boolean_object(false);
-            push(obj);
-        } else if (opcode == OP_POP) {
-            pop();
-        } else if (opcode == OP_JUMP) {
-            int pos = read_uint16(*ins, ip + 1);
-            current_frame()->ip = pos - 1;
-        } else if (opcode == OP_JUMP_NOT_TRUTHY) {
-            int pos = read_uint16(*ins, ip + 1);
-            current_frame()->ip += 2;
-
-            Ad_Object* condition = pop();
-            if (!is_truthy(condition)) {
-                current_frame()->ip = pos - 1;
-            }
-        } else if (opcode == OP_NULL) {
-            push(&NULLOBJECT);
-        } else if (opcode == OP_SET_GLOBAL) {
-            int global_index = read_uint16(*ins, ip + 1);
-            current_frame()->ip += 2;
-
-            // Ensure globals vector is large enough
-            if (global_index >= static_cast<int>(globals.size())) {
-                globals.resize(global_index + 1, nullptr);
-            }
-            globals[global_index] = pop();
-        } else if (opcode == OP_GET_GLOBAL) {
-            int global_index = read_uint16(*ins, ip + 1);
-            current_frame()->ip += 2;
-
-            if (global_index >= 0 && global_index < static_cast<int>(globals.size())) {
-                push(globals[global_index]);
-            } else {
-                std::cerr << "[ VM Error ] Global index out of bounds: " << global_index << std::endl;
-            }
-        } else if (opcode == OP_SET_LOCAL) {
-            int local_index = read_uint8(*ins, ip + 1);
-            current_frame()->ip += 1;
-
-            Frame* frame = current_frame();
-            if (frame == nullptr) {
-                std::cerr << "[ VM Error ] OP_SET_LOCAL: no current frame" << std::endl;
-                continue;
-            }
-            int slot = frame->base_pointer + local_index;
-            if (slot < 0 || slot >= stackSize) {
-                std::cerr << "[ VM Error ] OP_SET_LOCAL: local slot out of bounds: " << slot << std::endl;
-                continue;
-            }
+        }
+    } else if (opcode == OP_TRUE) {
+        push(native_bool_to_boolean_object(true));
+    } else if (opcode == OP_FALSE) {
+        push(native_bool_to_boolean_object(false));
+    } else if (opcode == OP_JUMP) {
+        int pos = read_uint16(*ins, ip + 1);
+        frame->ip = pos - 1;
+    } else if (opcode == OP_JUMP_NOT_TRUTHY) {
+        int pos = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        Ad_Object* condition = pop();
+        if (!is_truthy(condition)) {
+            frame->ip = pos - 1;
+        }
+    } else if (opcode == OP_NULL) {
+        push(&NULLOBJECT);
+    } else if (opcode == OP_SET_GLOBAL) {
+        int global_index = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        if (global_index >= static_cast<int>(globals.size())) {
+            globals.resize(global_index + 1, nullptr);
+        }
+        globals[global_index] = pop();
+    } else if (opcode == OP_GET_GLOBAL) {
+        int global_index = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        if (global_index >= 0 && global_index < static_cast<int>(globals.size())) {
+            push(globals[global_index]);
+        } else {
+            std::cerr << "[ VM Error ] Global index out of bounds: " << global_index << std::endl;
+        }
+    } else if (opcode == OP_SET_LOCAL) {
+        int local_index = read_uint8(*ins, ip + 1);
+        frame->ip += 1;
+        int slot = frame->base_pointer + local_index;
+        if (slot < 0 || slot >= stackSize) {
+            std::cerr << "[ VM Error ] OP_SET_LOCAL: local slot out of bounds: " << slot << std::endl;
+        } else {
             stack[slot] = pop();
-        } else if (opcode == OP_GET_LOCAL) {
-            int local_index = read_uint8(*ins, ip + 1);
-            current_frame()->ip += 1;
-
-            Frame* frame = current_frame();
-            if (frame == nullptr) {
-                std::cerr << "[ VM Error ] OP_GET_LOCAL: no current frame" << std::endl;
-                continue;
-            }
-            int slot = frame->base_pointer + local_index;
-            if (slot < 0 || slot >= stackSize) {
-                std::cerr << "[ VM Error ] OP_GET_LOCAL: local slot out of bounds: " << slot << std::endl;
-                continue;
-            }
+        }
+    } else if (opcode == OP_GET_LOCAL) {
+        int local_index = read_uint8(*ins, ip + 1);
+        frame->ip += 1;
+        int slot = frame->base_pointer + local_index;
+        if (slot < 0 || slot >= stackSize) {
+            std::cerr << "[ VM Error ] OP_GET_LOCAL: local slot out of bounds: " << slot << std::endl;
+        } else {
             push(stack[slot]);
-        } else if (opcode == OP_GET_BUILTIN) {
-            int builtin_index = read_uint8(*ins, ip + 1);
-            current_frame()->ip += 1;
-            Ad_Object* builtin_obj = vm_get_builtin_object(builtin_index);
-            if (builtin_obj != nullptr) {
-                push(builtin_obj);
-            } else {
-                std::cerr << "[ VM Error ] OP_GET_BUILTIN: invalid index " << builtin_index << std::endl;
-            }
-        } else if (opcode == OP_ARRAY) {
-            int numElements = read_uint16(*ins, ip + 1);
-            current_frame()->ip += 2;
-
-            Ad_Object* array_obj = build_array(sp - numElements, sp);
-            sp = sp - numElements;
-            push(array_obj);
-        } else if (opcode == OP_HASH) {
-            int numElements = read_uint16(*ins, ip + 1);
-            current_frame()->ip += 2;
-
-            Ad_Object* hash_obj = build_hash(sp - numElements, sp);
-            sp = sp - numElements;
-            push(hash_obj);
-        } else if (opcode == OP_INDEX) {
-            Ad_Object* index = pop();
-            Ad_Object* left = pop();
-            execute_index_expression(left, index);
-        } else if (opcode == OP_SET_INDEX) {
-            Ad_Object* value = pop();
-            Ad_Object* index = pop();
-            Ad_Object* left = pop();
-            execute_set_index_expression(left, index, value);
-        } else if (opcode == OP_CLOSURE) {
-            int const_index = read_uint16(*ins, ip + 1);
-            int num_free = read_uint8(*ins, ip + 3);
-            current_frame()->ip += 3;
-
-            if (const_index < 0 || const_index >= static_cast<int>(constants.size())) {
-                std::cerr << "[ VM Error ] OP_CLOSURE constant index out of bounds: " << const_index << std::endl;
-                continue;
-            }
-            if (constants[const_index] == nullptr || constants[const_index]->Type() != OBJ_COMPILED_FUNCTION) {
-                std::cerr << "[ VM Error ] OP_CLOSURE expected compiled function constant at index: " << const_index << std::endl;
-                continue;
-            }
-
+        }
+    } else if (opcode == OP_GET_BUILTIN) {
+        int builtin_index = read_uint8(*ins, ip + 1);
+        frame->ip += 1;
+        Ad_Object* builtin_obj = vm_get_builtin_object(builtin_index);
+        if (builtin_obj != nullptr) {
+            push(builtin_obj);
+        } else {
+            std::cerr << "[ VM Error ] OP_GET_BUILTIN: invalid index " << builtin_index << std::endl;
+        }
+    } else if (opcode == OP_ARRAY) {
+        int numElements = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        Ad_Object* array_obj = build_array(sp - numElements, sp);
+        sp = sp - numElements;
+        push(array_obj);
+    } else if (opcode == OP_HASH) {
+        int numElements = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        Ad_Object* hash_obj = build_hash(sp - numElements, sp);
+        sp = sp - numElements;
+        push(hash_obj);
+    } else if (opcode == OP_INDEX) {
+        Ad_Object* index = pop();
+        Ad_Object* left = pop();
+        execute_index_expression(left, index);
+    } else if (opcode == OP_SET_INDEX) {
+        Ad_Object* value = pop();
+        Ad_Object* index = pop();
+        Ad_Object* left = pop();
+        execute_set_index_expression(left, index, value);
+    } else if (opcode == OP_CLOSURE) {
+        int const_index = read_uint16(*ins, ip + 1);
+        int num_free = read_uint8(*ins, ip + 3);
+        frame->ip += 3;
+        if (const_index < 0 || const_index >= static_cast<int>(constants.size()) ||
+            constants[const_index] == nullptr ||
+            constants[const_index]->Type() != OBJ_COMPILED_FUNCTION) {
+            std::cerr << "[ VM Error ] OP_CLOSURE invalid compiled function constant\n";
+        } else {
             auto* closure = new AdClosureObject();
             closure->fn = static_cast<AdCompiledFunction*>(constants[const_index]);
             closure->free_vars.resize(static_cast<size_t>(num_free));
@@ -217,55 +192,93 @@ void VM::run(uint64_t max_instructions) {
                 closure->free_vars[static_cast<size_t>(i)] = pop();
             }
             push(closure);
-        } else if (opcode == OP_GET_FREE) {
-            int free_index = read_uint8(*ins, ip + 1);
-            current_frame()->ip += 1;
-            Frame* frame = current_frame();
-            if (frame == nullptr || frame->cl == nullptr) {
-                std::cerr << "[ VM Error ] OP_GET_FREE: no active closure frame\n";
-                continue;
-            }
-            if (free_index < 0 || free_index >= static_cast<int>(frame->cl->free_vars.size())) {
-                std::cerr << "[ VM Error ] OP_GET_FREE: index out of bounds: " << free_index << std::endl;
-                continue;
-            }
+        }
+    } else if (opcode == OP_GET_FREE) {
+        int free_index = read_uint8(*ins, ip + 1);
+        frame->ip += 1;
+        if (frame->cl == nullptr || free_index < 0 ||
+            free_index >= static_cast<int>(frame->cl->free_vars.size())) {
+            std::cerr << "[ VM Error ] OP_GET_FREE: index out of bounds\n";
+        } else {
             Ad_Object* captured = frame->cl->free_vars[static_cast<size_t>(free_index)];
-            if (captured != nullptr) {
-                push(captured);
-            } else {
-                push(&NULLOBJECT);
-            }
-        } else if (opcode == OP_CURRENT_CLOSURE) {
-            Frame* frame = current_frame();
-            if (frame == nullptr || frame->cl == nullptr) {
-                std::cerr << "[ VM Error ] OP_CURRENT_CLOSURE: no active closure\n";
-                continue;
-            }
+            push(captured != nullptr ? captured : &NULLOBJECT);
+        }
+    } else if (opcode == OP_CURRENT_CLOSURE) {
+        if (frame->cl == nullptr) {
+            std::cerr << "[ VM Error ] OP_CURRENT_CLOSURE: no active closure\n";
+        } else {
             push(frame->cl);
-        } else if (opcode == OP_CALL) {
-            int num_args = read_uint8(*ins, ip + 1);
-            current_frame()->ip += 1;
-            execute_call(num_args);
-        } else if (opcode == OP_RETURN_VALUE) {
-            Ad_Object* return_value = pop();
-            Frame frame = pop_frame();
-            sp = frame.base_pointer - 1;
-            push(return_value);
-            if (frames_index == 0) {
-                break;
-            }
-        } else if (opcode == OP_RETURN) {
-            Frame frame = pop_frame();
-            sp = frame.base_pointer - 1;
-            if (sp < 0) {
-                sp = 0;
-            }
-            // Match evaluator: implicit `return` / void completion yields a C++ null result, not `&NULLOBJECT`,
-            // so `EvalProgram` does not print a line for plain calls like `permute(0)`.
-            push(nullptr);
-            if (frames_index == 0) {
-                break;
-            }
+        }
+    } else if (opcode == OP_CALL) {
+        int num_args = read_uint8(*ins, ip + 1);
+        frame->ip += 1;
+        execute_call(num_args);
+    } else if (opcode == OP_RETURN_VALUE) {
+        Ad_Object* return_value = pop();
+        Frame ret_frame = pop_frame();
+        sp = ret_frame.base_pointer - 1;
+        push(return_value);
+        if (frames_index == 0) {
+            return false;
+        }
+    } else if (opcode == OP_RETURN) {
+        Frame ret_frame = pop_frame();
+        sp = ret_frame.base_pointer - 1;
+        if (sp < 0) {
+            sp = 0;
+        }
+        push(nullptr);
+        if (frames_index == 0) {
+            return false;
+        }
+    } else if (opcode == OP_CLASS) {
+        push(new AdCompiledClass());
+    } else if (opcode == OP_SET_METHOD) {
+        execute_set_method();
+    } else if (opcode == OP_GET_PROPERTY_SYM) {
+        int sym_index = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        execute_get_property_sym(sym_index);
+    } else if (opcode == OP_PATCH_PROPERTY_SYM) {
+        int sym_index = read_uint16(*ins, ip + 1);
+        frame->ip += 2;
+        execute_patch_property_sym(sym_index);
+    } else if (opcode == OP_GET_PROPERTY) {
+        execute_get_property();
+    } else if (opcode == OP_SET_PROPERTY) {
+        execute_set_property();
+    } else if (opcode == OP_GET_METHOD) {
+        execute_get_method();
+    } else {
+        std::cerr << "[ VM Error ] unknown opcode: " << static_cast<int>(opcode) << std::endl;
+    }
+
+    return frames_index > 0;
+}
+
+void VM::run_until_frames_index(int target_frames_index, uint64_t max_instructions) {
+    uint64_t instructions_executed = 0;
+    while (frames_index > target_frames_index) {
+        if (max_instructions != 0 && ++instructions_executed > max_instructions) {
+            std::cerr << "[ VM Error ] instruction budget exceeded (set AD_VM_MAX_INSTRUCTIONS to raise the cap)\n";
+            break;
+        }
+        if (!execute_instruction()) {
+            break;
+        }
+    }
+}
+
+void VM::run(uint64_t max_instructions) {
+    uint64_t instructions_executed = 0;
+    while (current_frame() != nullptr &&
+           current_frame()->ip < static_cast<int>(current_frame()->instructions()->bytes.size()) - 1) {
+        if (max_instructions != 0 && ++instructions_executed > max_instructions) {
+            std::cerr << "[ VM Error ] instruction budget exceeded (set AD_VM_MAX_INSTRUCTIONS to raise the cap)\n";
+            break;
+        }
+        if (!execute_instruction()) {
+            break;
         }
     }
 }
@@ -292,6 +305,8 @@ void VM::execute_call(int num_args) {
         call_bound_method(static_cast<AdBoundMethod*>(callee), num_args);
     } else {
         std::cerr << "[ VM Error ] SEVERE ERROR: calling error (unsupported callee type)\n";
+        sp = callee_index;
+        push(&NULLOBJECT);
     }
 }
 
@@ -311,7 +326,7 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
         push(err);
         return;
     }
-    Frame frame(cl, -1, sp - num_args, nullptr);
+    Frame frame(cl, -1, sp - num_args, current_bound_instance());
     push_frame(frame);
     sp = frame.base_pointer + cl->fn->num_locals;
 }
@@ -327,37 +342,59 @@ void VM::call_builtin(Ad_Builtin_Object* builtin, int num_args) {
     if (result != nullptr) {
         push(result);
     } else {
-        push(nullptr);
+        push(&NULLOBJECT);
     }
 }
 
 void VM::call_class(AdCompiledClass* cl, int num_args) {
+    const int callee_index = sp - 1 - num_args;
+    if (callee_index < 0) {
+        std::cerr << "[ VM Error ] call_class: stack underflow\n";
+        return;
+    }
+
+    std::vector<Ad_Object*> args;
+    args.reserve(static_cast<size_t>(num_args));
+    for (int i = 0; i < num_args; ++i) {
+        args.push_back(stack[callee_index + 1 + i]);
+    }
+    sp = callee_index;
+
     auto* instance = new AdCompiledInstance();
     instance->klass = cl;
     instance->definition_num_args = num_args;
-    bool need_to_remove = false;
+    if (gc != nullptr) {
+        gc->addObject(instance);
+    }
+
     for (AdCompiledFunction* field_initializer : cl->field_initializers) {
         auto* closure = new AdClosureObject();
         closure->fn = field_initializer;
-        push(closure);
-        need_to_remove = true;
         AdBoundMethod bound_initializer(instance, closure);
+        const int frames_before = frames_index;
+        const int sp_before = sp;
         call_bound_method(&bound_initializer, 0);
-        if (sp > 0 && stack[sp - 1] != nullptr) {
+        run_until_frames_index(frames_before);
+        while (sp > sp_before) {
             pop();
         }
     }
+
     auto ctor_it = cl->methods.find("constructor");
     if (ctor_it != cl->methods.end()) {
-        AdClosureObject* constructor = ctor_it->second;
-        if (!need_to_remove) {
+        AdBoundMethod bound_constructor(instance, ctor_it->second);
+        const int frames_before = frames_index;
+        const int sp_before = sp;
+        for (Ad_Object* arg : args) {
+            push(arg);
+        }
+        call_bound_method(&bound_constructor, num_args);
+        run_until_frames_index(frames_before);
+        while (sp > sp_before) {
             pop();
         }
-        AdBoundMethod bound_constructor(instance, constructor);
-        bound_constructor.owner = instance;
-        current_frame()->bound_instance = instance;
-        call_bound_method(&bound_constructor, num_args);
     }
+
     push(instance);
 }
 
@@ -370,18 +407,7 @@ void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
         std::cerr << "ERROR: wrong number of arguments expecting: " << bm->bound_method->fn->num_parameters
                   << " got: " << num_args << std::endl;
     }
-    int old_sp = sp;
-    std::vector<Ad_Object*> popped;
-    popped.reserve(static_cast<size_t>(num_args));
-    for (int total = num_args; total > 0; --total) {
-        popped.push_back(pop());
-    }
-    push(bm->owner);
-    while (!popped.empty()) {
-        push(popped.back());
-        popped.pop_back();
-    }
-    Frame frame(bm->bound_method, -1, old_sp - num_args, bm->owner);
+    Frame frame(bm->bound_method, -1, sp - num_args, bm->owner);
     push_frame(frame);
     sp = frame.base_pointer + bm->bound_method->fn->num_locals;
 }
@@ -675,4 +701,192 @@ void VM::execute_hash_index(Ad_Object* left, Ad_Object* index) {
     } else {
         push(&NULLOBJECT);
     }
+}
+
+AdCompiledInstance* VM::current_bound_instance() {
+    for (int i = frames_index - 1; i >= 0; --i) {
+        if (frames[i].bound_instance != nullptr) {
+            return frames[i].bound_instance;
+        }
+    }
+    return nullptr;
+}
+
+void VM::ensure_instance_field_capacity(AdCompiledInstance* inst, int index) {
+    if (inst == nullptr || index < 0) {
+        return;
+    }
+    const size_t needed = static_cast<size_t>(index) + 1;
+    if (inst->fields.size() < needed) {
+        inst->fields.resize(needed, nullptr);
+    }
+}
+
+void VM::register_instance_field_name(AdCompiledInstance* inst, const std::string& name, int index) {
+    if (inst == nullptr || inst->klass == nullptr) {
+        return;
+    }
+    inst->klass->field_name_to_index[name] = index;
+}
+
+int VM::lookup_instance_field_index(AdCompiledInstance* inst, const std::string& name) {
+    if (inst == nullptr || inst->klass == nullptr) {
+        return -1;
+    }
+    auto it = inst->klass->field_name_to_index.find(name);
+    if (it == inst->klass->field_name_to_index.end()) {
+        return -1;
+    }
+    return it->second;
+}
+
+static std::string vm_property_field_name(Ad_Object* field_name_obj) {
+    if (field_name_obj == nullptr) {
+        return "";
+    }
+    if (field_name_obj->Type() == OBJ_STRING) {
+        return static_cast<Ad_String_Object*>(field_name_obj)->value;
+    }
+    return field_name_obj->Inspect();
+}
+
+void VM::execute_get_property_sym(int sym_index) {
+    if (sp <= 0) {
+        std::cerr << "[ VM Error ] OP_GET_PROPERTY_SYM: stack underflow\n";
+        return;
+    }
+    Ad_Object* field_name_obj = pop();
+
+    AdCompiledInstance* inst = current_bound_instance();
+    if (inst == nullptr) {
+        std::cerr << "[ VM Error ] OP_GET_PROPERTY_SYM: no bound instance\n";
+        push(&NULLOBJECT);
+        return;
+    }
+    if (sym_index < 0 || sym_index >= static_cast<int>(inst->fields.size())) {
+        push(&NULLOBJECT);
+        return;
+    }
+    Ad_Object* value = inst->fields[static_cast<size_t>(sym_index)];
+    if (value != nullptr) {
+        push(value);
+    } else {
+        push(&NULLOBJECT);
+    }
+    (void)field_name_obj;
+}
+
+void VM::execute_patch_property_sym(int sym_index) {
+    if (sp < 2) {
+        std::cerr << "[ VM Error ] OP_PATCH_PROPERTY_SYM: stack underflow\n";
+        return;
+    }
+    Ad_Object* field_name_obj = pop();
+    Ad_Object* value = pop();
+
+    AdCompiledInstance* inst = current_bound_instance();
+    if (inst == nullptr) {
+        std::cerr << "[ VM Error ] OP_PATCH_PROPERTY_SYM: no bound instance\n";
+        return;
+    }
+    ensure_instance_field_capacity(inst, sym_index);
+    inst->fields[static_cast<size_t>(sym_index)] = value;
+    register_instance_field_name(inst, vm_property_field_name(field_name_obj), sym_index);
+}
+
+void VM::execute_get_property() {
+    if (sp < 2) {
+        std::cerr << "[ VM Error ] OP_GET_PROPERTY: stack underflow\n";
+        return;
+    }
+    Ad_Object* field_name_obj = pop();
+    Ad_Object* owner = pop();
+    if (owner == nullptr || owner->Type() != OBJ_COMPILED_INSTANCE) {
+        push(&NULLOBJECT);
+        return;
+    }
+    auto* inst = static_cast<AdCompiledInstance*>(owner);
+    const std::string field_name = vm_property_field_name(field_name_obj);
+    const int index = lookup_instance_field_index(inst, field_name);
+    if (index < 0 || index >= static_cast<int>(inst->fields.size())) {
+        push(&NULLOBJECT);
+        return;
+    }
+    Ad_Object* value = inst->fields[static_cast<size_t>(index)];
+    if (value != nullptr) {
+        push(value);
+    } else {
+        push(&NULLOBJECT);
+    }
+}
+
+void VM::execute_set_property() {
+    if (sp < 3) {
+        std::cerr << "[ VM Error ] OP_SET_PROPERTY: stack underflow\n";
+        return;
+    }
+    Ad_Object* field_name_obj = pop();
+    Ad_Object* value = pop();
+    Ad_Object* owner = pop();
+    if (owner == nullptr || owner->Type() != OBJ_COMPILED_INSTANCE) {
+        std::cerr << "[ VM Error ] OP_SET_PROPERTY: owner is not a compiled instance\n";
+        return;
+    }
+    auto* inst = static_cast<AdCompiledInstance*>(owner);
+    const std::string field_name = vm_property_field_name(field_name_obj);
+    int index = lookup_instance_field_index(inst, field_name);
+    if (index < 0) {
+        index = static_cast<int>(inst->fields.size());
+        register_instance_field_name(inst, field_name, index);
+    }
+    ensure_instance_field_capacity(inst, index);
+    inst->fields[static_cast<size_t>(index)] = value;
+}
+
+void VM::execute_get_method() {
+    if (sp < 2) {
+        std::cerr << "[ VM Error ] OP_GET_METHOD: stack underflow\n";
+        return;
+    }
+    Ad_Object* name_obj = pop();
+    Ad_Object* owner = pop();
+    if (owner == nullptr || owner->Type() != OBJ_COMPILED_INSTANCE) {
+        push(&NULLOBJECT);
+        return;
+    }
+    auto* inst = static_cast<AdCompiledInstance*>(owner);
+    if (inst->klass == nullptr) {
+        push(&NULLOBJECT);
+        return;
+    }
+    const std::string method_name = vm_property_field_name(name_obj);
+    auto it = inst->klass->methods.find(method_name);
+    if (it == inst->klass->methods.end() || it->second == nullptr) {
+        push(&NULLOBJECT);
+        return;
+    }
+    auto* bound = new AdBoundMethod(inst, it->second);
+    if (gc != nullptr) {
+        gc->addObject(bound);
+    }
+    push(bound);
+}
+
+void VM::execute_set_method() {
+    if (sp < 3) {
+        std::cerr << "[ VM Error ] OP_SET_METHOD: stack underflow\n";
+        return;
+    }
+    Ad_Object* name_obj = pop();
+    Ad_Object* method_obj = pop();
+    if (method_obj == nullptr || method_obj->Type() != OBJ_CLOSURE) {
+        std::cerr << "[ VM Error ] OP_SET_METHOD: expected closure\n";
+        return;
+    }
+    if (sp <= 0 || stack[sp - 1] == nullptr || stack[sp - 1]->Type() != OBJ_COMPILED_CLASS) {
+        std::cerr << "[ VM Error ] OP_SET_METHOD: expected compiled class on stack\n";
+        return;
+    }
+    auto* klass = static_cast<AdCompiledClass*>(stack[sp - 1]);
+    klass->methods[vm_property_field_name(name_obj)] = static_cast<AdClosureObject*>(method_obj);
 }

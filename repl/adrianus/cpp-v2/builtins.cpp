@@ -219,6 +219,14 @@ Ad_Object* context_builtin(std::vector<Ad_Object*> args, Environment* env, Garba
 }
 
 Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    (void)args;
+    if (env == nullptr) {
+        auto* empty = new Ad_Hash_Object();
+        if (gc != nullptr) {
+            gc->addObject(empty);
+        }
+        return empty;
+    }
     return env->storeToHashObject(gc);
 }
 

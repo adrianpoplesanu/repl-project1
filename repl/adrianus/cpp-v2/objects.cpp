@@ -1,6 +1,7 @@
 #include "objects.h"
 #include "gc.h"
 #include "environment.h"
+#include "vm/objects.h"
 #include "listobject.cpp"
 #include <sstream>
 
@@ -26,7 +27,12 @@ std::unordered_map<Ad_Object_Type, std::string> object_type_map = {
         {OBJ_THREAD, "THREAD"},
         {OBJ_TASK, "TASK"},
         {OBJ_BREAK, "BREAK"},
-        {OBJ_CONTINUE, "CONTINUE"}
+        {OBJ_CONTINUE, "CONTINUE"},
+        {OBJ_COMPILED_FUNCTION, "COMPILED_FUNCTION"},
+        {OBJ_CLOSURE, "CLOSURE"},
+        {OBJ_COMPILED_CLASS, "COMPILED_CLASS"},
+        {OBJ_COMPILED_INSTANCE, "COMPILED_INSTANCE"},
+        {OBJ_BOUND_METHOD, "BOUND_METHOD"}
 };
 
 Ad_Null_Object NULLOBJECT;
@@ -1188,6 +1194,55 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_FLOAT:
                 delete (Ad_Float_Object*) obj;
+            break;
+            case OBJ_COMPILED_FUNCTION: {
+                auto* fn = static_cast<AdCompiledFunction*>(obj);
+                if (fn->instructions != nullptr) {
+                    delete fn->instructions;
+                }
+                delete fn;
+            }
+            break;
+            case OBJ_CLOSURE: {
+                auto* closure = static_cast<AdClosureObject*>(obj);
+                if (closure->fn != nullptr) {
+                    if (closure->fn->instructions != nullptr) {
+                        delete closure->fn->instructions;
+                    }
+                    delete closure->fn;
+                }
+                delete closure;
+            }
+            break;
+            case OBJ_COMPILED_CLASS: {
+                auto* klass = static_cast<AdCompiledClass*>(obj);
+                for (const auto& entry : klass->methods) {
+                    if (entry.second != nullptr) {
+                        if (entry.second->fn != nullptr) {
+                            if (entry.second->fn->instructions != nullptr) {
+                                delete entry.second->fn->instructions;
+                            }
+                            delete entry.second->fn;
+                        }
+                        delete entry.second;
+                    }
+                }
+                for (AdCompiledFunction* initializer : klass->field_initializers) {
+                    if (initializer != nullptr) {
+                        if (initializer->instructions != nullptr) {
+                            delete initializer->instructions;
+                        }
+                        delete initializer;
+                    }
+                }
+                delete klass;
+            }
+            break;
+            case OBJ_COMPILED_INSTANCE:
+                delete static_cast<AdCompiledInstance*>(obj);
+            break;
+            case OBJ_BOUND_METHOD:
+                delete static_cast<AdBoundMethod*>(obj);
             break;
             default:
                 std::cout << obj->type << "\n";

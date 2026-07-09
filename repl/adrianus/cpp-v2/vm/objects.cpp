@@ -1,4 +1,5 @@
 #include "objects.h"
+#include <sstream>
 
 AdCompiledFunction::AdCompiledFunction() {
     type = OBJ_COMPILED_FUNCTION;
@@ -59,7 +60,13 @@ AdCompiledClass::AdCompiledClass() {
 }
 
 std::string AdCompiledClass::Inspect() {
-    return "todo: implement AdCompiledClass.Inspect()";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<compiled class at memory address: " + ss.str() + ">";
+}
+
+std::string AdCompiledClass::repr() {
+    return Inspect();
 }
 
 void AdCompiledClass::Print() {
@@ -88,7 +95,13 @@ AdCompiledInstance::AdCompiledInstance() {
 }
 
 std::string AdCompiledInstance::Inspect() {
-    return "todo: implement AdCompiledInstance.Inspect()";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<compiled instance at memory address: " + ss.str() + ">";
+}
+
+std::string AdCompiledInstance::repr() {
+    return Inspect();
 }
 
 void AdCompiledInstance::Print() {
