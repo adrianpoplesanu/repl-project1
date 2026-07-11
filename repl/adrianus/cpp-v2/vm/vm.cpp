@@ -5,6 +5,7 @@
 #include "../builtins_registry.h"
 #include "../evaluator.h"
 #include "../hashpair.h"
+#include "../utils.h"
 #include <iostream>
 #include <vector>
 #include <functional>
@@ -313,6 +314,8 @@ void VM::execute_call(int num_args) {
         call_class(static_cast<AdCompiledClass*>(callee), num_args);
     } else if (t == OBJ_BOUND_METHOD) {
         call_bound_method(static_cast<AdBoundMethod*>(callee), num_args);
+    } else if (t == OBJ_RUNTIME_BOUND_METHOD) {
+        call_runtime_bound_method(static_cast<AdRuntimeBoundMethod*>(callee), num_args);
     } else {
         std::cerr << "[ VM Error ] SEVERE ERROR: calling error (unsupported callee type)\n";
         sp = callee_index;
@@ -458,6 +461,52 @@ void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
     Frame frame(bm->bound_method, -1, sp - num_args, bm->owner);
     push_frame(frame);
     sp = frame.base_pointer + bm->bound_method->fn->num_locals;
+}
+
+void VM::call_runtime_bound_method(AdRuntimeBoundMethod* bm, int num_args) {
+    if (bm == nullptr || bm->receiver == nullptr) {
+        std::cerr << "[ VM Error ] call_runtime_bound_method: invalid bound method\n";
+        return;
+    }
+
+    std::vector<Ad_Object*> args;
+    args.reserve(static_cast<size_t>(num_args));
+    for (int i = sp - num_args; i < sp; ++i) {
+        args.push_back(stack[i]);
+    }
+    sp = sp - num_args - 1;
+
+    Ad_Object* result = nullptr;
+    if (bm->receiver->Type() == OBJ_FILE) {
+        auto* owner = static_cast<Ad_File_Object*>(bm->receiver);
+        if (bm->method_name == "read") {
+            if (owner->_operator == "r") {
+                std::string data = read_file_content(owner->filename);
+                result = new Ad_String_Object(data);
+                if (gc != nullptr) {
+                    gc->addObject(result);
+                }
+            }
+        } else if (bm->method_name == "write") {
+            if (owner->_operator.find('w') != std::string::npos) {
+                if (!args.empty() && args[0] != nullptr) {
+                    write_file_content(owner->filename, args[0]->repr());
+                }
+                result = &NULLOBJECT;
+            } else if (owner->_operator.find('a') != std::string::npos) {
+                if (!args.empty() && args[0] != nullptr) {
+                    append_file_content(owner->filename, args[0]->repr());
+                }
+                result = &NULLOBJECT;
+            }
+        }
+    }
+
+    if (result != nullptr) {
+        push(result);
+    } else {
+        push(&NULLOBJECT);
+    }
 }
 
 Ad_Object *VM::last_popped_stack_element() {
@@ -936,26 +985,38 @@ void VM::execute_get_method() {
     }
     Ad_Object* name_obj = pop();
     Ad_Object* owner = pop();
-    if (owner == nullptr || owner->Type() != OBJ_COMPILED_INSTANCE) {
-        push(&NULLOBJECT);
-        return;
-    }
-    auto* inst = static_cast<AdCompiledInstance*>(owner);
-    if (inst->klass == nullptr) {
+    if (owner == nullptr) {
         push(&NULLOBJECT);
         return;
     }
     const std::string method_name = vm_property_field_name(name_obj);
-    auto it = inst->klass->methods.find(method_name);
-    if (it == inst->klass->methods.end() || it->second == nullptr) {
-        push(&NULLOBJECT);
+    if (owner->Type() == OBJ_COMPILED_INSTANCE) {
+        auto* inst = static_cast<AdCompiledInstance*>(owner);
+        if (inst->klass == nullptr) {
+            push(&NULLOBJECT);
+            return;
+        }
+        auto it = inst->klass->methods.find(method_name);
+        if (it == inst->klass->methods.end() || it->second == nullptr) {
+            push(&NULLOBJECT);
+            return;
+        }
+        auto* bound = new AdBoundMethod(inst, it->second);
+        if (gc != nullptr) {
+            gc->addObject(bound);
+        }
+        push(bound);
         return;
     }
-    auto* bound = new AdBoundMethod(inst, it->second);
-    if (gc != nullptr) {
-        gc->addObject(bound);
+    if (owner->Type() == OBJ_FILE) {
+        auto* bound = new AdRuntimeBoundMethod(owner, method_name);
+        if (gc != nullptr) {
+            gc->addObject(bound);
+        }
+        push(bound);
+        return;
     }
-    push(bound);
+    push(&NULLOBJECT);
 }
 
 void VM::execute_get_super_method() {

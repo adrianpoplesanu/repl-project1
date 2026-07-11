@@ -49,6 +49,7 @@ enum Ad_Object_Type {
 	OBJ_COMPILED_CLASS,
 	OBJ_COMPILED_INSTANCE,
 	OBJ_BOUND_METHOD,
+	OBJ_RUNTIME_BOUND_METHOD,
 };
 
 extern std::unordered_map<Ad_Object_Type, std::string> object_type_map;

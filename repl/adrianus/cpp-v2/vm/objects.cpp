@@ -155,3 +155,38 @@ std::string AdBoundMethod::Hash() {
 Ad_Object* AdBoundMethod::copy(GarbageCollector*) {
     return NULL;
 }
+
+AdRuntimeBoundMethod::AdRuntimeBoundMethod() {
+    type = OBJ_RUNTIME_BOUND_METHOD;
+    ref_count = 0;
+    marked = false;
+    receiver = nullptr;
+    method_name = "";
+}
+
+AdRuntimeBoundMethod::AdRuntimeBoundMethod(Ad_Object* recv, std::string method) {
+    type = OBJ_RUNTIME_BOUND_METHOD;
+    ref_count = 0;
+    marked = false;
+    receiver = recv;
+    method_name = std::move(method);
+}
+
+std::string AdRuntimeBoundMethod::Inspect() {
+    return "todo: implement AdRuntimeBoundMethod.Inspect()";
+}
+
+void AdRuntimeBoundMethod::Print() {
+}
+
+Ad_Object_Type AdRuntimeBoundMethod::Type() {
+    return type;
+}
+
+std::string AdRuntimeBoundMethod::Hash() {
+    return "todo: implement AdRuntimeBoundMethod.Hash()";
+}
+
+Ad_Object* AdRuntimeBoundMethod::copy(GarbageCollector*) {
+    return NULL;
+}

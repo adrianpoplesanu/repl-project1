@@ -32,7 +32,8 @@ std::unordered_map<Ad_Object_Type, std::string> object_type_map = {
         {OBJ_CLOSURE, "CLOSURE"},
         {OBJ_COMPILED_CLASS, "COMPILED_CLASS"},
         {OBJ_COMPILED_INSTANCE, "COMPILED_INSTANCE"},
-        {OBJ_BOUND_METHOD, "BOUND_METHOD"}
+        {OBJ_BOUND_METHOD, "BOUND_METHOD"},
+        {OBJ_RUNTIME_BOUND_METHOD, "RUNTIME_BOUND_METHOD"}
 };
 
 Ad_Null_Object NULLOBJECT;
@@ -1243,6 +1244,9 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_BOUND_METHOD:
                 delete static_cast<AdBoundMethod*>(obj);
+            break;
+            case OBJ_RUNTIME_BOUND_METHOD:
+                delete static_cast<AdRuntimeBoundMethod*>(obj);
             break;
             default:
                 std::cout << obj->type << "\n";

@@ -282,6 +282,12 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             markObject(bound->bound_method);
             break;
         }
+        case OBJ_RUNTIME_BOUND_METHOD: {
+            obj->marked = true;
+            AdRuntimeBoundMethod* bound = static_cast<AdRuntimeBoundMethod*>(obj);
+            markObject(bound->receiver);
+            break;
+        }
 
         default: {
             std::cout << "MEMORY ERROR!!! garbage collection inconsistency!\n";

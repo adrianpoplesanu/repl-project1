@@ -54,6 +54,7 @@ public:
     void call_builtin(Ad_Builtin_Object* builtin, int num_args);
     void call_class(AdCompiledClass* cl, int num_args);
     void call_bound_method(AdBoundMethod* bm, int num_args);
+    void call_runtime_bound_method(AdRuntimeBoundMethod* bm, int num_args);
     void apply_default_arguments(AdCompiledFunction* fn, int& num_args);
 
     Ad_Object* build_locals_hash();

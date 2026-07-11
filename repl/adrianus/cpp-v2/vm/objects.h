@@ -90,4 +90,18 @@ public:
 	Ad_Object* copy(GarbageCollector*) override;
 };
 
+class AdRuntimeBoundMethod : public Ad_Object {
+public:
+    Ad_Object* receiver;
+    std::string method_name;
+
+    AdRuntimeBoundMethod();
+    AdRuntimeBoundMethod(Ad_Object* receiver, std::string method_name);
+    std::string Inspect() override;
+	void Print() override;
+	Ad_Object_Type Type() override;
+	std::string Hash() override;
+	Ad_Object* copy(GarbageCollector*) override;
+};
+
 #endif
