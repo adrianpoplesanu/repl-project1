@@ -1,0 +1,22 @@
+class User {
+  name = ""
+
+  def init(n) {
+    name = n
+  }
+
+  def display() {
+    println(name)
+  }
+}
+
+class Service {
+  def createUser() {
+    user = User()
+    user.init("chain")
+    return user
+  }
+}
+
+service = Service()
+service.createUser().display()

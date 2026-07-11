@@ -1,0 +1,15 @@
+class Box {
+  value = 0
+
+  def set(n) {
+    value = n
+  }
+
+  def get() {
+    return value
+  }
+}
+
+b = Box()
+b.set(42)
+println(b.get())
