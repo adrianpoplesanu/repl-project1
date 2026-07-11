@@ -1,0 +1,16 @@
+class Animal {
+    def speak() {
+        println("animal")
+    }
+}
+
+class Dog : Animal {
+    def speak() {
+        println("dog")
+    }
+}
+
+a = Animal()
+a.speak()
+d = Dog()
+d.speak()
