@@ -18,6 +18,7 @@ public:
     int frames_index;
     std::vector<Ad_Object*> constants;
     std::vector<Ad_Object*> globals;
+    std::vector<std::string> global_names;
     Bytecode last_loaded_bytecode;
     bool has_loaded_bytecode;
 
@@ -54,6 +55,8 @@ public:
     void call_class(AdCompiledClass* cl, int num_args);
     void call_bound_method(AdBoundMethod* bm, int num_args);
     void apply_default_arguments(AdCompiledFunction* fn, int& num_args);
+
+    Ad_Object* build_locals_hash();
 
     AdCompiledInstance* current_bound_instance();
     void ensure_instance_field_capacity(AdCompiledInstance* inst, int index);

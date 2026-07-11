@@ -49,6 +49,7 @@ public:
     void reset();
     void compile(Ad_AST_Node* node);
     Bytecode getBytecode();
+    void collect_global_names(Bytecode& bytecode);
     
     // New methods for instruction emission
     int emit(OpCode op, int n = 0, std::vector<int> args = {});

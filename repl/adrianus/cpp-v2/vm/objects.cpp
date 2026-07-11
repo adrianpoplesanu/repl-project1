@@ -62,7 +62,7 @@ AdCompiledClass::AdCompiledClass() {
 std::string AdCompiledClass::Inspect() {
     std::stringstream ss;
     ss << std::hex << this;
-    return "<compiled class at memory address: " + ss.str() + ">";
+    return "<class object at memory address: " + ss.str() + ">";
 }
 
 std::string AdCompiledClass::repr() {
@@ -97,7 +97,7 @@ AdCompiledInstance::AdCompiledInstance() {
 std::string AdCompiledInstance::Inspect() {
     std::stringstream ss;
     ss << std::hex << this;
-    return "<compiled instance at memory address: " + ss.str() + ">";
+    return "<class instance at memory address: " + ss.str() + ">";
 }
 
 std::string AdCompiledInstance::repr() {

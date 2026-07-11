@@ -4,10 +4,14 @@
 #include "utils.h"
 #include "../builtins_registry.h"
 #include "../evaluator.h"
+#include "../hashpair.h"
 #include <iostream>
 #include <vector>
 #include <functional>
 #include <cstdint>
+#include <unordered_map>
+
+extern Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc);
 
 VM::VM() {
     sp = 0;
@@ -16,6 +20,7 @@ VM::VM() {
     frames_index = 0;
     constants.clear();
     globals.clear();
+    global_names.clear();
     has_loaded_bytecode = false;
 }
 
@@ -25,6 +30,7 @@ void VM::load(Bytecode bytecode) {
 
     // Store constants from bytecode
     constants = bytecode.constants;
+    global_names = bytecode.global_names;
     globals.clear();
     
     // Create an AdCompiledFunction with the instructions
@@ -371,7 +377,12 @@ void VM::call_builtin(Ad_Builtin_Object* builtin, int num_args) {
         args.push_back(stack[i]);
     }
     sp = sp - num_args - 1;
-    Ad_Object* result = builtin->builtin_function(args, nullptr, gc);
+    Ad_Object* result = nullptr;
+    if (builtin->builtin_function == locals_builtin) {
+        result = build_locals_hash();
+    } else {
+        result = builtin->builtin_function(args, nullptr, gc);
+    }
     if (result != nullptr) {
         push(result);
     } else {
@@ -747,6 +758,33 @@ AdCompiledInstance* VM::current_bound_instance() {
         }
     }
     return nullptr;
+}
+
+Ad_Object* VM::build_locals_hash() {
+    std::unordered_map<std::string, HashPair> pairs;
+    std::hash<std::string> hash_string;
+
+    for (size_t i = 0; i < global_names.size(); ++i) {
+        const std::string& name = global_names[i];
+        if (name.empty()) {
+            continue;
+        }
+        if (i >= globals.size() || globals[i] == nullptr) {
+            continue;
+        }
+        auto* key = new Ad_String_Object(name);
+        if (gc != nullptr) {
+            gc->addObject(key);
+        }
+        HashPair hash_pair(key, globals[i]);
+        pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair));
+    }
+
+    auto* hash_object = new Ad_Hash_Object(pairs);
+    if (gc != nullptr) {
+        gc->addObject(hash_object);
+    }
+    return hash_object;
 }
 
 void VM::ensure_instance_field_capacity(AdCompiledInstance* inst, int index) {

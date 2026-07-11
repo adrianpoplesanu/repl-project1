@@ -8,6 +8,8 @@ class Bytecode {
 public:
     Instructions instructions;
     std::vector<Ad_Object*> constants;
+    /// Global slot index → name (for VM `__locals()` parity).
+    std::vector<std::string> global_names;
 };
 
 #endif

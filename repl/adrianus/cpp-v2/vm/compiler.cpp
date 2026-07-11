@@ -776,7 +776,37 @@ Bytecode Compiler::getBytecode() {
     Bytecode generatedBytecode;
     generatedBytecode.instructions = code.instructions;
     generatedBytecode.constants = constants;
+    collect_global_names(generatedBytecode);
     return generatedBytecode;
+}
+
+void Compiler::collect_global_names(Bytecode& bytecode) {
+    SymbolTable* root = symbol_table;
+    while (root != nullptr && root->outer != nullptr) {
+        root = root->outer;
+    }
+    if (root == nullptr) {
+        return;
+    }
+    int max_index = -1;
+    for (const auto& entry : root->store) {
+        if (entry.second.scope == SymbolScope::GLOBAL &&
+            entry.second.index > max_index) {
+            max_index = entry.second.index;
+        }
+    }
+    if (max_index < 0) {
+        return;
+    }
+    bytecode.global_names.assign(static_cast<size_t>(max_index + 1), "");
+    for (const auto& entry : root->store) {
+        if (entry.second.scope == SymbolScope::GLOBAL) {
+            const int idx = entry.second.index;
+            if (idx >= 0 && idx <= max_index) {
+                bytecode.global_names[static_cast<size_t>(idx)] = entry.first;
+            }
+        }
+    }
 }
 
 Definition* Compiler::lookup(OpCodeType op) {
