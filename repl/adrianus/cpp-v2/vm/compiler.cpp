@@ -99,6 +99,7 @@ void Compiler::reset() {
     bytecode = Bytecode();
     code.instructions = Instructions();
     constants.clear();
+    compiled_classes.clear();
     loop_stack.clear();
     compiling_program_direct_statement = false;
     scopes = {CompilationScope(code.instructions)};
@@ -381,13 +382,15 @@ void Compiler::compile(Ad_AST_Node* node) {
 
             if (member_access->owner->type == ST_THIS_EXPRESSION) {
                 Symbol* field_sym = resolve_class_field_symbol(member_name);
+                compile(assign_stmt->value);
+                Ad_String_Object* field = new Ad_String_Object(member_name);
+                emit(opConstant, 1, {addConstant(field)});
                 if (field_sym != nullptr) {
-                    compile(assign_stmt->value);
-                    Ad_String_Object* field = new Ad_String_Object(member_name);
-                    emit(opConstant, 1, {addConstant(field)});
                     emit(opPatchPropertySym, 1, {field_sym->index});
-                    return;
+                } else {
+                    emit(opPatchPropertySym, 1, {65535});
                 }
+                return;
             }
 
             compile(member_access->owner);
@@ -540,20 +543,18 @@ void Compiler::compile(Ad_AST_Node* node) {
         if (call_expr->function != nullptr && call_expr->function->type == ST_MEMBER_ACCESS) {
             auto* member_access = static_cast<Ad_AST_MemberAccess*>(call_expr->function);
             if (member_access->is_method) {
-                compile(member_access->owner);
                 std::string member_name;
                 if (member_access->member->type == ST_IDENTIFIER) {
                     member_name = static_cast<Ad_AST_Identifier*>(member_access->member)->value;
                 } else {
                     member_name = member_access->member->TokenLiteral();
                 }
-                Ad_String_Object* method_name = new Ad_String_Object(member_name);
-                emit(opConstant, 1, {addConstant(method_name)});
-                emit(opGetMethod, 0, {});
-                for (Ad_AST_Node* argument : call_expr->arguments) {
-                    compile(argument);
+                if (member_access->owner->type == ST_SUPER_EXPRESSION) {
+                    emit_super_method_call(static_cast<Ad_AST_Super_Expression*>(member_access->owner),
+                                           member_name, call_expr->arguments);
+                } else {
+                    emit_instance_method_call(member_access->owner, member_name, call_expr->arguments);
                 }
-                emit(opCall, 1, {static_cast<int>(call_expr->arguments.size())});
                 return;
             }
         }
@@ -748,15 +749,20 @@ void Compiler::compile(Ad_AST_Node* node) {
             }
         }
         if (member_access->is_method) {
-            compile(member_access->owner);
-            Ad_String_Object* method_name = new Ad_String_Object(member_name);
-            emit(opConstant, 1, {addConstant(method_name)});
-            emit(opGetMethod, 0, {});
-            for (Ad_AST_Node* argument : member_access->arguments) {
-                compile(argument);
+            if (member_access->owner->type == ST_SUPER_EXPRESSION) {
+                emit_super_method_call(static_cast<Ad_AST_Super_Expression*>(member_access->owner),
+                                       member_name, member_access->arguments);
+            } else {
+                emit_instance_method_call(member_access->owner, member_name, member_access->arguments);
             }
-            emit(opCall, 1, {static_cast<int>(member_access->arguments.size())});
             return;
+        }
+        if (member_access->owner->type == ST_SUPER_EXPRESSION) {
+            Symbol* field_sym = resolve_class_field_symbol(member_name);
+            if (field_sym != nullptr) {
+                load_symbol(*field_sym, member_name);
+                return;
+            }
         }
         compile(member_access->owner);
         Ad_String_Object* field = new Ad_String_Object(member_name);
@@ -1141,6 +1147,63 @@ void Compiler::fill_default_arg_values(AdCompiledFunction* fn, const std::vector
     }
 }
 
+void Compiler::emit_instance_method_call(Ad_AST_Node* owner, const std::string& method_name,
+                                         const std::vector<Ad_AST_Node*>& arguments) {
+    compile(owner);
+    Ad_String_Object* method_name_obj = new Ad_String_Object(method_name);
+    emit(opConstant, 1, {addConstant(method_name_obj)});
+    emit(opGetMethod, 0, {});
+    for (Ad_AST_Node* argument : arguments) {
+        compile(argument);
+    }
+    emit(opCall, 1, {static_cast<int>(arguments.size())});
+}
+
+void Compiler::emit_super_method_call(Ad_AST_Super_Expression* super_expr, const std::string& method_name,
+                                      const std::vector<Ad_AST_Node*>& arguments) {
+    if (super_expr == nullptr || super_expr->target == nullptr) {
+        std::cerr << "[ Compiler Error ] invalid super expression\n";
+        return;
+    }
+    const std::string parent_name = super_expr->target->TokenLiteral();
+    emit(opGetThis, 0, {});
+    Ad_String_Object* parent_name_obj = new Ad_String_Object(parent_name);
+    emit(opConstant, 1, {addConstant(parent_name_obj)});
+    Ad_String_Object* method_name_obj = new Ad_String_Object(method_name);
+    emit(opConstant, 1, {addConstant(method_name_obj)});
+    emit(opGetSuperMethod, 0, {});
+    for (Ad_AST_Node* argument : arguments) {
+        compile(argument);
+    }
+    emit(opCall, 1, {static_cast<int>(arguments.size())});
+}
+
+void Compiler::merge_parent_class(AdCompiledClass* klass, AdCompiledClass* parent,
+                                  const std::string& parent_name) {
+    if (klass == nullptr || parent == nullptr) {
+        return;
+    }
+    klass->supers.push_back(parent);
+    klass->super_classes_by_name[parent_name] = parent;
+
+    for (const auto& entry : parent->field_name_to_index) {
+        if (klass->field_name_to_index.find(entry.first) == klass->field_name_to_index.end()) {
+            Symbol field_sym = symbol_table->define(entry.first, true);
+            klass->field_name_to_index[entry.first] = field_sym.index;
+        }
+    }
+
+    for (AdCompiledFunction* initializer : parent->field_initializers) {
+        klass->field_initializers.push_back(initializer);
+    }
+
+    for (const auto& entry : parent->methods) {
+        if (klass->methods.find(entry.first) == klass->methods.end()) {
+            klass->methods[entry.first] = entry.second;
+        }
+    }
+}
+
 void Compiler::compile_class_statement(Ad_AST_Class* class_node) {
     if (class_node == nullptr || class_node->name == nullptr ||
         class_node->name->type != ST_IDENTIFIER) {
@@ -1152,7 +1215,21 @@ void Compiler::compile_class_statement(Ad_AST_Class* class_node) {
     Symbol class_sym = symbol_table->define(class_ident->value);
 
     auto* klass = new AdCompiledClass();
+    klass->name = class_ident->value;
     enter_scope_class();
+
+    for (Ad_AST_Node* parent_node : class_node->inheritFrom) {
+        if (parent_node == nullptr) {
+            continue;
+        }
+        const std::string parent_name = parent_node->TokenLiteral();
+        auto parent_it = compiled_classes.find(parent_name);
+        if (parent_it == compiled_classes.end() || parent_it->second == nullptr) {
+            std::cerr << "[ Compiler Error ] unknown parent class: " << parent_name << "\n";
+            continue;
+        }
+        merge_parent_class(klass, parent_it->second, parent_name);
+    }
 
     for (Ad_AST_Node* attr : class_node->attributes) {
         Ad_AST_AssignStatement* assign_stmt = class_attribute_as_assign(attr);
@@ -1194,6 +1271,8 @@ void Compiler::compile_class_statement(Ad_AST_Class* class_node) {
     }
 
     leave_scope();
+
+    compiled_classes[klass->name] = klass;
 
     emit(opConstant, 1, {addConstant(klass)});
     if (class_sym.scope == SymbolScope::GLOBAL) {

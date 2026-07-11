@@ -251,6 +251,8 @@ bool VM::execute_instruction() {
         execute_get_method();
     } else if (opcode == OP_GET_THIS) {
         execute_get_this();
+    } else if (opcode == OP_GET_SUPER_METHOD) {
+        execute_get_super_method();
     } else {
         std::cerr << "[ VM Error ] unknown opcode: " << static_cast<int>(opcode) << std::endl;
     }
@@ -824,9 +826,20 @@ void VM::execute_patch_property_sym(int sym_index) {
         std::cerr << "[ VM Error ] OP_PATCH_PROPERTY_SYM: no bound instance\n";
         return;
     }
-    ensure_instance_field_capacity(inst, sym_index);
-    inst->fields[static_cast<size_t>(sym_index)] = value;
-    register_instance_field_name(inst, vm_property_field_name(field_name_obj), sym_index);
+    const std::string field_name = vm_property_field_name(field_name_obj);
+    int index = sym_index;
+    if (sym_index == 65535) {
+        index = lookup_instance_field_index(inst, field_name);
+        if (index < 0) {
+            index = static_cast<int>(inst->fields.size());
+            register_instance_field_name(inst, field_name, index);
+        }
+    }
+    ensure_instance_field_capacity(inst, index);
+    inst->fields[static_cast<size_t>(index)] = value;
+    if (sym_index != 65535) {
+        register_instance_field_name(inst, field_name, index);
+    }
 }
 
 void VM::execute_get_property() {
@@ -901,6 +914,42 @@ void VM::execute_get_method() {
         return;
     }
     auto* bound = new AdBoundMethod(inst, it->second);
+    if (gc != nullptr) {
+        gc->addObject(bound);
+    }
+    push(bound);
+}
+
+void VM::execute_get_super_method() {
+    if (sp < 3) {
+        std::cerr << "[ VM Error ] OP_GET_SUPER_METHOD: stack underflow\n";
+        return;
+    }
+    Ad_Object* method_name_obj = pop();
+    Ad_Object* parent_name_obj = pop();
+    Ad_Object* owner = pop();
+    if (owner == nullptr || owner->Type() != OBJ_COMPILED_INSTANCE) {
+        push(&NULLOBJECT);
+        return;
+    }
+    auto* inst = static_cast<AdCompiledInstance*>(owner);
+    if (inst->klass == nullptr) {
+        push(&NULLOBJECT);
+        return;
+    }
+    const std::string parent_name = vm_property_field_name(parent_name_obj);
+    const std::string method_name = vm_property_field_name(method_name_obj);
+    auto parent_it = inst->klass->super_classes_by_name.find(parent_name);
+    if (parent_it == inst->klass->super_classes_by_name.end() || parent_it->second == nullptr) {
+        push(&NULLOBJECT);
+        return;
+    }
+    auto method_it = parent_it->second->methods.find(method_name);
+    if (method_it == parent_it->second->methods.end() || method_it->second == nullptr) {
+        push(&NULLOBJECT);
+        return;
+    }
+    auto* bound = new AdBoundMethod(inst, method_it->second);
     if (gc != nullptr) {
         gc->addObject(bound);
     }

@@ -261,6 +261,9 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             for (AdCompiledFunction* initializer : klass->field_initializers) {
                 markObject(initializer);
             }
+            for (AdCompiledClass* super_class : klass->supers) {
+                markObject(super_class);
+            }
             break;
         }
         case OBJ_COMPILED_INSTANCE: {

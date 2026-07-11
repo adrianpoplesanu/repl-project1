@@ -41,10 +41,15 @@ public:
 
 class AdCompiledClass : public Ad_Object {
 public:
+    std::string name;
     std::unordered_map<std::string, AdClosureObject*> methods;
     std::vector<AdCompiledFunction*> field_initializers;
     /// Maps field name → slot index in `AdCompiledInstance::fields`.
     std::unordered_map<std::string, int> field_name_to_index;
+    /// Resolved parent classes in declaration order.
+    std::vector<AdCompiledClass*> supers;
+    /// Parent lookup for `super(Parent).method(...)`.
+    std::unordered_map<std::string, AdCompiledClass*> super_classes_by_name;
 
     AdCompiledClass();
     std::string Inspect() override;

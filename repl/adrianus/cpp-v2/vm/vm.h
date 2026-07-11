@@ -64,6 +64,7 @@ public:
     void execute_get_property();
     void execute_set_property();
     void execute_get_method();
+    void execute_get_super_method();
     void execute_get_this();
     void execute_set_method();
 };

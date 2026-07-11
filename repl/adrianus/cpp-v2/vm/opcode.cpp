@@ -43,4 +43,5 @@ OpSetPropertySym opSetPropertySym;
 OpGetPropertySym opGetPropertySym;
 OpPatchPropertySym opPatchPropertySym;
 OpGetThis opGetThis;
+OpGetSuperMethod opGetSuperMethod;
 OpFileStmtOutput opFileStmtOutput;

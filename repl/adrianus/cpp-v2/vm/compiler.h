@@ -10,6 +10,7 @@
 #include "../objects.h"
 #include "../ast.h"
 #include <vector>
+#include <unordered_map>
 
 class Compiler {
 public:
@@ -35,6 +36,9 @@ public:
 
     /// True only while compiling a direct child of `ST_PROGRAM` (top-level script statements).
     bool compiling_program_direct_statement = false;
+
+    /// Classes compiled so far in the current compilation unit (for inheritance resolution).
+    std::unordered_map<std::string, AdCompiledClass*> compiled_classes;
 
     void emitLoopBreak();
     void emitLoopContinue();
@@ -79,6 +83,11 @@ public:
 
     bool in_class_scope() const;
     void compile_class_statement(Ad_AST_Class* class_node);
+    void merge_parent_class(AdCompiledClass* klass, AdCompiledClass* parent, const std::string& parent_name);
+    void emit_instance_method_call(Ad_AST_Node* owner, const std::string& method_name,
+                                   const std::vector<Ad_AST_Node*>& arguments);
+    void emit_super_method_call(Ad_AST_Super_Expression* super_expr, const std::string& method_name,
+                                const std::vector<Ad_AST_Node*>& arguments);
     AdCompiledFunction* compile_class_field_initializer(Ad_AST_AssignStatement* assign_stmt);
     AdClosureObject* compile_class_method(Ad_AST_Def_Statement* def_stmt);
     void fill_default_arg_values(AdCompiledFunction* fn, const std::vector<Ad_AST_Node*>& default_params);
