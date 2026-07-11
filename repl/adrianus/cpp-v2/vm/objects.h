@@ -13,6 +13,8 @@ public:
     Instructions* instructions;
     int num_locals;
     int num_parameters;
+    /// Default argument values for trailing parameters (evaluator parity).
+    std::vector<Ad_Object*> default_arg_values;
 
     AdCompiledFunction();
     std::string Inspect() override;

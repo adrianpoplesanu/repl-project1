@@ -371,7 +371,6 @@ void Compiler::compile(Ad_AST_Node* node) {
         Ad_AST_AssignStatement* assign_stmt = static_cast<Ad_AST_AssignStatement*>(node);
         if (assign_stmt->name->type == ST_MEMBER_ACCESS) {
             Ad_AST_MemberAccess* member_access = static_cast<Ad_AST_MemberAccess*>(assign_stmt->name);
-            compile(member_access->owner);
 
             std::string member_name;
             if (member_access->member->type == ST_IDENTIFIER) {
@@ -379,9 +378,19 @@ void Compiler::compile(Ad_AST_Node* node) {
             } else {
                 member_name = member_access->member->TokenLiteral();
             }
-            (void)symbol_table->resolve(member_name);
 
-            compile(assign_stmt->value);
+            if (member_access->owner->type == ST_THIS_EXPRESSION) {
+                Symbol* field_sym = resolve_class_field_symbol(member_name);
+                if (field_sym != nullptr) {
+                    compile(assign_stmt->value);
+                    Ad_String_Object* field = new Ad_String_Object(member_name);
+                    emit(opConstant, 1, {addConstant(field)});
+                    emit(opPatchPropertySym, 1, {field_sym->index});
+                    return;
+                }
+            }
+
+            compile(member_access->owner);
 
             Ad_String_Object* field = new Ad_String_Object(member_name);
             emit(opConstant, 1, {addConstant(field)});
@@ -443,11 +452,11 @@ void Compiler::compile(Ad_AST_Node* node) {
         if (symbol != nullptr) {
             load_symbol(*symbol, identifier_node->value);
         } else if (in_class_scope()) {
-            // Implicit instance field access inside class bodies / methods.
+            Symbol field_sym = symbol_table->define(identifier_node->value, true);
             Ad_String_Object* field = new Ad_String_Object(identifier_node->value);
             int const_index = addConstant(field);
             emit(opConstant, 1, {const_index});
-            emit(opGetPropertySym, 1, {0});
+            emit(opGetPropertySym, 1, {field_sym.index});
         } else {
             std::cerr << "[ Compiler Error ] undefined identifier: " << identifier_node->value << "\n";
         }
@@ -520,6 +529,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->instructions->size = instructions.size;
         compiled_func->num_locals = num_locals;
         compiled_func->num_parameters = static_cast<int>(fn_lit->parameters.size());
+        fill_default_arg_values(compiled_func, fn_lit->default_params);
 
         std::vector<int> args;
         args.push_back(addConstant(compiled_func));
@@ -600,6 +610,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->instructions->size = inner_instructions.size;
         compiled_func->num_locals = num_locals;
         compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+        fill_default_arg_values(compiled_func, def_stmt->default_params);
 
         emit(opClosure, 2, {addConstant(compiled_func), static_cast<int>(free_symbols.size())});
         if (symbol.scope == SymbolScope::GLOBAL) {
@@ -719,6 +730,8 @@ void Compiler::compile(Ad_AST_Node* node) {
         return;
     } else if (node->type == ST_CLASS_STATEMENT) {
         compile_class_statement(static_cast<Ad_AST_Class*>(node));
+    } else if (node->type == ST_THIS_EXPRESSION) {
+        emit(opGetThis, 0, {});
     } else if (node->type == ST_MEMBER_ACCESS) {
         auto* member_access = static_cast<Ad_AST_MemberAccess*>(node);
         std::string member_name;
@@ -726,6 +739,13 @@ void Compiler::compile(Ad_AST_Node* node) {
             member_name = static_cast<Ad_AST_Identifier*>(member_access->member)->value;
         } else {
             member_name = member_access->member->TokenLiteral();
+        }
+        if (!member_access->is_method && member_access->owner->type == ST_THIS_EXPRESSION) {
+            Symbol* field_sym = resolve_class_field_symbol(member_name);
+            if (field_sym != nullptr) {
+                load_symbol(*field_sym, member_name);
+                return;
+            }
         }
         if (member_access->is_method) {
             compile(member_access->owner);
@@ -1073,10 +1093,52 @@ AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) 
     compiled_func->instructions->size = instructions.size;
     compiled_func->num_locals = num_locals;
     compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+    fill_default_arg_values(compiled_func, def_stmt->default_params);
 
     auto* closure = new AdClosureObject();
     closure->fn = compiled_func;
     return closure;
+}
+
+Symbol* Compiler::resolve_class_field_symbol(const std::string& name) const {
+    for (SymbolTable* table = symbol_table; table != nullptr; table = table->outer) {
+        auto it = table->store.find(name);
+        if (it != table->store.end() && it->second.scope == SymbolScope::CLASS) {
+            return const_cast<Symbol*>(&it->second);
+        }
+    }
+    return nullptr;
+}
+
+void Compiler::fill_default_arg_values(AdCompiledFunction* fn, const std::vector<Ad_AST_Node*>& default_params) {
+    if (fn == nullptr) {
+        return;
+    }
+    for (Ad_AST_Node* node : default_params) {
+        Ad_Object* value = &NULLOBJECT;
+        if (node == nullptr) {
+            value = &NULLOBJECT;
+        } else if (node->type == ST_INTEGER) {
+            value = new Ad_Integer_Object(static_cast<Ad_AST_Integer*>(node)->value);
+        } else if (node->type == ST_FLOAT) {
+            auto* float_obj = new Ad_Float_Object();
+            float_obj->value = static_cast<Ad_AST_Float*>(node)->value;
+            value = float_obj;
+        } else if (node->type == ST_STRING_LITERAL) {
+            value = new Ad_String_Object(static_cast<Ad_AST_String*>(node)->value);
+        } else if (node->type == ST_NULL_EXPRESSION) {
+            value = &NULLOBJECT;
+        } else if (node->type == ST_BOOLEAN) {
+            value = new Ad_Boolean_Object(static_cast<Ad_AST_Boolean*>(node)->value);
+        } else {
+            std::cerr << "[ Compiler Error ] unsupported default parameter expression in the VM\n";
+            value = &NULLOBJECT;
+        }
+        if (value != &NULLOBJECT && gc != nullptr) {
+            gc->addObject(value);
+        }
+        fn->default_arg_values.push_back(value);
+    }
 }
 
 void Compiler::compile_class_statement(Ad_AST_Class* class_node) {

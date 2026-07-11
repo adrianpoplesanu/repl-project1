@@ -237,6 +237,10 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
         case OBJ_COMPILED_FUNCTION: {
             obj->marked = true;
+            auto* fn = static_cast<AdCompiledFunction*>(obj);
+            for (Ad_Object* default_value : fn->default_arg_values) {
+                markObject(default_value);
+            }
             break;
         }
         case OBJ_CLOSURE: {

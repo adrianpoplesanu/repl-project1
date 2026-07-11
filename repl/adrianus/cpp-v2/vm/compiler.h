@@ -81,6 +81,8 @@ public:
     void compile_class_statement(Ad_AST_Class* class_node);
     AdCompiledFunction* compile_class_field_initializer(Ad_AST_AssignStatement* assign_stmt);
     AdClosureObject* compile_class_method(Ad_AST_Def_Statement* def_stmt);
+    void fill_default_arg_values(AdCompiledFunction* fn, const std::vector<Ad_AST_Node*>& default_params);
+    Symbol* resolve_class_field_symbol(const std::string& name) const;
 
 };
 

@@ -53,6 +53,7 @@ public:
     void call_builtin(Ad_Builtin_Object* builtin, int num_args);
     void call_class(AdCompiledClass* cl, int num_args);
     void call_bound_method(AdBoundMethod* bm, int num_args);
+    void apply_default_arguments(AdCompiledFunction* fn, int& num_args);
 
     AdCompiledInstance* current_bound_instance();
     void ensure_instance_field_capacity(AdCompiledInstance* inst, int index);
@@ -63,6 +64,7 @@ public:
     void execute_get_property();
     void execute_set_property();
     void execute_get_method();
+    void execute_get_this();
     void execute_set_method();
 };
 

@@ -249,6 +249,8 @@ bool VM::execute_instruction() {
         execute_set_property();
     } else if (opcode == OP_GET_METHOD) {
         execute_get_method();
+    } else if (opcode == OP_GET_THIS) {
+        execute_get_this();
     } else {
         std::cerr << "[ VM Error ] unknown opcode: " << static_cast<int>(opcode) << std::endl;
     }
@@ -310,6 +312,34 @@ void VM::execute_call(int num_args) {
     }
 }
 
+void VM::apply_default_arguments(AdCompiledFunction* fn, int& num_args) {
+    if (fn == nullptr) {
+        return;
+    }
+    const int num_params = fn->num_parameters;
+    if (num_args >= num_params) {
+        return;
+    }
+    const int num_defaults = static_cast<int>(fn->default_arg_values.size());
+    if (num_args + num_defaults < num_params) {
+        std::cerr << "ERROR: wrong number of arguments expecting: " << num_params
+                  << " got: " << num_args << std::endl;
+        return;
+    }
+    const int threshold = num_defaults - num_params + num_args;
+    for (int i = 0; i < num_defaults; ++i) {
+        if (i >= threshold) {
+            Ad_Object* default_value = fn->default_arg_values[static_cast<size_t>(i)];
+            if (default_value != nullptr) {
+                push(default_value);
+            } else {
+                push(&NULLOBJECT);
+            }
+            ++num_args;
+        }
+    }
+}
+
 void VM::call_closure(AdClosureObject* cl, int num_args) {
     if (cl == nullptr || cl->fn == nullptr) {
         std::cerr << "[ VM Error ] call_closure: null closure or function\n";
@@ -326,6 +356,7 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
         push(err);
         return;
     }
+    apply_default_arguments(cl->fn, num_args);
     Frame frame(cl, -1, sp - num_args, current_bound_instance());
     push_frame(frame);
     sp = frame.base_pointer + cl->fn->num_locals;
@@ -403,6 +434,10 @@ void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
         std::cerr << "[ VM Error ] call_bound_method: invalid bound method\n";
         return;
     }
+    if (num_args != bm->bound_method->fn->num_parameters) {
+        // Defaults may reduce the gap; apply before the final arity check.
+    }
+    apply_default_arguments(bm->bound_method->fn, num_args);
     if (num_args != bm->bound_method->fn->num_parameters) {
         std::cerr << "ERROR: wrong number of arguments expecting: " << bm->bound_method->fn->num_parameters
                   << " got: " << num_args << std::endl;
@@ -870,6 +905,15 @@ void VM::execute_get_method() {
         gc->addObject(bound);
     }
     push(bound);
+}
+
+void VM::execute_get_this() {
+    AdCompiledInstance* inst = current_bound_instance();
+    if (inst != nullptr) {
+        push(inst);
+    } else {
+        push(&NULLOBJECT);
+    }
 }
 
 void VM::execute_set_method() {

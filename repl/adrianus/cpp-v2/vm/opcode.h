@@ -50,6 +50,8 @@ enum OpCodeType {
 
     OP_PATCH_PROPERTY_SYM,
 
+    OP_GET_THIS,
+
     /// Pop the top-of-stack value and print it like `Evaluator::EvalProgram` does for each
     /// top-level statement (skip only OBJ_SIGNAL). Used for VM file/REPL parity with the evaluator.
     OP_FILE_STMT_OUTPUT
@@ -313,6 +315,12 @@ public:
     }
 };
 
+class OpGetThis : public OpCode {
+public:
+    OpGetThis() : OpCode(OP_GET_THIS) {
+    }
+};
+
 class OpFileStmtOutput : public OpCode {
 public:
     OpFileStmtOutput() : OpCode(OP_FILE_STMT_OUTPUT) {
@@ -361,6 +369,7 @@ extern OpInvoke opInvoke;
 extern OpSetPropertySym opSetPropertySym;
 extern OpGetPropertySym opGetPropertySym;
 extern OpPatchPropertySym opPatchPropertySym;
+extern OpGetThis opGetThis;
 extern OpFileStmtOutput opFileStmtOutput;
 
 #endif

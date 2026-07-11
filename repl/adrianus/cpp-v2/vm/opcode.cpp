@@ -42,4 +42,5 @@ OpInvoke opInvoke;
 OpSetPropertySym opSetPropertySym;
 OpGetPropertySym opGetPropertySym;
 OpPatchPropertySym opPatchPropertySym;
+OpGetThis opGetThis;
 OpFileStmtOutput opFileStmtOutput;
