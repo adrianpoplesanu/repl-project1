@@ -461,13 +461,14 @@ void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
         std::cerr << "[ VM Error ] call_bound_method: invalid bound method\n";
         return;
     }
-    if (num_args != bm->bound_method->fn->num_parameters) {
-        // Defaults may reduce the gap; apply before the final arity check.
-    }
+    const int callee_index = sp - 1 - num_args;
     apply_default_arguments(bm->bound_method->fn, num_args);
     if (num_args != bm->bound_method->fn->num_parameters) {
+        sp = callee_index;
         std::cerr << "ERROR: wrong number of arguments expecting: " << bm->bound_method->fn->num_parameters
                   << " got: " << num_args << std::endl;
+        push(&NULLOBJECT);
+        return;
     }
     Frame frame(bm->bound_method, -1, sp - num_args, bm->owner);
     push_frame(frame);
@@ -898,17 +899,25 @@ void VM::execute_get_property_sym(int sym_index) {
         push(&NULLOBJECT);
         return;
     }
-    if (sym_index < 0 || sym_index >= static_cast<int>(inst->fields.size())) {
+    int index = sym_index;
+    if (sym_index == 65535) {
+        const std::string field_name = vm_property_field_name(field_name_obj);
+        index = lookup_instance_field_index(inst, field_name);
+        if (index < 0) {
+            push(&NULLOBJECT);
+            return;
+        }
+    }
+    if (index < 0 || index >= static_cast<int>(inst->fields.size())) {
         push(&NULLOBJECT);
         return;
     }
-    Ad_Object* value = inst->fields[static_cast<size_t>(sym_index)];
+    Ad_Object* value = inst->fields[static_cast<size_t>(index)];
     if (value != nullptr) {
         push(value);
     } else {
         push(&NULLOBJECT);
     }
-    (void)field_name_obj;
 }
 
 void VM::execute_patch_property_sym(int sym_index) {
@@ -1008,15 +1017,27 @@ void VM::execute_get_method() {
             return;
         }
         auto it = inst->klass->methods.find(method_name);
-        if (it == inst->klass->methods.end() || it->second == nullptr) {
-            push(&NULLOBJECT);
+        if (it != inst->klass->methods.end() && it->second != nullptr) {
+            auto* bound = new AdBoundMethod(inst, it->second);
+            if (gc != nullptr) {
+                gc->addObject(bound);
+            }
+            push(bound);
             return;
         }
-        auto* bound = new AdBoundMethod(inst, it->second);
-        if (gc != nullptr) {
-            gc->addObject(bound);
+        const int field_index = lookup_instance_field_index(inst, method_name);
+        if (field_index >= 0 && field_index < static_cast<int>(inst->fields.size())) {
+            Ad_Object* field_val = inst->fields[static_cast<size_t>(field_index)];
+            if (field_val != nullptr && field_val->Type() == OBJ_CLOSURE) {
+                auto* bound = new AdBoundMethod(inst, static_cast<AdClosureObject*>(field_val));
+                if (gc != nullptr) {
+                    gc->addObject(bound);
+                }
+                push(bound);
+                return;
+            }
         }
-        push(bound);
+        push(&NULLOBJECT);
         return;
     }
     if (owner->Type() == OBJ_FILE) {

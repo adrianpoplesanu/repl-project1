@@ -453,6 +453,7 @@ void Compiler::compile(Ad_AST_Node* node) {
             }
 
             compile(member_access->owner);
+            compile(assign_stmt->value);
 
             Ad_String_Object* field = new Ad_String_Object(member_name);
             emit(opConstant, 1, {addConstant(field)});
@@ -519,6 +520,10 @@ void Compiler::compile(Ad_AST_Node* node) {
             int const_index = addConstant(field);
             emit(opConstant, 1, {const_index});
             emit(opGetPropertySym, 1, {field_sym.index});
+        } else if (symbol_table->outer != nullptr) {
+            // Method / closure bodies resolve unknown names from the bound instance at runtime,
+            // matching evaluator instance_environment lookup (e.g. dex.printName -> name).
+            emit_dynamic_instance_field_lookup(identifier_node->value);
         } else {
             std::cerr << "[ Compiler Error ] undefined identifier: " << identifier_node->value << "\n";
         }
@@ -1131,6 +1136,12 @@ std::string assign_field_name(Ad_AST_AssignStatement* assign_stmt) {
 bool Compiler::in_class_scope() const {
     return scopeIndex >= 0 && scopeIndex < static_cast<int>(scopes.size()) &&
            scopes[scopeIndex].compilationType == "class";
+}
+
+void Compiler::emit_dynamic_instance_field_lookup(const std::string& field_name) {
+    Ad_String_Object* field = new Ad_String_Object(field_name);
+    emit(opConstant, 1, {addConstant(field)});
+    emit(opGetPropertySym, 1, {65535});
 }
 
 AdCompiledFunction* Compiler::compile_class_field_initializer(Ad_AST_AssignStatement* assign_stmt) {
