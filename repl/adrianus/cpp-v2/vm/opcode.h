@@ -25,6 +25,8 @@ enum OpCodeType {
     OP_HASH,
     OP_INDEX,
     OP_SET_INDEX,
+    /// Stack: ... old_value, new_value, left, index (index on top). Sets left[index]=new_value, pushes old_value.
+    OP_POSTFIX_INDEX,
     OP_CALL,
     OP_RETURN_VALUE,
     OP_RETURN,
@@ -203,6 +205,12 @@ public:
     }
 };
 
+class OpPostfixIndex : public OpCode {
+public:
+    OpPostfixIndex() : OpCode(OP_POSTFIX_INDEX) {
+    }
+};
+
 class OpCall : public OpCode {
 public:
     OpCall() : OpCode(OP_CALL) {
@@ -358,6 +366,7 @@ extern OpArray opArray;
 extern OpHash opHash;
 extern OpIndex opIndex;
 extern OpSetIndex opSetIndex;
+extern OpPostfixIndex opPostfixIndex;
 extern OpCall opCall;
 extern OpReturnValue opReturnValue;
 extern OpReturn opReturn;

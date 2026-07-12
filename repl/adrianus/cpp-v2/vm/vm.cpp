@@ -183,6 +183,17 @@ bool VM::execute_instruction() {
         Ad_Object* index = pop();
         Ad_Object* left = pop();
         execute_set_index_expression(left, index, value);
+    } else if (opcode == OP_POSTFIX_INDEX) {
+        if (sp < 4) {
+            std::cerr << "[ VM Error ] OP_POSTFIX_INDEX: stack underflow\n";
+        } else {
+            Ad_Object* index = pop();
+            Ad_Object* left = pop();
+            Ad_Object* new_value = pop();
+            Ad_Object* old_value = pop();
+            execute_set_index_expression(left, index, new_value);
+            push(old_value != nullptr ? old_value : &NULLOBJECT);
+        }
     } else if (opcode == OP_CLOSURE) {
         int const_index = read_uint16(*ins, ip + 1);
         int num_free = read_uint8(*ins, ip + 3);

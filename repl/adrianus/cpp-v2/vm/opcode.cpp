@@ -23,6 +23,7 @@ OpArray opArray;
 OpHash opHash;
 OpIndex opIndex;
 OpSetIndex opSetIndex;
+OpPostfixIndex opPostfixIndex;
 OpCall opCall;
 OpReturnValue opReturnValue;
 OpReturn opReturn;

@@ -217,38 +217,64 @@ void Compiler::compile(Ad_AST_Node* node) {
         }
     } else if (node->type == ST_POSTFIX_INCREMENT) {
         auto* post = static_cast<Ad_AST_PostfixIncrement*>(node);
-        if (post->name == nullptr || post->name->type != ST_IDENTIFIER) {
-            std::cerr << "[ Compiler Error ] postfix ++/-- only supported for simple identifiers in the VM\n";
+        if (post->name == nullptr) {
+            std::cerr << "[ Compiler Error ] postfix ++/-- requires a target\n";
             return;
         }
-        auto* ident = static_cast<Ad_AST_Identifier*>(post->name);
-        Symbol* sym = symbol_table->resolve(ident->value);
-        if (sym == nullptr) {
-            std::cerr << "[ Compiler Error ] undefined identifier in postfix ++/--: " << ident->value << "\n";
-            return;
-        }
-        if (sym->scope == SymbolScope::FREE) {
-            std::cerr << "[ Compiler Error ] postfix ++/-- for captured variables is not supported yet\n";
-            return;
-        }
-        load_symbol(*sym, ident->value);
-        load_symbol(*sym, ident->value);
-        int one_idx = addConstant(new Ad_Integer_Object(1));
-        emit(opConstant, 1, {one_idx});
-        if (post->_operator == "++") {
-            emit(opAdd, 0, {});
-        } else if (post->_operator == "--") {
-            emit(opSub, 0, {});
+        if (post->name->type == ST_INDEX_EXPRESSION) {
+            auto* index_expr = static_cast<Ad_AST_IndexExpression*>(post->name);
+            compile(index_expr->left);
+            compile(index_expr->index);
+            emit(opIndex, 0, {});
+            compile(index_expr->left);
+            compile(index_expr->index);
+            emit(opIndex, 0, {});
+            int one_idx = addConstant(new Ad_Integer_Object(1));
+            emit(opConstant, 1, {one_idx});
+            if (post->_operator == "++") {
+                emit(opAdd, 0, {});
+            } else if (post->_operator == "--") {
+                emit(opSub, 0, {});
+            } else {
+                std::cerr << "[ Compiler Error ] unsupported postfix increment operator\n";
+                return;
+            }
+            compile(index_expr->left);
+            compile(index_expr->index);
+            emit(opPostfixIndex, 0, {});
+        } else if (post->name->type == ST_IDENTIFIER) {
+            auto* ident = static_cast<Ad_AST_Identifier*>(post->name);
+            Symbol* sym = symbol_table->resolve(ident->value);
+            if (sym == nullptr) {
+                std::cerr << "[ Compiler Error ] undefined identifier in postfix ++/--: " << ident->value << "\n";
+                return;
+            }
+            if (sym->scope == SymbolScope::FREE) {
+                std::cerr << "[ Compiler Error ] postfix ++/-- for captured variables is not supported yet\n";
+                return;
+            }
+            load_symbol(*sym, ident->value);
+            load_symbol(*sym, ident->value);
+            int one_idx = addConstant(new Ad_Integer_Object(1));
+            emit(opConstant, 1, {one_idx});
+            if (post->_operator == "++") {
+                emit(opAdd, 0, {});
+            } else if (post->_operator == "--") {
+                emit(opSub, 0, {});
+            } else {
+                std::cerr << "[ Compiler Error ] unsupported postfix increment operator\n";
+                return;
+            }
+            if (sym->scope == SymbolScope::GLOBAL) {
+                emit(opSetGlobal, 1, {sym->index});
+            } else if (sym->scope == SymbolScope::LOCAL) {
+                emit(opSetLocal, 1, {sym->index});
+            } else {
+                std::cerr << "[ Compiler Error ] postfix ++/-- for this symbol scope is not supported in the VM\n";
+                return;
+            }
         } else {
-            std::cerr << "[ Compiler Error ] unsupported postfix increment operator\n";
-            return;
-        }
-        if (sym->scope == SymbolScope::GLOBAL) {
-            emit(opSetGlobal, 1, {sym->index});
-        } else if (sym->scope == SymbolScope::LOCAL) {
-            emit(opSetLocal, 1, {sym->index});
-        } else {
-            std::cerr << "[ Compiler Error ] postfix ++/-- for this symbol scope is not supported in the VM\n";
+            std::cerr << "[ Compiler Error ] postfix ++/-- only supported for simple identifiers and index expressions in the VM\n";
             return;
         }
     } else if (node->type == ST_INFIX_EXPRESSION) {
