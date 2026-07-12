@@ -9,6 +9,7 @@ test_compiler_simple
 test_compiler_simple.dSYM/
 test_vm
 test_vm.dSYM/
+test_vm_m0.dSYM/
 
 bytecode-logs/
 

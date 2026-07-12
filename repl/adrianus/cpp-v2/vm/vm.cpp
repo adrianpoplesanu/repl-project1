@@ -585,6 +585,9 @@ void VM::execute_binary_operation(OpCodeType opcode) {
     bool left_is_float = left->Type() == OBJ_FLOAT;
     bool right_is_float = right->Type() == OBJ_FLOAT;
 
+    bool left_is_string = left->Type() == OBJ_STRING;
+    bool right_is_string = right->Type() == OBJ_STRING;
+
     if ((left_is_int || left_is_float) && (right_is_int || right_is_float)) {
         bool use_float = left_is_float || right_is_float;
         float left_val = left_is_float ? static_cast<Ad_Float_Object*>(left)->value
@@ -629,6 +632,20 @@ void VM::execute_binary_operation(OpCodeType opcode) {
                 std::cerr << "[ VM Error ] Unknown binary operation opcode: " << opcode << std::endl;
                 return;
         }
+    } else if (opcode == OP_ADD) {
+        if (left_is_string && right_is_string) {
+            result = new Ad_String_Object(static_cast<Ad_String_Object*>(left)->value +
+                                           static_cast<Ad_String_Object*>(right)->value);
+        } else if (left_is_string && right_is_int) {
+            result = new Ad_String_Object(static_cast<Ad_String_Object*>(left)->value +
+                                           std::to_string(static_cast<Ad_Integer_Object*>(right)->value));
+        } else if (left_is_int && right_is_string) {
+            result = new Ad_String_Object(std::to_string(static_cast<Ad_Integer_Object*>(left)->value) +
+                                           static_cast<Ad_String_Object*>(right)->value);
+        } else {
+            std::cerr << "[ VM Error ] Unsupported types for binary operation" << std::endl;
+            return;
+        }
     } else {
         std::cerr << "[ VM Error ] Unsupported types for binary operation" << std::endl;
         return;
@@ -653,6 +670,9 @@ void VM::execute_comparison(OpCodeType opcode) {
     bool left_is_float = left->Type() == OBJ_FLOAT;
     bool right_is_float = right->Type() == OBJ_FLOAT;
 
+    bool left_is_string = left->Type() == OBJ_STRING;
+    bool right_is_string = right->Type() == OBJ_STRING;
+
     if ((left_is_int || left_is_float) && (right_is_int || right_is_float)) {
         float left_val = left_is_float ? static_cast<Ad_Float_Object*>(left)->value
                                        : static_cast<float>(static_cast<Ad_Integer_Object*>(left)->value);
@@ -674,6 +694,25 @@ void VM::execute_comparison(OpCodeType opcode) {
                 break;
             default:
                 std::cerr << "[ VM Error ] Unknown comparison opcode: " << opcode << std::endl;
+                return;
+        }
+        push(native_bool_to_boolean_object(comparison_result));
+        return;
+    }
+
+    if (left_is_string && right_is_string) {
+        const std::string& left_val = static_cast<Ad_String_Object*>(left)->value;
+        const std::string& right_val = static_cast<Ad_String_Object*>(right)->value;
+        bool comparison_result = false;
+        switch (opcode) {
+            case OP_EQUAL:
+                comparison_result = left_val == right_val;
+                break;
+            case OP_NOTEQUAL:
+                comparison_result = left_val != right_val;
+                break;
+            default:
+                std::cerr << "[ VM Error ] Unsupported types for comparison operation" << std::endl;
                 return;
         }
         push(native_bool_to_boolean_object(comparison_result));
@@ -762,6 +801,10 @@ void VM::execute_index_expression(Ad_Object* left, Ad_Object* index) {
         execute_hash_index(left, index);
         return;
     }
+    if (left->Type() == OBJ_STRING) {
+        execute_string_index(left, index);
+        return;
+    }
     push(&NULLOBJECT);
 }
 
@@ -799,6 +842,20 @@ void VM::execute_array_index(Ad_Object* left, Ad_Object* index) {
     } else {
         push(((Ad_List_Object*)left)->elements[i]);
     }
+}
+
+void VM::execute_string_index(Ad_Object* left, Ad_Object* index) {
+    if (index == nullptr || index->Type() != OBJ_INT) {
+        push(&NULLOBJECT);
+        return;
+    }
+    auto* str_obj = static_cast<Ad_String_Object*>(left);
+    const int idx = static_cast<Ad_Integer_Object*>(index)->value;
+    if (idx < 0 || idx >= static_cast<int>(str_obj->value.size())) {
+        push(&NULLOBJECT);
+        return;
+    }
+    push(new Ad_String_Object(str_obj->value.substr(static_cast<size_t>(idx), 1)));
 }
 
 void VM::execute_hash_index(Ad_Object* left, Ad_Object* index) {
@@ -886,6 +943,33 @@ static std::string vm_property_field_name(Ad_Object* field_name_obj) {
     return field_name_obj->Inspect();
 }
 
+void VM::push_bound_instance_member(AdCompiledInstance* inst, const std::string& name) {
+    if (inst == nullptr) {
+        push(&NULLOBJECT);
+        return;
+    }
+    const int index = lookup_instance_field_index(inst, name);
+    if (index >= 0 && index < static_cast<int>(inst->fields.size())) {
+        Ad_Object* value = inst->fields[static_cast<size_t>(index)];
+        if (value != nullptr) {
+            push(value);
+            return;
+        }
+    }
+    if (inst->klass != nullptr) {
+        auto it = inst->klass->methods.find(name);
+        if (it != inst->klass->methods.end() && it->second != nullptr) {
+            auto* bound = new AdBoundMethod(inst, it->second);
+            if (gc != nullptr) {
+                gc->addObject(bound);
+            }
+            push(bound);
+            return;
+        }
+    }
+    push(&NULLOBJECT);
+}
+
 void VM::execute_get_property_sym(int sym_index) {
     if (sp <= 0) {
         std::cerr << "[ VM Error ] OP_GET_PROPERTY_SYM: stack underflow\n";
@@ -902,11 +986,8 @@ void VM::execute_get_property_sym(int sym_index) {
     int index = sym_index;
     if (sym_index == 65535) {
         const std::string field_name = vm_property_field_name(field_name_obj);
-        index = lookup_instance_field_index(inst, field_name);
-        if (index < 0) {
-            push(&NULLOBJECT);
-            return;
-        }
+        push_bound_instance_member(inst, field_name);
+        return;
     }
     if (index < 0 || index >= static_cast<int>(inst->fields.size())) {
         push(&NULLOBJECT);

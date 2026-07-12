@@ -94,6 +94,7 @@ void Repl::LoopVM() {
             break;
         }
     }
+    free_builtin_map();
 }
 
 void Repl::ExecuteFile(std::ifstream &target) {
@@ -154,11 +155,13 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
         while (getline(target, line)) {
             text += line + "\n";
         }
+
+        compiler.reset();
+        load_bootstrap_vm(compiler, program, parser);
+
         parser.Load(text);
         program.reset();
         parser.ParseProgram(program);
-
-        compiler.reset();
         compiler.compile(&program);
         Bytecode bytecode = compiler.getBytecode();
 
@@ -187,6 +190,7 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
         program.reset();
     }
     target.close();
+    free_builtin_map();
 }
 
 bool Repl::ExecuteLine(std::string line) {
@@ -202,12 +206,14 @@ bool Repl::ExecuteLine(std::string line) {
 }
 
 bool Repl::ExecuteLineVM(std::string line) {
+    compiler.reset();
+    load_bootstrap_vm(compiler, program, parser);
+
     parser.Load(line);
     program.reset();
     parser.ParseProgram(program);
     std::cout << program.ToString();
 
-    compiler.reset();
     compiler.compile(&program);
 
     Bytecode bytecode = compiler.getBytecode();

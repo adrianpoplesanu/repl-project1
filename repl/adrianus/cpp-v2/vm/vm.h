@@ -48,6 +48,7 @@ public:
     void execute_set_index_expression(Ad_Object* left, Ad_Object* index, Ad_Object* value);
     void execute_array_index(Ad_Object* left, Ad_Object* index);
     void execute_hash_index(Ad_Object* left, Ad_Object* index);
+    void execute_string_index(Ad_Object* left, Ad_Object* index);
 
     void execute_call(int num_args);
     void call_closure(AdClosureObject* cl, int num_args);
@@ -63,6 +64,7 @@ public:
     void ensure_instance_field_capacity(AdCompiledInstance* inst, int index);
     void register_instance_field_name(AdCompiledInstance* inst, const std::string& name, int index);
     int lookup_instance_field_index(AdCompiledInstance* inst, const std::string& name);
+    void push_bound_instance_member(AdCompiledInstance* inst, const std::string& name);
     void execute_get_property_sym(int sym_index);
     void execute_patch_property_sym(int sym_index);
     void execute_get_property();
