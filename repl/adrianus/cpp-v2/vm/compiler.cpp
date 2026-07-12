@@ -49,6 +49,36 @@ void rebase_jump_operands_in_extracted_chunk(Instructions& ins, int extract_star
     }
 }
 
+Ad_AST_Def_Statement* program_def_statement(Ad_AST_Node* stmt) {
+    if (stmt == nullptr) {
+        return nullptr;
+    }
+    if (stmt->type == ST_DEF_STATEMENT) {
+        return static_cast<Ad_AST_Def_Statement*>(stmt);
+    }
+    if (stmt->type == ST_EXPRESSION_STATEMENT) {
+        auto* expr_stmt = static_cast<Ad_AST_ExpressionStatement*>(stmt);
+        if (expr_stmt->expression != nullptr && expr_stmt->expression->type == ST_DEF_STATEMENT) {
+            return static_cast<Ad_AST_Def_Statement*>(expr_stmt->expression);
+        }
+    }
+    return nullptr;
+}
+
+void hoist_program_function_names(Ad_AST_Program* program, SymbolTable* symbol_table) {
+    if (program == nullptr || symbol_table == nullptr) {
+        return;
+    }
+    for (Ad_AST_Node* stmt : program->statements) {
+        Ad_AST_Def_Statement* def_stmt = program_def_statement(stmt);
+        if (def_stmt == nullptr || def_stmt->name == nullptr || def_stmt->name->type != ST_IDENTIFIER) {
+            continue;
+        }
+        auto* def_name = static_cast<Ad_AST_Identifier*>(def_stmt->name);
+        symbol_table->define(def_name->value);
+    }
+}
+
 } // namespace
 
 void vm_register_builtin_symbols(SymbolTable* symbol_table) {
@@ -141,6 +171,9 @@ void Compiler::compile(Ad_AST_Node* node) {
         std::cout << "severe error: node is null" << std::endl;
     } else if (node->type == ST_PROGRAM) {
         Ad_AST_Program* program = (Ad_AST_Program*)node;
+        // Match evaluator behavior: top-level defs are all bound before any call runs,
+        // so forward references like test1() calling test2() must resolve at compile time.
+        hoist_program_function_names(program, symbol_table);
         for (Ad_AST_Node* stmt : program->statements) {
             compiling_program_direct_statement = true;
             compile(stmt);
