@@ -560,9 +560,20 @@ void Compiler::compile(Ad_AST_Node* node) {
     } else if (node->type == ST_INDEX_EXPRESSION) {
         Ad_AST_IndexExpression* index_expr = (Ad_AST_IndexExpression*)node;
         compile(index_expr->left);
-        compile(index_expr->index);
-        std::vector<int> args;
-        emit(opIndex, 0, args);
+        if (index_expr->indexEnd != nullptr) {
+            compile(index_expr->index);
+            compile(index_expr->indexEnd);
+            if (index_expr->step != nullptr) {
+                compile(index_expr->step);
+            } else {
+                emit(opNull, 0, {});
+            }
+            emit(opSlice, 0, {});
+        } else {
+            compile(index_expr->index);
+            std::vector<int> args;
+            emit(opIndex, 0, args);
+        }
     } else if (node->type == ST_FUNCTION_LITERAL) {
         Ad_AST_FunctionLiteral* fn_lit = (Ad_AST_FunctionLiteral*)node;
         enter_scope();
@@ -584,6 +595,7 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opReturn, 0, {});
         }
         std::vector<Symbol> free_symbols = symbol_table->free_symbols;
+        auto local_names = collect_scope_locals();
         int num_locals = symbol_table->num_definitions;
         Instructions instructions = leave_scope();
 
@@ -596,6 +608,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->instructions->bytes = instructions.bytes;
         compiled_func->instructions->size = instructions.size;
         compiled_func->num_locals = num_locals;
+        compiled_func->local_names = local_names;
         compiled_func->num_parameters = static_cast<int>(fn_lit->parameters.size());
         fill_default_arg_values(compiled_func, fn_lit->default_params);
 
@@ -663,6 +676,7 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opReturn, 0, {});
         }
         std::vector<Symbol> free_symbols = symbol_table->free_symbols;
+        auto local_names = collect_scope_locals();
         int num_locals = symbol_table->num_definitions;
         Instructions inner_instructions = leave_scope();
 
@@ -675,6 +689,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->instructions->bytes = inner_instructions.bytes;
         compiled_func->instructions->size = inner_instructions.size;
         compiled_func->num_locals = num_locals;
+        compiled_func->local_names = local_names;
         compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
         fill_default_arg_values(compiled_func, def_stmt->default_params);
 
@@ -1177,6 +1192,7 @@ AdCompiledFunction* Compiler::compile_class_field_initializer(Ad_AST_AssignState
     emit(opPatchPropertySym, 1, {field_sym->index});
     emit(opReturn, 0, {});
 
+    auto local_names = collect_scope_locals();
     int num_locals = symbol_table->num_definitions;
     Instructions instructions = leave_scope();
 
@@ -1185,6 +1201,7 @@ AdCompiledFunction* Compiler::compile_class_field_initializer(Ad_AST_AssignState
     compiled_func->instructions->bytes = instructions.bytes;
     compiled_func->instructions->size = instructions.size;
     compiled_func->num_locals = num_locals;
+    compiled_func->local_names = local_names;
     compiled_func->num_parameters = 0;
     return compiled_func;
 }
@@ -1208,6 +1225,7 @@ AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) 
         emit(opReturn, 0, {});
     }
 
+    auto local_names = collect_scope_locals();
     int num_locals = symbol_table->num_definitions;
     Instructions instructions = leave_scope();
 
@@ -1216,6 +1234,7 @@ AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) 
     compiled_func->instructions->bytes = instructions.bytes;
     compiled_func->instructions->size = instructions.size;
     compiled_func->num_locals = num_locals;
+    compiled_func->local_names = local_names;
     compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
     fill_default_arg_values(compiled_func, def_stmt->default_params);
 
@@ -1398,5 +1417,22 @@ void Compiler::compile_class_statement(Ad_AST_Class* class_node) {
     } else {
         emit(opSetLocal, 1, {class_sym.index});
     }
+}
+
+std::vector<std::pair<std::string, int>> Compiler::collect_scope_locals() const {
+    std::vector<std::pair<std::string, int>> locals;
+    if (symbol_table == nullptr) {
+        return locals;
+    }
+    for (const auto& entry : symbol_table->store) {
+        if (entry.second.scope == SymbolScope::LOCAL) {
+            locals.emplace_back(entry.first, entry.second.index);
+        }
+    }
+    std::sort(locals.begin(), locals.end(),
+              [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+                  return a.second < b.second;
+              });
+    return locals;
 }
 

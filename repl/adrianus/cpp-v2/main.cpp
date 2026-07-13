@@ -41,6 +41,7 @@
 #include "vm/utils.cpp"
 //#include "vm/vm.h"
 #include "vm/vm.cpp"
+#include "vm/vm_context.cpp"
 
 // 0 - no test is being run ar startinme, 1 - all tests are run at startime
 #define RUN_TESTS 0

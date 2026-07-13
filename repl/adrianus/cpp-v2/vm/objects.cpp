@@ -39,6 +39,10 @@ std::string AdClosureObject::Inspect() {
     return "<function at memory address: " + ss.str() + ">";
 }
 
+std::string AdClosureObject::repr() {
+    return Inspect();
+}
+
 void AdClosureObject::Print() {
 
 }
@@ -139,7 +143,16 @@ AdBoundMethod::AdBoundMethod(AdCompiledInstance* o, AdClosureObject* bm) {
 }
 
 std::string AdBoundMethod::Inspect() {
-    return "todo: implement AdBoundMethod.Inspect()";
+    if (bound_method != nullptr) {
+        return bound_method->Inspect();
+    }
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<function at memory address: " + ss.str() + ">";
+}
+
+std::string AdBoundMethod::repr() {
+    return Inspect();
 }
 
 void AdBoundMethod::Print() {

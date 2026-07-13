@@ -8,6 +8,7 @@
 #include "thread_workers.h"
 #include "profiling.h"
 #include "task_scheduler.cpp"
+#include "vm/vm_context.h"
 #include <thread>
 #include <cstdlib>
 #include <cstdint>
@@ -167,7 +168,9 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
 
         vm.load(bytecode);
         vm.printLogs();
+        ad_set_current_vm(&vm);
         run_vm_with_optional_instruction_limit(vm);
+        ad_set_current_vm(nullptr);
 
         garbageCollector->unmarkAllObjects();
         garbageCollector->markObjects(vm.stack, vm.sp);

@@ -52,6 +52,7 @@ public:
     void execute_array_index(Ad_Object* left, Ad_Object* index);
     void execute_hash_index(Ad_Object* left, Ad_Object* index);
     void execute_string_index(Ad_Object* left, Ad_Object* index);
+    void execute_slice_expression(Ad_Object* left, Ad_Object* start, Ad_Object* end, Ad_Object* step);
 
     void execute_call(int num_args);
     void call_closure(AdClosureObject* cl, int num_args);
@@ -76,6 +77,9 @@ public:
     void execute_get_super_method();
     void execute_get_this();
     void execute_set_method();
+
+    /// Invoke a closure synchronously (used by VM thread workers).
+    Ad_Object* invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args);
 };
 
 #endif

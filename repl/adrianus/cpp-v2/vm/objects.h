@@ -13,6 +13,8 @@ public:
     Instructions* instructions;
     int num_locals;
     int num_parameters;
+    /// Local slot index → name (for `__locals()` inside functions).
+    std::vector<std::pair<std::string, int>> local_names;
     /// Default argument values for trailing parameters (evaluator parity).
     std::vector<Ad_Object*> default_arg_values;
 
@@ -33,6 +35,7 @@ public:
 
 	AdClosureObject();
     std::string Inspect() override;
+    std::string repr() override;
 	void Print() override;
 	Ad_Object_Type Type() override;
 	std::string Hash() override;
@@ -84,6 +87,7 @@ public:
     AdBoundMethod();
     AdBoundMethod(AdCompiledInstance* owner, AdClosureObject* bound_method);
     std::string Inspect() override;
+    std::string repr() override;
 	void Print() override;
 	Ad_Object_Type Type() override;
 	std::string Hash() override;

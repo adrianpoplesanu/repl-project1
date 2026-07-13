@@ -6,13 +6,132 @@
 #include "../evaluator.h"
 #include "../hashpair.h"
 #include "../utils.h"
+#include "../socket_utils.h"
+#include "../thread_utils.h"
+#include "../environment.h"
 #include <iostream>
 #include <vector>
 #include <functional>
 #include <cstdint>
 #include <unordered_map>
+#include <climits>
+#include <algorithm>
 
 extern Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc);
+
+namespace {
+
+bool is_nullish(Ad_Object* obj) {
+    return obj == nullptr || obj == &NULLOBJECT || obj->Type() == OBJ_NULL;
+}
+
+int int_value(Ad_Object* obj) {
+    return static_cast<Ad_Integer_Object*>(obj)->value;
+}
+
+Ad_Object* vm_new_sub_list(Ad_Object* target, int i1, int i2, int step, GarbageCollector* gc) {
+    std::vector<Ad_Object*> elements;
+    int max = static_cast<int>(static_cast<Ad_List_Object*>(target)->elements.size());
+
+    if (step < 0 && i1 < -max) {
+        return new Ad_List_Object();
+    }
+    if (step < 0 && i1 >= max) {
+        i1 = INT_MAX;
+    }
+    if (step < 0 && i2 < -max) {
+        i2 = -INT_MAX;
+    }
+
+    if (i1 == INT_MAX) {
+        i1 = max - 1;
+    } else {
+        if (i1 < -max) i1 = -max;
+        if (i1 < 0) i1 += max;
+        if (i1 > max) i1 = max;
+    }
+
+    if (i2 == -INT_MAX) {
+        i2 = -1;
+    } else {
+        if (i2 < -max) i2 = -max;
+        if (i2 < 0) i2 += max;
+        if (i2 > max) i2 = max;
+    }
+
+    if (step > 0) {
+        for (int i = i1; i < i2; i += step) {
+            elements.push_back(static_cast<Ad_List_Object*>(target)->elements.at(static_cast<size_t>(i))->copy(gc));
+        }
+    } else if (step < 0) {
+        for (int i = i1; i > i2; i += step) {
+            elements.push_back(static_cast<Ad_List_Object*>(target)->elements.at(static_cast<size_t>(i))->copy(gc));
+        }
+    }
+    auto* result = new Ad_List_Object(elements);
+    if (gc != nullptr) {
+        gc->addObject(result);
+    }
+    return result;
+}
+
+Ad_Object* vm_new_sub_string(Ad_Object* target, int i1, int i2, int step, GarbageCollector* gc) {
+    std::string original = static_cast<Ad_String_Object*>(target)->value;
+    std::string result;
+
+    if (i1 < 0 && i2 < 0 && step > 0) {
+        i1 += static_cast<int>(original.length());
+        i2 += static_cast<int>(original.length());
+    } else if (i1 < 0 && i2 < 0 && step < 0) {
+        i1 += static_cast<int>(original.length());
+        if (i2 < -static_cast<int>(original.length())) {
+            i2 = -1;
+        } else {
+            i2 += static_cast<int>(original.length());
+        }
+    } else if (i1 < 0 && i2 == static_cast<int>(original.length()) && step < 0) {
+        if (i1 < -static_cast<int>(original.length())) {
+            return new Ad_String_Object("");
+        }
+        i1 += static_cast<int>(original.length());
+        i2 = -1;
+    } else if (i1 < 0 && i2 > 0) {
+        i1 += static_cast<int>(original.length());
+    } else if (i1 > 0 && i2 < 0 && step < 0) {
+        i2 += static_cast<int>(original.length());
+    } else if (i1 >= 0 && i2 < 0 && step > 0) {
+        i2 += static_cast<int>(original.length());
+    } else if (i1 < 0 && i2 >= 0 && step < 0) {
+        i1 += static_cast<int>(original.length());
+    } else if (i1 == 0 && i2 > 0 && step < 0) {
+        i1 += static_cast<int>(original.length()) - 1;
+        if (i2 == static_cast<int>(original.length()) - 1) {
+            i2 = -1;
+        }
+    }
+
+    if (i1 < i2 && step > 0) {
+        for (int i = i1; i < i2; i += step) {
+            result += original.at(static_cast<size_t>(i));
+        }
+    } else if (i1 > i2 && step < 0) {
+        for (int i = i1; i > i2; i += step) {
+            result += original.at(static_cast<size_t>(i));
+        }
+    } else if (i1 < i2 && step < 0) {
+        for (int i = i2; i >= i1; i += step) {
+            result += original.at(static_cast<size_t>(i));
+        }
+    }
+
+    auto* out = new Ad_String_Object(result);
+    if (gc != nullptr) {
+        gc->addObject(out);
+    }
+    return out;
+}
+
+} // namespace
 
 VM::VM() {
     sp = 0;
@@ -194,6 +313,16 @@ bool VM::execute_instruction() {
             Ad_Object* old_value = pop();
             execute_set_index_expression(left, index, new_value);
             push(old_value != nullptr ? old_value : &NULLOBJECT);
+        }
+    } else if (opcode == OP_SLICE) {
+        if (sp < 4) {
+            std::cerr << "[ VM Error ] OP_SLICE: stack underflow\n";
+        } else {
+            Ad_Object* step = pop();
+            Ad_Object* end = pop();
+            Ad_Object* start = pop();
+            Ad_Object* left = pop();
+            execute_slice_expression(left, start, end, step);
         }
     } else if (opcode == OP_CLOSURE) {
         int const_index = read_uint16(*ins, ip + 1);
@@ -512,6 +641,74 @@ void VM::call_runtime_bound_method(AdRuntimeBoundMethod* bm, int num_args) {
                 }
                 result = &NULLOBJECT;
             }
+        }
+    } else if (bm->receiver->Type() == OBJ_SOCKET) {
+        const std::string& method = bm->method_name;
+        if (method == "create_server") {
+            create_server(bm->receiver);
+            result = &NULLOBJECT;
+        } else if (method == "create_client") {
+            create_client2(bm->receiver);
+            result = &NULLOBJECT;
+        } else if (method == "accept") {
+            result = accept_socket(bm->receiver);
+            if (gc != nullptr && result != nullptr) {
+                gc->addObject(result);
+            }
+        } else if (method == "send") {
+            if (!args.empty()) {
+                send_socket(bm->receiver, args.at(0));
+            }
+            result = &NULLOBJECT;
+        } else if (method == "read") {
+            result = read_socket(bm->receiver);
+            if (gc != nullptr && result != nullptr) {
+                gc->addObject(result);
+            }
+        } else if (method == "readHTTP") {
+            result = readHTTP(bm->receiver);
+            if (gc != nullptr && result != nullptr) {
+                gc->addObject(result);
+            }
+        } else if (method == "sendAndReadBackHTTP") {
+            if (!args.empty()) {
+                result = sendAndReadBackHTTP(bm->receiver, args.at(0));
+                if (gc != nullptr && result != nullptr) {
+                    gc->addObject(result);
+                }
+            }
+        } else if (method == "sendAndReadBackHTTPS") {
+            if (!args.empty()) {
+                result = sendAndReadBackHTTPS(bm->receiver, args.at(0));
+                if (gc != nullptr && result != nullptr) {
+                    gc->addObject(result);
+                }
+            }
+        } else if (method == "close") {
+            close_socket(bm->receiver);
+            result = &NULLOBJECT;
+        } else {
+            std::cout << "[ Ad ][ sock ] unknown method called on sock object\n";
+            result = &NULLOBJECT;
+        }
+    } else if (bm->receiver->Type() == OBJ_THREAD) {
+        static Environment thread_env;
+        const std::string& method = bm->method_name;
+        if (method == "callback" || method == "execute") {
+            thread_callback(bm->receiver, args);
+            result = &NULLOBJECT;
+        } else if (method == "runAsync" || method == "start") {
+            thread_async_run(bm->receiver, gc, thread_env);
+            result = &NULLOBJECT;
+        } else if (method == "runBlocking" || method == "join") {
+            thread_blocking_run(bm->receiver, gc, thread_env);
+            result = &NULLOBJECT;
+        } else if (method == "await") {
+            thread_await(bm->receiver, gc, thread_env);
+            auto* thread_object = static_cast<Ad_Thread_Object*>(bm->receiver);
+            result = thread_object->result != nullptr ? thread_object->result : &NULLOBJECT;
+        } else {
+            result = &NULLOBJECT;
         }
     }
 
@@ -859,6 +1056,106 @@ void VM::execute_string_index(Ad_Object* left, Ad_Object* index) {
     push(new Ad_String_Object(str_obj->value.substr(static_cast<size_t>(idx), 1)));
 }
 
+void VM::execute_slice_expression(Ad_Object* left, Ad_Object* start, Ad_Object* end, Ad_Object* step) {
+    if (left == nullptr) {
+        push(&NULLOBJECT);
+        return;
+    }
+
+    const bool start_is_int = !is_nullish(start) && start->Type() == OBJ_INT;
+    const bool end_is_int = !is_nullish(end) && end->Type() == OBJ_INT;
+    const bool step_is_int = !is_nullish(step) && step->Type() == OBJ_INT;
+
+    if (left->Type() == OBJ_LIST) {
+        if (start_is_int && end_is_int && (is_nullish(step) || step_is_int)) {
+            int i3 = step_is_int ? int_value(step) : 1;
+            push(vm_new_sub_list(left, int_value(start), int_value(end), i3, gc));
+            return;
+        }
+        if (is_nullish(start) && end_is_int && (is_nullish(step) || step_is_int)) {
+            int i3 = step_is_int ? int_value(step) : 1;
+            int i1 = i3 > 0 ? 0 : INT_MAX;
+            push(vm_new_sub_list(left, i1, int_value(end), i3, gc));
+            return;
+        }
+        if (start_is_int && is_nullish(end) && (is_nullish(step) || step_is_int)) {
+            int i3 = step_is_int ? int_value(step) : 1;
+            int i2 = i3 > 0 ? static_cast<int>(static_cast<Ad_List_Object*>(left)->elements.size()) : -INT_MAX;
+            push(vm_new_sub_list(left, int_value(start), i2, i3, gc));
+            return;
+        }
+        if (is_nullish(start) && is_nullish(end) && (is_nullish(step) || step_is_int)) {
+            int i3 = step_is_int ? int_value(step) : 1;
+            if (i3 > 0) {
+                push(vm_new_sub_list(left, 0, static_cast<int>(static_cast<Ad_List_Object*>(left)->elements.size()), i3, gc));
+            } else {
+                push(vm_new_sub_list(left, static_cast<int>(static_cast<Ad_List_Object*>(left)->elements.size()) - 1, -INT_MAX, i3, gc));
+            }
+            return;
+        }
+        if (is_nullish(start) && is_nullish(end) && is_nullish(step)) {
+            int max = static_cast<int>(static_cast<Ad_List_Object*>(left)->elements.size());
+            push(vm_new_sub_list(left, 0, max, 1, gc));
+            return;
+        }
+    }
+
+    if (left->Type() == OBJ_STRING) {
+        if (start_is_int && end_is_int && (is_nullish(step) || step_is_int)) {
+            int max = static_cast<int>(static_cast<Ad_String_Object*>(left)->value.size());
+            int idx = int_value(start);
+            int idx_end = int_value(end);
+            int idx_step = step_is_int ? int_value(step) : 1;
+
+            if (idx < -max) idx = -max;
+            if (idx < 0) idx += max;
+            if (idx >= max) idx = max;
+            if (idx_end < -max) idx_end = -max;
+            if (idx_end < 0) idx_end += max;
+            if (idx_end >= max) idx_end = max;
+            if (idx < idx_end && idx_step < 0) {
+                push(new Ad_String_Object(""));
+                return;
+            }
+            if (idx > idx_end && idx_step > 0) {
+                push(new Ad_String_Object(""));
+                return;
+            }
+            push(vm_new_sub_string(left, int_value(start), int_value(end), idx_step, gc));
+            return;
+        }
+        if (is_nullish(start) && end_is_int && (is_nullish(step) || step_is_int)) {
+            int inc = step_is_int ? int_value(step) : 1;
+            int end_val = int_value(end);
+            auto* target = static_cast<Ad_String_Object*>(left);
+            if (end_val < 0) {
+                end_val += static_cast<int>(target->value.size());
+            }
+            push(vm_new_sub_string(target, 0, end_val, inc, gc));
+            return;
+        }
+        if (start_is_int && is_nullish(end) && (is_nullish(step) || step_is_int)) {
+            auto* target = static_cast<Ad_String_Object*>(left);
+            int inc = step_is_int ? int_value(step) : 1;
+            push(vm_new_sub_string(target, int_value(start), static_cast<int>(target->value.size()), inc, gc));
+            return;
+        }
+        if (is_nullish(start) && is_nullish(end) && (is_nullish(step) || step_is_int)) {
+            auto* target = static_cast<Ad_String_Object*>(left);
+            int inc = step_is_int ? int_value(step) : 1;
+            int end_val = inc >= 0 ? static_cast<int>(target->value.size()) : static_cast<int>(target->value.size()) - 1;
+            push(vm_new_sub_string(target, 0, end_val, inc, gc));
+            return;
+        }
+        if (is_nullish(start) && is_nullish(end) && is_nullish(step)) {
+            push(new Ad_String_Object(static_cast<Ad_String_Object*>(left)->value));
+            return;
+        }
+    }
+
+    push(&NULLOBJECT);
+}
+
 void VM::execute_hash_index(Ad_Object* left, Ad_Object* index) {
     std::hash<std::string> hash_string;
     std::string hash_key = std::to_string(hash_string(index->Hash()));
@@ -882,6 +1179,32 @@ AdCompiledInstance* VM::current_bound_instance() {
 Ad_Object* VM::build_locals_hash() {
     std::unordered_map<std::string, HashPair> pairs;
     std::hash<std::string> hash_string;
+
+    Frame* frame = current_frame();
+    if (frame != nullptr && frame->cl != nullptr && frame->cl->fn != nullptr &&
+        !frame->cl->fn->local_names.empty()) {
+        for (const auto& entry : frame->cl->fn->local_names) {
+            const int slot = frame->base_pointer + entry.second;
+            if (slot < 0 || slot >= stackSize) {
+                continue;
+            }
+            Ad_Object* value = stack[slot];
+            if (value == nullptr) {
+                continue;
+            }
+            auto* key = new Ad_String_Object(entry.first);
+            if (gc != nullptr) {
+                gc->addObject(key);
+            }
+            HashPair hash_pair(key, value);
+            pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair));
+        }
+        auto* hash_object = new Ad_Hash_Object(pairs);
+        if (gc != nullptr) {
+            gc->addObject(hash_object);
+        }
+        return hash_object;
+    }
 
     for (size_t i = 0; i < global_names.size(); ++i) {
         const std::string& name = global_names[i];
@@ -1133,6 +1456,14 @@ void VM::execute_get_method() {
         push(bound);
         return;
     }
+    if (owner->Type() == OBJ_SOCKET || owner->Type() == OBJ_THREAD) {
+        auto* bound = new AdRuntimeBoundMethod(owner, method_name);
+        if (gc != nullptr) {
+            gc->addObject(bound);
+        }
+        push(bound);
+        return;
+    }
     push(&NULLOBJECT);
 }
 
@@ -1198,4 +1529,37 @@ void VM::execute_set_method() {
     }
     auto* klass = static_cast<AdCompiledClass*>(stack[sp - 1]);
     klass->methods[vm_property_field_name(name_obj)] = static_cast<AdClosureObject*>(method_obj);
+}
+
+Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args) {
+    if (closure == nullptr || closure->fn == nullptr) {
+        return &NULLOBJECT;
+    }
+
+    VM runner;
+    runner.gc = gc;
+    runner.constants = constants;
+    runner.globals = globals;
+    runner.global_names = global_names;
+    runner.bootstrap_global_names = bootstrap_global_names;
+    runner.sp = 0;
+    runner.frames_index = 0;
+    runner.frames.clear();
+
+    for (Ad_Object* arg : args) {
+        runner.push(arg != nullptr ? arg : &NULLOBJECT);
+    }
+    runner.push(closure);
+
+    int num_args = static_cast<int>(args.size());
+    runner.apply_default_arguments(closure->fn, num_args);
+    Frame frame(closure, -1, runner.sp - num_args, nullptr);
+    runner.push_frame(frame);
+    runner.sp = frame.base_pointer + closure->fn->num_locals;
+
+    runner.run();
+    if (runner.sp > 0 && runner.stack[runner.sp - 1] != nullptr) {
+        return runner.stack[runner.sp - 1];
+    }
+    return &NULLOBJECT;
 }

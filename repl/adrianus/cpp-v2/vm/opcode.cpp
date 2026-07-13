@@ -24,6 +24,7 @@ OpHash opHash;
 OpIndex opIndex;
 OpSetIndex opSetIndex;
 OpPostfixIndex opPostfixIndex;
+OpSlice opSlice;
 OpCall opCall;
 OpReturnValue opReturnValue;
 OpReturn opReturn;
