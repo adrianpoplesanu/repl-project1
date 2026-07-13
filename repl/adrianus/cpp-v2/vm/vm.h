@@ -61,6 +61,7 @@ public:
     void call_bound_method(AdBoundMethod* bm, int num_args);
     void call_runtime_bound_method(AdRuntimeBoundMethod* bm, int num_args);
     void apply_default_arguments(AdCompiledFunction* fn, int& num_args);
+    void execute_call_kw(int num_pos, int num_kw);
 
     Ad_Object* build_locals_hash();
 

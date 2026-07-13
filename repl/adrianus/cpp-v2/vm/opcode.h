@@ -29,7 +29,10 @@ enum OpCodeType {
     OP_POSTFIX_INDEX,
     /// Stack: ... left, start, end, step (step on top). NULL operands mean omitted slice bounds.
     OP_SLICE,
+    /// Stack: ... value, left, index (index on top). Sets left[index]=value (for compound index assign).
+    OP_PATCH_INDEX,
     OP_CALL,
+    OP_CALL_KW,
     OP_RETURN_VALUE,
     OP_RETURN,
     OP_GET_LOCAL,
@@ -219,9 +222,21 @@ public:
     }
 };
 
+class OpPatchIndex : public OpCode {
+public:
+    OpPatchIndex() : OpCode(OP_PATCH_INDEX) {
+    }
+};
+
 class OpCall : public OpCode {
 public:
     OpCall() : OpCode(OP_CALL) {
+    }
+};
+
+class OpCallKw : public OpCode {
+public:
+    OpCallKw() : OpCode(OP_CALL_KW) {
     }
 };
 
@@ -376,7 +391,9 @@ extern OpIndex opIndex;
 extern OpSetIndex opSetIndex;
 extern OpPostfixIndex opPostfixIndex;
 extern OpSlice opSlice;
+extern OpPatchIndex opPatchIndex;
 extern OpCall opCall;
+extern OpCallKw opCallKw;
 extern OpReturnValue opReturnValue;
 extern OpReturn opReturn;
 extern OpGetLocal opGetLocal;

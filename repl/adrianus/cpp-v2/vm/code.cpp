@@ -94,7 +94,9 @@ Code::Code() {
     definitionsMap.insert(std::make_pair(OP_SET_INDEX, new Definition("OpSetIndex", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_POSTFIX_INDEX, new Definition("OpPostfixIndex", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_SLICE, new Definition("OpSlice", 0, new int)));
+    definitionsMap.insert(std::make_pair(OP_PATCH_INDEX, new Definition("OpPatchIndex", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_CALL, new Definition("OpCall", 1, new int[1] {1})));
+    definitionsMap.insert(std::make_pair(OP_CALL_KW, new Definition("OpCallKw", 2, new int[2] {1, 1})));
     definitionsMap.insert(std::make_pair(OP_RETURN_VALUE, new Definition("OpReturnValue", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_RETURN, new Definition("OpReturn", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_GET_LOCAL, new Definition("OpGetLocal", 1, new int[1] {1})));

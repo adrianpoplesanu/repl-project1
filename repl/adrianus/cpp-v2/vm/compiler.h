@@ -91,15 +91,30 @@ public:
     void compile_class_statement(Ad_AST_Class* class_node);
     void merge_parent_class(AdCompiledClass* klass, AdCompiledClass* parent, const std::string& parent_name);
     void emit_instance_method_call(Ad_AST_Node* owner, const std::string& method_name,
-                                   const std::vector<Ad_AST_Node*>& arguments);
+                                   const std::vector<Ad_AST_Node*>& arguments,
+                                   const std::vector<Ad_AST_Node*>& kw_args = {});
     void emit_super_method_call(Ad_AST_Super_Expression* super_expr, const std::string& method_name,
-                                const std::vector<Ad_AST_Node*>& arguments);
+                                const std::vector<Ad_AST_Node*>& arguments,
+                                const std::vector<Ad_AST_Node*>& kw_args = {});
+    void emit_kw_arg_pairs(const std::vector<Ad_AST_Node*>& kw_args);
+    void emit_call_op(int num_pos, const std::vector<Ad_AST_Node*>& kw_args);
+    void assign_parameter_names(AdCompiledFunction* fn, const std::vector<Ad_AST_Node*>& parameters);
     AdCompiledFunction* compile_class_field_initializer(Ad_AST_AssignStatement* assign_stmt);
     AdClosureObject* compile_class_method(Ad_AST_Def_Statement* def_stmt);
     void fill_default_arg_values(AdCompiledFunction* fn, const std::vector<Ad_AST_Node*>& default_params);
     std::vector<std::pair<std::string, int>> collect_scope_locals() const;
     Symbol* resolve_class_field_symbol(const std::string& name) const;
     void emit_dynamic_instance_field_lookup(const std::string& field_name);
+    void emit_dynamic_instance_field_patch(const std::string& field_name);
+    void compile_compound_index_assign(Ad_AST_IndexExpression* index_expr, Ad_AST_Node* value_expr,
+                                       const std::string& op_lit);
+    void compile_compound_field_assign(const std::string& field_name, int sym_index,
+                                       Ad_AST_Node* value_expr, const std::string& op_lit);
+    void compile_compound_instance_member_assign(Ad_AST_MemberAccess* member_access,
+                                                 Ad_AST_Node* value_expr,
+                                                 const std::string& op_lit);
+    void compile_postfix_field_increment(const std::string& field_name, int sym_index,
+                                         const std::string& op);
 
 };
 

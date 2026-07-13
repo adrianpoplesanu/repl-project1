@@ -17,6 +17,8 @@ public:
     std::vector<std::pair<std::string, int>> local_names;
     /// Default argument values for trailing parameters (evaluator parity).
     std::vector<Ad_Object*> default_arg_values;
+    /// Parameter names in declaration order (for keyword call sites).
+    std::vector<std::string> parameter_names;
 
     AdCompiledFunction();
     std::string Inspect() override;

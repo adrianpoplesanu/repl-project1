@@ -140,7 +140,9 @@ static std::map<unsigned char, Definition*>& get_definitions_map() {
         definitions_map[OP_SET_INDEX] = new Definition("OpSetIndex", 0, new int);
         definitions_map[OP_POSTFIX_INDEX] = new Definition("OpPostfixIndex", 0, new int);
         definitions_map[OP_SLICE] = new Definition("OpSlice", 0, new int);
+        definitions_map[OP_PATCH_INDEX] = new Definition("OpPatchIndex", 0, new int);
         definitions_map[OP_CALL] = new Definition("OpCall", 1, new int[1] {1});
+        definitions_map[OP_CALL_KW] = new Definition("OpCallKw", 2, new int[2] {1, 1});
         definitions_map[OP_RETURN_VALUE] = new Definition("OpReturnValue", 0, new int);
         definitions_map[OP_RETURN] = new Definition("OpReturn", 0, new int);
         definitions_map[OP_GET_LOCAL] = new Definition("OpGetLocal", 1, new int[1] {1});

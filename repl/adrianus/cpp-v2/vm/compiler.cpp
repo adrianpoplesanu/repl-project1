@@ -223,6 +223,22 @@ void Compiler::compile(Ad_AST_Node* node) {
         auto* ident = static_cast<Ad_AST_Identifier*>(pre->name);
         Symbol* sym = symbol_table->resolve(ident->value);
         if (sym == nullptr) {
+            if (symbol_table->outer != nullptr) {
+                emit_dynamic_instance_field_lookup(ident->value);
+                int one_idx = addConstant(new Ad_Integer_Object(1));
+                emit(opConstant, 1, {one_idx});
+                if (pre->_operator == "++") {
+                    emit(opAdd, 0, {});
+                } else if (pre->_operator == "--") {
+                    emit(opSub, 0, {});
+                } else {
+                    std::cerr << "[ Compiler Error ] unsupported prefix increment operator\n";
+                    return;
+                }
+                emit_dynamic_instance_field_patch(ident->value);
+                emit_dynamic_instance_field_lookup(ident->value);
+                return;
+            }
             std::cerr << "[ Compiler Error ] undefined identifier in prefix ++/--: " << ident->value << "\n";
             return;
         }
@@ -243,8 +259,15 @@ void Compiler::compile(Ad_AST_Node* node) {
         }
         if (sym->scope == SymbolScope::GLOBAL) {
             emit(opSetGlobal, 1, {sym->index});
+            load_symbol(*sym, ident->value);
         } else if (sym->scope == SymbolScope::LOCAL) {
             emit(opSetLocal, 1, {sym->index});
+            load_symbol(*sym, ident->value);
+        } else if (sym->scope == SymbolScope::CLASS) {
+            Ad_String_Object* field_name = new Ad_String_Object(ident->value);
+            emit(opConstant, 1, {addConstant(field_name)});
+            emit(opPatchPropertySym, 1, {sym->index});
+            load_symbol(*sym, ident->value);
         } else {
             std::cerr << "[ Compiler Error ] prefix ++/-- for this symbol scope is not supported in the VM\n";
             return;
@@ -279,32 +302,37 @@ void Compiler::compile(Ad_AST_Node* node) {
         } else if (post->name->type == ST_IDENTIFIER) {
             auto* ident = static_cast<Ad_AST_Identifier*>(post->name);
             Symbol* sym = symbol_table->resolve(ident->value);
-            if (sym == nullptr) {
+            if (sym != nullptr && sym->scope == SymbolScope::CLASS) {
+                compile_postfix_field_increment(ident->value, sym->index, post->_operator);
+            } else if (sym != nullptr && sym->scope != SymbolScope::CLASS) {
+                if (sym->scope == SymbolScope::FREE) {
+                    std::cerr << "[ Compiler Error ] postfix ++/-- for captured variables is not supported yet\n";
+                    return;
+                }
+                load_symbol(*sym, ident->value);
+                load_symbol(*sym, ident->value);
+                int one_idx = addConstant(new Ad_Integer_Object(1));
+                emit(opConstant, 1, {one_idx});
+                if (post->_operator == "++") {
+                    emit(opAdd, 0, {});
+                } else if (post->_operator == "--") {
+                    emit(opSub, 0, {});
+                } else {
+                    std::cerr << "[ Compiler Error ] unsupported postfix increment operator\n";
+                    return;
+                }
+                if (sym->scope == SymbolScope::GLOBAL) {
+                    emit(opSetGlobal, 1, {sym->index});
+                } else if (sym->scope == SymbolScope::LOCAL) {
+                    emit(opSetLocal, 1, {sym->index});
+                } else {
+                    std::cerr << "[ Compiler Error ] postfix ++/-- for this symbol scope is not supported in the VM\n";
+                    return;
+                }
+            } else if (symbol_table->outer != nullptr) {
+                compile_postfix_field_increment(ident->value, 65535, post->_operator);
+            } else {
                 std::cerr << "[ Compiler Error ] undefined identifier in postfix ++/--: " << ident->value << "\n";
-                return;
-            }
-            if (sym->scope == SymbolScope::FREE) {
-                std::cerr << "[ Compiler Error ] postfix ++/-- for captured variables is not supported yet\n";
-                return;
-            }
-            load_symbol(*sym, ident->value);
-            load_symbol(*sym, ident->value);
-            int one_idx = addConstant(new Ad_Integer_Object(1));
-            emit(opConstant, 1, {one_idx});
-            if (post->_operator == "++") {
-                emit(opAdd, 0, {});
-            } else if (post->_operator == "--") {
-                emit(opSub, 0, {});
-            } else {
-                std::cerr << "[ Compiler Error ] unsupported postfix increment operator\n";
-                return;
-            }
-            if (sym->scope == SymbolScope::GLOBAL) {
-                emit(opSetGlobal, 1, {sym->index});
-            } else if (sym->scope == SymbolScope::LOCAL) {
-                emit(opSetLocal, 1, {sym->index});
-            } else {
-                std::cerr << "[ Compiler Error ] postfix ++/-- for this symbol scope is not supported in the VM\n";
                 return;
             }
         } else {
@@ -610,6 +638,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->num_locals = num_locals;
         compiled_func->local_names = local_names;
         compiled_func->num_parameters = static_cast<int>(fn_lit->parameters.size());
+        assign_parameter_names(compiled_func, fn_lit->parameters);
         fill_default_arg_values(compiled_func, fn_lit->default_params);
 
         std::vector<int> args;
@@ -629,9 +658,10 @@ void Compiler::compile(Ad_AST_Node* node) {
                 }
                 if (member_access->owner->type == ST_SUPER_EXPRESSION) {
                     emit_super_method_call(static_cast<Ad_AST_Super_Expression*>(member_access->owner),
-                                           member_name, call_expr->arguments);
+                                           member_name, call_expr->arguments, call_expr->kw_args);
                 } else {
-                    emit_instance_method_call(member_access->owner, member_name, call_expr->arguments);
+                    emit_instance_method_call(member_access->owner, member_name, call_expr->arguments,
+                                              call_expr->kw_args);
                 }
                 return;
             }
@@ -640,7 +670,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         for (Ad_AST_Node* argument : call_expr->arguments) {
             compile(argument);
         }
-        emit(opCall, 1, {static_cast<int>(call_expr->arguments.size())});
+        emit_call_op(static_cast<int>(call_expr->arguments.size()), call_expr->kw_args);
     } else if (node->type == ST_RETURN_STATEMENT) {
         Ad_AST_ReturnStatement* ret_stmt = static_cast<Ad_AST_ReturnStatement*>(node);
         if (ret_stmt->value != nullptr) {
@@ -668,13 +698,11 @@ void Compiler::compile(Ad_AST_Node* node) {
             Ad_AST_Identifier* param = static_cast<Ad_AST_Identifier*>(p);
             symbol_table->define(param->value);
         }
-        compile(def_stmt->body);
-        if (lastInstructionIs(opPop)) {
-            replaceLastPopWithReturn();
-        }
-        if (!lastInstructionIs(opReturnValue)) {
-            emit(opReturn, 0, {});
-        }
+    compile(def_stmt->body);
+    // Class methods discard block expression results (evaluator FREE_BLOCK_STATEMENT parity).
+    if (!lastInstructionIs(opReturnValue)) {
+        emit(opReturn, 0, {});
+    }
         std::vector<Symbol> free_symbols = symbol_table->free_symbols;
         auto local_names = collect_scope_locals();
         int num_locals = symbol_table->num_definitions;
@@ -691,6 +719,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->num_locals = num_locals;
         compiled_func->local_names = local_names;
         compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+        assign_parameter_names(compiled_func, def_stmt->parameters);
         fill_default_arg_values(compiled_func, def_stmt->default_params);
 
         emit(opClosure, 2, {addConstant(compiled_func), static_cast<int>(free_symbols.size())});
@@ -768,18 +797,41 @@ void Compiler::compile(Ad_AST_Node* node) {
     } else if (node->type == ST_PLUS_EQUALS) {
         Ad_AST_Plus_Equals_Statement* stmt = static_cast<Ad_AST_Plus_Equals_Statement*>(node);
         const std::string op_lit = stmt->token.GetLiteral();
-        if (stmt->name->type != ST_IDENTIFIER) {
-            std::cerr << "[ Compiler Error ] +=/-= is only supported for simple identifiers in the VM\n";
-            return;
-        }
+        if (stmt->name->type == ST_INDEX_EXPRESSION) {
+            compile_compound_index_assign(static_cast<Ad_AST_IndexExpression*>(stmt->name),
+                                          stmt->value, op_lit);
+        } else if (stmt->name->type == ST_MEMBER_ACCESS) {
+            auto* member_access = static_cast<Ad_AST_MemberAccess*>(stmt->name);
+            std::string member_name;
+            if (member_access->member->type == ST_IDENTIFIER) {
+                member_name = static_cast<Ad_AST_Identifier*>(member_access->member)->value;
+            } else {
+                member_name = member_access->member->TokenLiteral();
+            }
+            if (member_access->owner->type == ST_THIS_EXPRESSION) {
+                Symbol* field_sym = resolve_class_field_symbol(member_name);
+                int sym_index = field_sym != nullptr ? field_sym->index : 65535;
+                compile_compound_field_assign(member_name, sym_index, stmt->value, op_lit);
+            } else {
+                compile_compound_instance_member_assign(member_access, stmt->value, op_lit);
+            }
+        } else if (stmt->name->type == ST_IDENTIFIER) {
         auto* ident = static_cast<Ad_AST_Identifier*>(stmt->name);
         Symbol* sym = symbol_table->resolve(ident->value);
+        if (sym == nullptr && symbol_table->outer != nullptr) {
+            compile_compound_field_assign(ident->value, 65535, stmt->value, op_lit);
+            return;
+        }
         if (sym == nullptr) {
             std::cerr << "[ Compiler Error ] undefined identifier in +=/-=: " << ident->value << "\n";
             return;
         }
         if (sym->scope == SymbolScope::FREE) {
             std::cerr << "[ Compiler Error ] +=/-= for captured variables is not supported yet\n";
+            return;
+        }
+        if (sym->scope == SymbolScope::CLASS) {
+            compile_compound_field_assign(ident->value, sym->index, stmt->value, op_lit);
             return;
         }
         load_symbol(*sym, ident->value);
@@ -799,12 +851,12 @@ void Compiler::compile(Ad_AST_Node* node) {
         } else if (sym->scope == SymbolScope::BUILTIN) {
             std::cerr << "[ Compiler Error ] cannot assign to builtin\n";
             return;
-        } else if (sym->scope == SymbolScope::CLASS) {
-            std::cerr << "[ Compiler Error ] +=/-= for class fields is not supported in the VM\n";
-            return;
         } else if (sym->scope == SymbolScope::FUNCTION) {
             std::cerr << "[ Compiler Error ] invalid +=/-= target\n";
             return;
+        }
+        } else {
+            std::cerr << "[ Compiler Error ] +=/-= target not supported in the VM\n";
         }
     } else if (node->type == ST_COMMENT) {
         // Comments do not emit bytecode.
@@ -831,9 +883,10 @@ void Compiler::compile(Ad_AST_Node* node) {
         if (member_access->is_method) {
             if (member_access->owner->type == ST_SUPER_EXPRESSION) {
                 emit_super_method_call(static_cast<Ad_AST_Super_Expression*>(member_access->owner),
-                                       member_name, member_access->arguments);
+                                       member_name, member_access->arguments, member_access->kw_args);
             } else {
-                emit_instance_method_call(member_access->owner, member_name, member_access->arguments);
+                emit_instance_method_call(member_access->owner, member_name, member_access->arguments,
+                                          member_access->kw_args);
             }
             return;
         }
@@ -1177,6 +1230,109 @@ void Compiler::emit_dynamic_instance_field_lookup(const std::string& field_name)
     emit(opGetPropertySym, 1, {65535});
 }
 
+void Compiler::emit_dynamic_instance_field_patch(const std::string& field_name) {
+    Ad_String_Object* field = new Ad_String_Object(field_name);
+    emit(opConstant, 1, {addConstant(field)});
+    emit(opPatchPropertySym, 1, {65535});
+}
+
+void Compiler::compile_compound_index_assign(Ad_AST_IndexExpression* index_expr, Ad_AST_Node* value_expr,
+                                             const std::string& op_lit) {
+    compile(index_expr->left);
+    compile(index_expr->index);
+    emit(opIndex, 0, {});
+    compile(value_expr);
+    if (op_lit == "+=") {
+        emit(opAdd, 0, {});
+    } else if (op_lit == "-=") {
+        emit(opSub, 0, {});
+    } else {
+        std::cerr << "[ Compiler Error ] unsupported compound assignment operator\n";
+        return;
+    }
+    compile(index_expr->left);
+    compile(index_expr->index);
+    emit(opPatchIndex, 0, {});
+}
+
+void Compiler::compile_compound_field_assign(const std::string& field_name, int sym_index,
+                                             Ad_AST_Node* value_expr, const std::string& op_lit) {
+    if (sym_index == 65535) {
+        emit_dynamic_instance_field_lookup(field_name);
+    } else {
+        Ad_String_Object* field = new Ad_String_Object(field_name);
+        emit(opConstant, 1, {addConstant(field)});
+        emit(opGetPropertySym, 1, {sym_index});
+    }
+    compile(value_expr);
+    if (op_lit == "+=") {
+        emit(opAdd, 0, {});
+    } else if (op_lit == "-=") {
+        emit(opSub, 0, {});
+    } else {
+        std::cerr << "[ Compiler Error ] unsupported compound assignment operator\n";
+        return;
+    }
+    Ad_String_Object* field = new Ad_String_Object(field_name);
+    emit(opConstant, 1, {addConstant(field)});
+    emit(opPatchPropertySym, 1, {sym_index});
+}
+
+void Compiler::compile_compound_instance_member_assign(Ad_AST_MemberAccess* member_access,
+                                                       Ad_AST_Node* value_expr,
+                                                       const std::string& op_lit) {
+    std::string member_name;
+    if (member_access->member->type == ST_IDENTIFIER) {
+        member_name = static_cast<Ad_AST_Identifier*>(member_access->member)->value;
+    } else {
+        member_name = member_access->member->TokenLiteral();
+    }
+
+    compile(member_access->owner);
+    compile(member_access->owner);
+    Ad_String_Object* field = new Ad_String_Object(member_name);
+    emit(opConstant, 1, {addConstant(field)});
+    emit(opGetProperty, 0, {});
+    compile(value_expr);
+    if (op_lit == "+=") {
+        emit(opAdd, 0, {});
+    } else if (op_lit == "-=") {
+        emit(opSub, 0, {});
+    } else {
+        std::cerr << "[ Compiler Error ] unsupported compound assignment operator\n";
+        return;
+    }
+    emit(opConstant, 1, {addConstant(new Ad_String_Object(member_name))});
+    emit(opSetProperty, 0, {});
+}
+
+void Compiler::compile_postfix_field_increment(const std::string& field_name, int sym_index,
+                                               const std::string& op) {
+    if (sym_index == 65535) {
+        emit_dynamic_instance_field_lookup(field_name);
+        emit_dynamic_instance_field_lookup(field_name);
+    } else {
+        Ad_String_Object* field = new Ad_String_Object(field_name);
+        emit(opConstant, 1, {addConstant(field)});
+        emit(opGetPropertySym, 1, {sym_index});
+        emit(opConstant, 1, {addConstant(new Ad_String_Object(field_name))});
+        emit(opGetPropertySym, 1, {sym_index});
+    }
+    int one_idx = addConstant(new Ad_Integer_Object(1));
+    emit(opConstant, 1, {one_idx});
+    if (op == "++") {
+        emit(opAdd, 0, {});
+    } else if (op == "--") {
+        emit(opSub, 0, {});
+    } else {
+        std::cerr << "[ Compiler Error ] unsupported postfix increment operator\n";
+        return;
+    }
+    Ad_String_Object* field = new Ad_String_Object(field_name);
+    emit(opConstant, 1, {addConstant(field)});
+    emit(opPatchPropertySym, 1, {sym_index});
+}
+
 AdCompiledFunction* Compiler::compile_class_field_initializer(Ad_AST_AssignStatement* assign_stmt) {
     const std::string field_name = assign_field_name(assign_stmt);
     Symbol* field_sym = symbol_table->resolve(field_name);
@@ -1218,9 +1374,7 @@ AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) 
         symbol_table->define(param->value);
     }
     compile(def_stmt->body);
-    if (lastInstructionIs(opPop)) {
-        replaceLastPopWithReturn();
-    }
+    // Class methods discard block expression results (evaluator FREE_BLOCK_STATEMENT parity).
     if (!lastInstructionIs(opReturnValue)) {
         emit(opReturn, 0, {});
     }
@@ -1236,6 +1390,7 @@ AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) 
     compiled_func->num_locals = num_locals;
     compiled_func->local_names = local_names;
     compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+    assign_parameter_names(compiled_func, def_stmt->parameters);
     fill_default_arg_values(compiled_func, def_stmt->default_params);
 
     auto* closure = new AdClosureObject();
@@ -1284,8 +1439,49 @@ void Compiler::fill_default_arg_values(AdCompiledFunction* fn, const std::vector
     }
 }
 
+void Compiler::assign_parameter_names(AdCompiledFunction* fn, const std::vector<Ad_AST_Node*>& parameters) {
+    if (fn == nullptr) {
+        return;
+    }
+    fn->parameter_names.clear();
+    fn->parameter_names.reserve(parameters.size());
+    for (Ad_AST_Node* param : parameters) {
+        if (param == nullptr) {
+            continue;
+        }
+        if (param->type == ST_IDENTIFIER) {
+            fn->parameter_names.push_back(static_cast<Ad_AST_Identifier*>(param)->value);
+        } else {
+            fn->parameter_names.push_back(param->TokenLiteral());
+        }
+    }
+}
+
+void Compiler::emit_kw_arg_pairs(const std::vector<Ad_AST_Node*>& kw_args) {
+    for (Ad_AST_Node* kw_node : kw_args) {
+        if (kw_node == nullptr || kw_node->type != ST_ASSIGN_STATEMENT) {
+            continue;
+        }
+        auto* assign = static_cast<Ad_AST_AssignStatement*>(kw_node);
+        compile(assign->value);
+        std::string name = assign->name != nullptr ? assign->name->TokenLiteral() : "";
+        emit(opConstant, 1, {addConstant(new Ad_String_Object(name))});
+    }
+}
+
+void Compiler::emit_call_op(int num_pos, const std::vector<Ad_AST_Node*>& kw_args) {
+    const int num_kw = static_cast<int>(kw_args.size());
+    if (num_kw == 0) {
+        emit(opCall, 1, {num_pos});
+    } else {
+        emit_kw_arg_pairs(kw_args);
+        emit(opCallKw, 2, {num_pos, num_kw});
+    }
+}
+
 void Compiler::emit_instance_method_call(Ad_AST_Node* owner, const std::string& method_name,
-                                         const std::vector<Ad_AST_Node*>& arguments) {
+                                         const std::vector<Ad_AST_Node*>& arguments,
+                                         const std::vector<Ad_AST_Node*>& kw_args) {
     compile(owner);
     Ad_String_Object* method_name_obj = new Ad_String_Object(method_name);
     emit(opConstant, 1, {addConstant(method_name_obj)});
@@ -1293,11 +1489,12 @@ void Compiler::emit_instance_method_call(Ad_AST_Node* owner, const std::string& 
     for (Ad_AST_Node* argument : arguments) {
         compile(argument);
     }
-    emit(opCall, 1, {static_cast<int>(arguments.size())});
+    emit_call_op(static_cast<int>(arguments.size()), kw_args);
 }
 
 void Compiler::emit_super_method_call(Ad_AST_Super_Expression* super_expr, const std::string& method_name,
-                                      const std::vector<Ad_AST_Node*>& arguments) {
+                                      const std::vector<Ad_AST_Node*>& arguments,
+                                      const std::vector<Ad_AST_Node*>& kw_args) {
     if (super_expr == nullptr || super_expr->target == nullptr) {
         std::cerr << "[ Compiler Error ] invalid super expression\n";
         return;
@@ -1312,7 +1509,7 @@ void Compiler::emit_super_method_call(Ad_AST_Super_Expression* super_expr, const
     for (Ad_AST_Node* argument : arguments) {
         compile(argument);
     }
-    emit(opCall, 1, {static_cast<int>(arguments.size())});
+    emit_call_op(static_cast<int>(arguments.size()), kw_args);
 }
 
 void Compiler::merge_parent_class(AdCompiledClass* klass, AdCompiledClass* parent,

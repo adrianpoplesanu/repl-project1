@@ -19,6 +19,8 @@
 
 extern Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc);
 
+static std::string vm_property_field_name(Ad_Object* field_name_obj);
+
 namespace {
 
 bool is_nullish(Ad_Object* obj) {
@@ -129,6 +131,69 @@ Ad_Object* vm_new_sub_string(Ad_Object* target, int i1, int i2, int step, Garbag
         gc->addObject(out);
     }
     return out;
+}
+
+bool vm_objects_equal(Ad_Object* left, Ad_Object* right) {
+    if (left == right) {
+        return true;
+    }
+    if (left == nullptr || right == nullptr) {
+        return false;
+    }
+    if (left->Type() != right->Type()) {
+        return false;
+    }
+    switch (left->Type()) {
+        case OBJ_NULL:
+            return true;
+        case OBJ_BOOL:
+            return static_cast<Ad_Boolean_Object*>(left)->value ==
+                   static_cast<Ad_Boolean_Object*>(right)->value;
+        case OBJ_INT:
+            return static_cast<Ad_Integer_Object*>(left)->value ==
+                   static_cast<Ad_Integer_Object*>(right)->value;
+        case OBJ_FLOAT:
+            return static_cast<Ad_Float_Object*>(left)->value ==
+                   static_cast<Ad_Float_Object*>(right)->value;
+        case OBJ_STRING:
+            return static_cast<Ad_String_Object*>(left)->value ==
+                   static_cast<Ad_String_Object*>(right)->value;
+        case OBJ_HASH: {
+            const auto& left_pairs = static_cast<Ad_Hash_Object*>(left)->pairs;
+            const auto& right_pairs = static_cast<Ad_Hash_Object*>(right)->pairs;
+            if (left_pairs.size() != right_pairs.size()) {
+                return false;
+            }
+            for (const auto& entry : left_pairs) {
+                auto right_it = right_pairs.find(entry.first);
+                if (right_it == right_pairs.end()) {
+                    return false;
+                }
+                if (!vm_objects_equal(entry.second.key, right_it->second.key)) {
+                    return false;
+                }
+                if (!vm_objects_equal(entry.second.value, right_it->second.value)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        case OBJ_LIST: {
+            const auto& left_elems = static_cast<Ad_List_Object*>(left)->elements;
+            const auto& right_elems = static_cast<Ad_List_Object*>(right)->elements;
+            if (left_elems.size() != right_elems.size()) {
+                return false;
+            }
+            for (size_t i = 0; i < left_elems.size(); ++i) {
+                if (!vm_objects_equal(left_elems[i], right_elems[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        default:
+            return false;
+    }
 }
 
 } // namespace
@@ -324,6 +389,15 @@ bool VM::execute_instruction() {
             Ad_Object* left = pop();
             execute_slice_expression(left, start, end, step);
         }
+    } else if (opcode == OP_PATCH_INDEX) {
+        if (sp < 3) {
+            std::cerr << "[ VM Error ] OP_PATCH_INDEX: stack underflow\n";
+        } else {
+            Ad_Object* index = pop();
+            Ad_Object* left = pop();
+            Ad_Object* value = pop();
+            execute_set_index_expression(left, index, value);
+        }
     } else if (opcode == OP_CLOSURE) {
         int const_index = read_uint16(*ins, ip + 1);
         int num_free = read_uint8(*ins, ip + 3);
@@ -361,10 +435,22 @@ bool VM::execute_instruction() {
         int num_args = read_uint8(*ins, ip + 1);
         frame->ip += 1;
         execute_call(num_args);
+    } else if (opcode == OP_CALL_KW) {
+        int num_pos = read_uint8(*ins, ip + 1);
+        int num_kw = read_uint8(*ins, ip + 2);
+        frame->ip += 2;
+        execute_call_kw(num_pos, num_kw);
     } else if (opcode == OP_RETURN_VALUE) {
         Ad_Object* return_value = pop();
+        const bool returning_from_main = frames_index == 1;
         Frame ret_frame = pop_frame();
         sp = ret_frame.base_pointer - 1;
+        if (sp < 0) {
+            sp = 0;
+        }
+        if (returning_from_main) {
+            std::cout << "WARNING: return outside function\n";
+        }
         push(return_value);
         if (frames_index == 0) {
             return false;
@@ -498,8 +584,8 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
         return;
     }
     const int callee_index = sp - 1 - num_args;
-    if (num_args < cl->fn->num_parameters) {
-        // Match `Evaluator::ApplyFunction` too-few-args path (same error message).
+    apply_default_arguments(cl->fn, num_args);
+    if (num_args != cl->fn->num_parameters) {
         sp = callee_index;
         auto* err = new Ad_Error_Object("some error message here");
         if (gc != nullptr) {
@@ -508,10 +594,125 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
         push(err);
         return;
     }
-    apply_default_arguments(cl->fn, num_args);
     Frame frame(cl, -1, sp - num_args, current_bound_instance());
     push_frame(frame);
     sp = frame.base_pointer + cl->fn->num_locals;
+}
+
+static AdCompiledFunction* vm_function_from_callee(Ad_Object* callee) {
+    if (callee == nullptr) {
+        return nullptr;
+    }
+    if (callee->Type() == OBJ_CLOSURE) {
+        auto* cl = static_cast<AdClosureObject*>(callee);
+        return cl != nullptr ? cl->fn : nullptr;
+    }
+    if (callee->Type() == OBJ_BOUND_METHOD) {
+        auto* bm = static_cast<AdBoundMethod*>(callee);
+        if (bm != nullptr && bm->bound_method != nullptr) {
+            return bm->bound_method->fn;
+        }
+    }
+    if (callee->Type() == OBJ_COMPILED_CLASS) {
+        auto* klass = static_cast<AdCompiledClass*>(callee);
+        if (klass == nullptr) {
+            return nullptr;
+        }
+        auto it = klass->methods.find("constructor");
+        if (it != klass->methods.end() && it->second != nullptr && it->second->fn != nullptr) {
+            return it->second->fn;
+        }
+    }
+    return nullptr;
+}
+
+void VM::execute_call_kw(int num_pos, int num_kw) {
+    std::unordered_map<std::string, Ad_Object*> kw_map;
+    for (int i = 0; i < num_kw; ++i) {
+        Ad_Object* name_obj = pop();
+        Ad_Object* val = pop();
+        kw_map[vm_property_field_name(name_obj)] = val;
+    }
+
+    const int callee_index = sp - 1 - num_pos;
+    if (callee_index < 0) {
+        std::cerr << "[ VM Error ] OP_CALL_KW: stack underflow\n";
+        return;
+    }
+
+    Ad_Object* callee = stack[callee_index];
+    AdCompiledFunction* fn = vm_function_from_callee(callee);
+    if (fn == nullptr) {
+        std::cerr << "[ VM Error ] OP_CALL_KW: unsupported callee type\n";
+        sp = callee_index;
+        push(&NULLOBJECT);
+        return;
+    }
+
+    int remaining_params = fn->num_parameters;
+    for (const std::string& pname : fn->parameter_names) {
+        if (kw_map.find(pname) != kw_map.end()) {
+            --remaining_params;
+        }
+    }
+    if (remaining_params > num_pos + static_cast<int>(fn->default_arg_values.size())) {
+        sp = callee_index;
+        auto* err = new Ad_Error_Object("some error message here");
+        if (gc != nullptr) {
+            gc->addObject(err);
+        }
+        push(err);
+        return;
+    }
+
+    std::vector<Ad_Object*> resolved(static_cast<size_t>(fn->num_parameters), nullptr);
+    for (int i = 0; i < num_pos && i < fn->num_parameters; ++i) {
+        resolved[static_cast<size_t>(i)] = stack[callee_index + 1 + i];
+    }
+
+    const int num_defaults = static_cast<int>(fn->default_arg_values.size());
+    const int threshold = num_defaults - fn->num_parameters + num_pos;
+    for (int i = 0; i < num_defaults; ++i) {
+        if (i >= threshold) {
+            const int param_idx = fn->num_parameters - num_defaults + i;
+            if (param_idx >= 0 && param_idx < fn->num_parameters &&
+                resolved[static_cast<size_t>(param_idx)] == nullptr) {
+                resolved[static_cast<size_t>(param_idx)] = fn->default_arg_values[static_cast<size_t>(i)];
+            }
+        }
+    }
+
+    for (const auto& entry : kw_map) {
+        for (size_t i = 0; i < fn->parameter_names.size(); ++i) {
+            if (fn->parameter_names[i] == entry.first) {
+                resolved[i] = entry.second;
+            }
+        }
+    }
+
+    for (int i = 0; i < fn->num_parameters; ++i) {
+        if (resolved[static_cast<size_t>(i)] == nullptr) {
+            sp = callee_index;
+            auto* err = new Ad_Error_Object("some error message here");
+            if (gc != nullptr) {
+                gc->addObject(err);
+            }
+            push(err);
+            return;
+        }
+    }
+
+    sp = callee_index;
+    push(callee);
+    for (Ad_Object* arg : resolved) {
+        push(arg);
+    }
+    if (callee->Type() == OBJ_COMPILED_CLASS) {
+        call_class(static_cast<AdCompiledClass*>(callee), fn->num_parameters);
+        return;
+    }
+
+    execute_call(fn->num_parameters);
 }
 
 void VM::call_builtin(Ad_Builtin_Object* builtin, int num_args) {
@@ -917,6 +1118,60 @@ void VM::execute_comparison(OpCodeType opcode) {
         return;
     }
 
+    if (left->Type() == OBJ_NULL || right->Type() == OBJ_NULL) {
+        bool both_null = is_nullish(left) && is_nullish(right);
+        bool comparison_result = false;
+        switch (opcode) {
+            case OP_EQUAL:
+                comparison_result = both_null;
+                break;
+            case OP_NOTEQUAL:
+                comparison_result = !both_null;
+                break;
+            default:
+                std::cerr << "[ VM Error ] Unsupported types for comparison operation" << std::endl;
+                return;
+        }
+        push(native_bool_to_boolean_object(comparison_result));
+        return;
+    }
+
+    if (left->Type() == OBJ_HASH && right->Type() == OBJ_HASH) {
+        bool equal = vm_objects_equal(left, right);
+        bool comparison_result = false;
+        switch (opcode) {
+            case OP_EQUAL:
+                comparison_result = equal;
+                break;
+            case OP_NOTEQUAL:
+                comparison_result = !equal;
+                break;
+            default:
+                std::cerr << "[ VM Error ] Unsupported types for comparison operation" << std::endl;
+                return;
+        }
+        push(native_bool_to_boolean_object(comparison_result));
+        return;
+    }
+
+    if (left->Type() == OBJ_LIST && right->Type() == OBJ_LIST) {
+        bool equal = vm_objects_equal(left, right);
+        bool comparison_result = false;
+        switch (opcode) {
+            case OP_EQUAL:
+                comparison_result = equal;
+                break;
+            case OP_NOTEQUAL:
+                comparison_result = !equal;
+                break;
+            default:
+                std::cerr << "[ VM Error ] Unsupported types for comparison operation" << std::endl;
+                return;
+        }
+        push(native_bool_to_boolean_object(comparison_result));
+        return;
+    }
+
     bool result = false;
     switch (opcode) {
         case OP_EQUAL:
@@ -1181,8 +1436,7 @@ Ad_Object* VM::build_locals_hash() {
     std::hash<std::string> hash_string;
 
     Frame* frame = current_frame();
-    if (frame != nullptr && frame->cl != nullptr && frame->cl->fn != nullptr &&
-        !frame->cl->fn->local_names.empty()) {
+    if (frame != nullptr && frame->cl != nullptr && frame->cl->fn != nullptr && frames_index > 1) {
         for (const auto& entry : frame->cl->fn->local_names) {
             const int slot = frame->base_pointer + entry.second;
             if (slot < 0 || slot >= stackSize) {
@@ -1260,7 +1514,7 @@ int VM::lookup_instance_field_index(AdCompiledInstance* inst, const std::string&
     return it->second;
 }
 
-static std::string vm_property_field_name(Ad_Object* field_name_obj) {
+std::string vm_property_field_name(Ad_Object* field_name_obj) {
     if (field_name_obj == nullptr) {
         return "";
     }
