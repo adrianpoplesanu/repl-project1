@@ -24,6 +24,8 @@ public:
     std::unordered_set<std::string> bootstrap_global_names;
     Bytecode last_loaded_bytecode;
     bool has_loaded_bytecode;
+    /// When true, prints "WARNING: return outside function" when returning from top-level frame.
+    bool warn_return_outside_function;
 
     VM();
     void load(Bytecode bytecode);

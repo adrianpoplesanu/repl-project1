@@ -14,6 +14,8 @@ enum OpCodeType {
     OP_NOTEQUAL,
     OP_GREATERTHAN,
     OP_GREATERTHAN_EQUAL,
+    OP_AND,
+    OP_OR,
     OP_MINUS,
     OP_BANG,
     OP_JUMP_NOT_TRUTHY,
@@ -141,6 +143,18 @@ public:
 class OpGreaterThanEqual : public OpCode {
 public:
     OpGreaterThanEqual() : OpCode(OP_GREATERTHAN_EQUAL) {
+    }
+};
+
+class OpAnd : public OpCode {
+public:
+    OpAnd() : OpCode(OP_AND) {
+    }
+};
+
+class OpOr : public OpCode {
+public:
+    OpOr() : OpCode(OP_OR) {
     }
 };
 
@@ -378,6 +392,8 @@ extern OpEqual opEqual;
 extern OpNotEqual opNotEqual;
 extern OpGreaterThan opGreaterThan;
 extern OpGreaterThanEqual opGreaterThanEqual;
+extern OpAnd opAnd;
+extern OpOr opOr;
 extern OpMinus opMinus;
 extern OpBang opBang;
 extern OpJumpNotTruthy opJumpNotTruthy;

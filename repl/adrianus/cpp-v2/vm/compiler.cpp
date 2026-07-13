@@ -368,6 +368,10 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opEqual, 0, {});
         } else if (infix_expr->_operator == "!=") {
             emit(opNotEqual, 0, {});
+        } else if (infix_expr->_operator == "and" || infix_expr->_operator == "&&") {
+            emit(OpCode(OP_AND), 0, {});
+        } else if (infix_expr->_operator == "or" || infix_expr->_operator == "||") {
+            emit(OpCode(OP_OR), 0, {});
         } else if (infix_expr->_operator == ">") {
             emit(opGreaterThan, 0, {});
         } else if (infix_expr->_operator == ">=") {

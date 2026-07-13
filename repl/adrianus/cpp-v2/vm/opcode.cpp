@@ -12,6 +12,8 @@ OpEqual opEqual;
 OpNotEqual opNotEqual;
 OpGreaterThan opGreaterThan;
 OpGreaterThanEqual opGreaterThanEqual;
+OpAnd opAnd;
+OpOr opOr;
 OpMinus opMinus;
 OpBang opBang;
 OpJumpNotTruthy opJumpNotTruthy;

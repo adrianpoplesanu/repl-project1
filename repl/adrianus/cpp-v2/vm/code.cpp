@@ -81,6 +81,8 @@ Code::Code() {
     definitionsMap.insert(std::make_pair(OP_NOTEQUAL, new Definition("OpNotEqual", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_GREATERTHAN, new Definition("OpGreaterThan", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_GREATERTHAN_EQUAL, new Definition("OpGreaterThanEqual", 0, new int)));
+    definitionsMap.insert(std::make_pair(OP_AND, new Definition("OpAnd", 0, new int)));
+    definitionsMap.insert(std::make_pair(OP_OR, new Definition("OpOr", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_MINUS, new Definition("OpMinus", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_BANG, new Definition("OpBang", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_JUMP_NOT_TRUTHY, new Definition("OpJumpNotTruthy", 1, new int[1] {2})));

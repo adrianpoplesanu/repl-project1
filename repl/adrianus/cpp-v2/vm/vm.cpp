@@ -207,6 +207,7 @@ VM::VM() {
     globals.clear();
     global_names.clear();
     has_loaded_bytecode = false;
+    warn_return_outside_function = true;
 }
 
 void VM::load(Bytecode bytecode) {
@@ -274,6 +275,21 @@ bool VM::execute_instruction() {
     } else if (opcode == OP_EQUAL || opcode == OP_NOTEQUAL ||
                opcode == OP_GREATERTHAN || opcode == OP_GREATERTHAN_EQUAL) {
         execute_comparison(opcode);
+    } else if (opcode == OP_AND || opcode == OP_OR) {
+        if (sp < 2) {
+            std::cerr << "[ VM Error ] Not enough elements on stack for boolean op\n";
+            return false;
+        }
+        Ad_Object* right = pop();
+        Ad_Object* left = pop();
+        if (left == nullptr || right == nullptr || left->Type() != OBJ_BOOL || right->Type() != OBJ_BOOL) {
+            std::cerr << "[ VM Error ] Unsupported types for boolean op\n";
+            push(&NULLOBJECT);
+        } else {
+            bool lv = static_cast<Ad_Boolean_Object*>(left)->value;
+            bool rv = static_cast<Ad_Boolean_Object*>(right)->value;
+            push(native_bool_to_boolean_object(opcode == OP_AND ? (lv && rv) : (lv || rv)));
+        }
     } else if (opcode == OP_BANG) {
         execute_bang_operator();
     } else if (opcode == OP_MINUS) {
@@ -448,7 +464,7 @@ bool VM::execute_instruction() {
         if (sp < 0) {
             sp = 0;
         }
-        if (returning_from_main) {
+        if (returning_from_main && warn_return_outside_function) {
             std::cout << "WARNING: return outside function\n";
         }
         push(return_value);
@@ -1032,15 +1048,14 @@ void VM::execute_binary_operation(OpCodeType opcode) {
                 return;
         }
     } else if (opcode == OP_ADD) {
-        if (left_is_string && right_is_string) {
-            result = new Ad_String_Object(static_cast<Ad_String_Object*>(left)->value +
-                                           static_cast<Ad_String_Object*>(right)->value);
-        } else if (left_is_string && right_is_int) {
-            result = new Ad_String_Object(static_cast<Ad_String_Object*>(left)->value +
-                                           std::to_string(static_cast<Ad_Integer_Object*>(right)->value));
-        } else if (left_is_int && right_is_string) {
-            result = new Ad_String_Object(std::to_string(static_cast<Ad_Integer_Object*>(left)->value) +
-                                           static_cast<Ad_String_Object*>(right)->value);
+        if (left_is_string || right_is_string) {
+            const std::string left_str = left_is_string
+                                             ? static_cast<Ad_String_Object*>(left)->value
+                                             : (left != nullptr ? left->repr() : "null");
+            const std::string right_str = right_is_string
+                                              ? static_cast<Ad_String_Object*>(right)->value
+                                              : (right != nullptr ? right->repr() : "null");
+            result = new Ad_String_Object(left_str + right_str);
         } else {
             std::cerr << "[ VM Error ] Unsupported types for binary operation" << std::endl;
             return;
@@ -1796,14 +1811,16 @@ Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Obj
     runner.globals = globals;
     runner.global_names = global_names;
     runner.bootstrap_global_names = bootstrap_global_names;
+    runner.warn_return_outside_function = false;
     runner.sp = 0;
     runner.frames_index = 0;
     runner.frames.clear();
 
+    // Arrange stack like `execute_call` expects: [callee, arg0, arg1, ...]
+    runner.push(closure);
     for (Ad_Object* arg : args) {
         runner.push(arg != nullptr ? arg : &NULLOBJECT);
     }
-    runner.push(closure);
 
     int num_args = static_cast<int>(args.size());
     runner.apply_default_arguments(closure->fn, num_args);

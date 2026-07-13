@@ -127,6 +127,8 @@ static std::map<unsigned char, Definition*>& get_definitions_map() {
         definitions_map[OP_NOTEQUAL] = new Definition("OpNotEqual", 0, new int);
         definitions_map[OP_GREATERTHAN] = new Definition("OpGreaterThan", 0, new int);
         definitions_map[OP_GREATERTHAN_EQUAL] = new Definition("OpGreaterThanEqual", 0, new int);
+        definitions_map[OP_AND] = new Definition("OpAnd", 0, new int);
+        definitions_map[OP_OR] = new Definition("OpOr", 0, new int);
         definitions_map[OP_MINUS] = new Definition("OpMinus", 0, new int);
         definitions_map[OP_BANG] = new Definition("OpBang", 0, new int);
         definitions_map[OP_JUMP_NOT_TRUTHY] = new Definition("OpJumpNotTruthy", 1, new int[1] {2});
