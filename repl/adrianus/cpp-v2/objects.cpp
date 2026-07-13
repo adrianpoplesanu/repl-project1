@@ -4,8 +4,28 @@
 #include "vm/objects.h"
 #include "listobject.cpp"
 #include <sstream>
+#include <algorithm>
+#include <vector>
 
 #define VERBOSE_MEMORY_CLEANUP 0
+
+namespace {
+
+std::vector<const HashPair*> sorted_hash_pairs_for_display(
+    const std::unordered_map<std::string, HashPair>& hash_pairs) {
+    std::vector<const HashPair*> entries;
+    entries.reserve(hash_pairs.size());
+    for (const std::pair<const std::string, HashPair>& it : hash_pairs) {
+        entries.push_back(&it.second);
+    }
+    std::sort(entries.begin(), entries.end(),
+              [](const HashPair* left, const HashPair* right) {
+                  return locals_name_display_order(left->key->repr(), right->key->repr());
+              });
+    return entries;
+}
+
+} // namespace
 
 std::unordered_map<Ad_Object_Type, std::string> object_type_map = {
         {OBJ_NULL, "NULL"},
@@ -615,10 +635,10 @@ Ad_Hash_Object::~Ad_Hash_Object() {
 std::string Ad_Hash_Object::Inspect() {
     std::string out = "{";
     bool displayed_first = false;
-    for(std::unordered_map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+    for (const HashPair* entry : sorted_hash_pairs_for_display(pairs)) {
         if (displayed_first) out += ", ";
         else displayed_first = true;
-        out += it->second.key->Inspect() + ": " + it->second.value->Inspect();
+        out += entry->key->Inspect() + ": " + entry->value->Inspect();
     }
     out += "}";
     return out;
@@ -627,10 +647,10 @@ std::string Ad_Hash_Object::Inspect() {
 std::string Ad_Hash_Object::repr() {
     std::string out = "{";
     bool displayed_first = false;
-    for(std::unordered_map<std::string, HashPair>::iterator it = pairs.begin(); it != pairs.end(); it++) {
+    for (const HashPair* entry : sorted_hash_pairs_for_display(pairs)) {
         if (displayed_first) out += ", ";
         else displayed_first = true;
-        out += it->second.key->Inspect() + ": " + it->second.value->Inspect();
+        out += entry->key->Inspect() + ": " + entry->value->Inspect();
     }
     out += "}";
     return out;

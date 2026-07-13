@@ -132,6 +132,7 @@ void Compiler::reset() {
     compiled_classes.clear();
     loop_stack.clear();
     compiling_program_direct_statement = false;
+    bootstrap_global_names.clear();
     scopes = {CompilationScope(code.instructions)};
     scopeIndex = 0;
     while (symbol_table != nullptr) {
@@ -841,7 +842,24 @@ Bytecode Compiler::getBytecode() {
     generatedBytecode.instructions = code.instructions;
     generatedBytecode.constants = constants;
     collect_global_names(generatedBytecode);
+    generatedBytecode.bootstrap_global_names = bootstrap_global_names;
     return generatedBytecode;
+}
+
+void Compiler::snapshot_bootstrap_globals() {
+    bootstrap_global_names.clear();
+    SymbolTable* root = symbol_table;
+    while (root != nullptr && root->outer != nullptr) {
+        root = root->outer;
+    }
+    if (root == nullptr) {
+        return;
+    }
+    for (const auto& entry : root->store) {
+        if (entry.second.scope == SymbolScope::GLOBAL) {
+            bootstrap_global_names.insert(entry.first);
+        }
+    }
 }
 
 void Compiler::collect_global_names(Bytecode& bytecode) {

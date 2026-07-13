@@ -3,9 +3,13 @@
 
 #include <map>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 #include "objects.h"
 #include "gc.h"
+
+/// Case-insensitive alphabetical order for `__locals()` display (ties: uppercase before lowercase).
+bool locals_name_display_order(const std::string& a, const std::string& b);
 
 class GarbageCollector; // forward declaration for GarbageCollector
 

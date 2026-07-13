@@ -7,6 +7,8 @@
 #include "../objects.h"
 #include "../gc.h"
 #include <vector>
+#include <unordered_set>
+#include <string>
 
 class VM {
 public:
@@ -19,6 +21,7 @@ public:
     std::vector<Ad_Object*> constants;
     std::vector<Ad_Object*> globals;
     std::vector<std::string> global_names;
+    std::unordered_set<std::string> bootstrap_global_names;
     Bytecode last_loaded_bytecode;
     bool has_loaded_bytecode;
 

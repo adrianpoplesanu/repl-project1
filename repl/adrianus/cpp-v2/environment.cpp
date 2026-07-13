@@ -1,4 +1,21 @@
 #include "environment.h"
+#include <cctype>
+
+bool locals_name_display_order(const std::string& a, const std::string& b) {
+    size_t i = 0;
+    while (i < a.size() && i < b.size()) {
+        const int ca = std::tolower(static_cast<unsigned char>(a[i]));
+        const int cb = std::tolower(static_cast<unsigned char>(b[i]));
+        if (ca != cb) {
+            return ca < cb;
+        }
+        ++i;
+    }
+    if (a.size() != b.size()) {
+        return a.size() < b.size();
+    }
+    return a > b;
+}
 
 Environment::Environment() {
     outer = NULL;

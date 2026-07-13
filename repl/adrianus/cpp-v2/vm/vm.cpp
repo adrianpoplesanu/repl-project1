@@ -32,6 +32,7 @@ void VM::load(Bytecode bytecode) {
     // Store constants from bytecode
     constants = bytecode.constants;
     global_names = bytecode.global_names;
+    bootstrap_global_names = bytecode.bootstrap_global_names;
     globals.clear();
     
     // Create an AdCompiledFunction with the instructions
@@ -885,6 +886,9 @@ Ad_Object* VM::build_locals_hash() {
     for (size_t i = 0; i < global_names.size(); ++i) {
         const std::string& name = global_names[i];
         if (name.empty()) {
+            continue;
+        }
+        if (bootstrap_global_names.count(name) > 0) {
             continue;
         }
         if (i >= globals.size() || globals[i] == nullptr) {

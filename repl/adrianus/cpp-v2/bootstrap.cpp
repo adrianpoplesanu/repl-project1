@@ -80,4 +80,5 @@ void load_bootstrap_vm(Compiler& compiler, Ad_AST_Program& program, Parser& pars
         parser.ParseProgram(program);
         compiler.compile(&program);
     }
+    compiler.snapshot_bootstrap_globals();
 }

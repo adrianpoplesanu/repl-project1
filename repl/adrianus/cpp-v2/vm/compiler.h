@@ -11,6 +11,7 @@
 #include "../ast.h"
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 class Compiler {
 public:
@@ -40,6 +41,9 @@ public:
     /// Classes compiled so far in the current compilation unit (for inheritance resolution).
     std::unordered_map<std::string, AdCompiledClass*> compiled_classes;
 
+    /// Global names registered while compiling bootstrap (excluded from VM `__locals()`).
+    std::unordered_set<std::string> bootstrap_global_names;
+
     void emitLoopBreak();
     void emitLoopContinue();
 
@@ -50,6 +54,7 @@ public:
     void compile(Ad_AST_Node* node);
     Bytecode getBytecode();
     void collect_global_names(Bytecode& bytecode);
+    void snapshot_bootstrap_globals();
     
     // New methods for instruction emission
     int emit(OpCode op, int n = 0, std::vector<int> args = {});

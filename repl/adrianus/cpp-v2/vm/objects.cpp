@@ -34,7 +34,9 @@ AdClosureObject::AdClosureObject() {
 }
 
 std::string AdClosureObject::Inspect() {
-    return "todo: implement AdClosureObject.Inspect()";
+    std::stringstream ss;
+    ss << std::hex << this;
+    return "<function at memory address: " + ss.str() + ">";
 }
 
 void AdClosureObject::Print() {
