@@ -3,6 +3,31 @@
 #include "objects.h"
 #include "vm/objects.h"
 #include "ast.h"
+#include <cstdint>
+
+extern Ad_Null_Object NULLOBJECT;
+
+namespace {
+
+bool looks_like_heap_object(Ad_Object* obj) {
+    if (obj == nullptr || obj == &NULLOBJECT) {
+        return false;
+    }
+    const uintptr_t addr = reinterpret_cast<uintptr_t>(obj);
+    if (addr < 0x1000) {
+        return false;
+    }
+    if (addr % alignof(Ad_Object) != 0) {
+        return false;
+    }
+    return true;
+}
+
+bool is_known_object_type(Ad_Object_Type type) {
+    return object_type_map.find(type) != object_type_map.end();
+}
+
+} // namespace
 
 GarbageCollector::GarbageCollector() {
     head = NULL;
@@ -131,7 +156,15 @@ void GarbageCollector::markObjects() {
 }
 
 void GarbageCollector::markObject(Ad_Object* obj) {
-    if (obj->marked) return;
+    if (!looks_like_heap_object(obj)) {
+        return;
+    }
+    if (obj->marked) {
+        return;
+    }
+    if (!is_known_object_type(obj->type)) {
+        return;
+    }
     switch (obj->type) {
         case OBJ_NULL: {
             obj->marked = true;
@@ -155,7 +188,9 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
         case OBJ_RETURN_VALUE: {
             obj->marked = true;
-            markObject(((Ad_ReturnValue_Object*)obj)->value);
+            if (Ad_Object* value = ((Ad_ReturnValue_Object*)obj)->value) {
+                markObject(value);
+            }
             break;
         }
         case OBJ_FUNCTION: {
@@ -178,8 +213,8 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         case OBJ_LIST: {
             obj->marked = true;
             Ad_List_Object *listObject = (Ad_List_Object*) obj;
-            for (std::vector<Ad_Object*>::iterator it = listObject->elements.begin() ; it != listObject->elements.end(); ++it) {
-                markObject(*it);
+            for (Ad_Object* element : listObject->elements) {
+                markObject(element);
             }
             break;
         }
@@ -199,11 +234,13 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
         case OBJ_INSTANCE: {
             obj->marked = true;
-            // TODO: i need to determine what to do with the contained Environment* object
-            Ad_Class_Instance *instanceObject = (Ad_Class_Instance*) obj;
+            Ad_Class_Instance* instanceObject = (Ad_Class_Instance*) obj;
             markObject(instanceObject->klass_object);
-            for (const std::pair<const std::string, Ad_Object*>& it : instanceObject->instance_environment->store) {
-                markObject(it.second);
+            if (instanceObject->instance_environment != nullptr) {
+                for (const std::pair<const std::string, Ad_Object*>& it :
+                     instanceObject->instance_environment->store) {
+                    markObject(it.second);
+                }
             }
             break;
         }
@@ -218,8 +255,10 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         case OBJ_THREAD: {
             obj->marked = true;
             Ad_Thread_Object* threadObject = (Ad_Thread_Object*) obj;
-            if (threadObject->callback != NULL) {
-                markObject(threadObject->callback);
+            markObject(threadObject->callback);
+            markObject(threadObject->result);
+            for (Ad_Object* param : threadObject->params) {
+                markObject(param);
             }
             break;
         }
@@ -239,7 +278,9 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             obj->marked = true;
             auto* fn = static_cast<AdCompiledFunction*>(obj);
             for (Ad_Object* default_value : fn->default_arg_values) {
-                markObject(default_value);
+                if (default_value != nullptr) {
+                    markObject(default_value);
+                }
             }
             break;
         }
@@ -248,7 +289,9 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             AdClosureObject* closure = static_cast<AdClosureObject*>(obj);
             markObject(closure->fn);
             for (Ad_Object* free_var : closure->free_vars) {
-                markObject(free_var);
+                if (free_var != nullptr) {
+                    markObject(free_var);
+                }
             }
             if (closure->bound_owner != nullptr) {
                 markObject(closure->bound_owner);
@@ -274,7 +317,9 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             AdCompiledInstance* instance = static_cast<AdCompiledInstance*>(obj);
             markObject(instance->klass);
             for (Ad_Object* field : instance->fields) {
-                markObject(field);
+                if (field != nullptr) {
+                    markObject(field);
+                }
             }
             break;
         }
@@ -294,7 +339,7 @@ void GarbageCollector::markObject(Ad_Object* obj) {
 
         default: {
             std::cerr << "MEMORY ERROR!!! garbage collection inconsistency! type="
-                      << object_type_map[obj->type] << "\n";
+                      << static_cast<int>(obj->type) << "\n";
             break;
         }
     }
@@ -358,6 +403,11 @@ void GarbageCollector::forceFreeObjects() {
     sweepObjects();
 }
 
-void GarbageCollector::markObjects(Ad_Object **stack, int sp) {
-
+void GarbageCollector::markObjects(Ad_Object** stack, int sp) {
+    if (stack == nullptr || sp <= 0) {
+        return;
+    }
+    for (int i = 0; i < sp; ++i) {
+        markObject(stack[i]);
+    }
 }

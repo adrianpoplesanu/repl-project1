@@ -1145,7 +1145,12 @@ void Ad_DECREF(Ad_Object* obj) {
 void free_Ad_Object_memory(Ad_Object* obj) {
     //return;
     //return; // cu asta am testat ca se marcheaza corect obiectele care trebuie sweep-uite
-    if (obj == NULL) return;
+    if (obj == NULL || obj == &NULLOBJECT) {
+        return;
+    }
+    if (object_type_map.find(obj->type) == object_type_map.end()) {
+        return;
+    }
     //if (obj->ref_count > 0) return; // no more of this nonsense
     if (VERBOSE_MEMORY_CLEANUP) {
         std::cout << "freeing up some memory\n";
@@ -1269,8 +1274,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
                 delete static_cast<AdRuntimeBoundMethod*>(obj);
             break;
             default:
-                std::cout << obj->type << "\n";
-                std::cout << "MEMORY ERROR!!! object: " << object_type_map[obj->type] << "\n";
+                std::cerr << "MEMORY ERROR!!! object type=" << static_cast<int>(obj->type) << "\n";
             break;
         }
     }

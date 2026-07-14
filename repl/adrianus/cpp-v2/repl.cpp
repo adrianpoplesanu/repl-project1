@@ -191,6 +191,14 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
 
         garbageCollector->unmarkAllObjects();
         garbageCollector->markObjects(vm.stack, vm.sp);
+        for (const Frame& frame : vm.frames) {
+            if (frame.cl != nullptr) {
+                garbageCollector->markObject(frame.cl);
+            }
+            if (frame.bound_instance != nullptr) {
+                garbageCollector->markObject(frame.bound_instance);
+            }
+        }
         if (vm.globals.size() > 0) {
             for (Ad_Object* global_obj : vm.globals) {
                 if (global_obj != nullptr) {
