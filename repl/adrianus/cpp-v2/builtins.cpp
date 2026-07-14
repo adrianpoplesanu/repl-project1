@@ -6,6 +6,7 @@
 #include <chrono>
 #include "gc.h"
 #include "eval_utils.h"
+#include "utils.h"
 #include "thread_utils.h"
 #include "builtins_registry.h"
 #include "builtins_registry_names.h"
@@ -493,6 +494,12 @@ Ad_Object* thread_builtin(std::vector<Ad_Object*> args, Environment *env, Garbag
 
 Ad_Object* import_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
     Ad_String_Object* path = (Ad_String_Object*) args[0];
+    if (VM* vm = ad_current_vm()) {
+        std::string source = read_file_content(path->value);
+        unescapeSource(source);
+        vm->execute_import_source(source);
+        return NULL;
+    }
     importSource(path->value, env, gc);
     return NULL;
 }

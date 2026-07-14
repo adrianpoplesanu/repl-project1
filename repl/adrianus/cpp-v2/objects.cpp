@@ -1231,7 +1231,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
             break;
             case OBJ_CLOSURE: {
                 auto* closure = static_cast<AdClosureObject*>(obj);
-                if (closure->fn != nullptr) {
+                if (closure->fn != nullptr && closure->owns_fn) {
                     if (closure->fn->instructions != nullptr) {
                         delete closure->fn->instructions;
                     }

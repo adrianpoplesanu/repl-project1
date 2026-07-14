@@ -91,6 +91,9 @@ public:
 
     /// Invoke a closure synchronously (used by VM thread workers).
     Ad_Object* invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args);
+
+    /// Compile and run an imported source unit, merging globals into the live VM.
+    void execute_import_source(const std::string& source);
 };
 
 #endif

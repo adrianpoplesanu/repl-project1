@@ -937,6 +937,21 @@ void Compiler::snapshot_bootstrap_globals() {
     }
 }
 
+void Compiler::seed_global_symbols(const std::vector<std::string>& names) {
+    int max_index = -1;
+    for (size_t i = 0; i < names.size(); ++i) {
+        if (names[i].empty()) {
+            continue;
+        }
+        Symbol sym(names[i], SymbolScope::GLOBAL, static_cast<int>(i));
+        symbol_table->store[names[i]] = sym;
+        max_index = static_cast<int>(i);
+    }
+    if (max_index >= 0) {
+        symbol_table->num_definitions = max_index + 1;
+    }
+}
+
 void Compiler::collect_global_names(Bytecode& bytecode) {
     SymbolTable* root = symbol_table;
     while (root != nullptr && root->outer != nullptr) {
@@ -1014,6 +1029,9 @@ void Compiler::setLastInstruction(OpCode opcode, int pos) {
 
 // Constants management implementation
 int Compiler::addConstant(Ad_Object* obj) {
+    if (gc != nullptr && obj != nullptr) {
+        gc->addObject(obj);
+    }
     constants.push_back(obj);
     return constants.size() - 1; // Return the index of the added constant
 }
@@ -1478,6 +1496,7 @@ AdClosureObject* Compiler::compile_default_param_closure(Ad_AST_Node* node) {
 
     auto* closure = new AdClosureObject();
     closure->fn = compiled_func;
+    closure->owns_fn = false;
     if (gc != nullptr) {
         gc->addObject(closure);
     }
@@ -1569,16 +1588,6 @@ void Compiler::merge_parent_class(AdCompiledClass* klass, AdCompiledClass* paren
         if (klass->field_name_to_index.find(entry.first) == klass->field_name_to_index.end()) {
             Symbol field_sym = symbol_table->define(entry.first, true);
             klass->field_name_to_index[entry.first] = field_sym.index;
-        }
-    }
-
-    for (AdCompiledFunction* initializer : parent->field_initializers) {
-        klass->field_initializers.push_back(initializer);
-    }
-
-    for (const auto& entry : parent->methods) {
-        if (klass->methods.find(entry.first) == klass->methods.end()) {
-            klass->methods[entry.first] = entry.second;
         }
     }
 }

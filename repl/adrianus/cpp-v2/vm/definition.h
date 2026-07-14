@@ -8,8 +8,9 @@ public:
     std::string name;
     int size;
     int *operandWidths;
+    bool owns_operand_widths;
 
-    Definition(std::string name, int size, int *operandWidths);
+    Definition(std::string name, int size, int *operandWidths, bool owns_operand_widths = true);
     ~Definition();
 };
 

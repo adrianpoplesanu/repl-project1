@@ -55,6 +55,7 @@ public:
     Bytecode getBytecode();
     void collect_global_names(Bytecode& bytecode);
     void snapshot_bootstrap_globals();
+    void seed_global_symbols(const std::vector<std::string>& global_names);
     
     // New methods for instruction emission
     int emit(OpCode op, int n = 0, std::vector<int> args = {});

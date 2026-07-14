@@ -2,6 +2,9 @@
 #include "code.h"
 #include "objects.h"
 #include "utils.h"
+#include "compiler.h"
+#include "../parser.h"
+#include "../ast.h"
 #include "../builtins_registry.h"
 #include "../evaluator.h"
 #include "../hashpair.h"
@@ -23,6 +26,119 @@ extern Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env,
 
 static std::string vm_property_field_name(Ad_Object* field_name_obj);
 
+static void vm_track(GarbageCollector* gc, Ad_Object* obj) {
+    if (gc != nullptr && obj != nullptr) {
+        gc->addObject(obj);
+    }
+}
+
+static AdClosureObject* lookup_class_method(AdCompiledClass* klass, const std::string& name) {
+    if (klass == nullptr) {
+        return nullptr;
+    }
+    auto it = klass->methods.find(name);
+    if (it != klass->methods.end() && it->second != nullptr) {
+        return it->second;
+    }
+    for (AdCompiledClass* super : klass->supers) {
+        AdClosureObject* method = lookup_class_method(super, name);
+        if (method != nullptr) {
+            return method;
+        }
+    }
+    return nullptr;
+}
+
+static int instruction_width_at_ip(const Instructions& ins, int offset) {
+    if (offset < 0 || offset >= ins.size) {
+        return 0;
+    }
+    Definition* def = lookup(ins.bytes[static_cast<size_t>(offset)]);
+    if (def == nullptr) {
+        return 1;
+    }
+    int width = 1;
+    for (int j = 0; j < def->size; ++j) {
+        width += def->operandWidths[j];
+    }
+    return width;
+}
+
+static void rebase_uint16_operand(Instructions& ins, int operand_ip, int offset) {
+    if (operand_ip + 1 >= ins.size) {
+        return;
+    }
+    int idx = read_uint16(ins, operand_ip);
+    idx += offset;
+    ins.bytes[static_cast<size_t>(operand_ip)] = static_cast<unsigned char>((idx >> 8) & 0xFF);
+    ins.bytes[static_cast<size_t>(operand_ip + 1)] = static_cast<unsigned char>(idx & 0xFF);
+}
+
+static void rebase_instruction_constants(Instructions& ins, int offset) {
+    if (offset == 0) {
+        return;
+    }
+    int i = 0;
+    while (i < ins.size) {
+        unsigned char op = ins.bytes[static_cast<size_t>(i)];
+        if (op == static_cast<unsigned char>(OP_CONSTANT) ||
+            op == static_cast<unsigned char>(OP_CLOSURE)) {
+            rebase_uint16_operand(ins, i + 1, offset);
+        }
+        int w = instruction_width_at_ip(ins, i);
+        if (w <= 0) {
+            break;
+        }
+        i += w;
+    }
+}
+
+static void rebase_compiled_function_constants(AdCompiledFunction* fn, int offset);
+static void rebase_object_constants(Ad_Object* obj, int offset);
+
+static void rebase_compiled_function_constants(AdCompiledFunction* fn, int offset) {
+    if (fn == nullptr || offset == 0) {
+        return;
+    }
+    if (fn->instructions != nullptr) {
+        rebase_instruction_constants(*fn->instructions, offset);
+    }
+    for (Ad_Object* default_value : fn->default_arg_values) {
+        rebase_object_constants(default_value, offset);
+    }
+}
+
+static void rebase_object_constants(Ad_Object* obj, int offset) {
+    if (obj == nullptr || offset == 0) {
+        return;
+    }
+    switch (obj->Type()) {
+        case OBJ_COMPILED_FUNCTION:
+            rebase_compiled_function_constants(static_cast<AdCompiledFunction*>(obj), offset);
+            break;
+        case OBJ_CLOSURE: {
+            auto* closure = static_cast<AdClosureObject*>(obj);
+            rebase_compiled_function_constants(closure->fn, offset);
+            break;
+        }
+        case OBJ_COMPILED_CLASS: {
+            auto* klass = static_cast<AdCompiledClass*>(obj);
+            for (AdCompiledFunction* initializer : klass->field_initializers) {
+                rebase_compiled_function_constants(initializer, offset);
+            }
+            for (const auto& entry : klass->methods) {
+                rebase_object_constants(entry.second, offset);
+            }
+            for (AdCompiledClass* super : klass->supers) {
+                rebase_object_constants(super, offset);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 namespace {
 
 bool is_nullish(Ad_Object* obj) {
@@ -38,7 +154,9 @@ Ad_Object* vm_new_sub_list(Ad_Object* target, int i1, int i2, int step, GarbageC
     int max = static_cast<int>(static_cast<Ad_List_Object*>(target)->elements.size());
 
     if (step < 0 && i1 < -max) {
-        return new Ad_List_Object();
+        auto* empty = new Ad_List_Object();
+        vm_track(gc, empty);
+        return empty;
     }
     if (step < 0 && i1 >= max) {
         i1 = INT_MAX;
@@ -95,7 +213,9 @@ Ad_Object* vm_new_sub_string(Ad_Object* target, int i1, int i2, int step, Garbag
         }
     } else if (i1 < 0 && i2 == static_cast<int>(original.length()) && step < 0) {
         if (i1 < -static_cast<int>(original.length())) {
-            return new Ad_String_Object("");
+            auto* empty = new Ad_String_Object("");
+            vm_track(gc, empty);
+            return empty;
         }
         i1 += static_cast<int>(original.length());
         i2 = -1;
@@ -235,7 +355,8 @@ void VM::load(Bytecode bytecode) {
     // Create an AdClosureObject wrapping the compiled function
     AdClosureObject* closure = new AdClosureObject();
     closure->fn = compiledFn;
-    
+    vm_track(gc, closure);
+
     // Create the initial frame with the closure
     frames.clear();
     frames_index = 0;
@@ -466,10 +587,12 @@ bool VM::execute_instruction() {
         } else {
             auto* closure = new AdClosureObject();
             closure->fn = static_cast<AdCompiledFunction*>(constants[const_index]);
+            closure->owns_fn = false;
             closure->free_vars.resize(static_cast<size_t>(num_free));
             for (int i = num_free - 1; i >= 0; --i) {
                 closure->free_vars[static_cast<size_t>(i)] = pop();
             }
+            vm_track(gc, closure);
             push(closure);
         }
     } else if (opcode == OP_GET_FREE) {
@@ -523,7 +646,9 @@ bool VM::execute_instruction() {
             return false;
         }
     } else if (opcode == OP_CLASS) {
-        push(new AdCompiledClass());
+        auto* klass = new AdCompiledClass();
+        vm_track(gc, klass);
+        push(klass);
     } else if (opcode == OP_SET_METHOD) {
         execute_set_method();
     } else if (opcode == OP_GET_PROPERTY_SYM) {
@@ -698,9 +823,9 @@ static AdCompiledFunction* vm_function_from_callee(Ad_Object* callee) {
         if (klass == nullptr) {
             return nullptr;
         }
-        auto it = klass->methods.find("constructor");
-        if (it != klass->methods.end() && it->second != nullptr && it->second->fn != nullptr) {
-            return it->second->fn;
+        AdClosureObject* ctor = lookup_class_method(klass, "constructor");
+        if (ctor != nullptr && ctor->fn != nullptr) {
+            return ctor->fn;
         }
     }
     return nullptr;
@@ -822,9 +947,9 @@ void VM::call_class(AdCompiledClass* cl, int num_args) {
         return;
     }
 
-    auto ctor_it = cl->methods.find("constructor");
-    if (ctor_it != cl->methods.end() && ctor_it->second != nullptr && ctor_it->second->fn != nullptr) {
-        AdCompiledFunction* ctor_fn = ctor_it->second->fn;
+    AdClosureObject* ctor = lookup_class_method(cl, "constructor");
+    if (ctor != nullptr && ctor->fn != nullptr) {
+        AdCompiledFunction* ctor_fn = ctor->fn;
         const int num_defaults = static_cast<int>(ctor_fn->default_arg_values.size());
         if (num_args + num_defaults < ctor_fn->num_parameters) {
             sp = callee_index;
@@ -851,21 +976,33 @@ void VM::call_class(AdCompiledClass* cl, int num_args) {
         gc->addObject(instance);
     }
 
-    for (AdCompiledFunction* field_initializer : cl->field_initializers) {
-        auto* closure = new AdClosureObject();
-        closure->fn = field_initializer;
-        AdBoundMethod bound_initializer(instance, closure);
-        const int frames_before = frames_index;
-        const int sp_before = sp;
-        call_bound_method(&bound_initializer, 0);
-        run_until_frames_index(frames_before);
-        while (sp > sp_before) {
-            pop();
+    std::function<void(AdCompiledClass*)> run_field_initializers;
+    run_field_initializers = [&](AdCompiledClass* klass) {
+        if (klass == nullptr) {
+            return;
         }
-    }
+        for (AdCompiledClass* super : klass->supers) {
+            run_field_initializers(super);
+        }
+        for (AdCompiledFunction* field_initializer : klass->field_initializers) {
+            auto* closure = new AdClosureObject();
+            closure->fn = field_initializer;
+            closure->owns_fn = false;
+            vm_track(gc, closure);
+            AdBoundMethod bound_initializer(instance, closure);
+            const int frames_before = frames_index;
+            const int sp_before = sp;
+            call_bound_method(&bound_initializer, 0);
+            run_until_frames_index(frames_before);
+            while (sp > sp_before) {
+                pop();
+            }
+        }
+    };
+    run_field_initializers(cl);
 
-    if (ctor_it != cl->methods.end()) {
-        AdBoundMethod bound_constructor(instance, ctor_it->second);
+    if (ctor != nullptr) {
+        AdBoundMethod bound_constructor(instance, ctor);
         const int frames_before = frames_index;
         const int sp_before = sp;
         for (Ad_Object* arg : args) {
@@ -1158,6 +1295,7 @@ void VM::execute_binary_operation(OpCodeType opcode) {
     }
     
     if (result != nullptr) {
+        vm_track(gc, result);
         push(result);
     }
 }
@@ -1306,11 +1444,15 @@ void VM::execute_minus_operator() {
         return;
     }
     if (operand->Type() == OBJ_INT) {
-        push(new Ad_Integer_Object(-static_cast<Ad_Integer_Object*>(operand)->value));
+        auto* value = new Ad_Integer_Object(-static_cast<Ad_Integer_Object*>(operand)->value);
+        vm_track(gc, value);
+        push(value);
         return;
     }
     if (operand->Type() == OBJ_FLOAT) {
-        push(new Ad_Float_Object(-static_cast<Ad_Float_Object*>(operand)->value));
+        auto* value = new Ad_Float_Object(-static_cast<Ad_Float_Object*>(operand)->value);
+        vm_track(gc, value);
+        push(value);
         return;
     }
     std::cerr << "[ VM Error ] Unsupported type for unary minus" << std::endl;
@@ -1336,7 +1478,9 @@ Ad_Object* VM::build_array(int start_index, int end_index) {
     for (int i = start_index; i < end_index; i++) {
         elements.push_back(stack[i]);
     }
-    return new Ad_List_Object(elements);
+    auto* array = new Ad_List_Object(elements);
+    vm_track(gc, array);
+    return array;
 }
 
 Ad_Object* VM::build_hash(int start_index, int end_index) {
@@ -1349,7 +1493,9 @@ Ad_Object* VM::build_hash(int start_index, int end_index) {
         std::string hash_key = std::to_string(hash_string(key->Hash()));
         hashed_pairs[hash_key] = pair;
     }
-    return new Ad_Hash_Object(hashed_pairs);
+    auto* hash = new Ad_Hash_Object(hashed_pairs);
+    vm_track(gc, hash);
+    return hash;
 }
 
 void VM::execute_index_expression(Ad_Object* left, Ad_Object* index) {
@@ -1416,6 +1562,7 @@ void VM::execute_string_index(Ad_Object* left, Ad_Object* index) {
         return;
     }
     push(new Ad_String_Object(str_obj->value.substr(static_cast<size_t>(idx), 1)));
+    vm_track(gc, stack[sp - 1]);
 }
 
 void VM::execute_slice_expression(Ad_Object* left, Ad_Object* start, Ad_Object* end, Ad_Object* step) {
@@ -1476,11 +1623,15 @@ void VM::execute_slice_expression(Ad_Object* left, Ad_Object* start, Ad_Object* 
             if (idx_end < 0) idx_end += max;
             if (idx_end >= max) idx_end = max;
             if (idx < idx_end && idx_step < 0) {
-                push(new Ad_String_Object(""));
+                auto* empty = new Ad_String_Object("");
+                vm_track(gc, empty);
+                push(empty);
                 return;
             }
             if (idx > idx_end && idx_step > 0) {
-                push(new Ad_String_Object(""));
+                auto* empty = new Ad_String_Object("");
+                vm_track(gc, empty);
+                push(empty);
                 return;
             }
             push(vm_new_sub_string(left, int_value(start), int_value(end), idx_step, gc));
@@ -1510,7 +1661,9 @@ void VM::execute_slice_expression(Ad_Object* left, Ad_Object* start, Ad_Object* 
             return;
         }
         if (is_nullish(start) && is_nullish(end) && is_nullish(step)) {
-            push(new Ad_String_Object(static_cast<Ad_String_Object*>(left)->value));
+            auto* copy = new Ad_String_Object(static_cast<Ad_String_Object*>(left)->value);
+            vm_track(gc, copy);
+            push(copy);
             return;
         }
     }
@@ -1645,9 +1798,9 @@ void VM::push_bound_instance_member(AdCompiledInstance* inst, const std::string&
         }
     }
     if (inst->klass != nullptr) {
-        auto it = inst->klass->methods.find(name);
-        if (it != inst->klass->methods.end() && it->second != nullptr) {
-            auto* bound = new AdBoundMethod(inst, it->second);
+        AdClosureObject* method = lookup_class_method(inst->klass, name);
+        if (method != nullptr) {
+            auto* bound = new AdBoundMethod(inst, method);
             if (gc != nullptr) {
                 gc->addObject(bound);
             }
@@ -1775,9 +1928,9 @@ void VM::execute_get_method() {
             push(&NULLOBJECT);
             return;
         }
-        auto it = inst->klass->methods.find(method_name);
-        if (it != inst->klass->methods.end() && it->second != nullptr) {
-            auto* bound = new AdBoundMethod(inst, it->second);
+        AdClosureObject* method = lookup_class_method(inst->klass, method_name);
+        if (method != nullptr) {
+            auto* bound = new AdBoundMethod(inst, method);
             if (gc != nullptr) {
                 gc->addObject(bound);
             }
@@ -1959,6 +2112,65 @@ void VM::set_instance_attribute(AdCompiledInstance* inst, const std::string& nam
     }
     ensure_instance_field_capacity(inst, index);
     inst->fields[static_cast<size_t>(index)] = value;
+}
+
+void VM::execute_import_source(const std::string& source) {
+    Parser parser;
+    Ad_AST_Program program;
+    parser.Load(source);
+    program.reset();
+    parser.ParseProgram(program);
+
+    Compiler import_compiler(gc);
+    import_compiler.seed_global_symbols(global_names);
+    import_compiler.compile(&program);
+    Bytecode imported = import_compiler.getBytecode();
+
+    for (size_t i = 0; i < imported.global_names.size(); ++i) {
+        if (imported.global_names[i].empty()) {
+            continue;
+        }
+        if (i >= global_names.size()) {
+            global_names.resize(i + 1, "");
+        }
+        if (global_names[i].empty()) {
+            global_names[i] = imported.global_names[i];
+        }
+    }
+    if (globals.size() < global_names.size()) {
+        globals.resize(global_names.size(), nullptr);
+    }
+
+    const int const_offset = static_cast<int>(constants.size());
+    constants.insert(constants.end(), imported.constants.begin(), imported.constants.end());
+    rebase_instruction_constants(imported.instructions, const_offset);
+    for (Ad_Object* obj : imported.constants) {
+        rebase_object_constants(obj, const_offset);
+    }
+
+    VM runner;
+    runner.gc = gc;
+    runner.constants = constants;
+    runner.globals = globals;
+    runner.global_names = global_names;
+    runner.bootstrap_global_names = bootstrap_global_names;
+    runner.warn_return_outside_function = false;
+    runner.sp = 0;
+    runner.frames_index = 0;
+    runner.frames.clear();
+
+    AdCompiledFunction* compiled_fn = new AdCompiledFunction();
+    auto* instructions = new Instructions();
+    instructions->bytes = imported.instructions.bytes;
+    instructions->size = imported.instructions.size;
+    compiled_fn->instructions = instructions;
+
+    AdClosureObject* closure = new AdClosureObject();
+    closure->fn = compiled_fn;
+    vm_track(gc, closure);
+    runner.push_frame(Frame(closure, -1, 0, nullptr));
+    runner.run();
+    globals = runner.globals;
 }
 
 Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args) {

@@ -109,66 +109,137 @@ void append_object_instructions(
 }
 } // namespace
 
+namespace {
+// Static operand-width tables (2 = uint16, 1 = uint8). Zero-operand ops use nullptr.
+static int ow_u16[] = {2};
+static int ow_u8[] = {1};
+static int ow_u8_u8[] = {1, 1};
+static int ow_u16_u8[] = {2, 1};
+
+static Definition kOpConstant("OpConstant", 1, ow_u16, false);
+static Definition kOpAdd("OpAdd", 0, nullptr, false);
+static Definition kOpSub("OpSub", 0, nullptr, false);
+static Definition kOpMultiply("OpMultiply", 0, nullptr, false);
+static Definition kOpDivide("OpDivide", 0, nullptr, false);
+static Definition kOpMod("OpMod", 0, nullptr, false);
+static Definition kOpPop("OpPop", 0, nullptr, false);
+static Definition kOpTrue("OpTrue", 0, nullptr, false);
+static Definition kOpFalse("OpFalse", 0, nullptr, false);
+static Definition kOpEqual("OpEqual", 0, nullptr, false);
+static Definition kOpNotEqual("OpNotEqual", 0, nullptr, false);
+static Definition kOpGreaterThan("OpGreaterThan", 0, nullptr, false);
+static Definition kOpGreaterThanEqual("OpGreaterThanEqual", 0, nullptr, false);
+static Definition kOpAnd("OpAnd", 0, nullptr, false);
+static Definition kOpOr("OpOr", 0, nullptr, false);
+static Definition kOpMinus("OpMinus", 0, nullptr, false);
+static Definition kOpBang("OpBang", 0, nullptr, false);
+static Definition kOpJumpNotTruthy("OpJumpNotTruthy", 1, ow_u16, false);
+static Definition kOpJump("OpJump", 1, ow_u16, false);
+static Definition kOpNull("OpNull", 0, nullptr, false);
+static Definition kOpGetGlobal("OpGetGlobal", 1, ow_u16, false);
+static Definition kOpSetGlobal("OpSetGlobal", 1, ow_u16, false);
+static Definition kOpArray("OpArray", 1, ow_u16, false);
+static Definition kOpHash("OpHash", 1, ow_u16, false);
+static Definition kOpIndex("OpIndex", 0, nullptr, false);
+static Definition kOpSetIndex("OpSetIndex", 0, nullptr, false);
+static Definition kOpPostfixIndex("OpPostfixIndex", 0, nullptr, false);
+static Definition kOpSlice("OpSlice", 0, nullptr, false);
+static Definition kOpPatchIndex("OpPatchIndex", 0, nullptr, false);
+static Definition kOpCall("OpCall", 1, ow_u8, false);
+static Definition kOpCallKw("OpCallKw", 2, ow_u8_u8, false);
+static Definition kOpReturnValue("OpReturnValue", 0, nullptr, false);
+static Definition kOpReturn("OpReturn", 0, nullptr, false);
+static Definition kOpGetLocal("OpGetLocal", 1, ow_u8, false);
+static Definition kOpSetLocal("OpSetLocal", 1, ow_u8, false);
+static Definition kOpGetBuiltin("OpGetBuiltin", 1, ow_u8, false);
+static Definition kOpClosure("OpClosure", 2, ow_u16_u8, false);
+static Definition kOpGetFree("OpGetFree", 1, ow_u8, false);
+static Definition kOpCurrentClosure("OpCurrentClosure", 0, nullptr, false);
+static Definition kOpClass("OpClass", 0, nullptr, false);
+static Definition kOpSetMethod("OpSetMethod", 0, nullptr, false);
+static Definition kOpGetProperty("OpGetProperty", 0, nullptr, false);
+static Definition kOpSetProperty("OpSetProperty", 0, nullptr, false);
+static Definition kOpGetMethod("OpGetMethod", 0, nullptr, false);
+static Definition kOpInvoke("OpInvoke", 1, ow_u8, false);
+static Definition kOpSetPropertySym("OpSetPropertySym", 1, ow_u16, false);
+static Definition kOpGetPropertySym("OpGetPropertySym", 1, ow_u16, false);
+static Definition kOpPatchPropertySym("OpPatchPropertySym", 1, ow_u16, false);
+static Definition kOpGetThis("OpGetThis", 0, nullptr, false);
+static Definition kOpGetSuperMethod("OpGetSuperMethod", 0, nullptr, false);
+static Definition kOpFileStmtOutput("OpFileStmtOutput", 0, nullptr, false);
+
+struct DefEntry {
+    unsigned char opcode;
+    Definition* def;
+};
+
+static const DefEntry kDefEntries[] = {
+    {OP_CONSTANT, &kOpConstant},
+    {OP_ADD, &kOpAdd},
+    {OP_SUB, &kOpSub},
+    {OP_MULTIPLY, &kOpMultiply},
+    {OP_DIVIDE, &kOpDivide},
+    {OP_MOD, &kOpMod},
+    {OP_POP, &kOpPop},
+    {OP_TRUE, &kOpTrue},
+    {OP_FALSE, &kOpFalse},
+    {OP_EQUAL, &kOpEqual},
+    {OP_NOTEQUAL, &kOpNotEqual},
+    {OP_GREATERTHAN, &kOpGreaterThan},
+    {OP_GREATERTHAN_EQUAL, &kOpGreaterThanEqual},
+    {OP_AND, &kOpAnd},
+    {OP_OR, &kOpOr},
+    {OP_MINUS, &kOpMinus},
+    {OP_BANG, &kOpBang},
+    {OP_JUMP_NOT_TRUTHY, &kOpJumpNotTruthy},
+    {OP_JUMP, &kOpJump},
+    {OP_NULL, &kOpNull},
+    {OP_GET_GLOBAL, &kOpGetGlobal},
+    {OP_SET_GLOBAL, &kOpSetGlobal},
+    {OP_ARRAY, &kOpArray},
+    {OP_HASH, &kOpHash},
+    {OP_INDEX, &kOpIndex},
+    {OP_SET_INDEX, &kOpSetIndex},
+    {OP_POSTFIX_INDEX, &kOpPostfixIndex},
+    {OP_SLICE, &kOpSlice},
+    {OP_PATCH_INDEX, &kOpPatchIndex},
+    {OP_CALL, &kOpCall},
+    {OP_CALL_KW, &kOpCallKw},
+    {OP_RETURN_VALUE, &kOpReturnValue},
+    {OP_RETURN, &kOpReturn},
+    {OP_GET_LOCAL, &kOpGetLocal},
+    {OP_SET_LOCAL, &kOpSetLocal},
+    {OP_GET_BUILTIN, &kOpGetBuiltin},
+    {OP_CLOSURE, &kOpClosure},
+    {OP_GET_FREE, &kOpGetFree},
+    {OP_CURRENT_CLOSURE, &kOpCurrentClosure},
+    {OP_CLASS, &kOpClass},
+    {OP_SET_METHOD, &kOpSetMethod},
+    {OP_GET_PROPERTY, &kOpGetProperty},
+    {OP_SET_PROPERTY, &kOpSetProperty},
+    {OP_GET_METHOD, &kOpGetMethod},
+    {OP_INVOKE, &kOpInvoke},
+    {OP_SET_PROPERTY_SYM, &kOpSetPropertySym},
+    {OP_GET_PROPERTY_SYM, &kOpGetPropertySym},
+    {OP_PATCH_PROPERTY_SYM, &kOpPatchPropertySym},
+    {OP_GET_THIS, &kOpGetThis},
+    {OP_GET_SUPER_METHOD, &kOpGetSuperMethod},
+    {OP_FILE_STMT_OUTPUT, &kOpFileStmtOutput},
+};
+} // namespace
+
 // Static function to initialize and return the definitions map
 static std::map<unsigned char, Definition*>& get_definitions_map() {
     static std::map<unsigned char, Definition*> definitions_map;
     static bool initialized = false;
-    
+
     if (!initialized) {
-        definitions_map[OP_CONSTANT] = new Definition("OpConstant", 1, new int[1] {2});
-        definitions_map[OP_ADD] = new Definition("OpAdd", 0, new int);
-        definitions_map[OP_SUB] = new Definition("OpSub", 0, new int);
-        definitions_map[OP_MULTIPLY] = new Definition("OpMultiply", 0, new int);
-        definitions_map[OP_DIVIDE] = new Definition("OpDivide", 0, new int);
-        definitions_map[OP_MOD] = new Definition("OpMod", 0, new int);
-        definitions_map[OP_POP] = new Definition("OpPop", 0, new int);
-        definitions_map[OP_TRUE] = new Definition("OpTrue", 0, new int);
-        definitions_map[OP_FALSE] = new Definition("OpFalse", 0, new int);
-        definitions_map[OP_EQUAL] = new Definition("OpEqual", 0, new int);
-        definitions_map[OP_NOTEQUAL] = new Definition("OpNotEqual", 0, new int);
-        definitions_map[OP_GREATERTHAN] = new Definition("OpGreaterThan", 0, new int);
-        definitions_map[OP_GREATERTHAN_EQUAL] = new Definition("OpGreaterThanEqual", 0, new int);
-        definitions_map[OP_AND] = new Definition("OpAnd", 0, new int);
-        definitions_map[OP_OR] = new Definition("OpOr", 0, new int);
-        definitions_map[OP_MINUS] = new Definition("OpMinus", 0, new int);
-        definitions_map[OP_BANG] = new Definition("OpBang", 0, new int);
-        definitions_map[OP_JUMP_NOT_TRUTHY] = new Definition("OpJumpNotTruthy", 1, new int[1] {2});
-        definitions_map[OP_JUMP] = new Definition("OpJump", 1, new int[1] {2});
-        definitions_map[OP_NULL] = new Definition("OpNull", 0, new int);
-        definitions_map[OP_GET_GLOBAL] = new Definition("OpGetGlobal", 1, new int[1] {2});
-        definitions_map[OP_SET_GLOBAL] = new Definition("OpSetGlobal", 1, new int[1] {2});
-        definitions_map[OP_ARRAY] = new Definition("OpArray", 1, new int[1] {2});
-        definitions_map[OP_HASH] = new Definition("OpHash", 1, new int[1] {2});
-        definitions_map[OP_INDEX] = new Definition("OpIndex", 0, new int);
-        definitions_map[OP_SET_INDEX] = new Definition("OpSetIndex", 0, new int);
-        definitions_map[OP_POSTFIX_INDEX] = new Definition("OpPostfixIndex", 0, new int);
-        definitions_map[OP_SLICE] = new Definition("OpSlice", 0, new int);
-        definitions_map[OP_PATCH_INDEX] = new Definition("OpPatchIndex", 0, new int);
-        definitions_map[OP_CALL] = new Definition("OpCall", 1, new int[1] {1});
-        definitions_map[OP_CALL_KW] = new Definition("OpCallKw", 2, new int[2] {1, 1});
-        definitions_map[OP_RETURN_VALUE] = new Definition("OpReturnValue", 0, new int);
-        definitions_map[OP_RETURN] = new Definition("OpReturn", 0, new int);
-        definitions_map[OP_GET_LOCAL] = new Definition("OpGetLocal", 1, new int[1] {1});
-        definitions_map[OP_SET_LOCAL] = new Definition("OpSetLocal", 1, new int[1] {1});
-        definitions_map[OP_GET_BUILTIN] = new Definition("OpGetBuiltin", 1, new int[1] {1});
-        definitions_map[OP_CLOSURE] = new Definition("OpClosure", 2, new int[2] {2, 1});
-        definitions_map[OP_GET_FREE] = new Definition("OpGetFree", 1, new int[1] {1});
-        definitions_map[OP_CURRENT_CLOSURE] = new Definition("OpCurrentClosure", 0, new int);
-        definitions_map[OP_CLASS] = new Definition("OpClass", 0, new int);
-        definitions_map[OP_SET_METHOD] = new Definition("OpSetMethod", 0, new int);
-        definitions_map[OP_GET_PROPERTY] = new Definition("OpGetProperty", 0, new int);
-        definitions_map[OP_SET_PROPERTY] = new Definition("OpSetProperty", 0, new int);
-        definitions_map[OP_GET_METHOD] = new Definition("OpGetMethod", 0, new int);
-        definitions_map[OP_INVOKE] = new Definition("OpInvoke", 1, new int[1] {1});
-        definitions_map[OP_SET_PROPERTY_SYM] = new Definition("OpSetPropertySym", 1, new int[1] {2});
-        definitions_map[OP_GET_PROPERTY_SYM] = new Definition("OpGetPropertySym", 1, new int[1] {2});
-        definitions_map[OP_PATCH_PROPERTY_SYM] = new Definition("OpPatchPropertySym", 1, new int[1] {2});
-        definitions_map[OP_GET_THIS] = new Definition("OpGetThis", 0, new int);
-        definitions_map[OP_GET_SUPER_METHOD] = new Definition("OpGetSuperMethod", 0, new int);
-        definitions_map[OP_FILE_STMT_OUTPUT] = new Definition("OpFileStmtOutput", 0, new int);
+        for (const DefEntry& entry : kDefEntries) {
+            definitions_map[entry.opcode] = entry.def;
+        }
         initialized = true;
     }
-    
+
     return definitions_map;
 }
 

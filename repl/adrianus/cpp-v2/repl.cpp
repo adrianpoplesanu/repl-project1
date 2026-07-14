@@ -189,29 +189,7 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
         threadPool.clear();
         ad_set_current_vm(nullptr);
 
-        garbageCollector->unmarkAllObjects();
-        garbageCollector->markObjects(vm.stack, vm.sp);
-        for (const Frame& frame : vm.frames) {
-            if (frame.cl != nullptr) {
-                garbageCollector->markObject(frame.cl);
-            }
-            if (frame.bound_instance != nullptr) {
-                garbageCollector->markObject(frame.bound_instance);
-            }
-        }
-        if (vm.globals.size() > 0) {
-            for (Ad_Object* global_obj : vm.globals) {
-                if (global_obj != nullptr) {
-                    garbageCollector->markObject(global_obj);
-                }
-            }
-        }
-        for (Ad_Object* constant : vm.constants) {
-            if (constant != nullptr) {
-                garbageCollector->markObject(constant);
-            }
-        }
-        garbageCollector->sweepObjects();
+        garbageCollector->forceFreeObjects();
         // Program output matches `Evaluator::EvalProgram` via OP_FILE_STMT_OUTPUT opcodes.
     } else {
         std::cout << "empty or missing ad source file\n";
@@ -252,9 +230,7 @@ bool Repl::ExecuteLineVM(std::string line) {
     vm.printLogs();
     run_vm_with_optional_instruction_limit(vm);
 
-    garbageCollector->unmarkAllObjects();
-    garbageCollector->markObjects(vm.stack, vm.sp);
-    garbageCollector->sweepObjects();
+    garbageCollector->forceFreeObjects();
 
     return false;
 }

@@ -38,6 +38,8 @@ public:
     std::vector<Ad_Object*> free_vars;
     /// Optional instance owner for setattr-installed closures (evaluator env parity).
     AdCompiledInstance* bound_owner = nullptr;
+    /// When false, `fn` is borrowed (e.g. from bytecode constants) and must not be deleted.
+    bool owns_fn = true;
 
 	AdClosureObject();
     std::string Inspect() override;
