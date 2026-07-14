@@ -7,6 +7,7 @@ enum OpCodeType {
     OP_SUB,
     OP_MULTIPLY,
     OP_DIVIDE,
+    OP_MOD,
     OP_POP,
     OP_TRUE,
     OP_FALSE,
@@ -101,6 +102,12 @@ public:
 class OpDivide : public OpCode {
 public:
     OpDivide() : OpCode(OP_DIVIDE) {
+    }
+};
+
+class OpMod : public OpCode {
+public:
+    OpMod() : OpCode(OP_MOD) {
     }
 };
 
@@ -385,6 +392,7 @@ extern OpAdd opAdd;
 extern OpSub opSub;
 extern OpMultiply opMultiply;
 extern OpDivide opDivide;
+extern OpMod opMod;
 extern OpPop opPop;
 extern OpTrue opTrue;
 extern OpFalse opFalse;

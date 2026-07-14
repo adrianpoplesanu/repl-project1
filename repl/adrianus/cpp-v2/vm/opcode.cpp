@@ -5,6 +5,7 @@ OpAdd opAdd;
 OpSub opSub;
 OpMultiply opMultiply;
 OpDivide opDivide;
+OpMod opMod;
 OpPop opPop;
 OpTrue opTrue;
 OpFalse opFalse;

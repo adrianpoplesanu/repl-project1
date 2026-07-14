@@ -364,6 +364,8 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opMultiply, 0, {});
         } else if (infix_expr->_operator == "/") {
             emit(opDivide, 0, {});
+        } else if (infix_expr->_operator == "%") {
+            emit(opMod, 0, {});
         } else if (infix_expr->_operator == "==") {
             emit(opEqual, 0, {});
         } else if (infix_expr->_operator == "!=") {
@@ -558,7 +560,8 @@ void Compiler::compile(Ad_AST_Node* node) {
             // matching evaluator instance_environment lookup (e.g. dex.printName -> name).
             emit_dynamic_instance_field_lookup(identifier_node->value);
         } else {
-            std::cerr << "[ Compiler Error ] undefined identifier: " << identifier_node->value << "\n";
+            Symbol symbol = symbol_table->define(identifier_node->value);
+            emit(opGetGlobal, 1, {symbol.index});
         }
     } else if (node->type == ST_STRING_LITERAL) {
         Ad_AST_String* string_node = (Ad_AST_String*)node;
@@ -1433,14 +1436,52 @@ void Compiler::fill_default_arg_values(AdCompiledFunction* fn, const std::vector
         } else if (node->type == ST_BOOLEAN) {
             value = new Ad_Boolean_Object(static_cast<Ad_AST_Boolean*>(node)->value);
         } else {
-            std::cerr << "[ Compiler Error ] unsupported default parameter expression in the VM\n";
-            value = &NULLOBJECT;
+            AdClosureObject* closure = compile_default_param_closure(node);
+            value = closure != nullptr ? static_cast<Ad_Object*>(closure) : &NULLOBJECT;
         }
         if (value != &NULLOBJECT && gc != nullptr) {
             gc->addObject(value);
         }
         fn->default_arg_values.push_back(value);
     }
+}
+
+AdClosureObject* Compiler::compile_default_param_closure(Ad_AST_Node* node) {
+    if (node == nullptr) {
+        return nullptr;
+    }
+    enter_scope();
+    compile(node);
+    if (lastInstructionIs(opPop)) {
+        replaceLastPopWithReturn();
+    }
+    if (!lastInstructionIs(opReturnValue)) {
+        emit(opReturnValue, 0, {});
+    }
+    if (!symbol_table->free_symbols.empty()) {
+        std::cerr << "[ Compiler Warning ] default parameter free variables not fully supported in the VM\n";
+    }
+    auto local_names = collect_scope_locals();
+    int num_locals = symbol_table->num_definitions;
+    Instructions inner_instructions = leave_scope();
+
+    auto* compiled_func = new AdCompiledFunction();
+    compiled_func->instructions = new Instructions();
+    compiled_func->instructions->bytes = inner_instructions.bytes;
+    compiled_func->instructions->size = inner_instructions.size;
+    compiled_func->num_locals = num_locals;
+    compiled_func->local_names = local_names;
+    compiled_func->num_parameters = 0;
+    if (gc != nullptr) {
+        gc->addObject(compiled_func);
+    }
+
+    auto* closure = new AdClosureObject();
+    closure->fn = compiled_func;
+    if (gc != nullptr) {
+        gc->addObject(closure);
+    }
+    return closure;
 }
 
 void Compiler::assign_parameter_names(AdCompiledFunction* fn, const std::vector<Ad_AST_Node*>& parameters) {

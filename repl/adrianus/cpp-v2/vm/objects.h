@@ -8,6 +8,8 @@
 #include "../gc.h"
 #include "instructions.h"
 
+class AdCompiledInstance;
+
 class AdCompiledFunction : public Ad_Object {
 public:
     Instructions* instructions;
@@ -34,6 +36,8 @@ public:
     /// Captured locals/globals from enclosing scopes (VM parallels evaluator free bindings).
     /// Index matches `SymbolScope::FREE` symbol index emitted by `OP_GET_FREE`.
     std::vector<Ad_Object*> free_vars;
+    /// Optional instance owner for setattr-installed closures (evaluator env parity).
+    AdCompiledInstance* bound_owner = nullptr;
 
 	AdClosureObject();
     std::string Inspect() override;

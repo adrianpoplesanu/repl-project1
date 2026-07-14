@@ -74,6 +74,7 @@ Code::Code() {
     definitionsMap.insert(std::make_pair(OP_SUB, new Definition("OpSub", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_MULTIPLY, new Definition("OpMultiply", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_DIVIDE, new Definition("OpDivide", 0, new int)));
+    definitionsMap.insert(std::make_pair(OP_MOD, new Definition("OpMod", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_POP, new Definition("OpPop", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_TRUE, new Definition("OpTrue", 0, new int)));
     definitionsMap.insert(std::make_pair(OP_FALSE, new Definition("OpFalse", 0, new int)));

@@ -10,6 +10,8 @@
 #include <unordered_set>
 #include <string>
 
+class Environment;
+
 class VM {
 public:
     int stackSize = 2048;
@@ -71,6 +73,7 @@ public:
     void ensure_instance_field_capacity(AdCompiledInstance* inst, int index);
     void register_instance_field_name(AdCompiledInstance* inst, const std::string& name, int index);
     int lookup_instance_field_index(AdCompiledInstance* inst, const std::string& name);
+    int find_or_add_global_index(const std::string& name);
     void push_bound_instance_member(AdCompiledInstance* inst, const std::string& name);
     void execute_get_property_sym(int sym_index);
     void execute_patch_property_sym(int sym_index);
@@ -80,6 +83,11 @@ public:
     void execute_get_super_method();
     void execute_get_this();
     void execute_set_method();
+
+    Environment* create_eval_environment(GarbageCollector* gc);
+    void sync_globals_from_environment(Environment* env);
+    void set_instance_attribute(AdCompiledInstance* inst, const std::string& name, Ad_Object* value);
+    Ad_Object* evaluate_default_arg_value(Ad_Object* default_value);
 
     /// Invoke a closure synchronously (used by VM thread workers).
     Ad_Object* invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args);

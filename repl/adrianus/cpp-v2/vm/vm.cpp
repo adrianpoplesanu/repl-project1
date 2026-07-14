@@ -9,6 +9,7 @@
 #include "../socket_utils.h"
 #include "../thread_utils.h"
 #include "../environment.h"
+#include "../builtins_registry_names.h"
 #include <iostream>
 #include <vector>
 #include <functional>
@@ -16,6 +17,7 @@
 #include <unordered_map>
 #include <climits>
 #include <algorithm>
+#include <cmath>
 
 extern Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc);
 
@@ -208,6 +210,9 @@ VM::VM() {
     global_names.clear();
     has_loaded_bytecode = false;
     warn_return_outside_function = true;
+    for (int i = 0; i < stackSize; ++i) {
+        stack[i] = nullptr;
+    }
 }
 
 void VM::load(Bytecode bytecode) {
@@ -270,7 +275,7 @@ bool VM::execute_instruction() {
         if (const_index >= 0 && const_index < static_cast<int>(constants.size())) {
             push(constants[const_index]);
         }
-    } else if (opcode == OP_ADD || opcode == OP_SUB || opcode == OP_MULTIPLY || opcode == OP_DIVIDE) {
+    } else if (opcode == OP_ADD || opcode == OP_SUB || opcode == OP_MULTIPLY || opcode == OP_DIVIDE || opcode == OP_MOD) {
         execute_binary_operation(opcode);
     } else if (opcode == OP_EQUAL || opcode == OP_NOTEQUAL ||
                opcode == OP_GREATERTHAN || opcode == OP_GREATERTHAN_EQUAL) {
@@ -302,7 +307,11 @@ bool VM::execute_instruction() {
         } else {
             Ad_Object* result = pop();
             if (result != nullptr && result->Type() != OBJ_SIGNAL && result->Type() != OBJ_NULL) {
-                std::cout << result->Inspect() << "\n";
+                std::cout << result->Inspect() << '\n';
+                std::cout.flush();
+                if (result->Type() == OBJ_ERROR) {
+                    return false;
+                }
             }
         }
     } else if (opcode == OP_TRUE) {
@@ -327,14 +336,46 @@ bool VM::execute_instruction() {
         if (global_index >= static_cast<int>(globals.size())) {
             globals.resize(global_index + 1, nullptr);
         }
-        globals[global_index] = pop();
+        Ad_Object* value = pop();
+        if (value != nullptr && value->Type() == OBJ_ERROR) {
+            std::cout << value->Inspect() << "\n";
+            return false;
+        }
+        globals[global_index] = value;
     } else if (opcode == OP_GET_GLOBAL) {
         int global_index = read_uint16(*ins, ip + 1);
         frame->ip += 2;
+        Ad_Object* value = nullptr;
         if (global_index >= 0 && global_index < static_cast<int>(globals.size())) {
-            push(globals[global_index]);
+            value = globals[global_index];
+        }
+        if (value != nullptr) {
+            push(value);
         } else {
-            std::cerr << "[ VM Error ] Global index out of bounds: " << global_index << std::endl;
+            std::string var_name = "unknown";
+            if (global_index >= 0 && global_index < static_cast<int>(global_names.size()) &&
+                !global_names[static_cast<size_t>(global_index)].empty()) {
+                var_name = global_names[static_cast<size_t>(global_index)];
+            }
+            AdCompiledInstance* inst = current_bound_instance();
+            if (inst == nullptr && frame->cl != nullptr && frame->cl->bound_owner != nullptr) {
+                inst = frame->cl->bound_owner;
+            }
+            if (inst != nullptr) {
+                const int field_index = lookup_instance_field_index(inst, var_name);
+                if (field_index >= 0 && field_index < static_cast<int>(inst->fields.size())) {
+                    Ad_Object* field_value = inst->fields[static_cast<size_t>(field_index)];
+                    if (field_value != nullptr) {
+                        push(field_value);
+                        return true;
+                    }
+                }
+            }
+            auto* err = new Ad_Error_Object("variable " + var_name + " undefined.");
+            if (gc != nullptr) {
+                gc->addObject(err);
+            }
+            push(err);
         }
     } else if (opcode == OP_SET_LOCAL) {
         int local_index = read_uint8(*ins, ip + 1);
@@ -583,7 +624,7 @@ void VM::apply_default_arguments(AdCompiledFunction* fn, int& num_args) {
     const int threshold = num_defaults - num_params + num_args;
     for (int i = 0; i < num_defaults; ++i) {
         if (i >= threshold) {
-            Ad_Object* default_value = fn->default_arg_values[static_cast<size_t>(i)];
+            Ad_Object* default_value = evaluate_default_arg_value(fn->default_arg_values[static_cast<size_t>(i)]);
             if (default_value != nullptr) {
                 push(default_value);
             } else {
@@ -592,6 +633,28 @@ void VM::apply_default_arguments(AdCompiledFunction* fn, int& num_args) {
             ++num_args;
         }
     }
+}
+
+Ad_Object* VM::evaluate_default_arg_value(Ad_Object* default_value) {
+    if (default_value == nullptr) {
+        return &NULLOBJECT;
+    }
+    if (default_value->Type() != OBJ_CLOSURE) {
+        return default_value;
+    }
+    auto* cl = static_cast<AdClosureObject*>(default_value);
+    if (cl->fn == nullptr) {
+        return &NULLOBJECT;
+    }
+    const int frames_before = frames_index;
+    const int sp_before = sp;
+    push(cl);
+    call_closure(cl, 0);
+    run_until_frames_index(frames_before);
+    if (sp > sp_before) {
+        return pop();
+    }
+    return &NULLOBJECT;
 }
 
 void VM::call_closure(AdClosureObject* cl, int num_args) {
@@ -610,9 +673,10 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
         push(err);
         return;
     }
-    Frame frame(cl, -1, sp - num_args, current_bound_instance());
+    Frame frame(cl, -1, sp - num_args, current_bound_instance() != nullptr ? current_bound_instance() : cl->bound_owner);
     push_frame(frame);
-    sp = frame.base_pointer + cl->fn->num_locals;
+    const int min_locals = std::max(cl->fn->num_locals, 1);
+    sp = frame.base_pointer + min_locals;
 }
 
 static AdCompiledFunction* vm_function_from_callee(Ad_Object* callee) {
@@ -758,6 +822,21 @@ void VM::call_class(AdCompiledClass* cl, int num_args) {
         return;
     }
 
+    auto ctor_it = cl->methods.find("constructor");
+    if (ctor_it != cl->methods.end() && ctor_it->second != nullptr && ctor_it->second->fn != nullptr) {
+        AdCompiledFunction* ctor_fn = ctor_it->second->fn;
+        const int num_defaults = static_cast<int>(ctor_fn->default_arg_values.size());
+        if (num_args + num_defaults < ctor_fn->num_parameters) {
+            sp = callee_index;
+            auto* err = new Ad_Error_Object("some error message here");
+            if (gc != nullptr) {
+                gc->addObject(err);
+            }
+            push(err);
+            return;
+        }
+    }
+
     std::vector<Ad_Object*> args;
     args.reserve(static_cast<size_t>(num_args));
     for (int i = 0; i < num_args; ++i) {
@@ -785,7 +864,6 @@ void VM::call_class(AdCompiledClass* cl, int num_args) {
         }
     }
 
-    auto ctor_it = cl->methods.find("constructor");
     if (ctor_it != cl->methods.end()) {
         AdBoundMethod bound_constructor(instance, ctor_it->second);
         const int frames_before = frames_index;
@@ -819,7 +897,8 @@ void VM::call_bound_method(AdBoundMethod* bm, int num_args) {
     }
     Frame frame(bm->bound_method, -1, sp - num_args, bm->owner);
     push_frame(frame);
-    sp = frame.base_pointer + bm->bound_method->fn->num_locals;
+    const int min_locals = std::max(bm->bound_method->fn->num_locals, 1);
+    sp = frame.base_pointer + min_locals;
 }
 
 void VM::call_runtime_bound_method(AdRuntimeBoundMethod* bm, int num_args) {
@@ -1041,6 +1120,19 @@ void VM::execute_binary_operation(OpCodeType opcode) {
                     result = new Ad_Float_Object(left_val / right_val);
                 } else {
                     result = new Ad_Integer_Object(static_cast<int>(left_val / right_val));
+                }
+                break;
+            case OP_MOD:
+                if (use_float) {
+                    result = new Ad_Float_Object(std::fmod(left_val, right_val));
+                } else {
+                    const int left_int = static_cast<int>(left_val);
+                    const int right_int = static_cast<int>(right_val);
+                    if (right_int == 0) {
+                        std::cerr << "[ VM Error ] Modulo by zero!" << std::endl;
+                        return;
+                    }
+                    result = new Ad_Integer_Object(left_int % right_int);
                 }
                 break;
             default:
@@ -1639,17 +1731,7 @@ void VM::execute_get_property() {
     }
     auto* inst = static_cast<AdCompiledInstance*>(owner);
     const std::string field_name = vm_property_field_name(field_name_obj);
-    const int index = lookup_instance_field_index(inst, field_name);
-    if (index < 0 || index >= static_cast<int>(inst->fields.size())) {
-        push(&NULLOBJECT);
-        return;
-    }
-    Ad_Object* value = inst->fields[static_cast<size_t>(index)];
-    if (value != nullptr) {
-        push(value);
-    } else {
-        push(&NULLOBJECT);
-    }
+    push_bound_instance_member(inst, field_name);
 }
 
 void VM::execute_set_property() {
@@ -1800,6 +1882,85 @@ void VM::execute_set_method() {
     klass->methods[vm_property_field_name(name_obj)] = static_cast<AdClosureObject*>(method_obj);
 }
 
+int VM::find_or_add_global_index(const std::string& name) {
+    for (size_t i = 0; i < global_names.size(); ++i) {
+        if (global_names[i] == name) {
+            return static_cast<int>(i);
+        }
+    }
+    global_names.push_back(name);
+    return static_cast<int>(global_names.size() - 1);
+}
+
+Environment* VM::create_eval_environment(GarbageCollector* eval_gc) {
+    auto* env = new Environment();
+    env->isGlobalEnvironment = true;
+    for (size_t i = 0; i < global_names.size(); ++i) {
+        const std::string& name = global_names[i];
+        if (name.empty()) {
+            continue;
+        }
+        if (i < globals.size() && globals[i] != nullptr) {
+            env->store[name] = globals[i];
+        }
+    }
+    for (int i = 0; AD_VM_BUILTIN_NAMES[i] != nullptr; ++i) {
+        Ad_Object* builtin_obj = vm_get_builtin_object(i);
+        if (builtin_obj != nullptr) {
+            env->store[std::string(AD_VM_BUILTIN_NAMES[i])] = builtin_obj;
+        }
+    }
+    if (eval_gc != nullptr) {
+        eval_gc->addEnvironment(env);
+    }
+    return env;
+}
+
+void VM::sync_globals_from_environment(Environment* env) {
+    if (env == nullptr) {
+        return;
+    }
+    for (const auto& entry : env->store) {
+        bool skip = false;
+        for (int i = 0; AD_VM_BUILTIN_NAMES[i] != nullptr; ++i) {
+            if (entry.first == AD_VM_BUILTIN_NAMES[i]) {
+                skip = true;
+                break;
+            }
+        }
+        if (skip || bootstrap_global_names.count(entry.first) > 0) {
+            continue;
+        }
+        int idx = -1;
+        for (size_t i = 0; i < global_names.size(); ++i) {
+            if (global_names[i] == entry.first) {
+                idx = static_cast<int>(i);
+                break;
+            }
+        }
+        if (idx < 0) {
+            continue;
+        }
+        if (idx >= static_cast<int>(globals.size())) {
+            globals.resize(static_cast<size_t>(idx) + 1, nullptr);
+        }
+        globals[static_cast<size_t>(idx)] = entry.second;
+    }
+}
+
+void VM::set_instance_attribute(AdCompiledInstance* inst, const std::string& name, Ad_Object* value) {
+    if (inst == nullptr) {
+        return;
+    }
+    int index = lookup_instance_field_index(inst, name);
+    if (index < 0) {
+        index = static_cast<int>(inst->fields.size());
+        register_instance_field_name(inst, name, index);
+    }
+    ensure_instance_field_capacity(inst, index);
+    inst->fields[static_cast<size_t>(index)] = value;
+}
+
 Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args) {
     if (closure == nullptr || closure->fn == nullptr) {
         return &NULLOBJECT;
@@ -1816,18 +1977,11 @@ Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Obj
     runner.frames_index = 0;
     runner.frames.clear();
 
-    // Arrange stack like `execute_call` expects: [callee, arg0, arg1, ...]
     runner.push(closure);
     for (Ad_Object* arg : args) {
         runner.push(arg != nullptr ? arg : &NULLOBJECT);
     }
-
-    int num_args = static_cast<int>(args.size());
-    runner.apply_default_arguments(closure->fn, num_args);
-    Frame frame(closure, -1, runner.sp - num_args, nullptr);
-    runner.push_frame(frame);
-    runner.sp = frame.base_pointer + closure->fn->num_locals;
-
+    runner.execute_call(static_cast<int>(args.size()));
     runner.run();
     if (runner.sp > 0 && runner.stack[runner.sp - 1] != nullptr) {
         return runner.stack[runner.sp - 1];

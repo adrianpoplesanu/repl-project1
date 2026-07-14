@@ -170,6 +170,23 @@ void Repl::ExecuteFileVM(std::ifstream &target) {
         vm.printLogs();
         ad_set_current_vm(&vm);
         run_vm_with_optional_instruction_limit(vm);
+
+        for (int i = 0; i < static_cast<int>(threadPool.size()); i++) {
+            Ad_Thread_Object* target_thread = static_cast<Ad_Thread_Object*>(threadPool.at(i));
+            if (target_thread->internal_thread != nullptr && target_thread->internal_thread->joinable()) {
+                target_thread->internal_thread->join();
+            }
+            if (target_thread->internal_gc != nullptr) {
+                target_thread->internal_gc->forceFreeObjects();
+                delete target_thread->internal_gc;
+                target_thread->internal_gc = nullptr;
+            }
+            if (target_thread->internal_thread != nullptr) {
+                delete target_thread->internal_thread;
+                target_thread->internal_thread = nullptr;
+            }
+        }
+        threadPool.clear();
         ad_set_current_vm(nullptr);
 
         garbageCollector->unmarkAllObjects();

@@ -250,6 +250,9 @@ void GarbageCollector::markObject(Ad_Object* obj) {
             for (Ad_Object* free_var : closure->free_vars) {
                 markObject(free_var);
             }
+            if (closure->bound_owner != nullptr) {
+                markObject(closure->bound_owner);
+            }
             break;
         }
         case OBJ_COMPILED_CLASS: {
@@ -290,7 +293,8 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
 
         default: {
-            std::cout << "MEMORY ERROR!!! garbage collection inconsistency!\n";
+            std::cerr << "MEMORY ERROR!!! garbage collection inconsistency! type="
+                      << object_type_map[obj->type] << "\n";
             break;
         }
     }

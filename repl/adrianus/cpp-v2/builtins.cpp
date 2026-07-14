@@ -9,6 +9,8 @@
 #include "thread_utils.h"
 #include "builtins_registry.h"
 #include "builtins_registry_names.h"
+#include "vm/vm_context.h"
+#include "vm/vm.h"
 #include <vector>
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
@@ -105,6 +107,7 @@ Ad_Object* print_builtin(std::vector<Ad_Object*> args, Environment* env, Garbage
     }
     // std::cout << obj->Inspect() << "\n"; // old print builtin
     std::cout << decodeEscapes(obj->repr());
+    std::cout.flush();
     free_builtin_arguments(args);
     return NULL;
 }
@@ -116,6 +119,7 @@ Ad_Object* println_builtin(std::vector<Ad_Object*> args, Environment* env, Garba
         return NULL;
     }
     std::cout << decodeEscapes(obj->repr()) << "\n";
+    std::cout.flush();
     free_builtin_arguments(args);
     return NULL;
 }
@@ -308,6 +312,12 @@ Ad_Object* __memory_address_builtin(std::vector<Ad_Object*> args, Environment* e
 
 Ad_Object* eval_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_String_Object* unescapedSource = (Ad_String_Object*) args[0];
+    if (VM* vm = ad_current_vm()) {
+        Environment* eval_env = vm->create_eval_environment(gc);
+        evalSource(unescapedSource->value, eval_env, gc);
+        vm->sync_globals_from_environment(eval_env);
+        return NULL;
+    }
     evalSource(unescapedSource->value, env, gc);
     return NULL;
 }
@@ -412,6 +422,16 @@ Ad_Object* setattr_builtin(std::vector<Ad_Object*> args, Environment *env, Garba
                 ((Ad_Class_Instance*) target)->instance_environment->store[name->value] = value;
             } else {
                 ((Ad_Class_Instance*) target)->instance_environment->store[name->value] = value;
+            }
+        } else if (target->type == OBJ_COMPILED_INSTANCE) {
+            Ad_String_Object* name = (Ad_String_Object*) args.at(1);
+            Ad_Object* value = args.at(2);
+            if (VM* vm = ad_current_vm()) {
+                auto* inst = static_cast<AdCompiledInstance*>(target);
+                if (value != nullptr && value->type == OBJ_CLOSURE) {
+                    static_cast<AdClosureObject*>(value)->bound_owner = inst;
+                }
+                vm->set_instance_attribute(inst, name->value, value);
             }
         }
     }
