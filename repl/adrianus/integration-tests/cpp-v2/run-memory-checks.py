@@ -16,7 +16,7 @@ for test_file in test_files:
     target = test_file.strip()
     #proc = subprocess.Popen(["leaks", "--atExit", "--", "{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)], stdout=subprocess.PIPE)
     if os_platform.lower() == "darwin":
-        proc = subprocess.Popen(["./memory-check-macos.sh", "{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)])
+        proc = subprocess.Popen(["./memory-check-macos.sh", "{0}{1}".format(binary_path, binary_excutable), "-vm", "{0}{1}".format(binary_path, target)])
     elif os_platform.lower() == "linux":
         proc = subprocess.Popen(["./memory-check-linux.sh", "{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)])
     else:

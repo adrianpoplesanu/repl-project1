@@ -16,7 +16,8 @@ failure_actual = []
 for test_file in test_files:
     target = test_file.strip()
     print ('running test: ' + target)
-    proc = subprocess.Popen(["{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)], stdout=subprocess.PIPE)
+    #proc = subprocess.Popen(["{0}{1}".format(binary_path, binary_excutable), "{0}{1}".format(binary_path, target)], stdout=subprocess.PIPE)
+    proc = subprocess.Popen(["{0}{1}".format(binary_path, binary_excutable), "-vm", "{0}{1}".format(binary_path, target)], stdout=subprocess.PIPE)
     proc.wait()
     output = proc.communicate()[0]
     expected_target = expected_folder + target.split("/")[-1].replace(".ad", ".txt")
