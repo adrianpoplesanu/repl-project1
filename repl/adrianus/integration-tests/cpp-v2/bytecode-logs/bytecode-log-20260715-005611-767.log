@@ -1,9 +1,9 @@
-timestamp: 20260715-002341-057
-constants_count: 276
+timestamp: 20260715-005611-767
+constants_count: 289
 
 === main ===
-size: 150
-bytes: 0 0 16 21 0 0 0 0 38 21 0 1 0 0 40 21 0 2 0 0 46 21 0 3 20 0 3 29 0 21 0 4 0 0 76 21 0 5 20 0 5 29 0 21 0 6 0 0 77 21 0 7 0 0 78 21 0 8 0 0 100 21 0 9 0 0 125 21 0 10 0 0 145 21 0 11 0 0 186 21 0 12 0 1 11 21 0 13 20 0 13 29 0 21 0 14 36 1 12 0 21 0 15 20 0 15 29 0 51 20 0 15 0 1 13 29 1 51 20 0 15 0 1 14 0 1 15 0 1 16 0 1 17 30 0 2 51 20 0 15 0 1 18 0 1 19 30 0 1 51
+size: 236
+bytes: 0 0 16 21 0 0 0 0 38 21 0 1 0 0 40 21 0 2 0 0 46 21 0 3 20 0 3 29 0 21 0 4 0 0 76 21 0 5 20 0 5 29 0 21 0 6 0 0 77 21 0 7 0 0 78 21 0 8 0 0 100 21 0 9 0 0 125 21 0 10 0 0 145 21 0 11 0 0 186 21 0 12 0 1 11 21 0 13 20 0 13 29 0 21 0 14 35 3 20 0 6 0 1 12 44 0 1 13 0 1 14 29 2 29 1 51 35 3 20 0 6 0 1 15 44 0 1 16 0 1 17 29 2 29 1 51 35 3 20 0 6 0 1 18 44 0 1 19 0 1 20 29 2 29 1 51 35 3 20 0 6 0 1 21 44 0 1 22 0 1 23 29 2 29 1 51 35 3 20 0 6 0 1 24 44 0 1 25 0 1 26 29 2 29 1 51 35 3 20 0 6 0 1 27 44 0 1 28 0 1 29 29 2 29 1 51 35 3 20 0 6 0 1 30 44 0 1 31 0 1 32 29 2 29 1 51
 0000 OpConstant 16
 0003 OpSetGlobal 0
 0006 OpConstant 38
@@ -37,27 +37,69 @@ bytes: 0 0 16 21 0 0 0 0 38 21 0 1 0 0 40 21 0 2 0 0 46 21 0 3 20 0 3 29 0 21 0 
 0088 OpGetGlobal 13
 0091 OpCall 0
 0093 OpSetGlobal 14
-0096 OpClosure 268 0
-0100 OpSetGlobal 15
-0103 OpGetGlobal 15
-0106 OpCall 0
-0108 OpFileStmtOutput
-0109 OpGetGlobal 15
-0112 OpConstant 269
-0115 OpCall 1
-0117 OpFileStmtOutput
-0118 OpGetGlobal 15
-0121 OpConstant 270
-0124 OpConstant 271
-0127 OpConstant 272
-0130 OpConstant 273
-0133 OpCallKw 0 2
-0136 OpFileStmtOutput
-0137 OpGetGlobal 15
-0140 OpConstant 274
-0143 OpConstant 275
-0146 OpCallKw 0 1
-0149 OpFileStmtOutput
+0096 OpGetBuiltin 3
+0098 OpGetGlobal 6
+0101 OpConstant 268
+0104 OpGetMethod
+0105 OpConstant 269
+0108 OpConstant 270
+0111 OpCall 2
+0113 OpCall 1
+0115 OpFileStmtOutput
+0116 OpGetBuiltin 3
+0118 OpGetGlobal 6
+0121 OpConstant 271
+0124 OpGetMethod
+0125 OpConstant 272
+0128 OpConstant 273
+0131 OpCall 2
+0133 OpCall 1
+0135 OpFileStmtOutput
+0136 OpGetBuiltin 3
+0138 OpGetGlobal 6
+0141 OpConstant 274
+0144 OpGetMethod
+0145 OpConstant 275
+0148 OpConstant 276
+0151 OpCall 2
+0153 OpCall 1
+0155 OpFileStmtOutput
+0156 OpGetBuiltin 3
+0158 OpGetGlobal 6
+0161 OpConstant 277
+0164 OpGetMethod
+0165 OpConstant 278
+0168 OpConstant 279
+0171 OpCall 2
+0173 OpCall 1
+0175 OpFileStmtOutput
+0176 OpGetBuiltin 3
+0178 OpGetGlobal 6
+0181 OpConstant 280
+0184 OpGetMethod
+0185 OpConstant 281
+0188 OpConstant 282
+0191 OpCall 2
+0193 OpCall 1
+0195 OpFileStmtOutput
+0196 OpGetBuiltin 3
+0198 OpGetGlobal 6
+0201 OpConstant 283
+0204 OpGetMethod
+0205 OpConstant 284
+0208 OpConstant 285
+0211 OpCall 2
+0213 OpCall 1
+0215 OpFileStmtOutput
+0216 OpGetBuiltin 3
+0218 OpGetGlobal 6
+0221 OpConstant 286
+0224 OpGetMethod
+0225 OpConstant 287
+0228 OpConstant 288
+0231 OpCall 2
+0233 OpCall 1
+0235 OpFileStmtOutput
 
 === constant[0] type=4 ===
 inspect: 'name'
@@ -108,7 +150,7 @@ inspect: 'file_object'
 inspect: 'write'
 
 === constant[16] type=22 ===
-inspect: <class object at memory address: 0xc00c54000>
+inspect: <class object at memory address: 0xa2cc58000>
 
 === constant[16] [compiled_class] ===
 field_initializers: 3
@@ -139,7 +181,7 @@ bytes: 19 0 0 2 48 0 2 32
 0007 OpReturn
 
 === constant[16].method[read] [closure] ===
-fn: 0xc01074140
+fn: 0xa2d070140
 
 === constant[16].method[read].fn [compiled_function] params=0 locals=0 ===
 size: 33
@@ -162,7 +204,7 @@ bytes: 0 0 8 47 0 1 0 0 9 9 17 0 30 0 0 10 47 0 2 0 0 11 44 29 0 31 19 18 0 31 1
 0032 OpReturn
 
 === constant[16].method[write] [closure] ===
-fn: 0xc010741e0
+fn: 0xa2d0701e0
 
 === constant[16].method[write].fn [compiled_function] params=1 locals=1 ===
 size: 35
@@ -186,7 +228,7 @@ bytes: 0 0 12 47 0 1 0 0 13 9 17 0 32 0 0 14 47 0 2 0 0 15 44 33 0 29 1 31 19 18
 0034 OpReturn
 
 === constant[16].method[constructor] [closure] ===
-fn: 0xc010740a0
+fn: 0xa2d0700a0
 
 === constant[16].method[constructor].fn [compiled_function] params=2 locals=2 ===
 size: 39
@@ -271,7 +313,7 @@ inspect: 'low_level_descriptor'
 inspect: ' ][ INFO ] '
 
 === constant[38] type=22 ===
-inspect: <class object at memory address: 0xc00c54100>
+inspect: <class object at memory address: 0xa2cc58100>
 
 === constant[38] [compiled_class] ===
 field_initializers: 2
@@ -294,7 +336,7 @@ bytes: 0 0 19 0 0 20 48 0 1 32
 0009 OpReturn
 
 === constant[38].method[info] [closure] ===
-fn: 0xc01074460
+fn: 0xa2d070460
 
 === constant[38].method[info].fn [compiled_function] params=1 locals=1 ===
 size: 34
@@ -318,7 +360,7 @@ bytes: 35 3 0 0 33 0 0 34 47 0 0 1 0 0 35 1 0 0 36 47 0 1 1 0 0 37 1 33 0 1 29 1
 0033 OpReturn
 
 === constant[38].method[error] [closure] ===
-fn: 0xc010743c0
+fn: 0xa2d0703c0
 
 === constant[38].method[error].fn [compiled_function] params=1 locals=1 ===
 size: 34
@@ -342,7 +384,7 @@ bytes: 35 3 0 0 28 0 0 29 47 0 0 1 0 0 30 1 0 0 31 47 0 1 1 0 0 32 1 33 0 1 29 1
 0033 OpReturn
 
 === constant[38].method[warning] [closure] ===
-fn: 0xc01074320
+fn: 0xa2d070320
 
 === constant[38].method[warning].fn [compiled_function] params=1 locals=1 ===
 size: 34
@@ -366,7 +408,7 @@ bytes: 35 3 0 0 23 0 0 24 47 0 0 1 0 0 25 1 0 0 26 47 0 1 1 0 0 27 1 33 0 1 29 1
 0033 OpReturn
 
 === constant[38].method[constructor] [closure] ===
-fn: 0xc01074280
+fn: 0xa2d070280
 
 === constant[38].method[constructor].fn [compiled_function] params=2 locals=2 ===
 size: 17
@@ -383,14 +425,14 @@ bytes: 33 0 0 0 21 48 0 0 33 1 0 0 22 48 0 1 32
 inspect: 'Test bultin method'
 
 === constant[40] type=22 ===
-inspect: <class object at memory address: 0xc00c54200>
+inspect: <class object at memory address: 0xa2cc58200>
 
 === constant[40] [compiled_class] ===
 field_initializers: 0
 methods: 1
 
 === constant[40].method[a] [closure] ===
-fn: 0xc01074500
+fn: 0xa2d070500
 
 === constant[40].method[a].fn [compiled_function] params=0 locals=0 ===
 size: 9
@@ -417,14 +459,14 @@ inspect: 1
 inspect: ''
 
 === constant[46] type=22 ===
-inspect: <class object at memory address: 0xc00c54300>
+inspect: <class object at memory address: 0xa2cc58300>
 
 === constant[46] [compiled_class] ===
 field_initializers: 0
 methods: 2
 
 === constant[46].method[printMatrix] [closure] ===
-fn: 0xc01074780
+fn: 0xa2d070640
 
 === constant[46].method[printMatrix].fn [compiled_function] params=1 locals=4 ===
 size: 81
@@ -473,7 +515,7 @@ bytes: 35 0 33 0 29 1 34 1 33 1 0 0 41 11 17 0 70 35 0 33 0 0 0 42 24 29 1 34 2 
 0080 OpReturn
 
 === constant[46].method[generateMatrix] [closure] ===
-fn: 0xc01074640
+fn: 0xa2d0705a0
 
 === constant[46].method[generateMatrix].fn [compiled_function] params=3 locals=4 ===
 size: 19
@@ -577,14 +619,14 @@ inspect: 1
 inspect: ''
 
 === constant[76] type=22 ===
-inspect: <class object at memory address: 0xc00c54400>
+inspect: <class object at memory address: 0xa2cc58400>
 
 === constant[76] [compiled_class] ===
 field_initializers: 0
 methods: 9
 
 === constant[76].method[toString] [closure] ===
-fn: 0xc01074be0
+fn: 0xa2d070be0
 
 === constant[76].method[toString].fn [compiled_function] params=1 locals=1 ===
 size: 7
@@ -595,7 +637,7 @@ bytes: 35 5 33 0 29 1 31
 0006 OpReturnValue
 
 === constant[76].method[startsWith] [closure] ===
-fn: 0xc01074960
+fn: 0xa2d070960
 
 === constant[76].method[startsWith].fn [compiled_function] params=2 locals=5 ===
 size: 83
@@ -649,7 +691,7 @@ bytes: 35 0 33 0 29 1 34 2 35 0 33 1 29 1 34 3 33 3 33 2 11 17 0 30 8 31 19 18 0
 0082 OpReturnValue
 
 === constant[76].method[isEmpty] [closure] ===
-fn: 0xc01074b40
+fn: 0xa2d070b40
 
 === constant[76].method[isEmpty].fn [compiled_function] params=1 locals=1 ===
 size: 34
@@ -678,7 +720,7 @@ bytes: 33 0 19 9 17 0 13 7 31 19 18 0 14 19 6 33 0 0 0 75 9 17 0 30 7 31 19 18 0
 0033 OpReturnValue
 
 === constant[76].method[splitFirst] [closure] ===
-fn: 0xc010748c0
+fn: 0xa2d0708c0
 
 === constant[76].method[splitFirst].fn [compiled_function] params=2 locals=6 ===
 size: 113
@@ -741,7 +783,7 @@ bytes: 22 0 0 34 2 33 0 34 3 0 0 61 47 255 255 33 0 33 1 29 2 34 4 33 4 0 0 62 1
 0112 OpReturnValue
 
 === constant[76].method[split] [closure] ===
-fn: 0xc01074820
+fn: 0xa2d070820
 
 === constant[76].method[split].fn [compiled_function] params=2 locals=6 ===
 size: 115
@@ -802,7 +844,7 @@ bytes: 22 0 0 34 2 33 0 34 3 0 0 55 47 255 255 33 0 33 1 29 2 34 4 33 4 0 0 56 1
 0114 OpReturnValue
 
 === constant[76].method[endsWith] [closure] ===
-fn: 0xc01074a00
+fn: 0xa2d070a00
 
 === constant[76].method[endsWith].fn [compiled_function] params=2 locals=5 ===
 size: 89
@@ -860,7 +902,7 @@ bytes: 35 0 33 0 29 1 34 2 35 0 33 1 29 1 34 3 33 3 33 2 11 17 0 30 8 31 19 18 0
 0088 OpReturnValue
 
 === constant[76].method[indexOf] [closure] ===
-fn: 0xc010745a0
+fn: 0xa2d070780
 
 === constant[76].method[indexOf].fn [compiled_function] params=2 locals=7 ===
 size: 128
@@ -935,7 +977,7 @@ bytes: 35 0 33 0 29 1 34 2 35 0 33 1 29 1 34 3 0 0 49 34 4 33 2 33 3 2 0 0 50 1 
 0127 OpReturnValue
 
 === constant[76].method[replace] [closure] ===
-fn: 0xc01074aa0
+fn: 0xa2d070aa0
 
 === constant[76].method[replace].fn [compiled_function] params=3 locals=8 ===
 size: 108
@@ -998,7 +1040,7 @@ bytes: 0 0 70 47 255 255 33 0 33 1 29 2 34 3 35 0 33 0 29 1 34 4 35 0 33 1 29 1 
 0107 OpReturnValue
 
 === constant[76].method[substring] [closure] ===
-fn: 0xc010746e0
+fn: 0xa2d0706e0
 
 === constant[76].method[substring].fn [compiled_function] params=3 locals=5 ===
 size: 44
@@ -1028,14 +1070,14 @@ bytes: 0 0 47 34 3 33 1 34 4 33 2 33 4 11 17 0 41 33 3 33 0 33 4 24 1 34 3 33 4 
 0043 OpReturnValue
 
 === constant[77] type=22 ===
-inspect: <class object at memory address: 0xc00c54500>
+inspect: <class object at memory address: 0xa2cc58500>
 
 === constant[77] [compiled_class] ===
 field_initializers: 0
 methods: 1
 
 === constant[77].method[execute] [closure] ===
-fn: 0xc01074c80
+fn: 0xa2d070c80
 
 === constant[77].method[execute].fn [compiled_function] params=1 locals=2 ===
 size: 11
@@ -1114,7 +1156,7 @@ inspect: 'sock'
 inspect: 'close'
 
 === constant[100] type=22 ===
-inspect: <class object at memory address: 0xc00c54600>
+inspect: <class object at memory address: 0xa2cc58600>
 
 === constant[100] [compiled_class] ===
 field_initializers: 3
@@ -1145,7 +1187,7 @@ bytes: 19 0 0 81 48 0 2 32
 0007 OpReturn
 
 === constant[100].method[close] [closure] ===
-fn: 0xc010750e0
+fn: 0xa2d0710e0
 
 === constant[100].method[close].fn [compiled_function] params=0 locals=0 ===
 size: 27
@@ -1165,7 +1207,7 @@ bytes: 0 0 96 47 0 2 0 0 97 44 29 0 6 0 0 98 47 0 0 0 0 99 44 29 0 6 32
 0026 OpReturn
 
 === constant[100].method[read] [closure] ===
-fn: 0xc01074fa0
+fn: 0xa2d070fa0
 
 === constant[100].method[read].fn [compiled_function] params=0 locals=1 ===
 size: 17
@@ -1180,7 +1222,7 @@ bytes: 0 0 92 47 0 2 0 0 93 44 29 0 34 0 33 0 31
 0016 OpReturnValue
 
 === constant[100].method[accept] [closure] ===
-fn: 0xc01074f00
+fn: 0xa2d070f00
 
 === constant[100].method[accept].fn [compiled_function] params=0 locals=0 ===
 size: 19
@@ -1195,7 +1237,7 @@ bytes: 0 0 89 47 0 0 0 0 90 44 29 0 0 0 91 48 0 2 32
 0018 OpReturn
 
 === constant[100].method[send] [closure] ===
-fn: 0xc01075040
+fn: 0xa2d071040
 
 === constant[100].method[send].fn [compiled_function] params=1 locals=1 ===
 size: 16
@@ -1210,7 +1252,7 @@ bytes: 0 0 94 47 0 2 0 0 95 44 33 0 29 1 6 32
 0015 OpReturn
 
 === constant[100].method[constructor] [closure] ===
-fn: 0xc01074e60
+fn: 0xa2d070e60
 
 === constant[100].method[constructor].fn [compiled_function] params=1 locals=1 ===
 size: 48
@@ -1311,7 +1353,7 @@ inspect: 'sock'
 inspect: 'close'
 
 === constant[125] type=22 ===
-inspect: <class object at memory address: 0xc00c54700>
+inspect: <class object at memory address: 0xa2cc58700>
 
 === constant[125] [compiled_class] ===
 field_initializers: 4
@@ -1350,7 +1392,7 @@ bytes: 19 0 0 104 48 0 3 32
 0007 OpReturn
 
 === constant[125].method[constructor] [closure] ===
-fn: 0xc01075180
+fn: 0xa2d071180
 
 === constant[125].method[constructor].fn [compiled_function] params=2 locals=2 ===
 size: 59
@@ -1383,7 +1425,7 @@ bytes: 33 0 0 0 105 48 0 2 33 1 0 0 106 48 0 1 35 16 0 0 107 0 0 108 47 0 2 0 0 
 0058 OpReturn
 
 === constant[125].method[sendAndReadBackHTTPS] [closure] ===
-fn: 0xc01075400
+fn: 0xa2d071400
 
 === constant[125].method[sendAndReadBackHTTPS].fn [compiled_function] params=1 locals=2 ===
 size: 19
@@ -1399,7 +1441,7 @@ bytes: 0 0 119 47 0 0 0 0 120 44 33 0 29 1 34 1 33 1 31
 0018 OpReturnValue
 
 === constant[125].method[sendAndReadBackHTTP] [closure] ===
-fn: 0xc01075360
+fn: 0xa2d071360
 
 === constant[125].method[sendAndReadBackHTTP].fn [compiled_function] params=1 locals=2 ===
 size: 19
@@ -1415,7 +1457,7 @@ bytes: 0 0 117 47 0 0 0 0 118 44 33 0 29 1 34 1 33 1 31
 0018 OpReturnValue
 
 === constant[125].method[read] [closure] ===
-fn: 0xc010752c0
+fn: 0xa2d0712c0
 
 === constant[125].method[read].fn [compiled_function] params=0 locals=1 ===
 size: 17
@@ -1430,7 +1472,7 @@ bytes: 0 0 115 47 0 0 0 0 116 44 29 0 34 0 33 0 31
 0016 OpReturnValue
 
 === constant[125].method[close] [closure] ===
-fn: 0xc010754a0
+fn: 0xa2d0714a0
 
 === constant[125].method[close].fn [compiled_function] params=0 locals=0 ===
 size: 27
@@ -1450,7 +1492,7 @@ bytes: 0 0 121 47 0 3 0 0 122 44 29 0 6 0 0 123 47 0 0 0 0 124 44 29 0 6 32
 0026 OpReturn
 
 === constant[125].method[send] [closure] ===
-fn: 0xc01075220
+fn: 0xa2d071220
 
 === constant[125].method[send].fn [compiled_function] params=1 locals=1 ===
 size: 16
@@ -1522,7 +1564,7 @@ inspect: '\r\nConnection: close\r\n\r\n'
 inspect: 'message'
 
 === constant[145] type=22 ===
-inspect: <class object at memory address: 0xc00c54800>
+inspect: <class object at memory address: 0xa2cc58800>
 
 === constant[145] [compiled_class] ===
 field_initializers: 3
@@ -1553,7 +1595,7 @@ bytes: 0 0 128 0 0 129 48 0 2 32
 0009 OpReturn
 
 === constant[145].method[start] [closure] ===
-fn: 0xc010755e0
+fn: 0xa2d0715e0
 
 === constant[145].method[start].fn [compiled_function] params=0 locals=0 ===
 size: 82
@@ -1598,7 +1640,7 @@ bytes: 35 3 0 0 134 0 0 135 47 0 0 1 29 1 6 7 17 0 81 0 0 136 47 0 1 0 0 137 44 
 0081 OpReturn
 
 === constant[145].method[constructor] [closure] ===
-fn: 0xc01075540
+fn: 0xa2d071540
 
 === constant[145].method[constructor].fn [compiled_function] params=2 locals=2 ===
 size: 34
@@ -1738,7 +1780,7 @@ inspect: '='
 inspect: 1
 
 === constant[186] type=22 ===
-inspect: <class object at memory address: 0xc00c54900>
+inspect: <class object at memory address: 0xa2cc58900>
 
 === constant[186] [compiled_class] ===
 field_initializers: 2
@@ -1764,7 +1806,7 @@ bytes: 0 0 149 0 0 150 48 0 1 32
 0009 OpReturn
 
 === constant[186].method[isHTTPS] [closure] ===
-fn: 0xc01075900
+fn: 0xa2d071900
 
 === constant[186].method[isHTTPS].fn [compiled_function] params=1 locals=1 ===
 size: 15
@@ -1778,7 +1820,7 @@ bytes: 20 0 6 0 0 169 44 33 0 0 0 170 29 2 31
 0014 OpReturnValue
 
 === constant[186].method[removeProtocol] [closure] ===
-fn: 0xc010759a0
+fn: 0xa2d0719a0
 
 === constant[186].method[removeProtocol].fn [compiled_function] params=1 locals=1 ===
 size: 91
@@ -1829,7 +1871,7 @@ bytes: 20 0 6 0 0 171 44 33 0 0 0 172 29 2 17 0 42 20 0 6 0 0 173 44 33 0 0 0 17
 0090 OpReturnValue
 
 === constant[186].method[isValidHost] [closure] ===
-fn: 0xc01075720
+fn: 0xa2d071860
 
 === constant[186].method[isValidHost].fn [compiled_function] params=1 locals=1 ===
 size: 30
@@ -1850,7 +1892,7 @@ bytes: 20 0 6 0 0 165 44 33 0 0 0 166 29 2 20 0 6 0 0 167 44 33 0 0 0 168 29 2 1
 0029 OpReturnValue
 
 === constant[186].method[getHeaders] [closure] ===
-fn: 0xc01075680
+fn: 0xa2d071680
 
 === constant[186].method[getHeaders].fn [compiled_function] params=0 locals=0 ===
 size: 4
@@ -1859,7 +1901,7 @@ bytes: 0 0 152 31
 0003 OpReturnValue
 
 === constant[186].method[getUri] [closure] ===
-fn: 0xc010757c0
+fn: 0xa2d071720
 
 === constant[186].method[getUri].fn [compiled_function] params=1 locals=3 ===
 size: 70
@@ -1901,7 +1943,7 @@ bytes: 20 0 6 0 0 153 44 33 0 0 0 154 29 2 34 1 0 0 155 35 0 33 1 29 1 11 17 0 3
 0069 OpReturnValue
 
 === constant[186].method[mapToQueryParams] [closure] ===
-fn: 0xc01075ae0
+fn: 0xa2d071a40
 
 === constant[186].method[mapToQueryParams].fn [compiled_function] params=1 locals=4 ===
 size: 106
@@ -1963,7 +2005,7 @@ bytes: 0 0 179 34 1 35 6 33 0 29 1 34 2 0 0 180 34 3 35 0 33 2 29 1 33 3 11 17 0
 0105 OpReturnValue
 
 === constant[186].method[getBody] [closure] ===
-fn: 0xc01074000
+fn: 0xa2d070000
 
 === constant[186].method[getBody].fn [compiled_function] params=0 locals=0 ===
 size: 4
@@ -1972,7 +2014,7 @@ bytes: 0 0 151 31
 0003 OpReturnValue
 
 === constant[186].method[getDomain] [closure] ===
-fn: 0xc01075860
+fn: 0xa2d0717c0
 
 === constant[186].method[getDomain].fn [compiled_function] params=1 locals=3 ===
 size: 50
@@ -2004,7 +2046,7 @@ bytes: 20 0 6 0 0 160 44 33 0 0 0 161 29 2 34 1 0 0 162 35 0 33 1 29 1 11 17 0 3
 0049 OpReturnValue
 
 === constant[186].method[constructor] [closure] ===
-fn: 0xc01074d20
+fn: 0xa2d070d20
 
 === constant[186].method[constructor].fn [compiled_function] params=0 locals=0 ===
 size: 1
@@ -2252,7 +2294,7 @@ inspect: 'sendAndReadBackHTTPS'
 inspect: 'sendAndReadBackHTTP'
 
 === constant[267] type=22 ===
-inspect: <class object at memory address: 0xc00c54a00>
+inspect: <class object at memory address: 0xa2cc58a00>
 
 === constant[267] [compiled_class] ===
 field_initializers: 2
@@ -2275,7 +2317,7 @@ bytes: 19 0 0 188 48 0 1 32
 0007 OpReturn
 
 === constant[267].method[get2] [closure] ===
-fn: 0xc01075c20
+fn: 0xa2d071c20
 
 === constant[267].method[get2].fn [compiled_function] params=2 locals=7 ===
 size: 118
@@ -2342,7 +2384,7 @@ bytes: 0 0 198 34 2 8 34 3 20 0 6 0 0 199 44 33 0 0 0 200 29 2 17 0 32 7 34 3 19
 0117 OpReturnValue
 
 === constant[267].method[post] [closure] ===
-fn: 0xc01075d60
+fn: 0xa2d071d60
 
 === constant[267].method[post].fn [compiled_function] params=3 locals=12 ===
 size: 286
@@ -2490,7 +2532,7 @@ bytes: 0 0 238 47 0 0 0 0 239 44 33 0 29 1 16 17 0 43 0 0 240 47 0 1 0 0 241 44 
 0285 OpReturnValue
 
 === constant[267].method[get] [closure] ===
-fn: 0xc01075b80
+fn: 0xa2d071b80
 
 === constant[267].method[get].fn [compiled_function] params=2 locals=6 ===
 size: 52
@@ -2523,7 +2565,7 @@ bytes: 0 0 193 34 2 20 0 10 33 0 33 2 29 2 34 3 0 0 194 33 0 1 0 0 195 1 34 4 33
 0051 OpReturnValue
 
 === constant[267].method[get3] [closure] ===
-fn: 0xc01075cc0
+fn: 0xa2d071cc0
 
 === constant[267].method[get3].fn [compiled_function] params=3 locals=12 ===
 size: 315
@@ -2687,7 +2729,7 @@ bytes: 0 0 207 47 0 0 0 0 208 44 33 0 29 1 16 17 0 43 0 0 209 47 0 1 0 0 210 44 
 0314 OpReturnValue
 
 === constant[267].method[constructor] [closure] ===
-fn: 0xc01075a40
+fn: 0xa2d071ae0
 
 === constant[267].method[constructor].fn [compiled_function] params=0 locals=0 ===
 size: 29
@@ -2704,40 +2746,66 @@ bytes: 20 0 12 29 0 0 0 189 48 0 0 20 0 1 0 0 190 0 0 191 29 2 0 0 192 48 0 1 32
 0025 OpPatchPropertySym 1
 0028 OpReturn
 
-=== constant[268] type=20 ===
-inspect: TODO: implement AdCompiledFunction.Inspect()
+=== constant[268] type=4 ===
+inspect: 'splitFirst'
 
-=== constant[268] [compiled_function] params=2 locals=2 ===
-size: 15
-bytes: 35 3 33 0 29 1 6 35 3 33 1 29 1 6 32
-0000 OpGetBuiltin 3
-0002 OpGetLocal 0
-0004 OpCall 1
-0006 OpPop
-0007 OpGetBuiltin 3
-0009 OpGetLocal 1
-0011 OpCall 1
-0013 OpPop
-0014 OpReturn
+=== constant[269] type=4 ===
+inspect: 'aaa/bbb/ccc'
 
-=== constant[269] type=1 ===
-inspect: 7
-
-=== constant[270] type=1 ===
-inspect: 55
+=== constant[270] type=4 ===
+inspect: '/'
 
 === constant[271] type=4 ===
-inspect: 'a'
+inspect: 'splitFirst'
 
-=== constant[272] type=1 ===
-inspect: 22
+=== constant[272] type=4 ===
+inspect: ''
 
 === constant[273] type=4 ===
-inspect: 'b'
+inspect: '/'
 
-=== constant[274] type=1 ===
-inspect: 11
+=== constant[274] type=4 ===
+inspect: 'splitFirst'
 
 === constant[275] type=4 ===
-inspect: 'b'
+inspect: 'adrianus.ro'
+
+=== constant[276] type=4 ===
+inspect: '/'
+
+=== constant[277] type=4 ===
+inspect: 'splitFirst'
+
+=== constant[278] type=4 ===
+inspect: '/'
+
+=== constant[279] type=4 ===
+inspect: '/'
+
+=== constant[280] type=4 ===
+inspect: 'splitFirst'
+
+=== constant[281] type=4 ===
+inspect: '/aaa'
+
+=== constant[282] type=4 ===
+inspect: '/'
+
+=== constant[283] type=4 ===
+inspect: 'splitFirst'
+
+=== constant[284] type=4 ===
+inspect: '/aaa/bbb'
+
+=== constant[285] type=4 ===
+inspect: '/'
+
+=== constant[286] type=4 ===
+inspect: 'splitFirst'
+
+=== constant[287] type=4 ===
+inspect: '/aaa/bbb/ccc/'
+
+=== constant[288] type=4 ===
+inspect: '/'
 

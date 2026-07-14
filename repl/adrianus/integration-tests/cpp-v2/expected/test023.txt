@@ -1,4 +1,4 @@
-{'x': 11, 'a': <function at memory address: (.*)>}
+{'a': <function at memory address: (.*)>, 'x': 11}
 {'y': 100}
 11
-{'x': 11, 'a': <function at memory address: (.*)>}
+{'a': <function at memory address: (.*)>, 'x': 11}
