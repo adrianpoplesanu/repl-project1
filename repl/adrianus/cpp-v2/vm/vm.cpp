@@ -318,6 +318,11 @@ bool vm_objects_equal(Ad_Object* left, Ad_Object* right) {
     }
 }
 
+static bool vm_frame_is_class_method(Frame* frame) {
+    return frame != nullptr && frame->cl != nullptr && frame->cl->fn != nullptr &&
+           frame->cl->fn->is_class_method;
+}
+
 } // namespace
 
 VM::VM() {
@@ -427,7 +432,7 @@ bool VM::execute_instruction() {
             std::cerr << "[ VM Error ] OP_FILE_STMT_OUTPUT: stack underflow\n";
         } else {
             Ad_Object* result = pop();
-            if (result != nullptr && result->Type() != OBJ_SIGNAL && result->Type() != OBJ_NULL) {
+            if (result != nullptr && result->Type() != OBJ_SIGNAL) {
                 std::cout << result->Inspect() << '\n';
                 std::cout.flush();
                 if (result->Type() == OBJ_ERROR) {
@@ -478,9 +483,12 @@ bool VM::execute_instruction() {
                 !global_names[static_cast<size_t>(global_index)].empty()) {
                 var_name = global_names[static_cast<size_t>(global_index)];
             }
-            AdCompiledInstance* inst = current_bound_instance();
-            if (inst == nullptr && frame->cl != nullptr && frame->cl->bound_owner != nullptr) {
-                inst = frame->cl->bound_owner;
+            AdCompiledInstance* inst = nullptr;
+            if (vm_frame_is_class_method(frame)) {
+                inst = frame->bound_instance;
+                if (inst == nullptr && frame->cl != nullptr) {
+                    inst = frame->cl->bound_owner;
+                }
             }
             if (inst != nullptr) {
                 const int field_index = lookup_instance_field_index(inst, var_name);
@@ -798,7 +806,7 @@ void VM::call_closure(AdClosureObject* cl, int num_args) {
         push(err);
         return;
     }
-    Frame frame(cl, -1, sp - num_args, current_bound_instance() != nullptr ? current_bound_instance() : cl->bound_owner);
+    Frame frame(cl, -1, sp - num_args, cl->bound_owner);
     push_frame(frame);
     const int min_locals = std::max(cl->fn->num_locals, 1);
     sp = frame.base_pointer + min_locals;
@@ -936,7 +944,7 @@ void VM::call_builtin(Ad_Builtin_Object* builtin, int num_args) {
     if (result != nullptr) {
         push(result);
     } else {
-        push(&NULLOBJECT);
+        push(nullptr);
     }
 }
 
@@ -966,6 +974,11 @@ void VM::call_class(AdCompiledClass* cl, int num_args) {
     args.reserve(static_cast<size_t>(num_args));
     for (int i = 0; i < num_args; ++i) {
         args.push_back(stack[callee_index + 1 + i]);
+    }
+    std::vector<Ad_Object*> preserved;
+    preserved.reserve(static_cast<size_t>(callee_index));
+    for (int i = 0; i < callee_index; ++i) {
+        preserved.push_back(stack[i]);
     }
     sp = callee_index;
 
@@ -1013,6 +1026,10 @@ void VM::call_class(AdCompiledClass* cl, int num_args) {
         while (sp > sp_before) {
             pop();
         }
+    }
+
+    for (int i = 0; i < callee_index; ++i) {
+        stack[i] = preserved[static_cast<size_t>(i)];
     }
 
     push(instance);
@@ -1145,10 +1162,14 @@ void VM::call_runtime_bound_method(AdRuntimeBoundMethod* bm, int num_args) {
         }
     }
 
-    if (result != nullptr) {
+    if (result == &NULLOBJECT &&
+        bm->receiver != nullptr &&
+        bm->receiver->Type() != OBJ_FILE) {
+        push(nullptr);
+    } else if (result != nullptr) {
         push(result);
     } else {
-        push(&NULLOBJECT);
+        push(nullptr);
     }
 }
 
@@ -2008,12 +2029,16 @@ void VM::execute_get_super_method() {
 }
 
 void VM::execute_get_this() {
-    AdCompiledInstance* inst = current_bound_instance();
-    if (inst != nullptr) {
-        push(inst);
-    } else {
-        push(&NULLOBJECT);
+    Frame* frame = current_frame();
+    if (frame != nullptr && frame->bound_instance != nullptr) {
+        push(frame->bound_instance);
+        return;
     }
+    if (frame != nullptr && frame->cl != nullptr && frame->cl->bound_owner != nullptr) {
+        push(frame->cl->bound_owner);
+        return;
+    }
+    push(&NULLOBJECT);
 }
 
 void VM::execute_set_method() {

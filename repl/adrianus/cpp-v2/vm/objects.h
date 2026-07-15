@@ -21,6 +21,8 @@ public:
     std::vector<Ad_Object*> default_arg_values;
     /// Parameter names in declaration order (for keyword call sites).
     std::vector<std::string> parameter_names;
+    /// True when compiled from a class `def` body.
+    bool is_class_method = false;
 
     AdCompiledFunction();
     std::string Inspect() override;

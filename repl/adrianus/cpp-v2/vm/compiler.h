@@ -37,12 +37,16 @@ public:
 
     /// True only while compiling a direct child of `ST_PROGRAM` (top-level script statements).
     bool compiling_program_direct_statement = false;
+    /// True while compiling an anonymous `func() {}` / `method() {}` body (not top-level `def`).
+    bool compiling_function_literal = false;
 
     /// Classes compiled so far in the current compilation unit (for inheritance resolution).
     std::unordered_map<std::string, AdCompiledClass*> compiled_classes;
 
     /// Global names registered while compiling bootstrap (excluded from VM `__locals()`).
     std::unordered_set<std::string> bootstrap_global_names;
+    /// Top-level `name = ...` identifiers (for forward refs inside nested functions).
+    std::unordered_set<std::string> program_assign_names;
 
     void emitLoopBreak();
     void emitLoopContinue();
@@ -117,6 +121,12 @@ public:
                                                  const std::string& op_lit);
     void compile_postfix_field_increment(const std::string& field_name, int sym_index,
                                          const std::string& op);
+    void compile_nested_member_property_assign(Ad_AST_MemberAccess* target, Ad_AST_Node* value_expr);
+    void stash_compiled_value(const Symbol& slot);
+    void load_stashed_value(const Symbol& slot);
+    bool enclosed_in_class_method() const;
+    SymbolTable* root_symbol_table() const;
+    void emit_forward_global_lookup(const std::string& name);
 
 };
 

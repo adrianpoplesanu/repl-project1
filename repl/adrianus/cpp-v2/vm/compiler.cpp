@@ -65,6 +65,25 @@ Ad_AST_Def_Statement* program_def_statement(Ad_AST_Node* stmt) {
     return nullptr;
 }
 
+void collect_program_assign_names(Ad_AST_Program* program, std::unordered_set<std::string>& names) {
+    if (program == nullptr) {
+        return;
+    }
+    for (Ad_AST_Node* stmt : program->statements) {
+        if (stmt->type != ST_EXPRESSION_STATEMENT) {
+            continue;
+        }
+        auto* expr = static_cast<Ad_AST_ExpressionStatement*>(stmt)->expression;
+        if (expr == nullptr || expr->type != ST_ASSIGN_STATEMENT) {
+            continue;
+        }
+        auto* assign_stmt = static_cast<Ad_AST_AssignStatement*>(expr);
+        if (assign_stmt->name != nullptr && assign_stmt->name->type == ST_IDENTIFIER) {
+            names.insert(static_cast<Ad_AST_Identifier*>(assign_stmt->name)->value);
+        }
+    }
+}
+
 void hoist_program_function_names(Ad_AST_Program* program, SymbolTable* symbol_table) {
     if (program == nullptr || symbol_table == nullptr) {
         return;
@@ -132,7 +151,9 @@ void Compiler::reset() {
     compiled_classes.clear();
     loop_stack.clear();
     compiling_program_direct_statement = false;
+    compiling_function_literal = false;
     bootstrap_global_names.clear();
+    program_assign_names.clear();
     scopes = {CompilationScope(code.instructions)};
     scopeIndex = 0;
     while (symbol_table != nullptr) {
@@ -175,6 +196,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         // Match evaluator behavior: top-level defs are all bound before any call runs,
         // so forward references like test1() calling test2() must resolve at compile time.
         hoist_program_function_names(program, symbol_table);
+        collect_program_assign_names(program, program_assign_names);
         for (Ad_AST_Node* stmt : program->statements) {
             compiling_program_direct_statement = true;
             compile(stmt);
@@ -487,6 +509,11 @@ void Compiler::compile(Ad_AST_Node* node) {
                 return;
             }
 
+            if (member_access->owner->type == ST_MEMBER_ACCESS) {
+                compile_nested_member_property_assign(member_access, assign_stmt->value);
+                return;
+            }
+
             compile(member_access->owner);
             compile(assign_stmt->value);
 
@@ -555,10 +582,13 @@ void Compiler::compile(Ad_AST_Node* node) {
             int const_index = addConstant(field);
             emit(opConstant, 1, {const_index});
             emit(opGetPropertySym, 1, {field_sym.index});
-        } else if (symbol_table->outer != nullptr) {
-            // Method / closure bodies resolve unknown names from the bound instance at runtime,
-            // matching evaluator instance_environment lookup (e.g. dex.printName -> name).
+        } else if (enclosed_in_class_method() || compiling_function_literal) {
             emit_dynamic_instance_field_lookup(identifier_node->value);
+        } else if (symbol_table->outer != nullptr &&
+                   program_assign_names.count(identifier_node->value) > 0) {
+            emit_forward_global_lookup(identifier_node->value);
+        } else if (symbol_table->outer != nullptr) {
+            emit(opNull, 0, {});
         } else {
             Symbol symbol = symbol_table->define(identifier_node->value);
             emit(opGetGlobal, 1, {symbol.index});
@@ -612,6 +642,8 @@ void Compiler::compile(Ad_AST_Node* node) {
     } else if (node->type == ST_FUNCTION_LITERAL) {
         Ad_AST_FunctionLiteral* fn_lit = (Ad_AST_FunctionLiteral*)node;
         enter_scope();
+        const bool saved_function_literal = compiling_function_literal;
+        compiling_function_literal = true;
 
         // When RHS of let (e.g. let foo = fn() {}), parser sets name so body can refer to self (recursion)
         if (!fn_lit->name.empty()) {
@@ -652,6 +684,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         args.push_back(addConstant(compiled_func));
         args.push_back(static_cast<int>(free_symbols.size()));
         emit(opClosure, 2, args);
+        compiling_function_literal = saved_function_literal;
     } else if (node->type == ST_CALL_EXPRESSION) {
         Ad_AST_CallExpression* call_expr = (Ad_AST_CallExpression*)node;
         if (call_expr->function != nullptr && call_expr->function->type == ST_MEMBER_ACCESS) {
@@ -731,6 +764,7 @@ void Compiler::compile(Ad_AST_Node* node) {
 
         emit(opClosure, 2, {addConstant(compiled_func), static_cast<int>(free_symbols.size())});
         if (symbol.scope == SymbolScope::GLOBAL) {
+            bootstrap_global_names.erase(def_name->value);
             emit(opSetGlobal, 1, {symbol.index});
         } else {
             emit(opSetLocal, 1, {symbol.index});
@@ -1249,6 +1283,74 @@ bool Compiler::in_class_scope() const {
            scopes[scopeIndex].compilationType == "class";
 }
 
+bool Compiler::enclosed_in_class_method() const {
+    if (scopeIndex <= 0 || scopeIndex >= static_cast<int>(scopes.size())) {
+        return false;
+    }
+    return scopes[static_cast<size_t>(scopeIndex - 1)].compilationType == "class";
+}
+
+SymbolTable* Compiler::root_symbol_table() const {
+    SymbolTable* root = symbol_table;
+    while (root != nullptr && root->outer != nullptr) {
+        root = root->outer;
+    }
+    return root;
+}
+
+void Compiler::emit_forward_global_lookup(const std::string& name) {
+    SymbolTable* root = root_symbol_table();
+    if (root == nullptr) {
+        emit(opNull, 0, {});
+        return;
+    }
+    Symbol* existing = root->resolve(name);
+    Symbol slot;
+    if (existing != nullptr && existing->scope == SymbolScope::GLOBAL) {
+        slot = *existing;
+    } else {
+        slot = root->define(name);
+    }
+    emit(opGetGlobal, 1, {slot.index});
+}
+
+void Compiler::stash_compiled_value(const Symbol& slot) {
+    if (slot.scope == SymbolScope::GLOBAL) {
+        emit(opSetGlobal, 1, {slot.index});
+    } else {
+        emit(opSetLocal, 1, {slot.index});
+    }
+}
+
+void Compiler::load_stashed_value(const Symbol& slot) {
+    load_symbol(slot, slot.name);
+}
+
+void Compiler::compile_nested_member_property_assign(Ad_AST_MemberAccess* target,
+                                                     Ad_AST_Node* value_expr) {
+    if (target == nullptr || target->owner == nullptr || value_expr == nullptr) {
+        return;
+    }
+    std::string member_name;
+    if (target->member->type == ST_IDENTIFIER) {
+        member_name = static_cast<Ad_AST_Identifier*>(target->member)->value;
+    } else {
+        member_name = target->member->TokenLiteral();
+    }
+
+    compile(target->owner);
+    Symbol owner_tmp = symbol_table->define("__nested_owner_tmp");
+    stash_compiled_value(owner_tmp);
+    compile(value_expr);
+    Symbol value_tmp = symbol_table->define("__nested_value_tmp");
+    stash_compiled_value(value_tmp);
+    load_stashed_value(owner_tmp);
+    load_stashed_value(value_tmp);
+    Ad_String_Object* field = new Ad_String_Object(member_name);
+    emit(opConstant, 1, {addConstant(field)});
+    emit(opSetProperty, 0, {});
+}
+
 void Compiler::emit_dynamic_instance_field_lookup(const std::string& field_name) {
     Ad_String_Object* field = new Ad_String_Object(field_name);
     emit(opConstant, 1, {addConstant(field)});
@@ -1415,6 +1517,7 @@ AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) 
     compiled_func->num_locals = num_locals;
     compiled_func->local_names = local_names;
     compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+    compiled_func->is_class_method = true;
     assign_parameter_names(compiled_func, def_stmt->parameters);
     fill_default_arg_values(compiled_func, def_stmt->default_params);
 
