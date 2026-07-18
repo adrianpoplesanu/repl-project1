@@ -58,3 +58,9 @@ curl --header "Content-Type: application/json" \
   --data '{"username":"xyz","password":"xyz"}' \
   http://localhost:5003/api/login
 */
+
+/*
+how to test if a process is running on a port
+
+$ lsof -nP -iTCP:5003 -sTCP:LISTEN 2>/dev/null || echo "nothing listening on 5003"
+*/
