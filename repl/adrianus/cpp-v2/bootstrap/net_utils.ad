@@ -40,6 +40,10 @@ class AdHTTPParser {
         return StringUtils.startsWith(path, "http://") or StringUtils.startsWith(path, "https://")
     }
 
+    def isLocalhost(path) {
+        return StringUtils.startsWith(path, "localhost") or StringUtils.startsWith(path, "127.0.0.1")
+    }
+
     def isHTTPS(path) {
         return StringUtils.startsWith(path, "https://")
     }

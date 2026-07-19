@@ -94,3 +94,58 @@ class ForeverEchoServer {
         }
     }
 }
+
+/*
+    Simple message server, multi-thread, does not close connextion
+*/
+class MultiThreadedEchoServer {
+    /*
+        how to test if a process is running on a port
+
+        $ lsof -nP -iTCP:5003 -sTCP:LISTEN 2>/dev/null || echo "nothing listening on 5003"
+    */
+
+    port = null
+    serverSocket = null
+    logger = AdLogger("AD", "MultiThreadedEchoServer")
+    message = ""
+
+    def constructor(_port, _message) {
+        port = _port
+        message = _message
+        serverSocket = ServerSocket(port)
+    }
+
+    def handleRequest(client) {
+        client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+        client.close()
+    }
+
+    def process(client) {
+        //println('handling request')
+        logger.info('handling request')
+        //println(client)
+
+        request_message = client.readHTTP()
+        //println(request_message)
+        logger.info(request_message)
+
+        client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+    }
+
+    def start() {
+        println("[ LOG ] waiting on port: " + port)
+
+        while(true) {
+            server.accept()
+            logger.info("handling request")
+            //println(server.client)
+            logger.info(str(server.client))
+            th1 = __thread("thread 1")
+
+            th1.callback(this.process, server.client)
+            th1.runAsync()
+            //process(server.client)
+        }
+    }
+}
