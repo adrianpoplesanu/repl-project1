@@ -11,7 +11,10 @@ std::vector<Ad_Object*> threadPool;
 namespace {
 
 Ad_Object* invoke_thread_callback(Ad_Object* rawCallback, std::vector<Ad_Object*> params, GarbageCollector* gc) {
-    if (rawCallback->type == OBJ_CLOSURE) {
+    if (rawCallback == nullptr) {
+        return &NULLOBJECT;
+    }
+    if (rawCallback->type == OBJ_CLOSURE || rawCallback->type == OBJ_BOUND_METHOD) {
         VM vm;
         vm.gc = gc;
         if (VM* parent = ad_current_vm()) {
@@ -20,7 +23,7 @@ Ad_Object* invoke_thread_callback(Ad_Object* rawCallback, std::vector<Ad_Object*
             vm.global_names = parent->global_names;
             vm.bootstrap_global_names = parent->bootstrap_global_names;
         }
-        return vm.invoke_closure(static_cast<AdClosureObject*>(rawCallback), params);
+        return vm.invoke_callable(rawCallback, params);
     }
     if (rawCallback->type == OBJ_FUNCTION) {
         Evaluator evaluator;

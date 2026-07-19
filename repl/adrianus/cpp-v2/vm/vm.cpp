@@ -2198,8 +2198,8 @@ void VM::execute_import_source(const std::string& source) {
     globals = runner.globals;
 }
 
-Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args) {
-    if (closure == nullptr || closure->fn == nullptr) {
+Ad_Object* VM::invoke_callable(Ad_Object* callee, const std::vector<Ad_Object*>& args) {
+    if (callee == nullptr) {
         return &NULLOBJECT;
     }
 
@@ -2214,7 +2214,7 @@ Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Obj
     runner.frames_index = 0;
     runner.frames.clear();
 
-    runner.push(closure);
+    runner.push(callee);
     for (Ad_Object* arg : args) {
         runner.push(arg != nullptr ? arg : &NULLOBJECT);
     }
@@ -2224,4 +2224,11 @@ Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Obj
         return runner.stack[runner.sp - 1];
     }
     return &NULLOBJECT;
+}
+
+Ad_Object* VM::invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args) {
+    if (closure == nullptr || closure->fn == nullptr) {
+        return &NULLOBJECT;
+    }
+    return invoke_callable(closure, args);
 }

@@ -89,6 +89,8 @@ public:
     void set_instance_attribute(AdCompiledInstance* inst, const std::string& name, Ad_Object* value);
     Ad_Object* evaluate_default_arg_value(Ad_Object* default_value);
 
+    /// Invoke a callable synchronously (closure, bound method, etc. — used by VM thread workers).
+    Ad_Object* invoke_callable(Ad_Object* callee, const std::vector<Ad_Object*>& args);
     /// Invoke a closure synchronously (used by VM thread workers).
     Ad_Object* invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args);
 
