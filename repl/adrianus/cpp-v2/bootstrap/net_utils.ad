@@ -1,17 +1,179 @@
 class AdHTTPParser {
     logger = AdLogger("AD", "AdHTTPParser")
-    version = "0.1"
+    version = "0.2"
+    nl = "
+"
+    cr = ""
 
     def constructor() {
         //logger.info("init AdHTTPParser version " + version + " ... done")
     }
 
-    def getBody() {
-        return ""
+    def toLower(s) {
+        upper_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        lower_chars = "abcdefghijklmnopqrstuvwxyz"
+        acc = ""
+        for (i = 0; i < len(s); i++) {
+            ch = s[i]
+            idx = StringUtils.indexOf(upper_chars, ch)
+            if (idx != -1) {
+                acc = acc + lower_chars[idx]
+            } else {
+                acc = acc + ch
+            }
+        }
+        return acc
     }
 
-    def getHeaders() {
-        return ""
+    def stripTrailingCR(line) {
+        if (StringUtils.endsWith(line, cr)) {
+            return StringUtils.substring(line, 0, len(line) - 1)
+        }
+        return line
+    }
+
+    def splitHeadBody(raw) {
+        sep_lf = nl + nl
+        sep_crlf = cr + nl + cr + nl
+        pos = StringUtils.indexOf(raw, sep_lf)
+        delim_len = len(sep_lf)
+        if (pos == -1) {
+            pos = StringUtils.indexOf(raw, sep_crlf)
+            if (pos != -1) {
+                delim_len = len(sep_crlf)
+            }
+        }
+        if (pos == -1) {
+            return [raw, ""]
+        }
+        head = StringUtils.substring(raw, 0, pos)
+        body = StringUtils.substring(raw, pos + delim_len, len(raw))
+        return [head, body]
+    }
+
+    def getFirstLine(raw) {
+        parts = this.splitHeadBody(raw)
+        head = parts[0]
+        lines = StringUtils.splitFirst(head, nl)
+        return this.stripTrailingCR(lines[0])
+    }
+
+    def getBody(raw) {
+        parts = this.splitHeadBody(raw)
+        return parts[1]
+    }
+
+    def getHeaders(raw) {
+        parts = this.splitHeadBody(raw)
+        head = parts[0]
+        lines = StringUtils.split(head, nl)
+        headers = {}
+        for (i = 1; i < len(lines); i++) {
+            line = this.stripTrailingCR(lines[i])
+            if (line == "") {
+                continue
+            }
+            pair = StringUtils.splitFirst(line, ":")
+            if (len(pair) < 2) {
+                continue
+            }
+            name = pair[0]
+            val = pair[1]
+            if (StringUtils.startsWith(val, " ")) {
+                val = StringUtils.substring(val, 1, len(val))
+            }
+            headers[name] = val
+        }
+        return headers
+    }
+
+    def getHeader(headers, name) {
+        look_for = this.toLower(name)
+        keys = __keys(headers)
+        for (i = 0; i < len(keys); i++) {
+            if (this.toLower(keys[i]) == look_for) {
+                return headers[keys[i]]
+            }
+        }
+        return null
+    }
+
+    def getMethod(raw) {
+        line = this.getFirstLine(raw)
+        tokens = StringUtils.split(line, " ")
+        if (len(tokens) < 1) {
+            return ""
+        }
+        return tokens[0]
+    }
+
+    def getPath(raw) {
+        line = this.getFirstLine(raw)
+        tokens = StringUtils.split(line, " ")
+        if (len(tokens) < 2) {
+            return "/"
+        }
+        req_target = tokens[1]
+        parts = StringUtils.splitFirst(req_target, "?")
+        return parts[0]
+    }
+
+    def getQueryString(raw) {
+        line = this.getFirstLine(raw)
+        tokens = StringUtils.split(line, " ")
+        if (len(tokens) < 2) {
+            return ""
+        }
+        req_target = tokens[1]
+        parts = StringUtils.splitFirst(req_target, "?")
+        if (len(parts) < 2) {
+            return ""
+        }
+        return parts[1]
+    }
+
+    def parseQueryParams(source) {
+        params = {}
+        query = source
+        qpos = StringUtils.indexOf(source, "?")
+        if (qpos != -1) {
+            query = StringUtils.substring(source, qpos + 1, len(source))
+        }
+        if (query == "") {
+            return params
+        }
+        pairs = StringUtils.split(query, "&")
+        for (i = 0; i < len(pairs); i++) {
+            pair = StringUtils.splitFirst(pairs[i], "=")
+            if (len(pair) < 2) {
+                params[pair[0]] = ""
+            } else {
+                params[pair[0]] = pair[1]
+            }
+        }
+        return params
+    }
+
+    def getStatusCode(raw) {
+        line = this.getFirstLine(raw)
+        tokens = StringUtils.split(line, " ")
+        if (len(tokens) < 2) {
+            return ""
+        }
+        return tokens[1]
+    }
+
+    def getStatusText(raw) {
+        line = this.getFirstLine(raw)
+        tokens = StringUtils.split(line, " ")
+        if (len(tokens) < 3) {
+            return ""
+        }
+        text = tokens[2]
+        for (i = 3; i < len(tokens); i++) {
+            text = text + " " + tokens[i]
+        }
+        return text
     }
 
     def getUri(path_without_protocol) {
@@ -34,6 +196,21 @@ class AdHTTPParser {
         }
         domain = tokens[0]
         return domain
+    }
+
+    def getHost(path_without_protocol) {
+        domain = this.getDomain(path_without_protocol)
+        tokens = StringUtils.splitFirst(domain, ":")
+        return tokens[0]
+    }
+
+    def getPort(path_without_protocol, default_port=80) {
+        domain = this.getDomain(path_without_protocol)
+        tokens = StringUtils.splitFirst(domain, ":")
+        if (len(tokens) < 2) {
+            return default_port
+        }
+        return tokens[1]
     }
 
     def isValidHost(path) {
@@ -61,16 +238,16 @@ class AdHTTPParser {
     }
 
     def mapToQueryParams(source) {
-        result = ""
+        query = ""
         keys = __keys(source)
         for (i = 0; i < len(keys); i++) {
-            if (result == "") {
-                result = "?"
+            if (query == "") {
+                query = "?"
             } else {
-                result = result + "&"
+                query = query + "&"
             }
-            result = result + repr(keys[i]) + "=" + repr(source[keys[i]])
+            query = query + repr(keys[i]) + "=" + repr(source[keys[i]])
         }
-        return result
+        return query
     }
 }

@@ -137,15 +137,15 @@ class MultiThreadedEchoServer {
         println("[ LOG ] waiting on port: " + port)
 
         while(true) {
-            server.accept()
+            serverSocket.accept()
             logger.info("handling request")
-            //println(server.client)
-            logger.info(str(server.client))
+            //println(serverSocket.client)
+            logger.info(str(serverSocket.client))
             th1 = __thread("thread 1")
 
-            th1.callback(this.process, server.client)
+            th1.callback(this.process, serverSocket.client)
             th1.runAsync()
-            //process(server.client)
+            //process(serverSocket.client)
         }
     }
 }
