@@ -1,0 +1,32 @@
+// Regression: instance methods must not clobber caller locals via Environment::Set
+// (see docs/method-env-caller-locals-isolation.plan.md)
+
+def local_i_survives_indexOf() {
+    i = 0
+    StringUtils.indexOf("abc", "a")
+    return i
+}
+
+assert(local_i_survives_indexOf() == 0)
+
+def for_i_survives_indexOf() {
+    n = 0
+    for (i = 0; i < 4; i = i + 1) {
+        StringUtils.indexOf("ABCD", "A")
+        n = n + 1
+    }
+    return n
+}
+
+assert(for_i_survives_indexOf() == 4)
+
+def for_i_final_value() {
+    for (i = 0; i < 3; i = i + 1) {
+        StringUtils.indexOf("xyz", "x")
+    }
+    return i
+}
+
+assert(for_i_final_value() == 3)
+
+println("==== method env isolation assertions passed ====")

@@ -1,0 +1,81 @@
+httpParser = AdHTTPParser()
+
+get_raw = "GET /api/login?user=a&role=admin HTTP/1.1
+Host: localhost
+Accept: text/html
+
+"
+post_raw = "POST /api/login HTTP/1.1
+Host: localhost
+Content-Type: application/json
+
+{\"username\":\"xyz\"}"
+resp_raw = "HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 5
+
+hello"
+
+println("==== GET request ====")
+println(httpParser.getMethod(get_raw))
+println(httpParser.getPath(get_raw))
+println(httpParser.getQueryString(get_raw))
+println(httpParser.parseQueryParams(httpParser.getQueryString(get_raw)))
+println(httpParser.getHeaders(get_raw))
+println(httpParser.getHeader(httpParser.getHeaders(get_raw), "host"))
+println(httpParser.getBody(get_raw))
+
+assert(httpParser.getMethod(get_raw) == "GET")
+assert(httpParser.getPath(get_raw) == "/api/login")
+assert(httpParser.getQueryString(get_raw) == "user=a&role=admin")
+assert(httpParser.parseQueryParams(httpParser.getQueryString(get_raw)) == {"user": "a", "role": "admin"})
+assert(httpParser.parseQueryParams("/api/login?user=a&role=admin") == {"user": "a", "role": "admin"})
+assert(httpParser.getHeader(httpParser.getHeaders(get_raw), "HOST") == "localhost")
+assert(httpParser.getHeader(httpParser.getHeaders(get_raw), "accept") == "text/html")
+assert(httpParser.getBody(get_raw) == "")
+
+println("==== POST request ====")
+println(httpParser.getMethod(post_raw))
+println(httpParser.getPath(post_raw))
+println(httpParser.getHeaders(post_raw))
+println(httpParser.getHeader(httpParser.getHeaders(post_raw), "content-type"))
+println(httpParser.getBody(post_raw))
+
+assert(httpParser.getMethod(post_raw) == "POST")
+assert(httpParser.getPath(post_raw) == "/api/login")
+assert(httpParser.getHeader(httpParser.getHeaders(post_raw), "Content-Type") == "application/json")
+assert(httpParser.getHeader(httpParser.getHeaders(post_raw), "content-type") == "application/json")
+assert(httpParser.getBody(post_raw) == "{\"username\":\"xyz\"}")
+
+println("==== HTTP response ====")
+println(httpParser.getStatusCode(resp_raw))
+println(httpParser.getStatusText(resp_raw))
+println(httpParser.getHeaders(resp_raw))
+println(httpParser.getBody(resp_raw))
+
+assert(httpParser.getStatusCode(resp_raw) == "200")
+assert(httpParser.getStatusText(resp_raw) == "OK")
+assert(httpParser.getHeader(httpParser.getHeaders(resp_raw), "content-type") == "text/html")
+assert(httpParser.getBody(resp_raw) == "hello")
+
+println("==== host / port ====")
+println(httpParser.getHost("example.com:8080/path"))
+println(httpParser.getPort("example.com:8080/path", 80))
+println(httpParser.getPort("example.com/path", 80))
+println(httpParser.getDomain("example.com:8080/path"))
+
+assert(httpParser.getHost("example.com:8080/path") == "example.com")
+assert(httpParser.getPort("example.com:8080/path", 80) == "8080")
+assert(httpParser.getPort("example.com/path", 80) == 80)
+assert(httpParser.getDomain("example.com:8080/path") == "example.com:8080")
+
+println("==== CRLF message ====")
+crlf_raw = "GET / HTTP/1.1
+Host: localhost
+
+body"
+assert(httpParser.getMethod(crlf_raw) == "GET")
+assert(httpParser.getHeader(httpParser.getHeaders(crlf_raw), "host") == "localhost")
+assert(httpParser.getBody(crlf_raw) == "body")
+
+println("==== all assertions passed ====")
