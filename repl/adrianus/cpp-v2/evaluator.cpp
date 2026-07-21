@@ -9,7 +9,6 @@
 #include "stack_thread.h"
 
 #include <future>
-#include <stdexcept>
 
 static thread_local bool g_ad_apply_function_disable_async = false;
 static thread_local bool g_ad_apply_method_disable_async = false;

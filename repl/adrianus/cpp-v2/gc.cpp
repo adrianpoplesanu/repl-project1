@@ -2,7 +2,6 @@
 #include "environment.h"
 #include "objects.h"
 #include "vm/objects.h"
-#include "ast.h"
 #include <cstdint>
 
 extern Ad_Null_Object NULLOBJECT;
