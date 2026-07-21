@@ -51,6 +51,9 @@ Environment* newEnvironment();
 Environment* newEnclosedEnvironment(Environment*);
 Environment* newEnclosedEnvironmentUnfreeable(Environment*);
 
+/// Walk `outer` until `isGlobalEnvironment`. Falls back to `env` if none found.
+Environment* resolveGlobalEnvironment(Environment* env);
+
 void free_Ad_environment_memory(Environment*);
 void Ad_INCREF(Environment*);
 void Ad_DECREF(Environment*);

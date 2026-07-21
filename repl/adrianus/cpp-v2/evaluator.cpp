@@ -755,7 +755,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
             Ad_AST_Node *node = *it;
             if (node->type == ST_ASSIGN_STATEMENT) {
                 Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) node;
-                klass_instance->instance_environment->outer = &env;
+                klass_instance->instance_environment->outer = resolveGlobalEnvironment(&env);
                 Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
                 Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
                 std::string key = assign_ident->value;
@@ -766,7 +766,7 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
                 Ad_AST_ExpressionStatement * expression_statement = (Ad_AST_ExpressionStatement*) node;
                 if (expression_statement->expression->type == ST_ASSIGN_STATEMENT) {
                     Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) expression_statement->expression;
-                    klass_instance->instance_environment->outer = &env;
+                    klass_instance->instance_environment->outer = resolveGlobalEnvironment(&env);
                     Ad_Object* evaluated = Eval(assign_statement->value, *klass_instance->instance_environment);
                     Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
                     std::string key = assign_ident->value;
@@ -817,8 +817,11 @@ Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::ve
             Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) currentMemberAccess->kw_args.at(i);
             kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
         }*/
-        instance_environment->outer = &env;
-        return ApplyMethod(klass_method, args, kw_args, *instance_environment);
+        Environment* old_outer = instance_environment->outer;
+        instance_environment->outer = resolveGlobalEnvironment(&env);
+        Ad_Object* ctor_result = ApplyMethod(klass_method, args, kw_args, *instance_environment);
+        instance_environment->outer = old_outer;
+        return ctor_result;
     }
     return NULL;
 }
@@ -874,7 +877,25 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
             }
             counter++;
         }
-        Environment* extendedEnv = ExtendMethodEnv(func, args, env);
+
+        // Prefer the instance environment as the enclose target; never leave a caller
+        // frame on instance.outer while the method body runs.
+        Environment* enclose = &env;
+        if (!enclose->isInstanceEnvironment && enclose->outer != NULL && enclose->outer->isInstanceEnvironment) {
+            enclose = enclose->outer;
+        }
+        Environment* saved_outer = NULL;
+        bool restored_outer = false;
+        if (enclose->isInstanceEnvironment) {
+            saved_outer = enclose->outer;
+            Environment* global = resolveGlobalEnvironment(saved_outer != NULL ? saved_outer : enclose);
+            if (global != NULL && global->isGlobalEnvironment) {
+                enclose->outer = global;
+                restored_outer = true;
+            }
+        }
+
+        Environment* extendedEnv = ExtendMethodEnv(func, args, *enclose);
 
         for (auto& it : kw_args) {
             extendedEnv->Set(it.first, it.second);
@@ -882,6 +903,9 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
 
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
         garbageCollector->addEnvironment(extendedEnv);
+        if (restored_outer) {
+            enclose->outer = saved_outer;
+        }
         return UnwrapReturnValue(evaluated, extendedEnv);
     }
     return NULL;
@@ -889,8 +913,13 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
 
 Environment* Evaluator::ExtendMethodEnv(Ad_Object* func, std::vector<Ad_Object*> args_objs, Environment& env) {
     Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
-    //Environment* extended = newEnclosedEnvironmentUnfreeable((func_obj)->env);
-    Environment* extended = newEnclosedEnvironmentUnfreeable(&env);
+    // Enclose the instance environment, never the calling method/function frame.
+    // Callers may pass a method frame whose outer is the instance env.
+    Environment* enclose = &env;
+    if (!enclose->isInstanceEnvironment && enclose->outer != NULL && enclose->outer->isInstanceEnvironment) {
+        enclose = enclose->outer;
+    }
+    Environment* extended = newEnclosedEnvironmentUnfreeable(enclose);
     int i = 0;
     for (std::vector<Ad_AST_Node*>::iterator it = func_obj->params.begin() ; it != func_obj->params.end(); ++it) {
         if (i >= args_objs.size()) {
@@ -1257,7 +1286,7 @@ void Evaluator::updateInstanceWithInheritedClasses(Ad_Object* obj, Environment& 
             if (node->type == ST_ASSIGN_STATEMENT) {
                 // this adds everything to main class
                 Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) node;
-                adClassInstance->instance_environment->outer = &env;
+                adClassInstance->instance_environment->outer = resolveGlobalEnvironment(&env);
                 Ad_Object* evaluated = Eval(assign_statement->value, *adClassInstance->instance_environment);
                 Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
                 std::string key = assign_ident->value;
@@ -1272,7 +1301,7 @@ void Evaluator::updateInstanceWithInheritedClasses(Ad_Object* obj, Environment& 
                 if (expression_statement->expression->type == ST_ASSIGN_STATEMENT) {
                     // this adds everything to main class
                     Ad_AST_AssignStatement* assign_statement = (Ad_AST_AssignStatement*) expression_statement->expression;
-                    adClassInstance->instance_environment->outer = &env;
+                    adClassInstance->instance_environment->outer = resolveGlobalEnvironment(&env);
                     Ad_Object* evaluated = Eval(assign_statement->value, *adClassInstance->instance_environment);
                     Ad_AST_Identifier* assign_ident = (Ad_AST_Identifier*) assign_statement->name;
                     std::string key = assign_ident->value;
@@ -1380,18 +1409,19 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
 
                 Environment* klass_environment = klass_instance->instance_environment;
                 Environment* old = klass_environment->outer;
-                klass_environment->outer = &env;
-                //klass_environment->outer = NULL;
+                klass_environment->outer = resolveGlobalEnvironment(&env);
 
                 Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
                 if (klass_method == NULL) {
                     //return &NULLOBJECT;
                     Ad_Error_Object *obj = new Ad_Error_Object("method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
                     garbageCollector->addObject(obj);
+                    klass_environment->outer = old;
                     return obj;
                 }
                 std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
                 if (args_objs.size() == 1 && IsError(args_objs[0])) {
+                    klass_environment->outer = old;
                     return args_objs[0];
                 }
 
@@ -1454,27 +1484,24 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
     if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
-            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-            currentEnvironment->SetOuterEnvironment(old);
+            currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(&env));
         }
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
-            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-            currentEnvironment->SetOuterEnvironment(old);
+            currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(&env));
         }
     }
 
     if (initialMemberAccess->type == ST_INDEX_EXPRESSION) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
-            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-            currentEnvironment->SetOuterEnvironment(old);
+            currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(&env));
         }
     }
     // end initialize env
@@ -1511,9 +1538,8 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
                     return obj2;
                 }
                 if (obj2->type == OBJ_INSTANCE) {
-                    Environment *old = currentEnvironment;
                     currentEnvironment = ((Ad_Class_Instance*) obj2)->instance_environment;
-                    currentEnvironment->SetOuterEnvironment(old);
+                    currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(&env));
                 }
             }
         } else {
@@ -1530,9 +1556,8 @@ Ad_Object* Evaluator::evalRecursiveMemberAccessCall(Ad_AST_Node* node, Environme
             }
 
             if (obj->type == OBJ_INSTANCE) {
-                Environment *old = currentEnvironment;
                 currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-                currentEnvironment->SetOuterEnvironment(old);
+                currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(&env));
             }
         }
     }
@@ -1564,27 +1589,24 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
     if (initialMemberAccess->type == ST_CALL_EXPRESSION) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
-            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-            currentEnvironment->SetOuterEnvironment(old);
+            currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(env));
         }
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
-            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-            currentEnvironment->SetOuterEnvironment(old);
+            currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(env));
         }
     }
 
     if (initialMemberAccess->type == ST_IDENTIFIER) {
         Ad_Object* obj = Eval(initialMemberAccess, *currentEnvironment);
         if (obj->type == OBJ_INSTANCE) {
-            Environment *old = currentEnvironment;
             currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-            currentEnvironment->SetOuterEnvironment(old);
+            currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(env));
         }
     }
     // end initialize env
@@ -1607,9 +1629,8 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
                     //return obj2;
                 }
                 if (obj2->type == OBJ_INSTANCE) {
-                    Environment *old = currentEnvironment;
                     currentEnvironment = ((Ad_Class_Instance*) obj2)->instance_environment;
-                    currentEnvironment->SetOuterEnvironment(old);
+                    currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(env));
                 }
             }
         } else {
@@ -1621,9 +1642,8 @@ Ad_Object* Evaluator::recursiveMemberAccessAssign(Ad_AST_Node *node, Environment
             }
 
             if (obj->type == OBJ_INSTANCE) {
-                Environment *old = currentEnvironment;
                 currentEnvironment = ((Ad_Class_Instance*) obj)->instance_environment;
-                currentEnvironment->SetOuterEnvironment(old);
+                currentEnvironment->SetOuterEnvironment(resolveGlobalEnvironment(env));
             }
         }
     }

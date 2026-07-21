@@ -187,6 +187,17 @@ Environment* newEnvironment() {
     return env;
 }
 
+Environment* resolveGlobalEnvironment(Environment* env) {
+    Environment* cur = env;
+    while (cur != NULL) {
+        if (cur->isGlobalEnvironment) {
+            return cur;
+        }
+        cur = cur->outer;
+    }
+    return env;
+}
+
 Environment* newEnclosedEnvironment(Environment *o) {
     Environment* env = new Environment();
     env->SetOuterEnvironment(o);
