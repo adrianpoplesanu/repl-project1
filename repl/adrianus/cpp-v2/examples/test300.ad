@@ -1,0 +1,12 @@
+class ApplicationServer {
+    logger = Logger("AdHTTPApplicationServer", "server")
+
+    def constructor(port = 8080) {
+        this.port = port
+        this.logger.info("ApplicationServer constructor called with port ${port}")
+    }
+
+    def start() {
+        println("Server started on port ${this.port}")
+    }
+}
