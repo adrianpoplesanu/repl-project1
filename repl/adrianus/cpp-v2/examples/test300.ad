@@ -1,3 +1,37 @@
+class Router {
+    def constructor() {
+        this.routes = []
+    }
+
+    def addRoute(route) {
+        this.routes.append(route)
+    }
+
+    def handleRequest(request) {
+        for (route in this.routes) {
+            if (route.path == request.path) {
+                route.handler(request)
+            }
+        }
+    }
+}
+
+class Route {
+    def constructor(path, handler) {
+        this.path = path
+        this.handler = handler
+    }
+}
+
+class Request {
+    def constructor(path, method, headers, body) {
+        this.path = path
+        this.method = method
+        this.headers = headers
+        this.body = body
+    }
+}
+
 class ApplicationServer {
     logger = Logger("AdHTTPApplicationServer", "server")
 
@@ -8,5 +42,29 @@ class ApplicationServer {
 
     def start() {
         println("Server started on port ${this.port}")
+    }
+
+    def handleRequest(request) {
+        this.router.handleRequest(request)
+    }
+
+    def stop() {
+        println("Server stopped")
+    }
+
+    def getRouter() {
+        return this.router
+    }
+
+    def getPort() {
+        return this.port
+    }
+
+    def setRouter(router) {
+        this.router = router
+    }
+
+    def setPort(port) {
+        this.port = port
     }
 }
