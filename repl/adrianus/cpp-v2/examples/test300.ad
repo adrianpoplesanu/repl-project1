@@ -173,35 +173,40 @@ def echo_query(request) {
 
 class AppController {
     title = null
+
     def constructor(page_title) {
         title = page_title
     }
+
     def home(request) {
         html = "<html><body><h1>" + title + "</h1><p>" + request.httpMethod + "</p></body></html>"
         return Response(200, "OK", {"Content-Type": "text/html"}, html)
     }
+
     def echo_query(request) {
         text = "path=" + request.path + " query=" + request.query
         return Response(200, "OK", {"Content-Type": "text/plain"}, text)
     }
+
     def login(request) {
         body_text = "{\"ok\":true,\"body\":\"" + request.body + "\"}"
         return Response(200, "OK", {"Content-Type": "application/json"}, body_text)
     }
 }
+
 controller = AppController("ApplicationServer")
 
 router = Router()
 
-router.get("/", home)
-router.get("/echo", echo_query)
-router.post("/api/login", login)
+//router.get("/", home)
+//router.get("/echo", echo_query)
+//router.post("/api/login", login)
 
-//router.get("/", controller.home)
-//router.get("/echo", controller.echo_query)
-//router.post("/api/login", controller.login)
+router.get("/", controller.home)
+router.get("/echo", controller.echo_query)
+router.post("/api/login", controller.login)
 
-app = ApplicationServer(5006, router)
+app = ApplicationServer(5005, router)
 app.start()
 
 /*
