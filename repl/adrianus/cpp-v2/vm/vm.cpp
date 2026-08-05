@@ -1969,6 +1969,12 @@ void VM::execute_get_method() {
                 push(bound);
                 return;
             }
+            // Callback fields may already hold a bound method (e.g. Route.handler = controller.home).
+            if (field_val != nullptr &&
+                (field_val->Type() == OBJ_BOUND_METHOD || field_val->Type() == OBJ_RUNTIME_BOUND_METHOD)) {
+                push(field_val);
+                return;
+            }
         }
         push(&NULLOBJECT);
         return;

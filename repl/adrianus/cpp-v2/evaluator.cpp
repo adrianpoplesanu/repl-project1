@@ -1430,7 +1430,19 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
                     kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
                 }
 
-                Ad_Object* result = ApplyMethod(klass_method, args_objs, kw_objs, *klass_environment);
+                // Stored callbacks (e.g. Route.handler = controller.home) keep the callee's
+                // own instance env on the function object. Prefer that over the property owner.
+                Ad_Object* result = NULL;
+                if (klass_method->type == OBJ_FUNCTION) {
+                    Ad_Function_Object* func_obj = (Ad_Function_Object*) klass_method;
+                    if (func_obj->env != NULL && func_obj->env->isInstanceEnvironment) {
+                        result = ApplyMethod(klass_method, args_objs, kw_objs, *func_obj->env);
+                    } else {
+                        result = ApplyFunction(klass_method, args_objs, kw_objs, env);
+                    }
+                } else {
+                    result = ApplyMethod(klass_method, args_objs, kw_objs, *klass_environment);
+                }
                 klass_environment->outer = old;
                 return result;
             } else {

@@ -22,6 +22,8 @@ void create_server(Ad_Object* rawSocket) {
     struct sockaddr_in serv_addr;
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    int reuse = 1;
+    setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
     memset(&serv_addr, '0', sizeof(serv_addr));
     memset(socketObject->sendBuff, '0', sizeof(socketObject->sendBuff));
 
