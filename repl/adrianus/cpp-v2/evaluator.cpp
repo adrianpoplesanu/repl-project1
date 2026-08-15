@@ -816,11 +816,11 @@ Ad_Object* Evaluator::CallInstanceConstructor(Ad_Object* klass_instance, std::ve
             Ad_AST_AssignStatement *assignStatement = (Ad_AST_AssignStatement*) currentMemberAccess->kw_args.at(i);
             kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
         }*/
-        Environment* old_outer = instance_environment->outer;
-        instance_environment->outer = resolveGlobalEnvironment(&env);
-        Ad_Object* ctor_result = ApplyMethod(klass_method, args, kw_args, *instance_environment);
-        instance_environment->outer = old_outer;
-        return ctor_result;
+        Environment* global = resolveGlobalEnvironment(&env);
+        if (global != NULL && global->isGlobalEnvironment) {
+            instance_environment->outer = global;
+        }
+        return ApplyMethod(klass_method, args, kw_args, *instance_environment);
     }
     return NULL;
 }
@@ -877,20 +877,17 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
             counter++;
         }
 
-        // Prefer the instance environment as the enclose target; never leave a caller
-        // frame on instance.outer while the method body runs.
+        // Prefer the instance environment as the enclose target. Keep instance.outer
+        // permanently on the global env — never point it at a caller frame, and do not
+        // temporarily null/swap it (that races with concurrent __thread workers).
         Environment* enclose = &env;
         if (!enclose->isInstanceEnvironment && enclose->outer != NULL && enclose->outer->isInstanceEnvironment) {
             enclose = enclose->outer;
         }
-        Environment* saved_outer = NULL;
-        bool restored_outer = false;
         if (enclose->isInstanceEnvironment) {
-            saved_outer = enclose->outer;
-            Environment* global = resolveGlobalEnvironment(saved_outer != NULL ? saved_outer : enclose);
+            Environment* global = resolveGlobalEnvironment(enclose->outer != NULL ? enclose->outer : enclose);
             if (global != NULL && global->isGlobalEnvironment) {
                 enclose->outer = global;
-                restored_outer = true;
             }
         }
 
@@ -902,9 +899,6 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
 
         Ad_Object* evaluated = Eval(((Ad_Function_Object*)func)->body, *extendedEnv);
         garbageCollector->addEnvironment(extendedEnv);
-        if (restored_outer) {
-            enclose->outer = saved_outer;
-        }
         return UnwrapReturnValue(evaluated, extendedEnv);
     }
     return NULL;
@@ -1396,6 +1390,17 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
             if (member_access->owner->type == ST_CALL_EXPRESSION) {
                 return evalRecursiveMemberAccessCall(member_access, env);
             }
+            if (member_access->owner->type == ST_INDEX_EXPRESSION) {
+                // Thread/socket owners are handled above via evalThreadObjectMethod /
+                // evalSocketObjectMethod. Instance methods on list elements go through
+                // recursive member access.
+                return evalRecursiveMemberAccessCall(member_access, env);
+            }
+            if (member_access->owner->type != ST_IDENTIFIER) {
+                Ad_Error_Object *obj = new Ad_Error_Object("unsupported method call owner");
+                garbageCollector->addObject(obj);
+                return obj;
+            }
             Ad_AST_Identifier* owner = (Ad_AST_Identifier*) member_access->owner;
             Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
             Ad_Object* target = env.Get(owner->value);
@@ -1407,20 +1412,20 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
                 }
 
                 Environment* klass_environment = klass_instance->instance_environment;
-                Environment* old = klass_environment->outer;
-                klass_environment->outer = resolveGlobalEnvironment(&env);
+                Environment* global = resolveGlobalEnvironment(&env);
+                if (global != NULL && global->isGlobalEnvironment) {
+                    klass_environment->outer = global;
+                }
 
-                Ad_Object* klass_method = klass_instance->instance_environment->Get(member->value);
+                Ad_Object* klass_method = klass_instance->instance_environment->lookupOnlyInStore(member->value);
                 if (klass_method == NULL) {
                     //return &NULLOBJECT;
                     Ad_Error_Object *obj = new Ad_Error_Object("method " + member->value + " not found in class " + ((Ad_Class_Object*) klass_instance->klass_object)->name->TokenLiteral());
                     garbageCollector->addObject(obj);
-                    klass_environment->outer = old;
                     return obj;
                 }
                 std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
                 if (args_objs.size() == 1 && IsError(args_objs[0])) {
-                    klass_environment->outer = old;
                     return args_objs[0];
                 }
 
@@ -1430,20 +1435,22 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
                     kw_objs.insert(std::pair(assignStatement->name->TokenLiteral(), Eval(assignStatement->value, env)));
                 }
 
-                // Stored callbacks (e.g. Route.handler = controller.home) keep the callee's
-                // own instance env on the function object. Prefer that over the property owner.
+                // Stored callbacks from another instance (e.g. Route.handler = controller.home)
+                // keep that instance env on the function object — prefer it over the property owner.
+                // Dynamically assigned func()/method() literals capture a non-instance env and must
+                // run with the property owner's instance env so `this` / fields resolve correctly.
                 Ad_Object* result = NULL;
                 if (klass_method->type == OBJ_FUNCTION) {
                     Ad_Function_Object* func_obj = (Ad_Function_Object*) klass_method;
-                    if (func_obj->env != NULL && func_obj->env->isInstanceEnvironment) {
+                    if (func_obj->env != NULL && func_obj->env->isInstanceEnvironment &&
+                        func_obj->env != klass_environment) {
                         result = ApplyMethod(klass_method, args_objs, kw_objs, *func_obj->env);
                     } else {
-                        result = ApplyFunction(klass_method, args_objs, kw_objs, env);
+                        result = ApplyMethod(klass_method, args_objs, kw_objs, *klass_environment);
                     }
                 } else {
                     result = ApplyMethod(klass_method, args_objs, kw_objs, *klass_environment);
                 }
-                klass_environment->outer = old;
                 return result;
             } else {
                 std::vector<Ad_Object*> args_objs = EvalExpressions(member_access->arguments, env);
@@ -1457,11 +1464,9 @@ Ad_Object* Evaluator::EvalMemberAccess(Ad_AST_Node* node, Environment& env) { //
                 Ad_AST_Identifier* member = (Ad_AST_Identifier*) member_access->member;
                 Ad_Class_Instance* klass_instance = (Ad_Class_Instance*) env.Get(owner->value);
                 Environment* klass_environment = klass_instance->instance_environment;
-                //klass_environment->outer = &env;
-                Environment* old = klass_environment->outer;
-                klass_environment->outer = NULL;
-                Ad_Object* result = Eval(member, *klass_environment);
-                klass_environment->outer = old;
+                // Field get must not null instance.outer (races with concurrent method calls).
+                // Only look at the instance store so globals are not mistaken for fields.
+                Ad_Object* result = klass_environment->lookupOnlyInStore(member->value);
                 return result;
             }
             if (member_access->owner->type == ST_MEMBER_ACCESS) {
@@ -1768,12 +1773,19 @@ Ad_Object* Evaluator::evalSocketObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
 
 Ad_Object* Evaluator::evalThreadObjectMethod(Ad_AST_Node* node, std::vector<Ad_AST_Node*> args, Environment& env) {
     Ad_AST_MemberAccess* member_access = (Ad_AST_MemberAccess*) node;
-    if (member_access->owner->type != ST_IDENTIFIER) {
+    Ad_AST_Identifier* member_ident = (Ad_AST_Identifier*) member_access->member;
+    Ad_Object* owner_obj_raw = NULL;
+    if (member_access->owner->type == ST_IDENTIFIER) {
+        Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
+        owner_obj_raw = env.Get(owner_ident->value);
+    } else if (member_access->owner->type == ST_INDEX_EXPRESSION ||
+               member_access->owner->type == ST_MEMBER_ACCESS ||
+               member_access->owner->type == ST_CALL_EXPRESSION) {
+        // e.g. workers[i].await() — do not Eval super/this/other special owners here
+        owner_obj_raw = Eval(member_access->owner, env);
+    } else {
         return NULL;
     }
-    Ad_AST_Identifier* owner_ident = (Ad_AST_Identifier*) member_access->owner;
-    Ad_AST_Identifier* member_ident = (Ad_AST_Identifier*) member_access->member;
-    Ad_Object* owner_obj_raw = env.Get(owner_ident->value);
     if (owner_obj_raw == NULL) {
         return NULL;
     }
