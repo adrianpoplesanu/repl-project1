@@ -3,7 +3,8 @@ class AdHTTPParser {
     version = "0.2"
     nl = "
 "
-    cr = ""
+    cr = "
+"
 
     def constructor() {
         //logger.info("init AdHTTPParser version " + version + " ... done")
@@ -204,13 +205,30 @@ class AdHTTPParser {
         return tokens[0]
     }
 
+    def parseInt(s) {
+        if (type(s) == "INTEGER") {
+            return s
+        }
+        digits = "0123456789"
+        n = 0
+        for (i = 0; i < len(s); i++) {
+            ch = s[i]
+            d = StringUtils.indexOf(digits, ch)
+            if (d == -1) {
+                break
+            }
+            n = n * 10 + d
+        }
+        return n
+    }
+
     def getPort(path_without_protocol, default_port=80) {
         domain = this.getDomain(path_without_protocol)
         tokens = StringUtils.splitFirst(domain, ":")
         if (len(tokens) < 2) {
             return default_port
         }
-        return tokens[1]
+        return this.parseInt(tokens[1])
     }
 
     def isValidHost(path) {

@@ -40,43 +40,61 @@ class _Requests {
         return message
     }
 
+    def resolveUrl(url) {
+        url_without_protocol = httpParser.removeProtocol(url)
+        is_https_call = httpParser.isHTTPS(url)
+        default_port = 80
+        if (is_https_call) {
+            default_port = 443
+        }
+        host = httpParser.getHost(url_without_protocol)
+        port = httpParser.getPort(url_without_protocol, default_port)
+        host_header = httpParser.getDomain(url_without_protocol)
+        uri = httpParser.getUri(url_without_protocol)
+        if (!StringUtils.startsWith(uri, "/")) {
+            uri = "/" + uri
+        }
+        return {
+            "host": host,
+            "port": port,
+            "host_header": host_header,
+            "uri": uri,
+            "https": is_https_call
+        }
+    }
+
+    def sendRequest(host, port, is_https_call, request) {
+        client = ClientSocket(host, port)
+        if (is_https_call) {
+            return client.sendAndReadBackHTTPS(request)
+        }
+        return client.sendAndReadBackHTTP(request)
+    }
+
     def get3(url=null, payload=null, headers=null) {
         if (!httpParser.isValidHost(url)) {
             logger.error(url + " is missing schema, maybe add http:// or https://")
             return null
         }
 
-        port = 80
-        is_https_call = httpParser.isHTTPS(url)
-        if (is_https_call) {
-            port = 443
-        }
-
-        url_without_protocol = httpParser.removeProtocol(url)
-        domain = httpParser.getDomain(url_without_protocol)
-        uri = httpParser.getUri(url_without_protocol)
-        if (!StringUtils.startsWith(uri, "/")) {
-            uri = "/" + uri
-        }
+        parts = this.resolveUrl(url)
+        host = parts["host"]
+        port = parts["port"]
+        host_header = parts["host_header"]
+        uri = parts["uri"]
+        is_https_call = parts["https"]
 
         queryParams = ""
-        if ((payload != null) and (type(payload) == 'HASH')) {
+        if ((payload != null) and (type(payload) == "HASH")) {
             queryParams = httpParser.mapToQueryParams(payload)
         }
 
-        request = "GET " + uri + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+        request = "GET " + uri + " HTTP/1.1\r\nHost: " + host_header + "\r\nConnection: close\r\n\r\n"
         if (queryParams != "") {
-            request = "GET " + uri + queryParams + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+            request = "GET " + uri + queryParams + " HTTP/1.1\r\nHost: " + host_header + "\r\nConnection: close\r\n\r\n"
         }
 
-        client = ClientSocket(domain, port)
-        message = null
-        if (is_https_call) {
-            message = client.sendAndReadBackHTTPS(request)
-        } else {
-            message = client.sendAndReadBackHTTP(request)
-        }
-        return message
+        return this.sendRequest(host, port, is_https_call, request)
     }
 
     def post(url=null, payload=null, headers=null) {
@@ -85,34 +103,49 @@ class _Requests {
             return null
         }
 
-        port = 80
-        is_https_call = httpParser.isHTTPS(url)
-        if (is_https_call) {
-            port = 443
+        parts = this.resolveUrl(url)
+        host = parts["host"]
+        port = parts["port"]
+        host_header = parts["host_header"]
+        uri = parts["uri"]
+        is_https_call = parts["https"]
+
+        queryParams = ""
+        if ((payload != null) and (type(payload) == "HASH")) {
+            queryParams = httpParser.mapToQueryParams(payload)
         }
 
-        url_without_protocol = httpParser.removeProtocol(url)
-        domain = httpParser.getDomain(url_without_protocol)
-        uri = httpParser.getUri(url_without_protocol)
-        if (!StringUtils.startsWith(uri, "/")) {
-            uri = "/" + uri
-        }
-
-        queryParams = httpParser.mapToQueryParams(payload)
-
-        request = "POST " + uri + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+        request = "POST " + uri + " HTTP/1.1\r\nHost: " + host_header + "\r\nConnection: close\r\n\r\n"
         if (queryParams != "") {
-            request = "POST " + uri + queryParams + " HTTP/1.1\r\nHost: " + domain + "\r\nConnection: close\r\n\r\n"
+            request = "POST " + uri + queryParams + " HTTP/1.1\r\nHost: " + host_header + "\r\nConnection: close\r\n\r\n"
         }
 
-        client = ClientSocket(domain, port)
-        message = null
-        if (is_https_call) {
-            message = client.sendAndReadBackHTTPS(request)
-        } else {
-            message = client.sendAndReadBackHTTP(request)
+        return this.sendRequest(host, port, is_https_call, request)
+    }
+
+    def postBody(url=null, body=null, content_type="application/json") {
+        if (!httpParser.isValidHost(url)) {
+            logger.error(url + " is missing schema, maybe add http:// or https://")
+            return null
         }
-        return message
+
+        parts = this.resolveUrl(url)
+        host = parts["host"]
+        port = parts["port"]
+        host_header = parts["host_header"]
+        uri = parts["uri"]
+        is_https_call = parts["https"]
+
+        body_text = ""
+        if (body != null) {
+            body_text = body
+        }
+        if (content_type == null) {
+            content_type = "application/json"
+        }
+
+        request = "POST " + uri + " HTTP/1.1\r\nHost: " + host_header + "\r\nContent-Type: " + content_type + "\r\nContent-Length: " + len(body_text) + "\r\nConnection: close\r\n\r\n" + body_text
+        return this.sendRequest(host, port, is_https_call, request)
     }
 }
 
