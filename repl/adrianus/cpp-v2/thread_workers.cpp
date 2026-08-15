@@ -10,7 +10,7 @@ std::vector<Ad_Object*> threadPool;
 
 namespace {
 
-Ad_Object* invoke_thread_callback(Ad_Object* rawCallback, std::vector<Ad_Object*> params, GarbageCollector* gc) {
+Ad_Object* invoke_thread_callback(Ad_Object* rawCallback, std::vector<Ad_Object*> params, GarbageCollector* gc, Environment* parent_env) {
     if (rawCallback == nullptr) {
         return &NULLOBJECT;
     }
@@ -29,8 +29,14 @@ Ad_Object* invoke_thread_callback(Ad_Object* rawCallback, std::vector<Ad_Object*
         Evaluator evaluator;
         evaluator.setGarbageCollector(gc);
         std::unordered_map<std::string, Ad_Object*> kw_args;
-        Environment env;
-        return evaluator.ApplyFunction(rawCallback, params, kw_args, env);
+        // Prefer the defining closure env; fall back to the parent program env.
+        Environment scratch;
+        Environment* call_env = parent_env;
+        if (call_env == nullptr) {
+            Ad_Function_Object* func = (Ad_Function_Object*) rawCallback;
+            call_env = func->env != nullptr ? func->env : &scratch;
+        }
+        return evaluator.ApplyFunction(rawCallback, params, kw_args, *call_env);
     }
     return &NULLOBJECT;
 }
@@ -38,16 +44,14 @@ Ad_Object* invoke_thread_callback(Ad_Object* rawCallback, std::vector<Ad_Object*
 } // namespace
 
 void ad_worker_async(Ad_Object* rawCallback, std::vector<Ad_Object*> params, Ad_Object* rawObject, GarbageCollector *gc, Environment* env) {
-    (void)env;
-    Ad_Object* result = invoke_thread_callback(rawCallback, params, gc);
+    Ad_Object* result = invoke_thread_callback(rawCallback, params, gc, env);
     Ad_Thread_Object *threadObject = (Ad_Thread_Object*) rawObject;
     threadObject->result = result;
     TOTAL_THREADS_RUNNING--;
 }
 
 void ad_worker_blocking(Ad_Object* rawCallback, std::vector<Ad_Object*> params, Ad_Object* rawObject, GarbageCollector *gc, Environment* env) {
-    (void)env;
-    Ad_Object* result = invoke_thread_callback(rawCallback, params, gc);
+    Ad_Object* result = invoke_thread_callback(rawCallback, params, gc, env);
     Ad_Thread_Object *threadObject = (Ad_Thread_Object*) rawObject;
     threadObject->result = result;
     TOTAL_THREADS_RUNNING--;
