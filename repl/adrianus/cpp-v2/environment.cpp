@@ -79,6 +79,17 @@ void Environment::Set(std::string key, Ad_Object* obj) {
         store[key] = obj;
         return;
     }
+    // Method call frames enclose an instance env. Update instance fields in place,
+    // but shadow everything else locally so helpers (e.g. StringUtils.startsWith)
+    // do not clobber global loop variables like `i`.
+    if (outer != NULL && outer->isInstanceEnvironment) {
+        if (outer->lookupOnlyInStore(key) != NULL) {
+            outer->setLocalParam(key, obj);
+            return;
+        }
+        store[key] = obj;
+        return;
+    }
     if (outer && outer->Check(key)) {
         outer->Set(key, obj);
         return;
