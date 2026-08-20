@@ -1,0 +1,33 @@
+// CPU-bound: enumerate permutations by backtracking (swap branch), no I/O.
+// n=8 -> 40320 leaves; checksum of first element at each leaf should be 141120.
+//
+// Note: uses list index assignment in swap(); evaluator and VM both support it.
+n = 8
+a = [0, 1, 2, 3, 4, 5, 6, 7]
+perm_count = 0
+checksum = 0
+
+def swap(i, j) {
+    t = a[i]
+    a[i] = a[j]
+    a[j] = t
+}
+
+def permute(k) {
+    if (k == n) {
+        perm_count = perm_count + 1
+        checksum = checksum + a[0]
+    } else {
+        i = k
+        while (i < n) {
+            swap(k, i)
+            permute(k + 1)
+            swap(k, i)
+            i = i + 1
+        }
+    }
+}
+
+permute(0)
+sink = perm_count + checksum
+println(perm_count)

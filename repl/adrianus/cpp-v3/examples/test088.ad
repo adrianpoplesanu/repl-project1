@@ -1,0 +1,11 @@
+def gen() {
+    def a () {
+        println("aaa")
+    }
+    return a
+}
+
+callback = gen()
+println("bbb")
+
+callback()

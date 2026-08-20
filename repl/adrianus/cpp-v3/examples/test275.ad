@@ -1,0 +1,14 @@
+class Dog {
+    name = "unknown"
+
+    def constructor(name) {
+        this.name = name
+    }
+
+    def test() {
+        println(name)
+    }
+}
+
+dog = Dog("dex")
+dog.test()

@@ -1,0 +1,15 @@
+eval("println(6)")
+
+eval("bbb=7")
+
+println(bbb)
+
+bbb = 15
+
+eval("println(bbb)")
+
+eval("println('bebe dex')")
+
+name = "dexiciut"
+
+eval("println(name)")

@@ -1,0 +1,5 @@
+class Box {
+    size = 0
+}
+b = Box()
+println(b.size)

@@ -1,0 +1,9 @@
+class Foo {
+  def bar(x = 99) {
+    println(x)
+  }
+}
+
+f = Foo()
+f.bar()
+f.bar(1)

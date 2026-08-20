@@ -1,0 +1,8 @@
+class Test {
+    def read() {
+        println("some text")
+    }
+}
+
+t = Test()
+t.read()

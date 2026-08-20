@@ -1,0 +1,5 @@
+// testing single comments
+println('aaa')
+// testing single comments
+println('bbb')
+// testing single comments

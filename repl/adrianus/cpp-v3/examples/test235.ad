@@ -1,0 +1,24 @@
+class Dog {
+    age = 14
+    name = "bebe dex"
+
+    def echo() {
+        println(talk)
+    }
+}
+
+dex = Dog()
+
+dex.printName = method() {
+    println(name)
+}
+
+dex.printAge = method(offset) {
+    println(age + offset)
+}
+
+dex.talk = "ham ham ham"
+
+dex.printName()
+dex.printAge(-1)
+dex.echo()

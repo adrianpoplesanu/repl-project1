@@ -1,0 +1,88 @@
+{
+  "scopeName": "source.adlang",
+  "name": "AdLang",
+  "patterns": [
+    {
+      "name": "keyword.control.adlang",
+      "match": "\\b(def|fun|function|let|func|class|this|super|if|else|return|while|for)\\b"
+    },
+    {
+      "name": "entity.name.def.adlang",
+      "match": "(?<=\\bdef\\s+)\\w+"
+    },
+    {
+      "name": "entity.name.fun.adlang",
+      "match": "(?<=\\bfun\\s+)\\w+"
+    },
+    {
+      "name": "entity.name.function.adlang",
+      "match": "(?<=\\bfunction\\s+)\\w+"
+    },
+    {
+      "name": "support.function.call.adlang",
+      "match": "\\b\\w+(?=\\s*\\()"
+    },
+    {
+      "name": "entity.name.class.adlang",
+      "match": "(?<=\\bclass\\s+)\\w+"
+    },
+    {
+      "name": "constant.language.boolean.true.adlang",
+      "match": "\\btrue\\b"
+    },
+    {
+      "name": "constant.language.boolean.false.adlang",
+      "match": "\\bfalse\\b"
+    },
+    {
+      "name": "comment.line.double-slash.adlang",
+      "match": "//.*$"
+    },
+    {
+      "name": "comment.block.adlang",
+      "begin": "/\\*",
+      "end": "\\*/"
+    },
+    {
+      "name": "support.function.builtin.adlang",
+      "match": "\\b(__socket|__utils)\\b"
+    },
+    {
+      "name": "comment.line.double-slash.adlang",
+      "match": "//.*$"
+    },
+    {
+      "name": "string.quoted.double.adlang",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.adlang",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "string.quoted.single.adlang",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "name": "constant.character.escape.adlang",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "constant.numeric.adlang",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    {
+      "name": "variable.adlang",
+      "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+    }
+  ],
+  "repository": {},
+  "fileTypes": ["ad"],
+  "uuid": "c1c1aaee-0000-4000-aaaa-123456789abc"
+}

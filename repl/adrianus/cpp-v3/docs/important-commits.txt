@@ -1,0 +1,1 @@
+https://github.com/adrianpoplesanu/repl-project1/commit/662f3819414316d653495bf1a7b770b173a8755b - evaluarea expresiilor care sunt recursive member access

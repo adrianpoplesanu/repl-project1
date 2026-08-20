@@ -1,0 +1,9 @@
+a = 5
+
+def change(a) {
+    a++
+    println(a)
+}
+
+change(a)
+println(a)

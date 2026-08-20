@@ -1,0 +1,16 @@
+def test() {
+    i = 0
+    while(i < 10) {
+        if (i == 5) {
+            println("cinci")
+            return 78
+        } else {
+            println(i)
+        }
+        i = i + 1
+    }
+    return 55
+}
+
+b = test()
+println(b)

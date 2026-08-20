@@ -1,0 +1,10 @@
+class Animal {
+    sound = "?"
+}
+
+class Dog : Animal {
+    sound = "woof"
+}
+
+d = Dog()
+println(d.sound)

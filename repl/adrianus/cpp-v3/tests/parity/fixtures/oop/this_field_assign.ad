@@ -1,0 +1,10 @@
+class Dog {
+  age = 0
+
+  def constructor(a) {
+    this.age = a
+  }
+}
+
+d = Dog(7)
+println(d.age)

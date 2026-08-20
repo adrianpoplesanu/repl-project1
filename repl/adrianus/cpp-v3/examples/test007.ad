@@ -1,0 +1,11 @@
+println("test class parsing for Ad")
+
+class Server {
+    port = 8080
+
+    def constructor(new_port) {
+        port = new_port
+    }
+}
+
+println("end test class parsing for Ad")

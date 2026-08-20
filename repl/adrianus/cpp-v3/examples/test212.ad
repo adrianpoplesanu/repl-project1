@@ -1,0 +1,11 @@
+names = ["anca", "andreea", "antonia", "alexandra", "alina"]
+
+th1 = __thread("thread-1")
+
+def runner(values) {
+    values[2] = "mihaela"
+}
+
+th1.callback(runner, names)
+th1.runBlocking()
+println(names)

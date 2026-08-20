@@ -1,0 +1,239 @@
+#include "environment.h"
+#include <cctype>
+
+bool locals_name_display_order(const std::string& a, const std::string& b) {
+    size_t i = 0;
+    while (i < a.size() && i < b.size()) {
+        const int ca = std::tolower(static_cast<unsigned char>(a[i]));
+        const int cb = std::tolower(static_cast<unsigned char>(b[i]));
+        if (ca != cb) {
+            return ca < cb;
+        }
+        ++i;
+    }
+    if (a.size() != b.size()) {
+        return a.size() < b.size();
+    }
+    return a > b;
+}
+
+Environment::Environment() {
+    outer = NULL;
+    bootstrap = NULL;
+    isBootstrapEnvironment = false;
+    isGlobalEnvironment = false;
+    isRunningImportCommand = false;
+    ref_count = 0;
+    isInstanceEnvironment = false;
+    owningInstanceEnvironment = NULL;
+}
+
+Environment::~Environment() {
+    // `siblings` stores links to environments, but this instance does not
+    // have clear ownership over those pointers. Deleting them here can trigger
+    // invalid frees when a sibling is owned/lifetime-managed elsewhere.
+    siblings.clear();
+}
+
+bool Environment::Check(std::string key) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
+    if (store.find(key) == store.end()) {
+        if (outer && outer->Check(key)) return true;
+        if (bootstrap && bootstrap->Check(key)) return true;
+        return false;
+    }
+    return true;
+}
+
+Ad_Object* Environment::Get(std::string key) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
+    if (store.find(key) == store.end() ) {
+        if (outer && outer->Check(key)) {
+            return outer->Get(key);
+        }
+        if (bootstrap && bootstrap->Check(key)) {
+            return bootstrap->Get(key);
+        }
+        return NULL;
+    } else {
+        return store[key];
+    }
+}
+
+Ad_Object* Environment::lookupOnlyInStore(std::string key) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
+    if (store.find(key) == store.end()) {
+        return NULL;
+    } else {
+        return store[key];
+    }
+}
+
+Ad_Object* Environment::lookupConstructor() {
+    return lookupOnlyInStore("constructor");
+}
+
+void Environment::Set(std::string key, Ad_Object* obj) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
+    if (store.find(key) != store.end()) {
+        store[key] = obj;
+        return;
+    }
+    // Method call frames enclose an instance env. Update instance fields in place,
+    // but shadow everything else locally so helpers (e.g. StringUtils.startsWith)
+    // do not clobber global loop variables like `i`.
+    if (outer != NULL && outer->isInstanceEnvironment) {
+        if (outer->lookupOnlyInStore(key) != NULL) {
+            outer->setLocalParam(key, obj);
+            return;
+        }
+        store[key] = obj;
+        return;
+    }
+    if (outer && outer->Check(key)) {
+        outer->Set(key, obj);
+        return;
+    }
+    store[key] = obj;
+}
+
+void Environment::setLocalParam(std::string key, Ad_Object* obj) {
+    std::lock_guard<std::recursive_mutex> lk(mu);
+    store[key] = obj;
+}
+
+void Environment::addSibling(std::string key, Environment *env) {
+    // TODO: determine a proper way to delete siblings
+    /*if (siblings.find(key) != siblings.end()) {
+        delete siblings[key];
+    }*/
+    siblings[key] = env;
+}
+
+Environment* Environment::getSibling(std::string key) {
+    return siblings[key];
+}
+
+void Environment::SetOuterEnvironment(Environment* o) {
+    outer = o;
+}
+
+void Environment::SetBootstrapEnvironment(Environment *b) {
+    bootstrap = b;
+}
+
+void Environment::PrintStore(int level) {
+    int k = 0;
+    if (level != 0) std::cout << "\n";
+    while(k++ < level) std::cout << " ";
+    std::cout << "store: {";
+    int size = store.size();
+    int total = 0;
+    for (const std::pair<const std::string, Ad_Object*>& it : store) {
+        std::cout << it.first << ": ";
+        std::cout << it.second->Inspect();
+        total++;
+        if (total < size) std::cout << ", "; // hmmm, this needs to be fixed
+    }
+    std::cout << "}\n";
+    k = 0;
+    while(k++ < level) std::cout << " ";
+    std::cout << "outer: {";
+    if (outer) {
+        outer->PrintStore(level + 4);
+    }
+    std::cout << "}\n";
+}
+
+Ad_Object* Environment::storeToHashObject(GarbageCollector *gc) {
+    std::unordered_map<std::string, HashPair> pairs;
+
+    for (const std::pair<const std::string, Ad_Object*>& it : store) {
+        std::hash<std::string> hash_string;
+
+        Ad_Object *key = new Ad_String_Object(it.first);
+        gc->addObject(key);
+        Ad_Object *value = it.second;
+
+        HashPair hash_pair(key, value);
+        pairs.insert(std::make_pair(std::to_string(hash_string(key->Hash())), hash_pair)); // value needs to be a HashPair
+    }
+
+    Ad_Hash_Object *hashObject = new Ad_Hash_Object(pairs);
+    gc->addObject(hashObject);
+    return hashObject;
+}
+
+Ad_Object* Environment::contextToHashObject(GarbageCollector *gc) {
+    std::unordered_map<std::string, HashPair> pairs;
+
+    Ad_Hash_Object *hashObject = new Ad_Hash_Object(pairs);
+    gc->addObject(hashObject);
+    return hashObject;
+}
+
+std::vector<std::string> Environment::populateGetattrs() {
+    std::vector<std::string> elements;
+    for (const std::pair<const std::string, Ad_Object*>& it : store) {
+        elements.push_back(it.first);
+    }
+    return elements;
+}
+
+Environment* Environment::copy(GarbageCollector *gc) {
+    // TODO: asta strica tot, se face un loop infinit aici
+    Environment *result = new Environment();
+    if (outer != NULL) {
+        //result->outer = outer->copy(gc);
+        result->outer = NULL;
+    }
+    if (result != NULL) {
+        result->bootstrap = bootstrap; // asta n-ar trebui sa se schimbe
+    }
+    return result;
+}
+
+Environment* newEnvironment() {
+    Environment *env = new Environment();
+    return env;
+}
+
+Environment* resolveGlobalEnvironment(Environment* env) {
+    Environment* cur = env;
+    while (cur != NULL) {
+        if (cur->isGlobalEnvironment) {
+            return cur;
+        }
+        cur = cur->outer;
+    }
+    return env;
+}
+
+Environment* newEnclosedEnvironment(Environment *o) {
+    Environment* env = new Environment();
+    env->SetOuterEnvironment(o);
+    return env;
+}
+
+Environment* newEnclosedEnvironmentUnfreeable(Environment *o) {
+    Environment* env = new Environment();
+    env->SetOuterEnvironment(o);
+    return env;
+}
+
+void free_Ad_environment_memory(Environment* env) {
+    if (env->ref_count > 0) return;
+    delete env;
+}
+
+void Ad_INCREF(Environment* env) {
+    if (env) {
+        env->ref_count++;
+    }
+}
+
+void Ad_DECREF(Environment* env) {
+    if (env) {
+        env->ref_count--;
+    }
+}

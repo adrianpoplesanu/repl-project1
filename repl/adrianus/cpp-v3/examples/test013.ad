@@ -1,0 +1,19 @@
+a = 5
+
+__locals()
+
+class Server {
+    port = 8080
+
+    def listen() {
+        println("listening...")
+    }
+}
+
+server = Server()
+server.port
+server.listen()
+
+println("aaa")
+println("bbb")
+__locals()

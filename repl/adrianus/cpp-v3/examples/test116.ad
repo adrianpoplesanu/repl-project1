@@ -1,0 +1,19 @@
+class Dog {
+    def test() {
+        println("aaa")
+    }
+}
+
+class Dex : Dog {
+    def test() {
+        println("bbb")
+    }
+
+    def test2() {
+        super(Dog).test()
+    }
+}
+
+dex = Dex()
+dex.test()
+dex.test2()

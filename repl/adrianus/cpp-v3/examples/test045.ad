@@ -1,0 +1,3 @@
+a = input()
+println(a)
+println(type(a))

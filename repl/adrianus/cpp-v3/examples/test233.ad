@@ -1,0 +1,11 @@
+class Dex {
+    age = 5
+
+    def add(val) {
+        this.age += val
+    }
+}
+
+dex = Dex()
+dex.add(4)
+println(dex.age)

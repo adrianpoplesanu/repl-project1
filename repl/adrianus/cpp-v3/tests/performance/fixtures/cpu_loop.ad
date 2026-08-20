@@ -1,0 +1,7 @@
+// CPU-bound micro-benchmark: no I/O, stable for timing evaluator vs VM.
+i = 0
+s = 0
+while (i < 50000) {
+  s = s + i
+  i = i + 1
+}

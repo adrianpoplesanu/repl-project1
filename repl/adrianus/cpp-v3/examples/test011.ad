@@ -1,0 +1,14 @@
+a = 5
+
+__locals()
+
+class Server {
+    port = 8080
+}
+
+server = Server()
+server.port
+
+println("aaa")
+println("bbb")
+__locals()

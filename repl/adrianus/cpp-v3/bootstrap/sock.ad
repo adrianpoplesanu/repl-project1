@@ -1,0 +1,151 @@
+class ServerSocket {
+    sock = null
+    port = null
+    client = null
+
+    def constructor(_port) {
+        port = _port
+        //println(port)
+        sock = __iosocket("server", "localhost", port, true, false, false, true)
+        sock.create_server()
+    }
+
+    def accept() {
+        client = sock.accept()
+    }
+
+    def read() {
+        response_message = client.read()
+        return response_message
+    }
+
+    def send(message) {
+        client.send(message)
+    }
+
+    def close() {
+        client.close()
+        sock.close()
+    }
+}
+
+class ClientSocket {
+    sock = null
+    port = null
+    host = null
+    server = null
+
+    def constructor(_host, _port) {
+        host = _host
+        port = _port
+        sock = __iosocket("client", host, port, true, false, true, false)
+        sock.create_client()
+    }
+
+    def send(message) {
+        sock.send(message)
+    }
+
+    def read() {
+        response_message = sock.read()
+        return response_message
+    }
+
+    def sendAndReadBackHTTP(req) {
+        response_message = sock.sendAndReadBackHTTP(req)
+        return response_message
+    }
+
+    def sendAndReadBackHTTPS(req) {
+        response_message = sock.sendAndReadBackHTTPS(req)
+        return response_message
+    }
+
+    def close() {
+        server.close()
+        sock.close()
+    }
+}
+
+/*
+    Simple echo server, mono-thread, does not close connextion
+*/
+class ForeverEchoServer {
+
+    port = null
+    serverSocket = null
+    message = ""
+
+    def constructor(_port, _message) {
+        port = _port
+        message = _message
+        serverSocket = ServerSocket(port)
+    }
+
+    def start() {
+        println("[ LOG ] waiting on port: " + port)
+        while(true) {
+            serverSocket.accept()
+            println("[ LOG ] handling request")
+
+            serverSocket.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+
+            /*serverSocket.close()*/
+        }
+    }
+}
+
+/*
+    Simple message server, multi-thread, does not close connextion
+*/
+class MultiThreadedEchoServer {
+    /*
+        how to test if a process is running on a port
+
+        $ lsof -nP -iTCP:5003 -sTCP:LISTEN 2>/dev/null || echo "nothing listening on 5003"
+    */
+
+    port = null
+    serverSocket = null
+    logger = AdLogger("AD", "MultiThreadedEchoServer")
+    message = ""
+
+    def constructor(_port, _message) {
+        port = _port
+        message = _message
+        serverSocket = ServerSocket(port)
+    }
+
+    def handleRequest(client) {
+        client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+        client.close()
+    }
+
+    def process(client) {
+        //println('handling request')
+        logger.info('handling request')
+        //println(client)
+
+        request_message = client.readHTTP()
+        //println(request_message)
+        logger.info(request_message)
+
+        client.send("HTTP/1.1 200 OK\r\nServer: AdServer\r\nContent-Type: text/html\r\nContent-Length: " + len(message) + "\r\nConnection: close\r\n\r\n" + message)
+    }
+
+    def start() {
+        println("[ LOG ] waiting on port: " + port)
+
+        while(true) {
+            serverSocket.accept()
+            logger.info("handling request")
+            //println(serverSocket.client)
+            logger.info(str(serverSocket.client))
+            th1 = __thread("thread 1")
+
+            th1.callback(this.process, serverSocket.client)
+            th1.runAsync()
+            //process(serverSocket.client)
+        }
+    }
+}

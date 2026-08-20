@@ -1,0 +1,7 @@
+class Dog {
+    age = 12
+}
+
+dex = Dog()
+dex.age += 2
+println(dex.age)

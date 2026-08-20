@@ -1,0 +1,3 @@
+class Doggy {
+    name = "bebe dex"
+}

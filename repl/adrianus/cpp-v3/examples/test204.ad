@@ -1,0 +1,3 @@
+system = SystemCommand()
+output = system.execute("node --version")
+println(output)

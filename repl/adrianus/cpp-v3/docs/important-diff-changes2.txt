@@ -1,0 +1,183 @@
+diff --git a/repl/adrianus/cpp/ast.cpp b/repl/adrianus/cpp/ast.cpp
+index 056fe43..7c9015b 100644
+--- a/repl/adrianus/cpp/ast.cpp
++++ b/repl/adrianus/cpp/ast.cpp
+@@ -162,6 +162,7 @@ Ad_AST_ExpressionStatement::Ad_AST_ExpressionStatement(Token t) {
+ 
+ Ad_AST_ExpressionStatement::~Ad_AST_ExpressionStatement() {
+     if (expression) { // TODO: de ce trebuie asta? nu inteleg de ce trebuie if-ul asta aici
++        //Ad_DECREF(expression);
+         free_Ad_AST_Node_memory(expression);
+     }
+ }
+@@ -402,6 +403,20 @@ Ad_AST_BlockStatement::Ad_AST_BlockStatement(Token t) {
+ Ad_AST_BlockStatement::~Ad_AST_BlockStatement() {
+     for (std::vector<Ad_AST_Node*>::iterator it = statements.begin() ; it != statements.end(); ++it) {
+         Ad_AST_Node *node = *it;
++        //Ad_DECREF(node);
++        // ******
++        if (true) {
++            if (node->type == ST_EXPRESSION_STATEMENT) {
++                Ad_AST_ExpressionStatement* expr = (Ad_AST_ExpressionStatement*) node;
++                if (expr->expression != NULL) {
++                    if (expr->expression->type == ST_CLASS_STATEMENT) {
++                        std::cout << "opa!!!\n";
++                        Ad_DECREF(expr->expression);
++                    }
++                }
++            }
++        }
++        // ******
+         free_Ad_AST_Node_memory(node);
+     }
+ }
+@@ -674,6 +689,7 @@ Ad_AST_Class::Ad_AST_Class(Token t) {
+ 
+ Ad_AST_Class::~Ad_AST_Class() {
+     // Class objects need a reference to this AST node that they will deallocate on object destruction
++    //std::cout << "deleting a class AST node " << this << "\n";
+     if (name) {
+         Ad_DECREF(name);
+         free_Ad_AST_Node_memory(name);
+@@ -999,6 +1015,7 @@ void free_Ad_AST_Node_memory(Ad_AST_Node* node) {
+             delete (Ad_AST_Comment*)node;
+         break;
+         case ST_CLASS_STATEMENT:
++            //std::cout << "deleting a class AST: " << (Ad_AST_Class*)node << '\n';
+             delete (Ad_AST_Class*)node;
+         break;
+         case ST_MEMBER_ACCESS:
+diff --git a/repl/adrianus/cpp/environment.cpp b/repl/adrianus/cpp/environment.cpp
+index a5ce1cf..1b536df 100644
+--- a/repl/adrianus/cpp/environment.cpp
++++ b/repl/adrianus/cpp/environment.cpp
+@@ -6,6 +6,7 @@ Environment::Environment() {
+ }
+ 
+ Environment::~Environment() {
++    //std::cout << "cleaning up an env\n";
+     for(std::map<std::string, Ad_Object* >::const_iterator it = store.begin(); it != store.end(); ++it) {
+         Ad_DECREF(it->second); // asta merge
+         //std::string mesaj = "vreau sa sterg" + it->second->Inspect();
+@@ -127,6 +128,11 @@ Environment NewEnvironment() {
+     return env;
+ }
+ 
++Environment* newEnvironment() {
++    Environment *env = new Environment();
++    return env;
++}
++
+ Environment NewEnclosedEnvironment(Environment *o) {
+     Environment env;
+     env.SetOuterEnvironment(o);
+diff --git a/repl/adrianus/cpp/evaluator.cpp b/repl/adrianus/cpp/evaluator.cpp
+index 0cfbb8e..0c18535 100644
+--- a/repl/adrianus/cpp/evaluator.cpp
++++ b/repl/adrianus/cpp/evaluator.cpp
+@@ -401,19 +401,20 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
+             for (int i = 0; i < args.size(); i++) free_Ad_Object_memory(args[i]);
+             return new Ad_Error_Object("function signature unrecognized, different number of params");
+         }
+-        Environment* extendedEnv = extendFunctionEnv(func, args);
+-        Ad_Object* evaluated = Eval(func_obj->body, *extendedEnv);
+-        environment_garbage_collection.push_back(extendedEnv);
++        //Environment* extendedEnv = extendFunctionEnv(func, args);
++        Environment extendedEnv = ExtendFunctionEnv(func, args);
++        Ad_Object* evaluated = Eval(func_obj->body, extendedEnv);
++        //environment_garbage_collection.push_back(extendedEnv);
+         return UnwrapReturnValue(evaluated);
+     }
+     if (func->type == OBJ_BUILTIN) {
+         Ad_Builtin_Object* builtinObject = (Ad_Builtin_Object*) func;
+-        if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
++        /*if (builtinObject->acceptedNumbersOfArguments.size() != 0 &&
+                 !std::count(builtinObject->acceptedNumbersOfArguments.begin(),
+                             builtinObject->acceptedNumbersOfArguments.end(),
+                             args.size())) {
+             return new Ad_Error_Object("builtin signature unrecognized, different number of params");
+-        }
++        }*/
+         Ad_Object* result = builtinObject->builtin_function(args, &env);
+         return result;
+     }
+diff --git a/repl/adrianus/cpp/objects.cpp b/repl/adrianus/cpp/objects.cpp
+index 00bce33..da0ba98 100644
+--- a/repl/adrianus/cpp/objects.cpp
++++ b/repl/adrianus/cpp/objects.cpp
+@@ -784,6 +784,7 @@ void free_Ad_Object_memory(Ad_Object* obj) {
+                 delete ((Ad_Hash_Object*)obj);
+             break;
+             case OBJ_CLASS:
++                //std::cout << "deleting a class object " << obj << "\n";
+                 delete (Ad_Class_Object*) obj;
+             break;
+             case OBJ_INSTANCE:
+diff --git a/repl/adrianus/cpp/parser.cpp b/repl/adrianus/cpp/parser.cpp
+index 6466161..063be08 100644
+--- a/repl/adrianus/cpp/parser.cpp
++++ b/repl/adrianus/cpp/parser.cpp
+@@ -476,6 +476,27 @@ Ad_AST_Node* Parser::ParseDefExpression() {
+     Ad_AST_Node* body = ParseBlockStatement();
+     stmt->body = body;
+     Ad_INCREF(stmt->body);
++
++    // ****
++    if (true) {
++        for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)body)->statements.begin() ; it != ((Ad_AST_BlockStatement*)body)->statements.end(); ++it) {
++            Ad_AST_Node *node = *it;
++            //free_Ad_AST_Node_memory(node);
++            //std::cout << statement_type_map[node->type] << "\n";
++            //Ad_INCREF(node);
++            if (node->type == ST_EXPRESSION_STATEMENT) {
++                Ad_AST_ExpressionStatement* expr = (Ad_AST_ExpressionStatement*) node;
++                if (expr->expression != NULL) {
++                    if (expr->expression->type == ST_CLASS_STATEMENT) {
++                        //std::cout << "aaa\n";
++                        Ad_INCREF(expr->expression);
++                    }
++                }
++            }
++        }
++    }
++    // ****
++
+     return stmt;
+ }
+ 
+diff --git a/repl/adrianus/cpp/repl.cpp b/repl/adrianus/cpp/repl.cpp
+index 1b60db6..25c9337 100644
+--- a/repl/adrianus/cpp/repl.cpp
++++ b/repl/adrianus/cpp/repl.cpp
+@@ -11,7 +11,8 @@ Repl::Repl() {
+ }
+ 
+ Repl::~Repl() {
+-
++    //env->PrintStore(0);
++    //delete env2;
+ }
+ 
+ void Repl::Loop() {
+@@ -33,6 +34,9 @@ void Repl::ExecuteFile(std::ifstream &target) {
+     Environment* bootstrap = load_bootstrap(program, parser, evaluator);
+     env = NewEnvironment();
+     env.SetBootstrapEnvironment(bootstrap);
++
++    //env2 = newEnvironment();
++    //env2->SetBootstrapEnvironment(bootstrap);
+     if (target.is_open()) {
+         std::string line;
+         std::string text;
+diff --git a/repl/adrianus/cpp/repl.h b/repl/adrianus/cpp/repl.h
+index 8ee2dde..d9f27f3 100644
+--- a/repl/adrianus/cpp/repl.h
++++ b/repl/adrianus/cpp/repl.h
+@@ -13,6 +13,7 @@ public:
+     Parser parser;
+     Evaluator evaluator;
+     Environment env;
++    //Environment *env2;
+     Ad_AST_Program program;
+ 
+     Repl();

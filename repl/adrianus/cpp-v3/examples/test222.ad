@@ -1,0 +1,22 @@
+SIZE = 1000
+
+//a = 5
+//b = 6
+
+def teest() {
+    a = 7
+    b = 8
+    for (i = 0; i < 1000; i++) {
+        a = b
+    }
+}
+
+def main() {
+    i = 0
+    while (i < 1000) {
+        teest()
+        i++
+    }
+}
+
+main()

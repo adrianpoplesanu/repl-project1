@@ -1,0 +1,20 @@
+a = 5
+
+class Generator {
+    def get() {
+        class Action {
+            def do(p) {
+                println(a * 5)
+                println(p)
+                return 5
+            }
+        }
+
+        action = Action()
+        return action
+    }
+}
+
+generator = Generator()
+result = generator.get().do("bedus")
+println(result)

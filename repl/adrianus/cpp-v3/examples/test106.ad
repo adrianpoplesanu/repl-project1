@@ -1,0 +1,3 @@
+a = "bebe dex e drabutz"
+b = "dex"
+println(StringUtils.indexOf(a, b))

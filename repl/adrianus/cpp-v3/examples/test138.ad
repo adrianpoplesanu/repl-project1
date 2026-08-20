@@ -1,0 +1,11 @@
+import("examples/test137.ad")
+/* the second import is for the it tests to work */
+import("../../cpp/examples/test137.ad")
+
+doggy = Doggy()
+println(doggy.name)
+
+/*system = SystemCommand()
+
+path = system.execute("pwd")
+println(path)*/

@@ -1,0 +1,7 @@
+def t() {
+    println("aaa")
+}
+
+t()
+t()
+t()

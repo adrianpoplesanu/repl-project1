@@ -1,0 +1,8 @@
+for (i = 0; i < 10; i++) {
+    println(i)
+    if (i == 5) {
+        return 8
+    }
+}
+
+/* asta returneaza in evalProgram un obiect return value pe care se face inspect(), nu ar fi logic sa se faca unwrapreturnvalue pe acel obiect? */

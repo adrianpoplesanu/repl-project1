@@ -1,0 +1,228 @@
+class Request {
+    httpMethod = null
+    path = null
+    query = null
+    queryParams = null
+    headers = null
+    body = null
+    raw = null
+
+    def constructor(raw_message, parser) {
+        raw = raw_message
+        httpMethod = parser.getMethod(raw_message)
+        path = parser.getPath(raw_message)
+        query = parser.getQueryString(raw_message)
+        queryParams = parser.parseQueryParams(query)
+        headers = parser.getHeaders(raw_message)
+        body = parser.getBody(raw_message)
+    }
+}
+
+class Response {
+    statusCode = 200
+    statusText = "OK"
+    headers = null
+    body = ""
+
+    def constructor(status_code, status_text, headers_map, body_text) {
+        statusCode = status_code
+        statusText = status_text
+        headers = headers_map
+        body = body_text
+    }
+
+    def toHTTP() {
+        body_text = body
+        if (body_text == null) {
+            body_text = ""
+        }
+        header_block = ""
+        keys = __keys(headers)
+        has_content_type = false
+        for (i = 0; i < len(keys); i++) {
+            key = keys[i]
+            if (key == "Content-Type") {
+                has_content_type = true
+            }
+            header_block = header_block + key + ": " + headers[key] + "\r\n"
+        }
+        if (!has_content_type) {
+            header_block = header_block + "Content-Type: text/plain\r\n"
+        }
+        header_block = header_block + "Content-Length: " + len(body_text) + "\r\n"
+        header_block = header_block + "Connection: close\r\n"
+        return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" + header_block + "\r\n" + body_text
+    }
+}
+
+class Route {
+    httpMethod = null
+    path = null
+    handler = null
+
+    def constructor(method_name, path_value, handler_fn) {
+        httpMethod = method_name
+        path = path_value
+        handler = handler_fn
+    }
+}
+
+class Router {
+    routes = null
+
+    def constructor() {
+        routes = []
+    }
+
+    def addRoute(route) {
+        __append(routes, route)
+    }
+
+    def get(path_value, handler_fn) {
+        addRoute(Route("GET", path_value, handler_fn))
+    }
+
+    def post(path_value, handler_fn) {
+        addRoute(Route("POST", path_value, handler_fn))
+    }
+
+    def handle(request) {
+        for (i = 0; i < len(routes); i++) {
+            route = routes[i]
+            if ((route.httpMethod == request.httpMethod) and (route.path == request.path)) {
+                return route.handler(request)
+            }
+        }
+        return null
+    }
+}
+
+class ApplicationServer {
+    port = null
+    router = null
+    serverSocket = null
+    httpParser = null
+    logger = null
+
+    def constructor(listen_port, app_router) {
+        port = listen_port
+        logger = AdLogger("AD", "ApplicationServer")
+        httpParser = AdHTTPParser()
+        router = app_router
+        serverSocket = ServerSocket(port)
+        logger.info("ApplicationServer ready on port " + port)
+    }
+
+    def getRouter() {
+        return router
+    }
+
+    def setRouter(app_router) {
+        router = app_router
+    }
+
+    def buildRequest(raw_message) {
+        return Request(raw_message, httpParser)
+    }
+
+    def notFoundResponse(request) {
+        body_text = "404 Not Found: " + request.httpMethod + " " + request.path
+        return Response(404, "Not Found", {"Content-Type": "text/plain"}, body_text)
+    }
+
+    def process(client) {
+        logger.info("handling request")
+        raw_message = client.readHTTP()
+        request = buildRequest(raw_message)
+        logger.info(request.httpMethod + " " + request.path)
+
+        response = router.handle(request)
+        if (response == null) {
+            response = notFoundResponse(request)
+        }
+        client.send(response.toHTTP())
+        client.close()
+    }
+
+    def start() {
+        logger.info("waiting on port: " + port)
+        while (true) {
+            serverSocket.accept()
+            logger.info(str(serverSocket.client))
+            th1 = __thread("app-server-worker")
+            th1.callback(this.process, serverSocket.client)
+            th1.runAsync()
+        }
+    }
+}
+
+def home(request) {
+    html = "<html><title>ApplicationServer</title><body><h1>home</h1><p>method=" + request.httpMethod + "</p></body></html>"
+    return Response(200, "OK", {"Content-Type": "text/html"}, html)
+}
+
+def login(request) {
+    body_text = "{\"ok\":true,\"path\":\"" + request.path + "\",\"received\":\"" + request.body + "\"}"
+    return Response(200, "OK", {"Content-Type": "application/json"}, body_text)
+}
+
+def echo_query(request) {
+    text = "path=" + request.path + " query=" + request.query
+    return Response(200, "OK", {"Content-Type": "text/plain"}, text)
+}
+
+class AppController {
+    title = null
+
+    def constructor(page_title) {
+        title = page_title
+    }
+
+    def home(request) {
+        html = "<html><body><h1>" + title + "</h1><p>" + request.httpMethod + "</p></body></html>"
+        return Response(200, "OK", {"Content-Type": "text/html"}, html)
+    }
+
+    def echo_query(request) {
+        text = "path=" + request.path + " query=" + request.query
+        return Response(200, "OK", {"Content-Type": "text/plain"}, text)
+    }
+
+    def login(request) {
+        body_text = "{\"ok\":true,\"body\":\"" + request.body + "\"}"
+        return Response(200, "OK", {"Content-Type": "application/json"}, body_text)
+    }
+}
+
+controller = AppController("ApplicationServer")
+
+router = Router()
+
+//router.get("/", home)
+//router.get("/echo", echo_query)
+//router.post("/api/login", login)
+
+router.get("/", controller.home)
+router.get("/echo", controller.echo_query)
+router.post("/api/login", controller.login)
+
+app = ApplicationServer(5005, router)
+app.start()
+
+/*
+GET:
+  curl localhost:5005/
+  curl "localhost:5005/echo?user=a&role=admin"
+
+POST:
+  curl --header "Content-Type: application/json" \
+    --request POST \
+    --data '{"username":"xyz","password":"xyz"}' \
+    http://localhost:5005/api/login
+
+404:
+  curl localhost:5005/missing
+
+Check port:
+  lsof -nP -iTCP:5005 -sTCP:LISTEN 2>/dev/null || echo "nothing listening on 5005"
+*/

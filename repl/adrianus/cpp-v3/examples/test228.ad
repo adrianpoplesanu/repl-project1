@@ -1,0 +1,11 @@
+a = 5
+println(a++)
+println(a)
+println(++a)
+println(a)
+
+b = 5
+println(b--)
+println(b)
+println(--b)
+println(b)

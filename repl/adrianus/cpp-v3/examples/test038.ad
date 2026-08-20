@@ -1,0 +1,25 @@
+class File {
+    name = null
+    operator = null
+    file_object = null
+
+    def init(p_name, p_operator) {
+        name = p_name
+        operator = p_operator
+        file_object = __iofile(name, operator)
+    }
+
+    def read() {
+        if (operator == "r") {
+            return file_object.read()
+        }
+    }
+
+    def write(text) {
+        return file_object.write(text)
+    }
+}
+
+file = File()
+file.init("README.md", "r")
+file.read()

@@ -1,0 +1,9 @@
+def test(a, b) {
+    test2(c=a, d=b)
+}
+
+def test2(c, d) {
+    println(c + d)
+}
+
+test(2, 3)

@@ -1,0 +1,8 @@
+def return_value() {
+    return 7
+}
+
+def return_null() {
+}
+
+return_value()

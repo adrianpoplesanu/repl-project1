@@ -1,0 +1,7 @@
+class Dex {
+    age = 5
+}
+
+dex = Dex()
+dex.age += 2
+println(dex.age)

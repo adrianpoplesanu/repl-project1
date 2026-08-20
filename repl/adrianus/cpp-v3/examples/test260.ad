@@ -1,0 +1,15 @@
+// problema cu method ca def sau fun
+// uita-te la test235
+// investigheaza mai mult
+class Elev() {
+    method constructor(age) {
+        this.age = age
+    }
+    method print() {
+        println(age)
+    }
+}
+
+elev = Elev(45)
+println(elev.age)
+elev.print()

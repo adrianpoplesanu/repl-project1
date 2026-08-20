@@ -1,0 +1,9 @@
+a = "ala bala portocala"
+b = "ala"
+
+println(StringUtils.startsWith(a, b))
+
+c = "ala bala portocala"
+d = "alad"
+
+println(StringUtils.startsWith(c, d))

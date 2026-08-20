@@ -1,0 +1,9 @@
+def f() {
+  let acc = 0
+  let k = 0
+  for (k = 0; k < 3; k = k + 1) {
+    acc = acc + k
+  }
+  return acc
+}
+f()

@@ -1,0 +1,15 @@
+class Dog {
+    def test() {
+        println("aaa")
+    }
+}
+
+class Dex : Dog {
+    def test2() {
+        println("bbb")
+    }
+}
+
+dex = Dex()
+dex.test()
+dex.test2()

@@ -1,0 +1,13 @@
+def c() {
+  let r = 0
+  let i = 0
+  while (i < 5) {
+    i = i + 1
+    if (i == 2) {
+      continue
+    }
+    r = r + i
+  }
+  return r
+}
+c()

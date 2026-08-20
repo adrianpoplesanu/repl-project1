@@ -1,0 +1,74 @@
+// Parallel HTTP clients against ApplicationServer from test300.ad (port 5005).
+// Run test300 in another terminal first:
+//   ./main -vm examples/test300.ad
+// Then:
+//   ./main examples/test301.ad
+//   ./main -vm examples/test301.ad
+
+parser = AdHTTPParser()
+base = "http://127.0.0.1:5005"
+workers = []
+worker_count = 6
+
+def fetch_home(worker_id) {
+    raw = requests.get3(base + "/")
+    if (raw == null) {
+        println("home#" + worker_id + " status=null")
+        return "null"
+    }
+    code = parser.getStatusCode(raw)
+    println("home#" + worker_id + " status=" + code)
+    return code
+}
+
+def fetch_echo(worker_id) {
+    raw = requests.get3(base + "/echo", {"user": "w" + worker_id, "role": "admin"})
+    if (raw == null) {
+        println("echo#" + worker_id + " status=null")
+        return "null"
+    }
+    code = parser.getStatusCode(raw)
+    body = parser.getBody(raw)
+    println("echo#" + worker_id + " status=" + code + " body=" + body)
+    return code
+}
+
+def fetch_login(worker_id) {
+    payload = "{\"username\":\"u" + worker_id + "\",\"password\":\"x\"}"
+    raw = requests.postBody(base + "/api/login", payload)
+    if (raw == null) {
+        println("login#" + worker_id + " status=null")
+        return "null"
+    }
+    code = parser.getStatusCode(raw)
+    body = parser.getBody(raw)
+    println("login#" + worker_id + " status=" + code + " body=" + body)
+    return code
+}
+
+for (i = 0; i < worker_count; i++) {
+    th = __thread("client-" + i)
+    kind = i % 3
+    if (kind == 0) {
+        th.callback(fetch_home, i)
+    } else {
+        if (kind == 1) {
+            th.callback(fetch_echo, i)
+        } else {
+            th.callback(fetch_login, i)
+        }
+    }
+    th.runAsync()
+    __append(workers, th)
+}
+
+ok = 0
+for (i = 0; i < len(workers); i++) {
+    code = workers[i].await()
+    if (code == "200") {
+        ok = ok + 1
+    }
+}
+
+println("parallel clients done ok=" + ok + "/" + len(workers))
+assert(ok == worker_count)

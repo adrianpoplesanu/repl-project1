@@ -1,0 +1,10 @@
+class Dog {
+    def echo(value='hamutz hamutz hamutz') {
+        println(value)
+    }
+}
+
+dex = Dog()
+dex.echo()
+dex.echo("hamic hamic hamic")
+dex.echo(value = "hamuletz hamuletz hamuletz")

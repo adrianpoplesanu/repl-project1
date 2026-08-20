@@ -1,0 +1,12 @@
+#ifndef __AD_SETTINGS_H
+#define __AD_SETTINGS_H
+
+/*bool IS_CONSOLE_RUN = false; // this is defaulted to false but correctly setup at startime
+bool USE_FIX_FOR_CLASS_STATEMENT_AS_EXPRESSION_STATEMENT_IN_BLOCK = true;
+bool FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS = true;*/
+
+extern bool IS_CONSOLE_RUN;
+extern bool USE_FIX_FOR_CLASS_STATEMENT_AS_EXPRESSION_STATEMENT_IN_BLOCK;
+extern bool FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS;
+
+#endif

@@ -1,0 +1,5 @@
+class Counter {
+    value = 10
+}
+c = Counter()
+println(c)
