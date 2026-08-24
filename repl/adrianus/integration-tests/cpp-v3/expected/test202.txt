@@ -1,0 +1,10 @@
+total 8
+drwxr-xr-x@  (.*) adrianpoplesanu  staff  (.*) (.*) .
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) ..
+-rw-r--r--   (.*) adrianpoplesanu  staff  (.*) (.*) README.md
+-rw-r--r--   (.*) adrianpoplesanu  staff    (.*) (.*) check-all.sh
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) cpp
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) cpp-v2
+-rw-r--r--   (.*) adrianpoplesanu  staff    (.*) (.*) cross-check.sh
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) java
+drwxr-xr-x  (.*) adrianpoplesanu  staff  (.*) (.*) python

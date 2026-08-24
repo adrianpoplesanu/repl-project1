@@ -1,0 +1,4 @@
+{'a': <function at memory address: (.*)>, 'x': 11}
+{'y': 100}
+11
+{'a': <function at memory address: (.*)>, 'x': 11}

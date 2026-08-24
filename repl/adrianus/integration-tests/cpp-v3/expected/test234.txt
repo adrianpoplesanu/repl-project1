@@ -1,0 +1,2 @@
+<function at memory address: (.*)>
+14

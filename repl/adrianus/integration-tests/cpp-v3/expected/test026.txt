@@ -1,0 +1,3 @@
+56
+buna dimineata!!!
+{'s': <class instance at memory address: (.*)>, 'Student': <class object at memory address: (.*)>}
