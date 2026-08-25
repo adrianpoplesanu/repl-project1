@@ -264,3 +264,12 @@ examples/test289.ad
 examples/test290.ad
 examples/test291.ad
 examples/test292.ad
+examples/test293.ad
+examples/test294.ad
+examples/test295.ad
+examples/test298.ad
+examples/test299.ad
+examples/test302.ad
+examples/test303.ad
+examples/test304.ad
+examples/test305.ad
