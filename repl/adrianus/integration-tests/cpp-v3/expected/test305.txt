@@ -1,0 +1,5 @@
+\[ AD CORE \]\[ _AdDataTypeStack \] {1, 2, 3}
+3
+2
+false
+\[ AD CORE \]\[ _AdDataTypeStack \] {1, 2}

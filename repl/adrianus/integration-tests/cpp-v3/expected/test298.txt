@@ -1,0 +1,26 @@
+==== GET request ====
+GET
+/api/login
+user=a&role=admin
+{'role': 'admin', 'user': 'a'}
+{'Accept': 'text/html', 'Host': 'localhost'}
+localhost
+
+==== POST request ====
+POST
+/api/login
+{'Content-Type': 'application/json', 'Host': 'localhost'}
+application/json
+{"username":"xyz"}
+==== HTTP response ====
+200
+OK
+{'Content-Length': '5', 'Content-Type': 'text/html'}
+hello
+==== host / port ====
+example\.com
+8080
+80
+example\.com:8080
+==== CRLF message ====
+==== all assertions passed ====
