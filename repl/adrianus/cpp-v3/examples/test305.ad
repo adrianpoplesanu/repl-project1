@@ -1,0 +1,11 @@
+// data types bootstrap tests
+
+stack = _AdDataTypeStack()
+stack.push(1)
+stack.push(2)
+stack.push(3)
+println(stack.toString())
+println(stack.pop())
+println(stack.peek())
+println(stack.is_empty())
+println(stack.toString())

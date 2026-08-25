@@ -1,0 +1,24 @@
+s = "ab"
+s += "c"
+println(s)
+s += 12
+println(s)
+s -= "b"
+println(s)
+println("hello" - "ll")
+
+class Box {
+    def constructor() {
+        this.n = 5
+        this.s = "hi"
+    }
+    def bump() {
+        this.n -= 2
+        this.s += "!"
+        this.s -= "i"
+    }
+}
+b = Box()
+b.bump()
+println(b.n)
+println(b.s)

@@ -1,0 +1,21 @@
+// algos bootstrap tests
+
+insertionSort = _AdAlgos_InsertionSort()
+a = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+insertionSort.sort(a)
+println(a)
+
+bubbleSort = _AdAlgos_BubbleSort()
+b = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+bubbleSort.sort(b)
+println(b)
+
+minSort = _AdAlgos_MinSort()
+c = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+minSort.sort(c)
+println(c)
+
+maxSort = _AdAlgos_MaxSort()
+d = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+maxSort.sort(d)
+println(d)

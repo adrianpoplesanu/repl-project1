@@ -1,0 +1,6 @@
+s = "hello"
+s -= "ll"
+println(s)
+println("abc" - "b")
+s += "xy"
+println(s)

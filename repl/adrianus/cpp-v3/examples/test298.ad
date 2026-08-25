@@ -65,7 +65,7 @@ println(httpParser.getPort("example.com/path", 80))
 println(httpParser.getDomain("example.com:8080/path"))
 
 assert(httpParser.getHost("example.com:8080/path") == "example.com")
-assert(httpParser.getPort("example.com:8080/path", 80) == "8080")
+assert(httpParser.getPort("example.com:8080/path", 80) == 8080)
 assert(httpParser.getPort("example.com/path", 80) == 80)
 assert(httpParser.getDomain("example.com:8080/path") == "example.com:8080")
 
