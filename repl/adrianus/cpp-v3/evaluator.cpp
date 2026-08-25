@@ -420,6 +420,15 @@ Ad_Object* Evaluator::EvalStringInfixExpression(std::string _operator, Ad_Object
         garbageCollector->addObject(obj);
         return obj;
     }
+    if (_operator == "-") {
+        size_t pos = left_val.find(right_val);
+        if (pos != std::string::npos) {
+            left_val.erase(pos, right_val.size());
+        }
+        Ad_String_Object* obj = new Ad_String_Object(left_val);
+        garbageCollector->addObject(obj);
+        return obj;
+    }
     if (_operator == "==") {
         return NativeBoolToBooleanObject(left_val == right_val);
     }
@@ -2013,39 +2022,72 @@ Ad_Object* Evaluator::evalThisExpression(Ad_AST_Node* node, Environment *env) {
     return NULL;
 }
 
+static bool applyPlusMinusEqualsInPlace(Ad_Object* obj, Ad_Object* step_obj, const std::string& op) {
+    if (obj == NULL || step_obj == NULL) {
+        return false;
+    }
+    if (op == "+=") {
+        if (obj->type == OBJ_INT && step_obj->type == OBJ_INT) {
+            ((Ad_Integer_Object*) obj)->value += ((Ad_Integer_Object*) step_obj)->value;
+            return true;
+        }
+        if (obj->type == OBJ_STRING && step_obj->type == OBJ_STRING) {
+            ((Ad_String_Object*) obj)->value += ((Ad_String_Object*) step_obj)->value;
+            return true;
+        }
+        if (obj->type == OBJ_STRING && step_obj->type == OBJ_INT) {
+            ((Ad_String_Object*) obj)->value += std::to_string(((Ad_Integer_Object*) step_obj)->value);
+            return true;
+        }
+        return false;
+    }
+    if (op == "-=") {
+        if (obj->type == OBJ_INT && step_obj->type == OBJ_INT) {
+            ((Ad_Integer_Object*) obj)->value -= ((Ad_Integer_Object*) step_obj)->value;
+            return true;
+        }
+        if (obj->type == OBJ_STRING && step_obj->type == OBJ_STRING) {
+            std::string& s = ((Ad_String_Object*) obj)->value;
+            const std::string& rem = ((Ad_String_Object*) step_obj)->value;
+            size_t pos = s.find(rem);
+            if (pos != std::string::npos) {
+                s.erase(pos, rem.size());
+            }
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
 Ad_Object* Evaluator::evalPlusEqualsStatement(Ad_AST_Node* node, Environment *env) {
     Ad_AST_Plus_Equals_Statement* stmt = (Ad_AST_Plus_Equals_Statement*) node;
+    std::string op = node->TokenLiteral();
     if (stmt->name->type == ST_INDEX_EXPRESSION) {
         evalPlusEqualsIndexExpression(node, env);
     } else if (stmt->name->type == ST_MEMBER_ACCESS) {
-        // eval_mermber_access call
         Ad_Object* obj = EvalMemberAccess(stmt->name, *env);
-        Ad_Object* step_obj = Eval(stmt->value, *env);
-        if (obj->type == OBJ_INT && step_obj->type == OBJ_INT) {
-            ((Ad_Integer_Object*) obj)->value += ((Ad_Integer_Object*) step_obj)->value;
+        if (obj == NULL || IsError(obj)) {
+            return obj;
         }
+        Ad_Object* step_obj = Eval(stmt->value, *env);
+        if (step_obj == NULL || IsError(step_obj)) {
+            return step_obj;
+        }
+        applyPlusMinusEqualsInPlace(obj, step_obj, op);
     } else {
         Ad_AST_Identifier *ident = (Ad_AST_Identifier*) stmt->name;
         Ad_Object *obj = env->Get(ident->value);
-        if (IsError(obj)) {
+        if (obj == NULL || IsError(obj)) {
             return obj;
         }
 
         Ad_Object *step_obj = Eval(stmt->value, *env);
-        if (IsError(step_obj)) {
+        if (step_obj == NULL || IsError(step_obj)) {
             return step_obj;
         }
 
-        if (node->TokenLiteral() == "+=") {
-            if (obj->type == OBJ_INT && obj->type == OBJ_INT) {
-                ((Ad_Integer_Object *) obj)->value += ((Ad_Integer_Object*) step_obj)->value;
-            }
-        }
-        if (node->TokenLiteral() == "-=") {
-            if (obj->type == OBJ_INT && obj->type == OBJ_INT) {
-                ((Ad_Integer_Object *) obj)->value -= ((Ad_Integer_Object*) step_obj)->value;
-            }
-        }
+        applyPlusMinusEqualsInPlace(obj, step_obj, op);
     }
     return NULL;
 }
@@ -2065,25 +2107,14 @@ Ad_Object* Evaluator::evalPlusEqualsIndexExpression(Ad_AST_Node* node, Environme
         Ad_List_Object* target = (Ad_List_Object*) obj;
         Ad_Object* valObj = Eval(stmt->value, *env);
         Ad_Integer_Object* idxValue = (Ad_Integer_Object*) index;
-        if (node->TokenLiteral() == "+=" && target->elements[idxValue->value]->type == OBJ_INT && valObj->type == OBJ_INT) {
-            ((Ad_Integer_Object*)target->elements[idxValue->value])->value += ((Ad_Integer_Object*) valObj)->value;
-        }
-        if (node->TokenLiteral() == "-=" && target->elements[idxValue->value]->type == OBJ_INT && valObj->type == OBJ_INT) {
-            ((Ad_Integer_Object*)target->elements[idxValue->value])->value -= ((Ad_Integer_Object*) valObj)->value;
-        }
+        applyPlusMinusEqualsInPlace(target->elements[idxValue->value], valObj, node->TokenLiteral());
     }
     if (obj->type == OBJ_HASH) {
         std::hash<std::string> hash_string;
         Ad_Hash_Object* target = (Ad_Hash_Object*) obj;
         Ad_Object* valObj = Eval(stmt->value, *env);
-        std::string hashed = index->Hash();
         Ad_Object* oldObj = target->pairs[std::to_string(hash_string(index->Hash()))].value;
-        if (node->TokenLiteral() == "+=" && oldObj->type == OBJ_INT && valObj->type == OBJ_INT) {
-            ((Ad_Integer_Object*) oldObj)->value += ((Ad_Integer_Object*) valObj)->value;
-        }
-        if (node->TokenLiteral() == "-=" && oldObj->type == OBJ_INT && valObj->type == OBJ_INT) {
-            ((Ad_Integer_Object*) oldObj)->value -= ((Ad_Integer_Object*) valObj)->value;
-        }
+        applyPlusMinusEqualsInPlace(oldObj, valObj, node->TokenLiteral());
     }
     return NULL;
 }
