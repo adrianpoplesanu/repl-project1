@@ -13,6 +13,7 @@
 #include "../thread_utils.h"
 #include "../environment.h"
 #include "../builtins_registry_names.h"
+#include "../task_scheduler.h"
 #include <iostream>
 #include <vector>
 #include <functional>
@@ -21,8 +22,12 @@
 #include <climits>
 #include <algorithm>
 #include <cmath>
+#include <future>
+#include <thread>
 
 extern Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc);
+
+static thread_local bool g_vm_disable_async_spawn = false;
 
 static std::string vm_property_field_name(Ad_Object* field_name_obj);
 
@@ -623,6 +628,12 @@ bool VM::execute_instruction() {
         int num_args = read_uint8(*ins, ip + 1);
         frame->ip += 1;
         execute_call(num_args);
+    } else if (opcode == OP_SPAWN) {
+        int num_args = read_uint8(*ins, ip + 1);
+        frame->ip += 1;
+        execute_spawn(num_args);
+    } else if (opcode == OP_AWAIT) {
+        execute_await();
     } else if (opcode == OP_CALL_KW) {
         int num_pos = read_uint8(*ins, ip + 1);
         int num_kw = read_uint8(*ins, ip + 2);
@@ -723,6 +734,21 @@ void VM::execute_call(int num_args) {
         return;
     }
     Ad_Object_Type t = callee->Type();
+    if (!g_vm_disable_async_spawn) {
+        AdCompiledFunction* async_fn = nullptr;
+        if (t == OBJ_CLOSURE) {
+            async_fn = static_cast<AdClosureObject*>(callee)->fn;
+        } else if (t == OBJ_BOUND_METHOD) {
+            auto* bm = static_cast<AdBoundMethod*>(callee);
+            if (bm != nullptr && bm->bound_method != nullptr) {
+                async_fn = bm->bound_method->fn;
+            }
+        }
+        if (async_fn != nullptr && async_fn->is_async) {
+            execute_spawn(num_args);
+            return;
+        }
+    }
     if (t == OBJ_CLOSURE) {
         call_closure(static_cast<AdClosureObject*>(callee), num_args);
     } else if (t == OBJ_BUILTIN) {
@@ -1310,6 +1336,14 @@ void VM::execute_binary_operation(OpCodeType opcode) {
             std::cerr << "[ VM Error ] Unsupported types for binary operation" << std::endl;
             return;
         }
+    } else if (opcode == OP_SUB && left_is_string && right_is_string) {
+        std::string left_str = static_cast<Ad_String_Object*>(left)->value;
+        const std::string& right_str = static_cast<Ad_String_Object*>(right)->value;
+        size_t pos = left_str.find(right_str);
+        if (pos != std::string::npos) {
+            left_str.erase(pos, right_str.size());
+        }
+        result = new Ad_String_Object(left_str);
     } else {
         std::cerr << "[ VM Error ] Unsupported types for binary operation" << std::endl;
         return;
@@ -2202,6 +2236,85 @@ void VM::execute_import_source(const std::string& source) {
     runner.push_frame(Frame(closure, -1, 0, nullptr));
     runner.run();
     globals = runner.globals;
+}
+
+void VM::execute_spawn(int num_args) {
+    int callee_index = sp - 1 - num_args;
+    if (callee_index < 0) {
+        std::cerr << "[ VM Error ] OP_SPAWN: stack underflow\n";
+        return;
+    }
+    Ad_Object* callee = stack[callee_index];
+    std::vector<Ad_Object*> args;
+    args.reserve(static_cast<size_t>(num_args));
+    for (int i = 0; i < num_args; ++i) {
+        Ad_Object* arg = stack[callee_index + 1 + i];
+        args.push_back(arg != nullptr ? arg : &NULLOBJECT);
+    }
+    sp = callee_index;
+
+    if (callee == nullptr) {
+        auto* err = new Ad_Error_Object("spawn() requires a user function");
+        vm_track(gc, err);
+        push(err);
+        return;
+    }
+
+    VM* parent = this;
+    auto sched = ad_global_task_scheduler();
+    std::shared_ptr<AdTaskHandle> handle;
+    if (sched) {
+        handle = sched->submit([parent, callee, args]() -> Ad_Object* {
+            g_vm_disable_async_spawn = true;
+            Ad_Object* result = parent->invoke_callable(callee, args);
+            g_vm_disable_async_spawn = false;
+            return result;
+        });
+    } else {
+        handle = std::make_shared<AdTaskHandle>();
+        auto prom = std::make_shared<std::promise<Ad_Object*>>();
+        handle->future = prom->get_future();
+        std::thread([parent, callee, args, prom]() mutable {
+            try {
+                g_vm_disable_async_spawn = true;
+                Ad_Object* result = parent->invoke_callable(callee, args);
+                g_vm_disable_async_spawn = false;
+                prom->set_value(result);
+            } catch (...) {
+                try {
+                    prom->set_exception(std::current_exception());
+                } catch (...) {
+                }
+            }
+        }).detach();
+    }
+
+    Ad_Task_Object* task = new Ad_Task_Object();
+    task->handle = std::move(handle);
+    vm_track(gc, task);
+    push(task);
+}
+
+void VM::execute_await() {
+    if (sp < 1) {
+        std::cerr << "[ VM Error ] OP_AWAIT: stack underflow\n";
+        return;
+    }
+    Ad_Object* inner = pop();
+    if (inner == nullptr || inner->Type() != OBJ_TASK) {
+        auto* err = new Ad_Error_Object("await requires a task (spawn result)");
+        vm_track(gc, err);
+        push(err);
+        return;
+    }
+    try {
+        Ad_Object* result = ad_task_join_handle(static_cast<Ad_Task_Object*>(inner)->handle, gc);
+        push(result != nullptr ? result : &NULLOBJECT);
+    } catch (const std::exception& ex) {
+        auto* err = new Ad_Error_Object(std::string("await/join error: ") + ex.what());
+        vm_track(gc, err);
+        push(err);
+    }
 }
 
 Ad_Object* VM::invoke_callable(Ad_Object* callee, const std::vector<Ad_Object*>& args) {

@@ -52,3 +52,5 @@ OpPatchPropertySym opPatchPropertySym;
 OpGetThis opGetThis;
 OpGetSuperMethod opGetSuperMethod;
 OpFileStmtOutput opFileStmtOutput;
+OpSpawn opSpawn;
+OpAwait opAwait;

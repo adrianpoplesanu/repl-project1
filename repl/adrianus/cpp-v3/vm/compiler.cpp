@@ -376,6 +376,29 @@ void Compiler::compile(Ad_AST_Node* node) {
             return;
         }
 
+        // Short-circuit `and`/`or` so the RHS is not evaluated when the LHS
+        // already decides the result (needed for `j >= 0 and key < arr[j]`).
+        if (infix_expr->_operator == "and" || infix_expr->_operator == "&&") {
+            compile(infix_expr->left);
+            int jump_false = emit(opJumpNotTruthy, 1, {9999});
+            compile(infix_expr->right);
+            int jump_end = emit(opJump, 1, {9999});
+            changeOperand(jump_false, code.instructions.size);
+            emit(opFalse, 0, {});
+            changeOperand(jump_end, code.instructions.size);
+            return;
+        }
+        if (infix_expr->_operator == "or" || infix_expr->_operator == "||") {
+            compile(infix_expr->left);
+            int jump_if_false = emit(opJumpNotTruthy, 1, {9999});
+            emit(opTrue, 0, {});
+            int jump_end = emit(opJump, 1, {9999});
+            changeOperand(jump_if_false, code.instructions.size);
+            compile(infix_expr->right);
+            changeOperand(jump_end, code.instructions.size);
+            return;
+        }
+
         compile(infix_expr->left);
         compile(infix_expr->right);
         if (infix_expr->_operator == "+") {
@@ -392,10 +415,6 @@ void Compiler::compile(Ad_AST_Node* node) {
             emit(opEqual, 0, {});
         } else if (infix_expr->_operator == "!=") {
             emit(opNotEqual, 0, {});
-        } else if (infix_expr->_operator == "and" || infix_expr->_operator == "&&") {
-            emit(OpCode(OP_AND), 0, {});
-        } else if (infix_expr->_operator == "or" || infix_expr->_operator == "||") {
-            emit(OpCode(OP_OR), 0, {});
         } else if (infix_expr->_operator == ">") {
             emit(opGreaterThan, 0, {});
         } else if (infix_expr->_operator == ">=") {
@@ -677,6 +696,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->num_locals = num_locals;
         compiled_func->local_names = local_names;
         compiled_func->num_parameters = static_cast<int>(fn_lit->parameters.size());
+        compiled_func->is_async = fn_lit->is_async;
         assign_parameter_names(compiled_func, fn_lit->parameters);
         fill_default_arg_values(compiled_func, fn_lit->default_params);
 
@@ -759,6 +779,7 @@ void Compiler::compile(Ad_AST_Node* node) {
         compiled_func->num_locals = num_locals;
         compiled_func->local_names = local_names;
         compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
+        compiled_func->is_async = def_stmt->is_async;
         assign_parameter_names(compiled_func, def_stmt->parameters);
         fill_default_arg_values(compiled_func, def_stmt->default_params);
 
@@ -942,6 +963,17 @@ void Compiler::compile(Ad_AST_Node* node) {
         Ad_String_Object* field = new Ad_String_Object(member_name);
         emit(opConstant, 1, {addConstant(field)});
         emit(opGetProperty, 0, {});
+    } else if (node->type == ST_SPAWN_EXPRESSION) {
+        Ad_AST_SpawnExpression* sp = static_cast<Ad_AST_SpawnExpression*>(node);
+        compile(sp->function);
+        for (Ad_AST_Node* argument : sp->arguments) {
+            compile(argument);
+        }
+        emit(opSpawn, 1, {static_cast<int>(sp->arguments.size())});
+    } else if (node->type == ST_AWAIT_EXPRESSION) {
+        Ad_AST_AwaitExpression* aw = static_cast<Ad_AST_AwaitExpression*>(node);
+        compile(aw->operand);
+        emit(opAwait, 0, {});
     }
     // TODO: add support for other statement types
 }
@@ -1518,6 +1550,7 @@ AdClosureObject* Compiler::compile_class_method(Ad_AST_Def_Statement* def_stmt) 
     compiled_func->local_names = local_names;
     compiled_func->num_parameters = static_cast<int>(def_stmt->parameters.size());
     compiled_func->is_class_method = true;
+    compiled_func->is_async = def_stmt->is_async;
     assign_parameter_names(compiled_func, def_stmt->parameters);
     fill_default_arg_values(compiled_func, def_stmt->default_params);
 

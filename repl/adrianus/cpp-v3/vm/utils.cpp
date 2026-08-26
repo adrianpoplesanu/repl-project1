@@ -167,6 +167,8 @@ static Definition kOpPatchPropertySym("OpPatchPropertySym", 1, ow_u16, false);
 static Definition kOpGetThis("OpGetThis", 0, nullptr, false);
 static Definition kOpGetSuperMethod("OpGetSuperMethod", 0, nullptr, false);
 static Definition kOpFileStmtOutput("OpFileStmtOutput", 0, nullptr, false);
+static Definition kOpSpawn("OpSpawn", 1, ow_u8, false);
+static Definition kOpAwait("OpAwait", 0, nullptr, false);
 
 struct DefEntry {
     unsigned char opcode;
@@ -225,6 +227,8 @@ static const DefEntry kDefEntries[] = {
     {OP_GET_THIS, &kOpGetThis},
     {OP_GET_SUPER_METHOD, &kOpGetSuperMethod},
     {OP_FILE_STMT_OUTPUT, &kOpFileStmtOutput},
+    {OP_SPAWN, &kOpSpawn},
+    {OP_AWAIT, &kOpAwait},
 };
 } // namespace
 

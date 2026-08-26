@@ -94,6 +94,11 @@ public:
     /// Invoke a closure synchronously (used by VM thread workers).
     Ad_Object* invoke_closure(AdClosureObject* closure, const std::vector<Ad_Object*>& args);
 
+    /// Spawn callee(args...) as a scheduler/pthread task; push Ad_Task_Object.
+    void execute_spawn(int num_args);
+    /// Join a task on the stack and push its result.
+    void execute_await();
+
     /// Compile and run an imported source unit, merging globals into the live VM.
     void execute_import_source(const std::string& source);
 };

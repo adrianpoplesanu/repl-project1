@@ -66,7 +66,12 @@ enum OpCodeType {
 
     /// Pop the top-of-stack value and print it like `Evaluator::EvalProgram` does for each
     /// top-level statement (skip only OBJ_SIGNAL). Used for VM file/REPL parity with the evaluator.
-    OP_FILE_STMT_OUTPUT
+    OP_FILE_STMT_OUTPUT,
+
+    /// Stack: ... callee, arg0..argN-1 (same as OP_CALL). Submit callable as a task; push OBJ_TASK.
+    OP_SPAWN,
+    /// Stack: ... task. Join task handle and push its result.
+    OP_AWAIT
 };
 
 class OpCode {
@@ -387,6 +392,18 @@ public:
     }
 };
 
+class OpSpawn : public OpCode {
+public:
+    OpSpawn() : OpCode(OP_SPAWN) {
+    }
+};
+
+class OpAwait : public OpCode {
+public:
+    OpAwait() : OpCode(OP_AWAIT) {
+    }
+};
+
 extern OpConstant opConstant;
 extern OpAdd opAdd;
 extern OpSub opSub;
@@ -439,5 +456,7 @@ extern OpPatchPropertySym opPatchPropertySym;
 extern OpGetThis opGetThis;
 extern OpGetSuperMethod opGetSuperMethod;
 extern OpFileStmtOutput opFileStmtOutput;
+extern OpSpawn opSpawn;
+extern OpAwait opAwait;
 
 #endif

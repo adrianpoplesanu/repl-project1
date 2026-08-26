@@ -120,6 +120,8 @@ Code::Code() {
     definitionsMap.insert(std::make_pair(OP_GET_THIS, new Definition("OpGetThis", 0, nullptr)));
     definitionsMap.insert(std::make_pair(OP_GET_SUPER_METHOD, new Definition("OpGetSuperMethod", 0, nullptr)));
     definitionsMap.insert(std::make_pair(OP_FILE_STMT_OUTPUT, new Definition("OpFileStmtOutput", 0, nullptr)));
+    definitionsMap.insert(std::make_pair(OP_SPAWN, new Definition("OpSpawn", 1, new int[1] {1})));
+    definitionsMap.insert(std::make_pair(OP_AWAIT, new Definition("OpAwait", 0, nullptr)));
 }
 
 Code::~Code() {

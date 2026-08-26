@@ -23,6 +23,8 @@ public:
     std::vector<std::string> parameter_names;
     /// True when compiled from a class `def` body.
     bool is_class_method = false;
+    /// True when compiled from `async def` / `async fun` (call sites spawn a task).
+    bool is_async = false;
 
     AdCompiledFunction();
     std::string Inspect() override;
