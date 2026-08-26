@@ -1,0 +1,94 @@
+class _AdDataTypeStack {
+
+    def constructor() {
+        this.stack = []
+        this.size = 0
+    }
+
+    def push(item) {
+        __append(this.stack, item)
+        this.size += 1
+    }
+
+    def pop() {
+        this.size -= 1
+        return __pop(this.stack)
+    }
+
+    def peek() {
+        return this.stack[this.size - 1]
+    }
+
+    def is_empty() {
+        return this.size == 0
+    }
+
+    def toString() {
+        out = "{"
+        for (i = 0; i < this.size; i++) {
+            out = out + this.stack[i]
+            if (i < this.size - 1) {
+                out = out + ", "
+            }
+        }
+        out = out + "}"
+        return "[ AD CORE ][ _AdDataTypeStack ] " + out
+    }
+}
+
+class _AdDataTypeQueue {
+    def constructor() {
+        this.queue = []
+        this.size = 0
+    }
+    
+    def enqueue(item) {
+        __append(this.queue, item)
+        this.size += 1
+    }
+
+    def dequeue() {
+        this.size -= 1
+        return __pop(this.queue, 0)
+    }
+
+    def peek() {
+        return this.queue[0]
+    }
+
+    def is_empty() {
+        return this.size == 0
+    }
+
+    def toString() {
+        out = "{"
+        for (i = 0; i < this.size; i++) {
+            out = out + this.queue[i]
+            if (i < this.size - 1) {
+                out = out + ", "
+            }
+        }
+        out = out + "}"
+        return "[ AD CORE ][ _AdDataTypeQueue ] " + out
+    }
+}
+
+/*stack = _AdDataTypeStack()
+stack.push(1)
+stack.push(2)
+stack.push(3)
+println(stack.toString())
+println(stack.pop())
+println(stack.peek())
+println(stack.is_empty())
+println(stack.toString())
+
+queue = _AdDataTypeQueue()
+queue.enqueue(1)
+queue.enqueue(2)
+queue.enqueue(3)
+println(queue.toString())
+println(queue.dequeue())
+println(queue.peek())
+println(queue.is_empty())
+println(queue.toString())*/

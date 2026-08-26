@@ -16,7 +16,9 @@ std::vector<std::string> bootstrap_files {
     "bootstrap/test2.ad",
     "bootstrap/sock.ad",
     "bootstrap/net_utils.ad",
-    "bootstrap/requests.ad"
+    "bootstrap/requests.ad",
+    "bootstrap/algos.ad",
+    "bootstrap/data_types.ad"
 };
 
 namespace {
