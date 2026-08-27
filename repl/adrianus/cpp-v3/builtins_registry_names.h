@@ -44,6 +44,7 @@ static const char* const AD_VM_BUILTIN_NAMES[] = {
     "str",
     "repr",
     "assert",
+    "__remove_key",
     nullptr,
 };
 

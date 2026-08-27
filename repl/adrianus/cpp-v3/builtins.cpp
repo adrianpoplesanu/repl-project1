@@ -194,6 +194,24 @@ Ad_Object* keys_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageC
     return result;
 }
 
+Ad_Object* remove_key_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
+    (void)env;
+    (void)gc;
+    if (args.size() < 2 || args[0] == nullptr || args[0]->Type() != OBJ_HASH || args[1] == nullptr) {
+        return &NULLOBJECT;
+    }
+    Ad_Hash_Object* target = (Ad_Hash_Object*)args[0];
+    std::hash<std::string> hash_string;
+    std::string hash_key = std::to_string(hash_string(args[1]->Hash()));
+    auto it = target->pairs.find(hash_key);
+    if (it == target->pairs.end()) {
+        return &NULLOBJECT;
+    }
+    Ad_Object* result = it->second.GetValue();
+    target->pairs.erase(it);
+    return result;
+}
+
 Ad_Object* append_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
     Ad_List_Object* target = (Ad_List_Object*)args[0];
     Ad_Object* obj = args[1];
@@ -203,7 +221,33 @@ Ad_Object* append_builtin(std::vector<Ad_Object*> args, Environment* env, Garbag
 }
 
 Ad_Object* pop_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
-    return NULL;
+    (void)env;
+    (void)gc;
+    if (args.empty() || args[0] == nullptr || args[0]->Type() != OBJ_LIST) {
+        return &NULLOBJECT;
+    }
+    Ad_List_Object* target = (Ad_List_Object*)args[0];
+    if (target->elements.empty()) {
+        return &NULLOBJECT;
+    }
+    if (args.size() == 1) {
+        Ad_Object* result = target->elements.back();
+        target->elements.pop_back();
+        return result;
+    }
+    if (args.size() == 2) {
+        if (args[1] == nullptr || args[1]->Type() != OBJ_INT) {
+            return &NULLOBJECT;
+        }
+        int idx = ((Ad_Integer_Object*)args[1])->value;
+        if (idx < 0 || idx >= (int)target->elements.size()) {
+            return &NULLOBJECT;
+        }
+        Ad_Object* result = target->elements[static_cast<size_t>(idx)];
+        target->elements.erase(target->elements.begin() + idx);
+        return result;
+    }
+    return &NULLOBJECT;
 }
 
 Ad_Object* remove_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector *gc) {
@@ -648,6 +692,7 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"ref_count", new Ad_Builtin_Object(&ref_count)},
     {"type", new Ad_Builtin_Object(&type_builtin)},
     {"__keys", new Ad_Builtin_Object(&keys_builtin)},
+    {"__remove_key", new Ad_Builtin_Object(&remove_key_builtin)},
     {"__append", new Ad_Builtin_Object(&append_builtin)},
     {"__pop", new Ad_Builtin_Object(&pop_builtin)},
     {"__remove", new Ad_Builtin_Object(&remove_builtin)},
