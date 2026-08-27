@@ -1,0 +1,6 @@
+h = {"aaa": 1, "bbb": 2, "ccc": 3}
+removed = __remove_key(h, "bbb")
+println(removed)
+println(h)
+println(type(__remove_key(h, "missing")))
+println(h)
