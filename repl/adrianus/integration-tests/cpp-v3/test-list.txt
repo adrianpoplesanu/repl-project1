@@ -273,3 +273,4 @@ examples/test302.ad
 examples/test303.ad
 examples/test304.ad
 examples/test305.ad
+examples/test306.ad

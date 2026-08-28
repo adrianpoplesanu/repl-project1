@@ -3,3 +3,8 @@
 2
 false
 \[ AD CORE \]\[ _AdDataTypeStack \] {1, 2}
+\[ AD CORE \]\[ _AdDataTypeQueue \] {1, 2, 3}
+1
+2
+false
+\[ AD CORE \]\[ _AdDataTypeQueue \] {2, 3}
