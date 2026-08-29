@@ -34,6 +34,8 @@ public:
     void printLogs();
     /// Run until completion. If `max_instructions` is 0, no instruction limit is enforced.
     void run(uint64_t max_instructions = 0);
+    /// Mark/sweep VM heap roots every `gc->maxCycleVM` executed instructions.
+    void maybe_garbage_collect();
     /// Run instructions until `frames_index` is at most `target_frames_index`.
     void run_until_frames_index(int target_frames_index, uint64_t max_instructions = 0);
     bool execute_instruction();

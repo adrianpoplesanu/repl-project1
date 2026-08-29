@@ -381,6 +381,19 @@ void VM::printLogs() {
     write_bytecode_log(last_loaded_bytecode);
 }
 
+void VM::maybe_garbage_collect() {
+    if (gc == nullptr || !gc->vmMidRunCollection) {
+        return;
+    }
+    gc->cycleVM++;
+    if (gc->cycleVM < gc->maxCycleVM) {
+        return;
+    }
+    gc->cycleVM = 0;
+    gc->markObjectsVM(this);
+    gc->sweepObjectsVM();
+}
+
 bool VM::execute_instruction() {
     Frame* frame = current_frame();
     if (frame == nullptr) {
@@ -389,6 +402,8 @@ bool VM::execute_instruction() {
     if (frame->ip >= static_cast<int>(frame->instructions()->bytes.size()) - 1) {
         return false;
     }
+
+    maybe_garbage_collect();
 
     frame->ip += 1;
     int ip = frame->ip;
