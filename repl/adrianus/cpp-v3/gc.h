@@ -6,6 +6,7 @@
 class Environment;
 class Ad_Object;
 class Ad_AST_Node;
+class VM;
 
 class GarbageCollector {
 public:
@@ -21,9 +22,14 @@ public:
     int cycle1;
     int cycle2;
     int cycle3;
+    int cycleVM;
     int maxCycle1 = 100;
     int maxCycle2 = 100;
     int maxCycle3 = 100;
+    /// VM instructions between mid-run mark/sweep collections.
+    int maxCycleVM = 10000;
+    /// When false, VM skips periodic mark/sweep (end-of-run forceFree still runs).
+    bool vmMidRunCollection = true;
     //int maxCycle1 = 0;
     //int maxCycle2 = 0;
     //int maxCycle3 = 0;
@@ -40,8 +46,10 @@ public:
     void markObjects();
     void markObject(Ad_Object*);
     void markObjects(Ad_Object *stack[2048], int sp);
+    void markObjectsVM(VM*);
     void unmarkAllObjects();
     void sweepObjects();
+    void sweepObjectsVM();
     void sweepAstNodes();
     void forceFreeEnvironments();
     void forceFreeObjects();

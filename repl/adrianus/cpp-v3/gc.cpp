@@ -2,6 +2,8 @@
 #include "environment.h"
 #include "objects.h"
 #include "vm/objects.h"
+#include "vm/vm.h"
+#include "vm/vm_context.h"
 #include <cstdint>
 
 extern Ad_Null_Object NULLOBJECT;
@@ -36,6 +38,7 @@ GarbageCollector::GarbageCollector() {
     cycle1 = 0;
     cycle2 = 0;
     cycle3 = 0;
+    cycleVM = 0;
 }
 
 GarbageCollector::~GarbageCollector() {
@@ -409,4 +412,57 @@ void GarbageCollector::markObjects(Ad_Object** stack, int sp) {
     for (int i = 0; i < sp; ++i) {
         markObject(stack[i]);
     }
+}
+
+void GarbageCollector::markObjectsVM(VM* vm) {
+    unmarkAllObjects();
+
+    auto mark_vm_roots = [this](VM* v) {
+        if (v == nullptr) {
+            return;
+        }
+        for (int i = 0; i < v->sp && i < v->stackSize; ++i) {
+            markObject(v->stack[i]);
+        }
+        for (int i = 0; i < v->frames_index && i < static_cast<int>(v->frames.size()); ++i) {
+            markObject(v->frames[static_cast<size_t>(i)].cl);
+            markObject(v->frames[static_cast<size_t>(i)].bound_instance);
+        }
+        for (Ad_Object* global : v->globals) {
+            markObject(global);
+        }
+        for (Ad_Object* constant : v->constants) {
+            markObject(constant);
+        }
+        for (Ad_Object* constant : v->last_loaded_bytecode.constants) {
+            markObject(constant);
+        }
+    };
+
+    mark_vm_roots(vm);
+    VM* current = ad_current_vm();
+    if (current != nullptr && current != vm) {
+        mark_vm_roots(current);
+    }
+
+    if (mainEnv != NULL) {
+        for (const std::pair<const std::string, Ad_Object*>& it : mainEnv->store) {
+            markObject(it.second);
+        }
+    }
+    for (Environment* env : gc_environments) {
+        for (const std::pair<const std::string, Ad_Object*>& it : env->store) {
+            markObject(it.second);
+        }
+        for (std::unordered_map<std::string, Environment*>::const_iterator it = env->siblings.begin();
+             it != env->siblings.end(); ++it) {
+            for (const std::pair<const std::string, Ad_Object*>& j : it->second->store) {
+                markObject(j.second);
+            }
+        }
+    }
+}
+
+void GarbageCollector::sweepObjectsVM() {
+    sweepObjects();
 }
