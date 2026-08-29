@@ -26,12 +26,17 @@ class TimedRun:
     seconds: List[float]
 
 
-def run_mode_once(binary: str, mode: str, fixture: pathlib.Path) -> Tuple[int, float]:
+def run_mode_once(
+    binary: str, mode: str, fixture: pathlib.Path, no_mid_gc: bool = False
+) -> Tuple[int, float]:
     fixture_path = str(pathlib.Path(fixture).resolve())
     if mode == "evaluator":
         cmd = [binary, fixture_path]
     elif mode == "vm":
-        cmd = [binary, "-vm", fixture_path]
+        cmd = [binary, "-vm"]
+        if no_mid_gc:
+            cmd.append("-no-mid-gc")
+        cmd.append(fixture_path)
     else:
         raise ValueError(f"unsupported mode: {mode}")
     t0 = time.perf_counter()
@@ -51,14 +56,15 @@ def bench_mode(
     fixture: pathlib.Path,
     warmup: int,
     iterations: int,
+    no_mid_gc: bool = False,
 ) -> TimedRun:
     for _ in range(max(0, warmup)):
-        run_mode_once(binary, mode, fixture)
+        run_mode_once(binary, mode, fixture, no_mid_gc)
 
     codes: List[int] = []
     times_s: List[float] = []
     for _ in range(max(1, iterations)):
-        code, elapsed = run_mode_once(binary, mode, fixture)
+        code, elapsed = run_mode_once(binary, mode, fixture, no_mid_gc)
         codes.append(code)
         times_s.append(elapsed)
     return TimedRun(mode=mode, returncodes=codes, seconds=times_s)
@@ -109,6 +115,11 @@ def main() -> int:
         default=10,
         help="timed runs per mode per fixture (default: 10)",
     )
+    parser.add_argument(
+        "--no-mid-gc",
+        action="store_true",
+        help="disable VM mid-run mark/sweep for A/B comparison (end-of-run free still runs)",
+    )
     args = parser.parse_args()
 
     binary = pathlib.Path(args.binary).expanduser()
@@ -133,7 +144,8 @@ def main() -> int:
 
     print(
         f"[info] performance: {len(fixtures)} fixture(s), "
-        f"warmup={args.warmup}, iterations={args.iterations}"
+        f"warmup={args.warmup}, iterations={args.iterations}, "
+        f"vm_mid_run_gc={not args.no_mid_gc}"
     )
     print(f"[info] binary: {binary_exe}")
 
@@ -142,8 +154,12 @@ def main() -> int:
         rel = fixture.as_posix()
         print(f"\n[fixture] {rel}")
 
-        ev = bench_mode(str(binary_exe), "evaluator", fixture, args.warmup, args.iterations)
-        vm = bench_mode(str(binary_exe), "vm", fixture, args.warmup, args.iterations)
+        ev = bench_mode(
+            str(binary_exe), "evaluator", fixture, args.warmup, args.iterations, args.no_mid_gc
+        )
+        vm = bench_mode(
+            str(binary_exe), "vm", fixture, args.warmup, args.iterations, args.no_mid_gc
+        )
 
         ev_ok = all(c == 0 for c in ev.returncodes)
         vm_ok = all(c == 0 for c in vm.returncodes)
