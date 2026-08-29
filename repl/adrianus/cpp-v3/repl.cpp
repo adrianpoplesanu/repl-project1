@@ -31,6 +31,26 @@ Repl::Repl() {
     evaluator.setGarbageCollector(garbageCollector);
     compiler.gc = garbageCollector;
     vm.gc = garbageCollector;
+    if (const char* mid_run_gc = std::getenv("AD_VM_MID_RUN_GC")) {
+        std::string value(mid_run_gc);
+        if (value == "0" || value == "false" || value == "off" || value == "no") {
+            garbageCollector->vmMidRunCollection = false;
+        } else if (value == "1" || value == "true" || value == "on" || value == "yes") {
+            garbageCollector->vmMidRunCollection = true;
+        } else {
+            std::cerr << "warning: invalid AD_VM_MID_RUN_GC, using default (on)\n";
+        }
+    }
+    if (const char* gc_interval = std::getenv("AD_VM_GC_INTERVAL")) {
+        try {
+            int interval = std::stoi(gc_interval);
+            if (interval > 0) {
+                garbageCollector->maxCycleVM = interval;
+            }
+        } catch (...) {
+            std::cerr << "warning: invalid AD_VM_GC_INTERVAL, using default\n";
+        }
+    }
     task_scheduler_ = std::make_shared<TaskScheduler>(0);
     if (const char* q = std::getenv("ADLANG_QUANTUM_BUDGET")) {
         try {
@@ -228,7 +248,9 @@ bool Repl::ExecuteLineVM(std::string line) {
 
     vm.load(bytecode);
     vm.printLogs();
+    ad_set_current_vm(&vm);
     run_vm_with_optional_instruction_limit(vm);
+    ad_set_current_vm(nullptr);
 
     garbageCollector->forceFreeObjects();
 
