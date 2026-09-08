@@ -1,0 +1,2 @@
+// Baseline: process + bootstrap, no sort. Used only if present; runner ignores names starting with _.
+i = 0
