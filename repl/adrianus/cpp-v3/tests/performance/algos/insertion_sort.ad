@@ -7,3 +7,4 @@ while (r < repeats) {
   sorter.sort(a)
   r = r + 1
 }
+println(a)

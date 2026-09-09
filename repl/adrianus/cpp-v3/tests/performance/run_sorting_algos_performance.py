@@ -5,7 +5,8 @@ Performance harness: wall-clock time for bootstrap sorting methods.
 Same binary / subprocess contract as tests/performance/run_performance.py.
 Each fixture in tests/performance/algos sorts the same 30-element array with
 one _AdAlgos_* class from bootstrap/algos.ad. After per-fixture evaluator-vs-VM
-timings, prints a ranking of sorting methods by median time.
+timings, prints a ranking of sorting methods by median time. Each sort fixture
+prints the last sorted array; the harness checks that output.
 """
 
 from __future__ import annotations
@@ -18,7 +19,13 @@ import statistics
 import subprocess
 import sys
 import time
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
+
+
+EXPECTED_SORTED = (
+    "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, "
+    "21, 22, 23, 24, 25, 26, 27, 28, 29, 30]"
+)
 
 
 @dataclasses.dataclass
@@ -26,11 +33,12 @@ class TimedRun:
     mode: str
     returncodes: List[int]
     seconds: List[float]
+    stdouts: List[str]
 
 
 def run_mode_once(
     binary: str, mode: str, fixture: pathlib.Path, no_mid_gc: bool = False
-) -> Tuple[int, float]:
+) -> Tuple[int, float, str]:
     fixture_path = str(pathlib.Path(fixture).resolve())
     if mode == "evaluator":
         cmd = [binary, fixture_path]
@@ -49,7 +57,7 @@ def run_mode_once(
         check=False,
     )
     elapsed = time.perf_counter() - t0
-    return completed.returncode, elapsed
+    return completed.returncode, elapsed, completed.stdout
 
 
 def bench_mode(
@@ -65,11 +73,28 @@ def bench_mode(
 
     codes: List[int] = []
     times_s: List[float] = []
+    stdouts: List[str] = []
     for _ in range(max(1, iterations)):
-        code, elapsed = run_mode_once(binary, mode, fixture, no_mid_gc)
+        code, elapsed, stdout = run_mode_once(binary, mode, fixture, no_mid_gc)
         codes.append(code)
         times_s.append(elapsed)
-    return TimedRun(mode=mode, returncodes=codes, seconds=times_s)
+        stdouts.append(stdout)
+    return TimedRun(mode=mode, returncodes=codes, seconds=times_s, stdouts=stdouts)
+
+
+def last_printed_line(stdout: str) -> str:
+    lines = [line.rstrip("\r") for line in stdout.splitlines() if line.strip()]
+    return lines[-1] if lines else ""
+
+
+def check_sorted_output(run: TimedRun) -> Optional[str]:
+    for i, stdout in enumerate(run.stdouts):
+        got = last_printed_line(stdout)
+        if got != EXPECTED_SORTED:
+            return (
+                f"{run.mode} run {i}: expected {EXPECTED_SORTED!r}, got {got!r}"
+            )
+    return None
 
 
 def collect_fixtures(fixtures_dir: pathlib.Path) -> List[pathlib.Path]:
@@ -177,6 +202,7 @@ def main() -> int:
     )
     print(f"[info] binary: {binary_exe}")
     print("[info] input: 30-element reverse-sorted array [30..1], 400 repeats per run")
+    print("[info] each sort fixture prints the last array; harness checks it is [1..30]")
 
     any_failure = False
     ev_medians: Dict[str, float] = {}
@@ -230,6 +256,17 @@ def main() -> int:
             any_failure = True
             print(f"  [error] vm: non-zero return code(s): {vm.returncodes}")
 
+        ev_sort_err = check_sorted_output(ev)
+        vm_sort_err = check_sorted_output(vm)
+        if ev_sort_err:
+            any_failure = True
+            print(f"  [error] evaluator result: {ev_sort_err}")
+        if vm_sort_err:
+            any_failure = True
+            print(f"  [error] vm result: {vm_sort_err}")
+        if ev_sort_err is None and vm_sort_err is None:
+            print("  result     sorted [1..30] ok (evaluator and vm)")
+
         ev_med, ev_lo, ev_hi = summarize_seconds(ev.seconds)
         vm_med, vm_lo, vm_hi = summarize_seconds(vm.seconds)
         ev_medians[name] = ev_med
@@ -255,7 +292,7 @@ def main() -> int:
     if any_failure:
         print("\n[summary] completed with errors (see above)")
         return 1
-    print("\n[summary] all timed runs exited with code 0")
+    print("\n[summary] all timed runs exited with code 0 and sorted [1..30]")
     return 0
 
 
