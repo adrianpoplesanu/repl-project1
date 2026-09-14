@@ -1831,6 +1831,56 @@ Ad_Object* Evaluator::evalThreadObjectMethod(Ad_AST_Node* node, std::vector<Ad_A
 
 Ad_Object* Evaluator::EvalPrefixIncrement(Ad_AST_Node* node, Environment& env) {
     Ad_AST_PrefixIncrement* prefix_increment = (Ad_AST_PrefixIncrement*) node;
+    if (prefix_increment->name != NULL && prefix_increment->name->type == ST_INDEX_EXPRESSION) {
+        Ad_AST_IndexExpression *indexExpression = (Ad_AST_IndexExpression*) (prefix_increment->name);
+        Ad_Object *old_obj = evalIndexExpression(indexExpression, &env);
+        int value = ((Ad_Integer_Object*) old_obj)->value;
+        if ("++" == prefix_increment->_operator  || "--" == prefix_increment->_operator) {
+            Ad_Integer_Object *new_obj;
+            int result_value;
+            if ("++" == prefix_increment->_operator) {
+                new_obj = new Ad_Integer_Object(value + 1);
+                result_value = value + 1;
+            } else {
+                new_obj = new Ad_Integer_Object(value - 1);
+                result_value = value - 1;
+            }
+            garbageCollector->addObject(new_obj);
+            Ad_AST_Node *left = indexExpression->left;
+            Ad_AST_Node *index = indexExpression->index;
+            Ad_Object *left_obj = Eval(left, env);
+            Ad_Object *index_obj = Eval(index, env);
+            if (left_obj->type == OBJ_LIST) {
+                int i = ((Ad_Integer_Object*) index_obj)->value;
+                Ad_List_Object *target = (Ad_List_Object*) left_obj;
+                target->elements[i] = new_obj;
+                Ad_Integer_Object *returned_obj = new Ad_Integer_Object(result_value);
+                garbageCollector->addObject(returned_obj);
+                return returned_obj;
+            }
+            if (left_obj->type == OBJ_HASH) {
+                std::hash<std::string> hash_string;
+                Ad_Hash_Object *target = (Ad_Hash_Object*) left_obj;
+
+                HashPair hash_pair(index_obj, new_obj);
+                std::string hash = std::to_string(hash_string(index_obj->Hash()));
+
+                std::unordered_map<std::string, HashPair>::iterator it = target->pairs.find(hash);
+
+                if (it == target->pairs.end()) {
+                    target->pairs.insert(std::make_pair(hash, hash_pair));
+                } else {
+                    HashPair old_hash_pair = it->second;
+                    it->second = hash_pair;
+                }
+
+                Ad_Integer_Object *returned_obj = new Ad_Integer_Object(result_value);
+                garbageCollector->addObject(returned_obj);
+                return returned_obj;
+            }
+        }
+        return &NULLOBJECT;
+    }
     Ad_AST_Identifier* ident = (Ad_AST_Identifier*) prefix_increment->name;
     Ad_Object* old_obj = env.Get(ident->value);
     if (old_obj->Type() == OBJ_INT) {
@@ -1863,8 +1913,13 @@ Ad_Object* Evaluator::EvalPostfixIncrement(Ad_AST_Node* node, Environment& env) 
         Ad_AST_IndexExpression *indexExpression = (Ad_AST_IndexExpression*) (expr->name);
         Ad_Object *old_obj = evalIndexExpression(indexExpression, &env);
         int value = ((Ad_Integer_Object*) old_obj)->value;
-        if ("++" == expr->_operator) {
-            Ad_Integer_Object *new_obj = new Ad_Integer_Object(value + 1);
+        if ("++" == expr->_operator  || "--" == expr->_operator) {
+            Ad_Integer_Object *new_obj;
+            if ("++" == expr->_operator) {
+                new_obj = new Ad_Integer_Object(value + 1);
+            } else {
+                new_obj = new Ad_Integer_Object(value - 1);
+            }
             garbageCollector->addObject(new_obj);
             Ad_AST_Node *left = indexExpression->left;
             Ad_AST_Node *index = indexExpression->index;

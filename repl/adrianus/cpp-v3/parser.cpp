@@ -899,8 +899,7 @@ Ad_AST_Node* Parser::ParsePrefixPlusPlus() {
     Ad_AST_PrefixIncrement* expr = new Ad_AST_PrefixIncrement(current_token);
     expr->_operator = current_token.literal;
     NextToken();
-    Ad_AST_Identifier* name = new Ad_AST_Identifier(current_token, current_token.GetLiteral());
-    expr->name = name;
+    expr->name = ParseExpression(PT_PREFIX);
     return expr;
 }
 

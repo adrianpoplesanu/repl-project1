@@ -238,8 +238,35 @@ void Compiler::compile(Ad_AST_Node* node) {
         }
     } else if (node->type == ST_PREFIX_INCREMENT) {
         auto* pre = static_cast<Ad_AST_PrefixIncrement*>(node);
-        if (pre->name == nullptr || pre->name->type != ST_IDENTIFIER) {
-            std::cerr << "[ Compiler Error ] prefix ++/-- only supported for simple identifiers in the VM\n";
+        if (pre->name == nullptr) {
+            std::cerr << "[ Compiler Error ] prefix ++/-- requires a target\n";
+            return;
+        }
+        if (pre->name->type == ST_INDEX_EXPRESSION) {
+            auto* index_expr = static_cast<Ad_AST_IndexExpression*>(pre->name);
+            compile(index_expr->left);
+            compile(index_expr->index);
+            emit(opIndex, 0, {});
+            int one_idx = addConstant(new Ad_Integer_Object(1));
+            emit(opConstant, 1, {one_idx});
+            if (pre->_operator == "++") {
+                emit(opAdd, 0, {});
+            } else if (pre->_operator == "--") {
+                emit(opSub, 0, {});
+            } else {
+                std::cerr << "[ Compiler Error ] unsupported prefix increment operator\n";
+                return;
+            }
+            compile(index_expr->left);
+            compile(index_expr->index);
+            emit(opPatchIndex, 0, {});
+            compile(index_expr->left);
+            compile(index_expr->index);
+            emit(opIndex, 0, {});
+            return;
+        }
+        if (pre->name->type != ST_IDENTIFIER) {
+            std::cerr << "[ Compiler Error ] prefix ++/-- only supported for simple identifiers and index expressions in the VM\n";
             return;
         }
         auto* ident = static_cast<Ad_AST_Identifier*>(pre->name);
