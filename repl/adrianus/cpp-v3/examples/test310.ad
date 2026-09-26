@@ -1,0 +1,7 @@
+a = 5
+println(++a + 1)
+
+b = [1, 2, 3, 4, 5]
+println(++b[2] + 1)
+
+println("done")
