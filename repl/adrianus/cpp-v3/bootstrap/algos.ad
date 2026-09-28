@@ -138,6 +138,38 @@ class _AdAlgos_QuickSort {
     }
 }
 
+class _AdAlgos_CountingSort {
+
+    def max(a) {
+        answer = a[0]
+        for (i = 1; i < len(a); i++) {
+            if (a[i] > answer) {
+                answer = a[i]
+            }
+        }
+        return answer
+    }
+
+    def sort(a) {
+        max_value = max(a)
+        count = list(max_value + 1, 0)
+        for (i = 0; i < len(a); i++) {
+            count[a[i]]++
+        }
+        for (i = 1; i <= max_value; i++) {
+            count[i] += count[i - 1]
+        }
+        output = list(len(a), 0)
+        for (i = len(a) - 1; i >= 0; i--) {
+            output[count[a[i]] - 1] = a[i]
+            count[a[i]]--
+        }
+        for (i = 0; i < len(a); i++) {
+            a[i] = output[i]
+        }
+    }
+}
+
 /*insertionSort = _AdAlgos_InsertionSort()
 a = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 insertionSort.sort(a)
@@ -166,4 +198,9 @@ println(f)
 quickSort = _AdAlgos_QuickSort()
 e = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 quickSort.sort(e)
-println(e)*/
+println(e)
+
+countingSort = _AdAlgos_CountingSort()
+g = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+countingSort.sort(g)
+println(g)*/
