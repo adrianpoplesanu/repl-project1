@@ -1,0 +1,22 @@
+mat1 = list(10, list(10, 0))
+
+for (i = 0; i < 10; i++) {
+    for (j = 0; j < 10; j++) {
+        print(mat1[i][j] + " ")
+    }
+    println("")
+}
+
+for(l = 0; l < 10; l++) {
+    for (i = 0; i < 10 - l; i++) {
+        j = i + l;
+        mat1[i][j] = l + 1;
+    }
+}
+
+for (i = 0; i < 10; i++) {
+    for (j = 0; j < 10; j++) {
+        print(mat1[i][j] + " ")
+    }
+    println("")
+}
