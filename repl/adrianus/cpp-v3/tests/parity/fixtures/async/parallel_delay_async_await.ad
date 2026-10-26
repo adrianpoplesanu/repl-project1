@@ -1,0 +1,6 @@
+let f = async func(n) {
+    delay(20);
+    return n + 1;
+};
+println(await f(10));
+println(await f(41));

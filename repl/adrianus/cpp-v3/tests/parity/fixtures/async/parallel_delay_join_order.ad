@@ -1,0 +1,6 @@
+let slow = spawn(func() { delay(50); return 10; });
+let fast = spawn(func() { delay(10); return 20; });
+let mid = spawn(func() { delay(30); return 30; });
+println(join(mid));
+println(join(slow));
+println(join(fast));

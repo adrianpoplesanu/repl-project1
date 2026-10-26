@@ -1,0 +1,6 @@
+let parent = spawn(func() {
+    let c1 = spawn(func() { delay(20); return 5; });
+    let c2 = spawn(func() { delay(20); return 6; });
+    return join(c1) + join(c2);
+});
+println(join(parent));
