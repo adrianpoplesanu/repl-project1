@@ -727,29 +727,30 @@ There are **two** threading models in the VM.
 
 ```mermaid
 sequenceDiagram
-    participant VM as Parent VM
-    participant SCH as TaskScheduler or std::thread
-    participant W as Child VM invoke_callable
-    VM->>VM: OP_SPAWN N
-    VM->>SCH: submit lambda capturing callee+args
-    VM->>VM: push Ad_Task_Object
-    Note over SCH,W: worker sets g_vm_disable_async_spawn
-    SCH->>W: new VM sharing gc, constants, globals
-    W->>W: push callee+args, execute_call, run
-    VM->>VM: OP_AWAIT pops task, ad_task_join_handle
-    VM->>VM: push result
+  participant VM as Parent VM
+  participant SCH as TaskScheduler
+  participant W as Worker VM
+  VM->>VM: OP_SPAWN N or async OP_CALL
+  VM->>SCH: submitPreemptible
+  VM->>VM: push Ad_Task_Object
+  SCH->>W: new VM, own GC, copy constants and globals
+  Note over W: g_vm_disable_async_spawn only for the entry call
+  W->>W: execute_call then run
+  W-->>SCH: delay or join or OP_AWAIT throws AdSuspendRequest
+  SCH->>SCH: snapshot frames and stack, park, free worker
+  SCH->>W: timer or child completion restores snapshot and pushes the resume value
+  VM->>VM: OP_AWAIT or join parks if this VM is itself a task, else blocks
 ```
 
 `execute_spawn`:
 
-- Same stack as `OP_CALL`.
-- Prefer `ad_global_task_scheduler()->submit(...)`.
-- Else detached `std::thread` + `std::promise` / `AdTaskHandle`.
-- Worker: `invoke_callable` creates a **new** `VM` with `runner.gc = gc`, copies `constants`/`globals` **vectors** (same object pointers), runs the call to completion, returns the top-of-stack object.
+- Same stack as `OP_CALL`. Callee must be `OBJ_CLOSURE` or `OBJ_BOUND_METHOD`.
+- Submits to `ad_global_task_scheduler()`. Nested spawn always enqueues on that pool.
+- The worker VM has its own garbage collector. `join` / `await` copy the result into the caller collector.
+- `delay` inside a task parks until the timer fires and resumes `null`. `sleep` always blocks the carrier, including inside a task.
+- `await` and `join` are single-shot. A second join throws.
 
-`execute_await`: pop; must be `OBJ_TASK`; `ad_task_join_handle`; push result or error.
-
-`async def` / `async fun`: compiler sets `is_async` on the compiled function. A normal `OP_CALL` then behaves like `OP_SPAWN`. Nested workers disable that redirection so the body runs synchronously.
+`async def` / `async fun`: compiler sets `is_async` on the compiled function. A normal `OP_CALL` then behaves like `OP_SPAWN`. The worker’s entry call disables that redirection so the body runs on the task VM. Nested async calls spawn new tasks.
 
 ### 13.2 `__thread` builtin objects (`OBJ_THREAD`)
 
@@ -764,13 +765,13 @@ Method dispatch is **not** bytecode for the body of `runAsync`. Compiler emits `
 | `runBlocking`, `join` | `thread_blocking_run` |
 | `await` | `thread_await`; push `thread_object->result` |
 
-`thread_async_run` / workers (see `thread_workers.cpp`) may construct a VM (`vm.gc = gc`, copy parent via `ad_current_vm()`) and `invoke_callable` the callback — same nested-VM pattern as spawn.
+`thread_async_run` / workers (see `thread_workers.cpp`) may construct a VM (`vm.gc = gc`, copy parent via `ad_current_vm()`) and `invoke_callable` the callback. That path stays on an OS thread. It does not park on `TaskScheduler`.
 
 `ExecuteFileVM` joins `threadPool` and `forceFreeObjects` on each worker’s `internal_gc` after `vm.run()`.
 
 ### 13.3 Persistence and races
 
-Spawned tasks share heap objects and `globals` with the parent. Mid-run GC on the parent marks `ad_current_vm()` plus the running VM; workers are not a complete concurrent GC story. Prefer joining tasks before process teardown.
+Spawned tasks keep a heap per task. `join` / `await` copy the result into the caller heap. Callees, arguments, and constants are still the parent's objects, so a parent collection marks `kept_alive` on each `OBJ_TASK`. Prefer joining tasks before process teardown. `sleep` and `__thread` still block an OS thread.
 
 ---
 

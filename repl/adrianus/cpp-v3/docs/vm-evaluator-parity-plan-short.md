@@ -56,7 +56,7 @@ Done when:
 - [ ] Phase 4: OOP parity
 - [ ] Phase 5: Slicing/index edge-case parity
 - [ ] Phase 6: Runtime object parity
-- [ ] Phase 7: Async/task parity (`spawn`/`await`)
+- [x] Phase 7: Async/task parity (`spawn`/`await` park on the shared scheduler; `delay` frees the worker, `sleep` and `__thread` stay blocking)
 - [ ] Phase 8: Stabilization, performance, CI hardening
 
 ## Suggested Timeline

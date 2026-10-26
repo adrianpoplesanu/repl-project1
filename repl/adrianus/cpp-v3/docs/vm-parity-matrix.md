@@ -33,7 +33,7 @@ Legend:
 | Classes | `ST_CLASS_STATEMENT` | Y | N | P | N | OOP phase major gap |
 | Member access | `ST_MEMBER_ACCESS` | Y | N | P | N | OOP phase major gap |
 | `this` / `super` | `ST_THIS_EXPRESSION`, `ST_SUPER_EXPRESSION` | Y | N | N | N | OOP phase gap |
-| Spawn / await | `ST_SPAWN_EXPRESSION`, `ST_AWAIT_EXPRESSION` | Y | N | N | N | Async phase gap |
+| Spawn / await | `ST_SPAWN_EXPRESSION`, `ST_AWAIT_EXPRESSION` | Y | Y | Y | Y | `delay` parks the task; `sleep` blocks; `__thread` stays 1:1 OS threads |
 
 ## Near-Term Updates
 
