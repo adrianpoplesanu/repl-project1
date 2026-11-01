@@ -1,0 +1,6 @@
+let t = spawn(func() {
+    delay(200);
+    return 123;
+});
+println(task_cancel(t));
+join(t);

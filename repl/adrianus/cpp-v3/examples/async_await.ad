@@ -1,0 +1,8 @@
+async def f() { return 7; }
+println(await f());
+
+async def add1(x) { return x + 1; }
+println(await add1(41));
+
+let t = spawn(func() { return 100; });
+println(join(t));

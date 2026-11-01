@@ -1,0 +1,5 @@
+let t = spawn(func() {
+    delay(20);
+    return 11;
+});
+println(join(t));
