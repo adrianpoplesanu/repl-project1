@@ -13,6 +13,7 @@
 #include "vm/vm_context.h"
 #include "vm/vm.h"
 #include <vector>
+#include <thread>
 
 void free_builtin_arguments(std::vector<Ad_Object*>);
 
@@ -564,6 +565,31 @@ Ad_Object* sleep_builtin(std::vector<Ad_Object*> args, Environment *env, Garbage
     return NULL;
 }
 
+// Parks the running task. sleep() stays a blocking OS wait (Kotlin Thread.sleep).
+Ad_Object* delay_builtin(std::vector<Ad_Object*> args, Environment *env, GarbageCollector *gc) {
+    (void)env;
+    if (args.size() != 1 || args[0] == nullptr || args[0]->type != OBJ_INT) {
+        Ad_Error_Object* err = new Ad_Error_Object("delay() requires an integer number of milliseconds");
+        gc->addObject(err);
+        return err;
+    }
+    int total_ms = ((Ad_Integer_Object*)args[0])->value;
+    if (total_ms < 0) {
+        Ad_Error_Object* err = new Ad_Error_Object("delay() requires a non-negative number of milliseconds");
+        gc->addObject(err);
+        return err;
+    }
+    if (ad_tls_task_ctx() != nullptr) {
+        AdSuspendRequest sr;
+        sr.kind = AdSuspendRequest::Kind::Delay;
+        sr.wake_at = std::chrono::steady_clock::now() + std::chrono::milliseconds(total_ms);
+        sr.resume_cont = [](Ad_Object* v) { return v; };
+        throw sr;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(total_ms));
+    return NULL;
+}
+
 Ad_Object* join_task_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc) {
     (void)env;
     if (args.size() != 1) {
@@ -619,6 +645,9 @@ Ad_Object* task_cancel_builtin(std::vector<Ad_Object*> args, Environment* env, G
     }
     Ad_Task_Object* t = (Ad_Task_Object*)args[0];
     t->handle->cancel_requested.store(true);
+    if (auto sched = t->handle->scheduler.lock()) {
+        sched->requestCancel(t->handle);
+    }
     return &TRUE;
 }
 
@@ -719,7 +748,7 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
     {"__thread", new Ad_Builtin_Object(&thread_builtin)},
     {"import", new Ad_Builtin_Object(&import_builtin)},
     {"sleep", new Ad_Builtin_Object(&sleep_builtin)},
-    {"delay", new Ad_Builtin_Object(&sleep_builtin)},
+    {"delay", new Ad_Builtin_Object(&delay_builtin)},
     {"join", new Ad_Builtin_Object(&join_task_builtin)},
     {"task_status", new Ad_Builtin_Object(&task_status_builtin)},
     {"task_cancel", new Ad_Builtin_Object(&task_cancel_builtin)},
@@ -735,16 +764,17 @@ std::unordered_map<std::string, Ad_Object*> builtins_map = {
 };
 
 Ad_Object* vm_get_builtin_object(int index) {
-    static std::vector<Ad_Object*> cache;
-    if (cache.empty()) {
+    static const std::vector<Ad_Object*> cache = [] {
+        std::vector<Ad_Object*> built;
         for (int i = 0; AD_VM_BUILTIN_NAMES[i] != nullptr; ++i) {
             std::string name(AD_VM_BUILTIN_NAMES[i]);
             auto it = builtins_map.find(name);
             if (it != builtins_map.end()) {
-                cache.push_back(it->second);
+                built.push_back(it->second);
             }
         }
-    }
+        return built;
+    }();
     if (index < 0 || index >= static_cast<int>(cache.size())) {
         return nullptr;
     }
