@@ -8,6 +8,7 @@
 
 #include <stdexcept>
 #include <thread>
+#include <utility>
 
 thread_local bool TaskScheduler::tls_in_worker_{false};
 thread_local AdTaskExecutionContext* g_tls_task_ctx{nullptr};
@@ -22,6 +23,10 @@ std::shared_ptr<TaskScheduler> ad_global_task_scheduler() {
     return g_ad_global_scheduler;
 }
 
+bool ad_task_status_terminal(AdTaskStatus status) {
+    return status == AdTaskStatus::Completed || status == AdTaskStatus::Failed || status == AdTaskStatus::Cancelled;
+}
+
 const char* ad_task_status_name(AdTaskStatus s) {
     switch (s) {
         case AdTaskStatus::Ready:
@@ -30,6 +35,8 @@ const char* ad_task_status_name(AdTaskStatus s) {
             return "running";
         case AdTaskStatus::Yielded:
             return "yielded";
+        case AdTaskStatus::Waiting:
+            return "waiting";
         case AdTaskStatus::Completed:
             return "completed";
         case AdTaskStatus::Failed:
@@ -65,6 +72,23 @@ void ad_task_checkpoint() {
     }
 }
 
+namespace {
+
+Ad_Object* copy_task_result(Ad_Object* result, GarbageCollector* gc) {
+    if (result == nullptr || result == &NULLOBJECT) {
+        return &NULLOBJECT;
+    }
+    if (gc != nullptr) {
+        Ad_Object* copied = result->copy(gc);
+        if (copied != nullptr) {
+            return copied;
+        }
+    }
+    return result;
+}
+
+}  // namespace
+
 Ad_Object* ad_task_join_handle(const std::shared_ptr<AdTaskHandle>& h, GarbageCollector* gc) {
     if (!h) {
         throw std::runtime_error("join on null task");
@@ -72,22 +96,44 @@ Ad_Object* ad_task_join_handle(const std::shared_ptr<AdTaskHandle>& h, GarbageCo
     if (h->joined.exchange(true)) {
         throw std::runtime_error("join on already joined task");
     }
+
+    Ad_Object* ready_value = nullptr;
+    std::exception_ptr ready_error;
+    bool already_done = false;
+    {
+        std::lock_guard<std::mutex> lk(h->mu);
+        if (h->has_result) {
+            already_done = true;
+            ready_value = h->result_value;
+            ready_error = h->result_error;
+        }
+    }
+    if (already_done) {
+        if (h->has_overflow_pthread) {
+            pthread_join(h->overflow_pthread, nullptr);
+            h->has_overflow_pthread = false;
+        }
+        if (ready_error) {
+            std::rethrow_exception(ready_error);
+        }
+        return copy_task_result(ready_value, gc);
+    }
+
+    if (ad_tls_task_ctx() != nullptr) {
+        AdSuspendRequest sr;
+        sr.kind = AdSuspendRequest::Kind::Join;
+        sr.join_target = h;
+        sr.resume_cont = [](Ad_Object* v) { return v; };
+        throw sr;
+    }
+
     try {
         Ad_Object* result = h->future.get();
         if (h->has_overflow_pthread) {
             pthread_join(h->overflow_pthread, nullptr);
             h->has_overflow_pthread = false;
         }
-        if (result == nullptr) {
-            return &NULLOBJECT;
-        }
-        if (gc != nullptr) {
-            Ad_Object* copied = result->copy(gc);
-            if (copied != nullptr) {
-                return copied;
-            }
-        }
-        return result;
+        return copy_task_result(result, gc);
     } catch (...) {
         if (h->has_overflow_pthread) {
             pthread_join(h->overflow_pthread, nullptr);
@@ -107,17 +153,15 @@ size_t default_workers() {
     return hc < 2 ? 2 : static_cast<size_t>(hc);
 }
 
-void* run_std_function_void(void* p) {
-    auto* f = static_cast<std::function<void()>*>(p);
-    (*f)();
-    delete f;
-    return nullptr;
-}
-
 }  // namespace
 
 void* TaskScheduler::worker_entry(void* self) {
     static_cast<TaskScheduler*>(self)->workerLoop();
+    return nullptr;
+}
+
+void* TaskScheduler::timer_entry(void* self) {
+    static_cast<TaskScheduler*>(self)->timerLoop();
     return nullptr;
 }
 
@@ -130,14 +174,46 @@ TaskScheduler::TaskScheduler(size_t num_workers) {
             throw std::runtime_error("failed to start worker thread");
         }
     }
+    if (!start_pthread_with_stack(kStack, timer_entry, this, &timer_thread_)) {
+        throw std::runtime_error("failed to start timer thread");
+    }
+    timer_started_ = true;
 }
 
 TaskScheduler::~TaskScheduler() {
+    std::vector<std::shared_ptr<AdScheduledTask>> to_fail;
     {
         std::lock_guard<std::mutex> lk(mu_);
         stop_ = true;
+        while (!queue_.empty()) {
+            to_fail.push_back(std::move(queue_.front()));
+            queue_.pop();
+        }
     }
+    {
+        std::lock_guard<std::mutex> lk(delay_mu_);
+        while (!delay_queue_.empty()) {
+            to_fail.push_back(delay_queue_.top().task);
+            delay_queue_.pop();
+        }
+    }
+    for (auto& t : to_fail) {
+        if (!t || !t->handle) {
+            continue;
+        }
+        if (ad_task_status_terminal(t->handle->status.load())) {
+            continue;
+        }
+        try {
+            failTask(t, AdTaskStatus::Cancelled);
+        } catch (...) {
+        }
+    }
+    delay_cv_.notify_all();
     cv_.notify_all();
+    if (timer_started_) {
+        pthread_join(timer_thread_, nullptr);
+    }
     for (pthread_t w : workers_) {
         pthread_join(w, nullptr);
     }
@@ -155,25 +231,258 @@ void TaskScheduler::set_quantum_budget(size_t budget) {
 void TaskScheduler::enqueueTask(std::shared_ptr<AdScheduledTask> task) {
     {
         std::lock_guard<std::mutex> lk(mu_);
+        if (stop_) {
+            return;
+        }
         queue_.push(std::move(task));
     }
     cv_.notify_one();
 }
 
 void TaskScheduler::finishTask(const std::shared_ptr<AdScheduledTask>& task, Ad_Object* value, AdTaskStatus status) {
-    task->handle->status.store(status);
-    task->handle->metrics.completed_at = std::chrono::steady_clock::now();
-    task->promise->set_value(value);
+    std::vector<std::shared_ptr<AdScheduledTask>> waiters;
+    {
+        std::lock_guard<std::mutex> lk(task->handle->mu);
+        task->handle->result_value = value;
+        task->handle->result_error = nullptr;
+        task->handle->has_result = true;
+        task->handle->status.store(status);
+        task->handle->metrics.completed_at = std::chrono::steady_clock::now();
+        task->handle->parked_scheduled.reset();
+        waiters.swap(task->handle->waiters);
+    }
+    try {
+        task->promise->set_value(value);
+    } catch (...) {
+    }
+    for (auto& w : waiters) {
+        if (!w || !w->handle) {
+            continue;
+        }
+        if (ad_task_status_terminal(w->handle->status.load())) {
+            continue;
+        }
+        if (w->handle->cancel_requested.load()) {
+            failTask(w, AdTaskStatus::Cancelled);
+            continue;
+        }
+        w->pending_resume = value;
+        w->pending_error = nullptr;
+        w->has_pending_resume = true;
+        {
+            std::lock_guard<std::mutex> lk(w->handle->mu);
+            w->handle->parked_scheduled.reset();
+        }
+        enqueueTask(w);
+    }
 }
 
 void TaskScheduler::failTask(const std::shared_ptr<AdScheduledTask>& task, AdTaskStatus status) {
-    task->handle->status.store(status);
-    task->handle->metrics.completed_at = std::chrono::steady_clock::now();
+    std::exception_ptr err;
     if (status == AdTaskStatus::Cancelled) {
-        task->promise->set_exception(std::make_exception_ptr(std::runtime_error("task cancelled")));
+        err = std::make_exception_ptr(std::runtime_error("task cancelled"));
+    } else {
+        err = std::current_exception();
+        if (!err) {
+            err = std::make_exception_ptr(std::runtime_error("task failed"));
+        }
+    }
+    std::vector<std::shared_ptr<AdScheduledTask>> waiters;
+    {
+        std::lock_guard<std::mutex> lk(task->handle->mu);
+        if (ad_task_status_terminal(task->handle->status.load()) && task->handle->has_result) {
+            return;
+        }
+        task->handle->result_value = nullptr;
+        task->handle->result_error = err;
+        task->handle->has_result = true;
+        task->handle->status.store(status);
+        task->handle->metrics.completed_at = std::chrono::steady_clock::now();
+        task->handle->parked_scheduled.reset();
+        waiters.swap(task->handle->waiters);
+    }
+    try {
+        task->promise->set_exception(err);
+    } catch (...) {
+    }
+    for (auto& w : waiters) {
+        if (!w || !w->handle) {
+            continue;
+        }
+        if (ad_task_status_terminal(w->handle->status.load())) {
+            continue;
+        }
+        if (w->handle->cancel_requested.load()) {
+            failTask(w, AdTaskStatus::Cancelled);
+            continue;
+        }
+        w->pending_resume = nullptr;
+        w->pending_error = err;
+        w->has_pending_resume = true;
+        {
+            std::lock_guard<std::mutex> lk(w->handle->mu);
+            w->handle->parked_scheduled.reset();
+        }
+        enqueueTask(w);
+    }
+}
+
+void TaskScheduler::armResumeSlice(std::shared_ptr<AdScheduledTask> task,
+                                   std::function<Ad_Object*(Ad_Object*)> resume_cont) {
+    std::shared_ptr<AdScheduledTask> st = std::move(task);
+    st->run_slice = [st, resume_cont = std::move(resume_cont)](const std::shared_ptr<AdTaskHandle>& handle,
+                                                               size_t budget) mutable {
+        Ad_Object* pending = st->pending_resume;
+        std::exception_ptr pending_error = st->pending_error;
+        st->has_pending_resume = false;
+        st->pending_error = nullptr;
+        st->pending_resume = nullptr;
+        if (handle->frontend_kind == AdTaskFrontendKind::Vm) {
+            return ad_vm_resume_slice(handle, budget, resume_cont, pending, pending_error);
+        }
+        return ad_eval_resume_slice(handle, budget, resume_cont, pending, pending_error);
+    };
+}
+
+void TaskScheduler::parkOnDelay(std::shared_ptr<AdScheduledTask> task,
+                                std::chrono::steady_clock::time_point wake_at) {
+    task->handle->status.store(AdTaskStatus::Waiting);
+    uint64_t gen = 0;
+    {
+        std::lock_guard<std::mutex> lk(task->handle->mu);
+        task->handle->delay_generation++;
+        gen = task->handle->delay_generation;
+        task->handle->parked_scheduled = task;
+    }
+    {
+        std::lock_guard<std::mutex> lk(delay_mu_);
+        delay_queue_.push(DelayItem{wake_at, gen, task});
+    }
+    delay_cv_.notify_one();
+}
+
+void TaskScheduler::parkOnJoin(std::shared_ptr<AdScheduledTask> task, const std::shared_ptr<AdTaskHandle>& target) {
+    if (!target) {
+        failTask(task, AdTaskStatus::Failed);
         return;
     }
-    task->promise->set_exception(std::current_exception());
+    Ad_Object* ready_value = nullptr;
+    std::exception_ptr ready_error;
+    bool already_done = false;
+    {
+        std::lock_guard<std::mutex> lk(target->mu);
+        if (target->has_result) {
+            already_done = true;
+            ready_value = target->result_value;
+            ready_error = target->result_error;
+        } else {
+            task->handle->status.store(AdTaskStatus::Waiting);
+            {
+                std::lock_guard<std::mutex> lk2(task->handle->mu);
+                task->handle->parked_scheduled = task;
+            }
+            target->waiters.push_back(task);
+        }
+    }
+    if (already_done) {
+        if (task->handle->cancel_requested.load()) {
+            failTask(task, AdTaskStatus::Cancelled);
+            return;
+        }
+        task->pending_resume = ready_value;
+        task->pending_error = ready_error;
+        task->has_pending_resume = true;
+        enqueueTask(std::move(task));
+    }
+}
+
+bool TaskScheduler::cancelParkedLocked(const std::shared_ptr<AdTaskHandle>& handle,
+                                       std::vector<std::shared_ptr<AdScheduledTask>>* out_fail) {
+    auto st = handle->status.load();
+    if (st != AdTaskStatus::Waiting) {
+        return false;
+    }
+    auto parked = handle->parked_scheduled.lock();
+    if (!parked) {
+        return false;
+    }
+    handle->delay_generation++;
+    handle->parked_scheduled.reset();
+    out_fail->push_back(parked);
+    return true;
+}
+
+void TaskScheduler::requestCancel(const std::shared_ptr<AdTaskHandle>& handle) {
+    if (!handle) {
+        return;
+    }
+    handle->cancel_requested.store(true);
+    std::vector<std::shared_ptr<AdScheduledTask>> to_fail;
+    {
+        std::lock_guard<std::mutex> lk(handle->mu);
+        cancelParkedLocked(handle, &to_fail);
+    }
+    for (auto& t : to_fail) {
+        failTask(t, AdTaskStatus::Cancelled);
+    }
+    delay_cv_.notify_all();
+}
+
+void TaskScheduler::timerLoop() {
+    while (true) {
+        std::shared_ptr<AdScheduledTask> due;
+        {
+            std::unique_lock<std::mutex> lk(delay_mu_);
+            if (stop_ && delay_queue_.empty()) {
+                break;
+            }
+            if (delay_queue_.empty()) {
+                delay_cv_.wait(lk, [&] { return stop_ || !delay_queue_.empty(); });
+                if (stop_ && delay_queue_.empty()) {
+                    break;
+                }
+                continue;
+            }
+            auto wake = delay_queue_.top().wake_at;
+            auto now = std::chrono::steady_clock::now();
+            if (wake > now) {
+                delay_cv_.wait_until(lk, wake, [&] {
+                    return stop_ || delay_queue_.empty() ||
+                           delay_queue_.top().wake_at <= std::chrono::steady_clock::now();
+                });
+                if (stop_ && delay_queue_.empty()) {
+                    break;
+                }
+                continue;
+            }
+            DelayItem item = delay_queue_.top();
+            delay_queue_.pop();
+            due = item.task;
+            if (due && due->handle) {
+                std::lock_guard<std::mutex> hlk(due->handle->mu);
+                if (item.generation != due->handle->delay_generation) {
+                    due.reset();
+                } else if (ad_task_status_terminal(due->handle->status.load())) {
+                    due.reset();
+                }
+            }
+        }
+        if (!due) {
+            continue;
+        }
+        if (due->handle->cancel_requested.load()) {
+            failTask(due, AdTaskStatus::Cancelled);
+            continue;
+        }
+        due->pending_resume = nullptr;
+        due->pending_error = nullptr;
+        due->has_pending_resume = true;
+        {
+            std::lock_guard<std::mutex> lk(due->handle->mu);
+            due->handle->parked_scheduled.reset();
+        }
+        enqueueTask(std::move(due));
+    }
 }
 
 void TaskScheduler::workerLoop() {
@@ -192,6 +501,9 @@ void TaskScheduler::workerLoop() {
             }
         }
         if (!task) {
+            continue;
+        }
+        if (ad_task_status_terminal(task->handle->status.load())) {
             continue;
         }
         if (task->handle->cancel_requested.load()) {
@@ -218,6 +530,17 @@ void TaskScheduler::workerLoop() {
                     return cont(handle, budget);
                 };
                 enqueueTask(std::move(task));
+            } else if (result.status == AdRunSliceResult::Status::Suspended && result.resume_continuation) {
+                if (task->handle->cancel_requested.load()) {
+                    failTask(task, AdTaskStatus::Cancelled);
+                } else {
+                    armResumeSlice(task, std::move(result.resume_continuation));
+                    if (result.suspend_kind == AdSuspendRequest::Kind::Delay) {
+                        parkOnDelay(std::move(task), result.wake_at);
+                    } else {
+                        parkOnJoin(std::move(task), result.join_target);
+                    }
+                }
             } else {
                 task->handle->continuation.reset();
                 finishTask(task, result.value, AdTaskStatus::Completed);
@@ -236,56 +559,12 @@ std::shared_ptr<AdTaskHandle> TaskScheduler::submitPreemptible(
     auto handle = std::make_shared<AdTaskHandle>();
     handle->future = std::move(fut);
     handle->status.store(AdTaskStatus::Ready);
+    handle->scheduler = shared_from_this();
 
     auto scheduled = std::make_shared<AdScheduledTask>();
     scheduled->handle = handle;
     scheduled->promise = prom;
     scheduled->run_slice = std::move(run_slice);
-
-    if (tls_in_worker_) {
-        auto fp = new std::function<void()>([scheduled, this]() {
-            try {
-                for (;;) {
-                    if (scheduled->handle->cancel_requested.load()) {
-                        failTask(scheduled, AdTaskStatus::Cancelled);
-                        return;
-                    }
-                    if (scheduled->handle->metrics.run_slices == 0) {
-                        scheduled->handle->metrics.first_started_at = std::chrono::steady_clock::now();
-                    }
-                    scheduled->handle->status.store(AdTaskStatus::Running);
-                    scheduled->handle->metrics.run_slices++;
-                    AdRunSliceResult result = scheduled->run_slice(scheduled->handle, quantum_budget_.load());
-                    scheduled->handle->metrics.checkpoint_count += result.checkpoints;
-                    if (result.status == AdRunSliceResult::Status::Yielded && result.continuation) {
-                        scheduled->handle->status.store(AdTaskStatus::Yielded);
-                        scheduled->handle->metrics.yield_count++;
-                        scheduled->handle->continuation = std::make_shared<AdTaskContinuationState>();
-                        scheduled->handle->continuation->frame_id = scheduled->handle->metrics.run_slices;
-                        auto continuation = std::move(result.continuation);
-                        scheduled->run_slice =
-                            [cont = std::move(continuation)](const std::shared_ptr<AdTaskHandle>& h,
-                                                             size_t budget) mutable { return cont(h, budget); };
-                        continue;
-                    }
-                    scheduled->handle->continuation.reset();
-                    finishTask(scheduled, result.value, AdTaskStatus::Completed);
-                    return;
-                }
-            } catch (...) {
-                failTask(scheduled, AdTaskStatus::Failed);
-            }
-        });
-        pthread_t tid{};
-        constexpr size_t kStack = 8u * 1024u * 1024u;
-        if (!start_pthread_with_stack(kStack, run_std_function_void, fp, &tid)) {
-            delete fp;
-            throw std::runtime_error("failed to start overflow thread");
-        }
-        handle->overflow_pthread = tid;
-        handle->has_overflow_pthread = true;
-        return handle;
-    }
 
     enqueueTask(std::move(scheduled));
     return handle;
