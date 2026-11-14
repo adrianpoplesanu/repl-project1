@@ -266,6 +266,12 @@ void GarbageCollector::markObject(Ad_Object* obj) {
         }
         case OBJ_TASK: {
             obj->marked = true;
+            Ad_Task_Object* task_object = (Ad_Task_Object*)obj;
+            if (task_object->handle) {
+                for (Ad_Object* kept : task_object->handle->kept_alive) {
+                    markObject(kept);
+                }
+            }
             break;
         }
         case OBJ_BREAK: {
