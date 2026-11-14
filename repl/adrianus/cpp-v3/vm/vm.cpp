@@ -24,6 +24,7 @@
 #include <cmath>
 #include <future>
 #include <thread>
+#include <memory>
 
 extern Ad_Object* locals_builtin(std::vector<Ad_Object*> args, Environment* env, GarbageCollector* gc);
 
@@ -2253,6 +2254,139 @@ void VM::execute_import_source(const std::string& source) {
     globals = runner.globals;
 }
 
+struct AdVmSnapshot {
+    std::vector<Frame> frames;
+    int frames_index{0};
+    std::vector<Ad_Object*> stack;
+    int sp{0};
+};
+
+struct AdVmTaskState {
+    std::shared_ptr<GarbageCollector> gc;
+    std::vector<Ad_Object*> constants;
+    std::vector<Ad_Object*> globals;
+    std::vector<std::string> global_names;
+    std::unordered_set<std::string> bootstrap_global_names;
+    AdVmSnapshot snapshot;
+    bool has_snapshot{false};
+    bool started{false};
+    Ad_Object* callee{nullptr};
+    std::vector<Ad_Object*> args;
+};
+
+std::shared_ptr<GarbageCollector> make_vm_task_gc() {
+    auto gc = std::shared_ptr<GarbageCollector>(new GarbageCollector(), [](GarbageCollector* raw) {
+        if (raw == nullptr) {
+            return;
+        }
+        raw->forceFreeObjects();
+        delete raw;
+    });
+    gc->vmMidRunCollection = false;
+    return gc;
+}
+
+void capture_vm_snapshot(AdVmTaskState* state, VM* vm) {
+    state->snapshot.frames = vm->frames;
+    state->snapshot.frames_index = vm->frames_index;
+    state->snapshot.sp = vm->sp;
+    state->snapshot.stack.clear();
+    if (vm->sp > 0) {
+        state->snapshot.stack.assign(vm->stack, vm->stack + vm->sp);
+    }
+    state->globals = vm->globals;
+    state->has_snapshot = true;
+}
+
+void restore_vm_snapshot(AdVmTaskState* state, VM* vm) {
+    vm->frames = state->snapshot.frames;
+    vm->frames_index = state->snapshot.frames_index;
+    vm->sp = state->snapshot.sp;
+    for (int i = 0; i < vm->sp; ++i) {
+        vm->stack[i] = state->snapshot.stack[static_cast<size_t>(i)];
+    }
+}
+
+std::unique_ptr<VM> make_task_vm(AdVmTaskState* state) {
+    auto vm = std::make_unique<VM>();
+    vm->gc = state->gc.get();
+    vm->constants = state->constants;
+    vm->globals = state->globals;
+    vm->global_names = state->global_names;
+    vm->bootstrap_global_names = state->bootstrap_global_names;
+    vm->warn_return_outside_function = false;
+    return vm;
+}
+
+AdRunSliceResult vm_drive_task(const std::shared_ptr<AdVmTaskState>& state,
+                               const std::shared_ptr<AdTaskHandle>& handle, size_t budget, bool resuming,
+                               Ad_Object* pending, std::exception_ptr pending_error) {
+    AdTaskExecutionContext ctx;
+    ctx.task = handle;
+    ctx.checkpoint_budget = budget == 0 ? 1 : budget;
+    ctx.remaining_budget = ctx.checkpoint_budget;
+    AdTaskExecutionContext* prev_ctx = ad_tls_task_ctx();
+    VM* prev_vm = ad_current_vm();
+    ad_tls_set_task_ctx(&ctx);
+    std::unique_ptr<VM> vm = make_task_vm(state.get());
+    ad_set_tls_current_vm(vm.get());
+    AdRunSliceResult result;
+    try {
+        if (pending_error) {
+            std::rethrow_exception(pending_error);
+        }
+        if (!state->started) {
+            vm->push(state->callee);
+            for (Ad_Object* arg : state->args) {
+                vm->push(arg != nullptr ? arg : &NULLOBJECT);
+            }
+            g_vm_disable_async_spawn = true;
+            vm->execute_call(static_cast<int>(state->args.size()));
+            g_vm_disable_async_spawn = false;
+            state->started = true;
+        } else if (resuming && state->has_snapshot) {
+            restore_vm_snapshot(state.get(), vm.get());
+            vm->push(pending);
+        }
+        vm->run();
+        Ad_Object* value = nullptr;
+        if (vm->sp > 0) {
+            value = vm->stack[vm->sp - 1];
+        }
+        result.status = AdRunSliceResult::Status::Completed;
+        result.value = value;
+        result.checkpoints = ctx.checkpoints;
+    } catch (AdSuspendRequest& sr) {
+        capture_vm_snapshot(state.get(), vm.get());
+        result.status = AdRunSliceResult::Status::Suspended;
+        result.suspend_kind = sr.kind;
+        result.wake_at = sr.wake_at;
+        result.join_target = std::move(sr.join_target);
+        result.resume_continuation = sr.resume_cont ? std::move(sr.resume_cont) : [](Ad_Object* v) { return v; };
+        result.checkpoints = ctx.checkpoints;
+        ad_set_tls_current_vm(prev_vm);
+        ad_tls_clear_task_ctx(prev_ctx);
+        return result;
+    } catch (...) {
+        g_vm_disable_async_spawn = false;
+        ad_set_tls_current_vm(prev_vm);
+        ad_tls_clear_task_ctx(prev_ctx);
+        throw;
+    }
+    g_vm_disable_async_spawn = false;
+    ad_set_tls_current_vm(prev_vm);
+    ad_tls_clear_task_ctx(prev_ctx);
+    return result;
+}
+
+AdRunSliceResult ad_vm_resume_slice(const std::shared_ptr<AdTaskHandle>& handle, size_t budget,
+                                    const std::function<Ad_Object*(Ad_Object*)>& resume_cont, Ad_Object* pending,
+                                    std::exception_ptr pending_error) {
+    (void)resume_cont;
+    auto state = std::static_pointer_cast<AdVmTaskState>(handle->frontend_state);
+    return vm_drive_task(state, handle, budget, true, pending, pending_error);
+}
+
 void VM::execute_spawn(int num_args) {
     int callee_index = sp - 1 - num_args;
     if (callee_index < 0) {
@@ -2268,24 +2402,36 @@ void VM::execute_spawn(int num_args) {
     }
     sp = callee_index;
 
-    if (callee == nullptr) {
+    if (callee == nullptr ||
+        (callee->Type() != OBJ_CLOSURE && callee->Type() != OBJ_BOUND_METHOD)) {
         auto* err = new Ad_Error_Object("spawn() requires a user function");
         vm_track(gc, err);
         push(err);
         return;
     }
 
-    VM* parent = this;
     auto sched = ad_global_task_scheduler();
     std::shared_ptr<AdTaskHandle> handle;
     if (sched) {
-        handle = sched->submit([parent, callee, args]() -> Ad_Object* {
-            g_vm_disable_async_spawn = true;
-            Ad_Object* result = parent->invoke_callable(callee, args);
-            g_vm_disable_async_spawn = false;
-            return result;
+        auto state = std::make_shared<AdVmTaskState>();
+        state->gc = make_vm_task_gc();
+        state->constants = constants;
+        state->globals = globals;
+        state->global_names = global_names;
+        state->bootstrap_global_names = bootstrap_global_names;
+        state->callee = callee;
+        state->args = std::move(args);
+        handle = sched->submitPreemptible([state](const std::shared_ptr<AdTaskHandle>& task_handle, size_t budget) {
+            task_handle->frontend_kind = AdTaskFrontendKind::Vm;
+            task_handle->frontend_state = state;
+            return vm_drive_task(state, task_handle, budget, false, nullptr, nullptr);
         });
+        handle->kept_alive.push_back(callee);
+        for (Ad_Object* arg : state->args) {
+            handle->kept_alive.push_back(arg);
+        }
     } else {
+        VM* parent = this;
         handle = std::make_shared<AdTaskHandle>();
         auto prom = std::make_shared<std::promise<Ad_Object*>>();
         handle->future = prom->get_future();
