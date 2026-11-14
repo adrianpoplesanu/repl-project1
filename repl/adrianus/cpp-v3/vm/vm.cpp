@@ -1,4 +1,5 @@
 #include "vm.h"
+#include "vm_context.h"
 #include "code.h"
 #include "objects.h"
 #include "utils.h"
