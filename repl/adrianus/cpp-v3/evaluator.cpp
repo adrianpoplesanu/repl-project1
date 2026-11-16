@@ -12,6 +12,31 @@
 
 static thread_local bool g_ad_apply_function_disable_async = false;
 static thread_local bool g_ad_apply_method_disable_async = false;
+static thread_local Evaluator* g_tls_evaluator = nullptr;
+
+struct AdTaskEvalState {
+    std::shared_ptr<GarbageCollector> gc;
+    Ad_AST_Program* prog{nullptr};
+    std::shared_ptr<TaskScheduler> sched;
+};
+
+static std::shared_ptr<GarbageCollector> make_task_gc() {
+    return std::shared_ptr<GarbageCollector>(new GarbageCollector(), [](GarbageCollector* gc) {
+        if (gc == nullptr) {
+            return;
+        }
+        gc->forceFreeObjects();
+        delete gc;
+    });
+}
+
+static std::shared_ptr<AdTaskEvalState> make_task_eval_state(Evaluator* owner) {
+    auto state = std::make_shared<AdTaskEvalState>();
+    state->gc = make_task_gc();
+    state->prog = owner->eval_program_root_;
+    state->sched = owner->task_scheduler_;
+    return state;
+}
 
 //Ad_Null_Object NULLOBJECT;
 Ad_Boolean_Object TRUE(true);
@@ -25,9 +50,22 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_LET_STATEMENT: {
-            Ad_Object* obj = Eval(((Ad_AST_LetStatement*)node)->value, env);
-            env.setLocalParam(((Ad_AST_LetStatement*)node)->name.value, obj);
-            //env.Set(((Ad_AST_LetStatement*)node)->name.value, obj);
+            Ad_AST_LetStatement* let_stmt = (Ad_AST_LetStatement*)node;
+            Ad_Object* obj = NULL;
+            try {
+                obj = Eval(let_stmt->value, env);
+            } catch (AdSuspendRequest& sr) {
+                auto prev = std::move(sr.resume_cont);
+                Environment* env_c = &env;
+                std::string name = let_stmt->name.value;
+                sr.resume_cont = [prev = std::move(prev), env_c, name](Ad_Object* rv) {
+                    Ad_Object* val = prev ? prev(rv) : rv;
+                    env_c->setLocalParam(name, val);
+                    return static_cast<Ad_Object*>(NULL);
+                };
+                throw;
+            }
+            env.setLocalParam(let_stmt->name.value, obj);
             return NULL;
         }
         break;
@@ -36,7 +74,16 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_RETURN_STATEMENT: {
-            Ad_Object* val = Eval(((Ad_AST_ReturnStatement*)node)->value, env);
+            Ad_AST_ReturnStatement* ret = (Ad_AST_ReturnStatement*)node;
+            Ad_Object* val = NULL;
+            if (ret->value != nullptr) {
+                try {
+                    val = Eval(ret->value, env);
+                } catch (AdSuspendRequest& sr) {
+                    sr.done_after = true;
+                    throw;
+                }
+            }
             Ad_ReturnValue_Object* obj = new Ad_ReturnValue_Object();
             garbageCollector->addObject(obj);
             obj->value = val;
@@ -69,13 +116,50 @@ Ad_Object* Evaluator::Eval(Ad_AST_Node* node, Environment &env) {
         }
         break;
         case ST_INFIX_EXPRESSION: {
-            Ad_Object* left = Eval(((Ad_AST_InfixExpression*)node)->left, env);
-            Ad_Object* right = Eval(((Ad_AST_InfixExpression*)node)->right, env);
-            Ad_Object* result = EvalInfixExpression(((Ad_AST_InfixExpression*)node)->_operator, left, right);
-            // TODO: mark and sweep cleanup
-            //free_Ad_Object_memory(right);
-            //free_Ad_Object_memory(left);
-            return result;
+            Ad_AST_InfixExpression* inf = (Ad_AST_InfixExpression*)node;
+            Ad_Object* left = NULL;
+            try {
+                left = Eval(inf->left, env);
+            } catch (AdSuspendRequest& sr) {
+                auto prev = std::move(sr.resume_cont);
+                Ad_AST_Node* right_expr = inf->right;
+                std::string op = inf->_operator;
+                Environment* env_c = &env;
+                sr.resume_cont = [prev = std::move(prev), right_expr, op, env_c](Ad_Object* rv) {
+                    Evaluator* ev = g_tls_evaluator;
+                    Ad_Object* left_v = prev ? prev(rv) : rv;
+                    try {
+                        Ad_Object* right_v = ev->Eval(right_expr, *env_c);
+                        return ev->EvalInfixExpression(op, left_v, right_v);
+                    } catch (AdSuspendRequest& sr2) {
+                        auto prev2 = std::move(sr2.resume_cont);
+                        Ad_Object* left_c = left_v;
+                        std::string op_c = op;
+                        sr2.resume_cont = [prev2 = std::move(prev2), left_c, op_c](Ad_Object* rv2) {
+                            Evaluator* ev2 = g_tls_evaluator;
+                            Ad_Object* right_v = prev2 ? prev2(rv2) : rv2;
+                            return ev2->EvalInfixExpression(op_c, left_c, right_v);
+                        };
+                        throw;
+                    }
+                };
+                throw;
+            }
+            Ad_Object* right = NULL;
+            try {
+                right = Eval(inf->right, env);
+            } catch (AdSuspendRequest& sr) {
+                auto prev = std::move(sr.resume_cont);
+                Ad_Object* left_c = left;
+                std::string op = inf->_operator;
+                sr.resume_cont = [prev = std::move(prev), left_c, op](Ad_Object* rv) {
+                    Evaluator* ev = g_tls_evaluator;
+                    Ad_Object* right_v = prev ? prev(rv) : rv;
+                    return ev->EvalInfixExpression(op, left_c, right_v);
+                };
+                throw;
+            }
+            return EvalInfixExpression(inf->_operator, left, right);
         }
         break;
         case ST_PREFIX_EXPRESSION: {
@@ -619,12 +703,66 @@ Ad_Object* Evaluator::EvalIfExpression(Ad_AST_Node* node, Environment &env) {
 }
 
 Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
-    Ad_Object* result;
-    result = NULL;
-    for (std::vector<Ad_AST_Node*>::iterator it = ((Ad_AST_BlockStatement*)node)->statements.begin() ; it != ((Ad_AST_BlockStatement*)node)->statements.end(); ++it) {
-        Ad_AST_Node *node = *it;
-        result = NULL;
-        result = Eval(node, env);
+    Ad_AST_BlockStatement* block = (Ad_AST_BlockStatement*)node;
+    Ad_Object* result = NULL;
+    for (size_t i = 0; i < block->statements.size(); ++i) {
+        try {
+            result = Eval(block->statements[i], env);
+        } catch (AdSuspendRequest& sr) {
+            auto prev = std::move(sr.resume_cont);
+            bool done_after = sr.done_after;
+            sr.done_after = false;
+            Environment* env_c = &env;
+            Ad_AST_BlockStatement* blk = block;
+            size_t idx = i;
+            sr.resume_cont = [prev = std::move(prev), done_after, env_c, blk, idx](Ad_Object* rv) {
+                Evaluator* ev = g_tls_evaluator;
+                Ad_Object* cur = prev ? prev(rv) : rv;
+                if (done_after) {
+                    return cur;
+                }
+                for (size_t j = idx + 1; j < blk->statements.size(); ++j) {
+                    try {
+                        Ad_Object* r = ev->Eval(blk->statements[j], *env_c);
+                        if (r && (r->type == OBJ_RETURN_VALUE || r->type == OBJ_BREAK || r->type == OBJ_CONTINUE)) {
+                            return r;
+                        }
+                        cur = r;
+                    } catch (AdSuspendRequest& sr2) {
+                        auto prev2 = std::move(sr2.resume_cont);
+                        bool done2 = sr2.done_after;
+                        sr2.done_after = false;
+                        Environment* env2 = env_c;
+                        Ad_AST_BlockStatement* blk2 = blk;
+                        size_t idx2 = j;
+                        sr2.resume_cont = [prev2 = std::move(prev2), done2, env2, blk2, idx2](Ad_Object* rv2) {
+                            Evaluator* ev2 = g_tls_evaluator;
+                            Ad_Object* cur2 = prev2 ? prev2(rv2) : rv2;
+                            if (done2) {
+                                return cur2;
+                            }
+                            for (size_t k = idx2 + 1; k < blk2->statements.size(); ++k) {
+                                Ad_Object* r2 = ev2->Eval(blk2->statements[k], *env2);
+                                if (r2 && (r2->type == OBJ_RETURN_VALUE || r2->type == OBJ_BREAK || r2->type == OBJ_CONTINUE)) {
+                                    return r2;
+                                }
+                                cur2 = r2;
+                            }
+                            if (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS) {
+                                return static_cast<Ad_Object*>(NULL);
+                            }
+                            return cur2;
+                        };
+                        throw;
+                    }
+                }
+                if (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS) {
+                    return static_cast<Ad_Object*>(NULL);
+                }
+                return cur;
+            };
+            throw;
+        }
         if (result && result->type == OBJ_RETURN_VALUE) {
             return result;
         }
@@ -634,23 +772,11 @@ Ad_Object* Evaluator::EvalBlockStatement(Ad_AST_Node* node, Environment &env) {
         if (result && result->type == OBJ_CONTINUE) {
             return result;
         }
-        if (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS) {
-            if (result) {
-                //result->Print();
-                //std::cout << result->Inspect() << "\n"; // maybe have this on for command line flow and disabled for file execution
-                // TODO: mark and sweep cleanup
-                //free_Ad_Object_memory(result);
-            }
-        }
-        // TODO: fix this, this is an important memory leak, test55.ad ran with valgrind has this issue, when doint i++ in a while block
-        //free_Ad_Object_memory(result); // 11+12; as an expression in an if block or an while block needs to be freed
     }
-    //return result;
     if (FREE_BLOCK_STATEMENT_EVAL_STATEMENT_RESULTS) {
         return NULL;
-    } else {
-        return result;
     }
+    return result;
 }
 
 std::vector<Ad_Object*> Evaluator::EvalExpressions(std::vector<Ad_AST_Node*> args, Environment &env) {
@@ -672,31 +798,37 @@ Ad_Object* Evaluator::ApplyFunction(Ad_Object* func, std::vector<Ad_Object*> arg
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
         if (func_obj->is_async && task_scheduler_ && !g_ad_apply_function_disable_async) {
-            Ad_AST_Program* prog = eval_program_root_;
-            auto sched = task_scheduler_;
-            std::shared_ptr<AdTaskHandle> h = sched->submitPreemptible(
-                [this, prog, sched, func, args, kw_args, &env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) mutable {
+            auto state = make_task_eval_state(this);
+            Environment* call_env = &env;
+            std::shared_ptr<AdTaskHandle> h = state->sched->submitPreemptible(
+                [state, func, args, kw_args, call_env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) {
+                    handle->frontend_kind = AdTaskFrontendKind::Eval;
+                    handle->frontend_state = state;
                     AdTaskExecutionContext ctx;
                     ctx.task = handle;
                     ctx.checkpoint_budget = budget;
                     ctx.remaining_budget = budget;
-                    GarbageCollector local_gc;
                     Evaluator inner;
-                    inner.setGarbageCollector(&local_gc);
-                    inner.task_scheduler_ = sched;
-                    inner.eval_program_root_ = prog;
+                    inner.setGarbageCollector(state->gc.get());
+                    inner.task_scheduler_ = state->sched;
+                    inner.eval_program_root_ = state->prog;
                     return inner.runWorkSlice(ctx, [&]() {
                         g_ad_apply_function_disable_async = true;
-                        Ad_Object* r = inner.ApplyFunction(func, args, kw_args, env);
+                        Ad_Object* r = inner.ApplyFunction(func, args, kw_args, *call_env);
                         g_ad_apply_function_disable_async = false;
                         return r;
                     });
                 });
-            Ad_Task_Object* t = new Ad_Task_Object();
-            t->handle = std::move(h);
-            garbageCollector->addObject(t);
-            return t;
+        Ad_Task_Object* t = new Ad_Task_Object();
+        t->handle = std::move(h);
+        t->handle->kept_alive.push_back(func);
+        for (Ad_Object* arg : args) {
+            t->handle->kept_alive.push_back(arg);
         }
+        garbageCollector->addObject(t);
+        return t;
+        }
+        g_ad_apply_function_disable_async = false;
         std::vector<Ad_Object*> default_params = EvalExpressions(func_obj->default_params, env);
         int remainingParams = func_obj->params.size();
         
@@ -838,31 +970,37 @@ Ad_Object* Evaluator::ApplyMethod(Ad_Object* func, std::vector<Ad_Object*> args,
     if (func->type == OBJ_FUNCTION) {
         Ad_Function_Object* func_obj = (Ad_Function_Object*) func;
         if (func_obj->is_async && task_scheduler_ && !g_ad_apply_method_disable_async) {
-            Ad_AST_Program* prog = eval_program_root_;
-            auto sched = task_scheduler_;
-            std::shared_ptr<AdTaskHandle> h = sched->submitPreemptible(
-                [this, prog, sched, func, args, kw_args, &env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) mutable {
+            auto state = make_task_eval_state(this);
+            Environment* call_env = &env;
+            std::shared_ptr<AdTaskHandle> h = state->sched->submitPreemptible(
+                [state, func, args, kw_args, call_env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) {
+                    handle->frontend_kind = AdTaskFrontendKind::Eval;
+                    handle->frontend_state = state;
                     AdTaskExecutionContext ctx;
                     ctx.task = handle;
                     ctx.checkpoint_budget = budget;
                     ctx.remaining_budget = budget;
-                    GarbageCollector local_gc;
                     Evaluator inner;
-                    inner.setGarbageCollector(&local_gc);
-                    inner.task_scheduler_ = sched;
-                    inner.eval_program_root_ = prog;
+                    inner.setGarbageCollector(state->gc.get());
+                    inner.task_scheduler_ = state->sched;
+                    inner.eval_program_root_ = state->prog;
                     return inner.runWorkSlice(ctx, [&]() {
                         g_ad_apply_method_disable_async = true;
-                        Ad_Object* r = inner.ApplyMethod(func, args, kw_args, env);
+                        Ad_Object* r = inner.ApplyMethod(func, args, kw_args, *call_env);
                         g_ad_apply_method_disable_async = false;
                         return r;
                     });
                 });
             Ad_Task_Object* t = new Ad_Task_Object();
             t->handle = std::move(h);
+            t->handle->kept_alive.push_back(func);
+            for (Ad_Object* arg : args) {
+                t->handle->kept_alive.push_back(arg);
+            }
             garbageCollector->addObject(t);
             return t;
         }
+        g_ad_apply_method_disable_async = false;
         std::vector<Ad_Object*> default_params = EvalExpressions(func_obj->default_params, env);
         int remainingParams = func_obj->params.size();
         
@@ -2039,9 +2177,68 @@ Ad_Object* Evaluator::evalCallExpression(Ad_AST_Node* node, Environment *env) {
         return result;
     }
     std::vector<Ad_Object*> args_objs;
-    args_objs = EvalExpressions(callExpression->arguments, *env);
-    if (args_objs.size() == 1 && IsError(args_objs[0])) {
-        return args_objs[0];
+    for (size_t i = 0; i < callExpression->arguments.size(); ++i) {
+        try {
+            Ad_Object* evaluated = Eval(callExpression->arguments[i], *env);
+            if (IsError(evaluated)) {
+                return evaluated;
+            }
+            args_objs.push_back(evaluated);
+        } catch (AdSuspendRequest& sr) {
+            auto prev = std::move(sr.resume_cont);
+            Ad_Object* func_c = func;
+            std::vector<Ad_Object*> args_so_far = args_objs;
+            Ad_AST_CallExpression* call = callExpression;
+            size_t arg_i = i;
+            Environment* env_c = env;
+            sr.resume_cont = [prev = std::move(prev), func_c, args_so_far, call, arg_i, env_c](Ad_Object* rv) mutable {
+                Evaluator* ev = g_tls_evaluator;
+                args_so_far.push_back(prev ? prev(rv) : rv);
+                for (size_t j = arg_i + 1; j < call->arguments.size(); ++j) {
+                    try {
+                        Ad_Object* nxt = ev->Eval(call->arguments[j], *env_c);
+                        if (ev->IsError(nxt)) {
+                            return nxt;
+                        }
+                        args_so_far.push_back(nxt);
+                    } catch (AdSuspendRequest& sr2) {
+                        auto prev2 = std::move(sr2.resume_cont);
+                        Ad_Object* func2 = func_c;
+                        std::vector<Ad_Object*> args2 = args_so_far;
+                        Ad_AST_CallExpression* call2 = call;
+                        size_t arg_j = j;
+                        Environment* env2 = env_c;
+                        sr2.resume_cont = [prev2 = std::move(prev2), func2, args2, call2, arg_j, env2](Ad_Object* rv2) mutable {
+                            Evaluator* ev2 = g_tls_evaluator;
+                            args2.push_back(prev2 ? prev2(rv2) : rv2);
+                            for (size_t k = arg_j + 1; k < call2->arguments.size(); ++k) {
+                                Ad_Object* nxt2 = ev2->Eval(call2->arguments[k], *env2);
+                                if (ev2->IsError(nxt2)) {
+                                    return nxt2;
+                                }
+                                args2.push_back(nxt2);
+                            }
+                            std::unordered_map<std::string, Ad_Object*> kw;
+                            for (int ki = 0; ki < static_cast<int>(call2->kw_args.size()); ++ki) {
+                                Ad_AST_AssignStatement* assignStatement = (Ad_AST_AssignStatement*)call2->kw_args.at(ki);
+                                kw.insert(std::pair<std::string, Ad_Object*>(
+                                    assignStatement->name->TokenLiteral(), ev2->Eval(assignStatement->value, *env2)));
+                            }
+                            return ev2->ApplyFunction(func2, args2, kw, *env2);
+                        };
+                        throw;
+                    }
+                }
+                std::unordered_map<std::string, Ad_Object*> kw;
+                for (int ki = 0; ki < static_cast<int>(call->kw_args.size()); ++ki) {
+                    Ad_AST_AssignStatement* assignStatement = (Ad_AST_AssignStatement*)call->kw_args.at(ki);
+                    kw.insert(std::pair<std::string, Ad_Object*>(
+                        assignStatement->name->TokenLiteral(), ev->Eval(assignStatement->value, *env_c)));
+                }
+                return ev->ApplyFunction(func_c, args_so_far, kw, *env_c);
+            };
+            throw;
+        }
     }
     std::unordered_map<std::string, Ad_Object*> kw_args;
     for (int i = 0; i < callExpression->kw_args.size(); i++) {
@@ -2493,10 +2690,15 @@ AdRunSliceResult Evaluator::runWorkSlice(AdTaskExecutionContext& ctx, const std:
         ctx.remaining_budget = ctx.checkpoint_budget;
     }
     AdTaskExecutionContext* prev = ad_tls_task_ctx();
+    Evaluator* prev_eval = g_tls_evaluator;
     ad_tls_set_task_ctx(&ctx);
+    g_tls_evaluator = this;
     AdRunSliceResult result;
     try {
         Ad_Object* computed = work();
+        if (computed != nullptr && computed->type == OBJ_RETURN_VALUE) {
+            computed = ((Ad_ReturnValue_Object*)computed)->value;
+        }
         if (ctx.yield_requested) {
             result.status = AdRunSliceResult::Status::Yielded;
             result.continuation = [computed](const std::shared_ptr<AdTaskHandle>&, size_t) mutable {
@@ -2510,17 +2712,62 @@ AdRunSliceResult Evaluator::runWorkSlice(AdTaskExecutionContext& ctx, const std:
             result.value = computed;
         }
         result.checkpoints = ctx.checkpoints;
+    } catch (AdSuspendRequest& sr) {
+        result.status = AdRunSliceResult::Status::Suspended;
+        result.suspend_kind = sr.kind;
+        result.wake_at = sr.wake_at;
+        result.join_target = sr.join_target;
+        result.resume_continuation = std::move(sr.resume_cont);
+        if (!result.resume_continuation) {
+            result.resume_continuation = [](Ad_Object* v) { return v; };
+        }
+        result.checkpoints = ctx.checkpoints;
+        g_tls_evaluator = prev_eval;
+        ad_tls_clear_task_ctx(prev);
+        return result;
     } catch (...) {
+        g_tls_evaluator = prev_eval;
         ad_tls_clear_task_ctx(prev);
         throw;
     }
+    g_tls_evaluator = prev_eval;
     ad_tls_clear_task_ctx(prev);
     return result;
 }
 
+AdRunSliceResult ad_eval_resume_slice(const std::shared_ptr<AdTaskHandle>& handle, size_t budget,
+                                      const std::function<Ad_Object*(Ad_Object*)>& resume_cont,
+                                      Ad_Object* pending, std::exception_ptr pending_error) {
+    auto state = std::static_pointer_cast<AdTaskEvalState>(handle->frontend_state);
+    Evaluator inner;
+    if (state) {
+        inner.setGarbageCollector(state->gc.get());
+        inner.task_scheduler_ = state->sched;
+        inner.eval_program_root_ = state->prog;
+    }
+    AdTaskExecutionContext ctx;
+    ctx.task = handle;
+    ctx.checkpoint_budget = budget;
+    ctx.remaining_budget = budget;
+    return inner.runWorkSlice(ctx, [&]() {
+        if (pending_error) {
+            std::rethrow_exception(pending_error);
+        }
+        if (resume_cont) {
+            return resume_cont(pending);
+        }
+        return pending;
+    });
+}
+
 AdRunSliceResult Evaluator::runCallableSlice(AdTaskExecutionContext& ctx, Ad_Object* callee, std::vector<Ad_Object*> args,
                                             Environment* call_env) {
-    return runWorkSlice(ctx, [&]() { return ApplyFunction(callee, args, {}, *call_env); });
+    return runWorkSlice(ctx, [&]() {
+        g_ad_apply_function_disable_async = true;
+        Ad_Object* r = ApplyFunction(callee, args, {}, *call_env);
+        g_ad_apply_function_disable_async = false;
+        return r;
+    });
 }
 
 namespace {
@@ -2562,24 +2809,29 @@ Ad_Object* Evaluator::spawnCall(Ad_Object* callee, std::vector<Ad_Object*> args,
         garbageCollector->addObject(err);
         return err;
     }
-    Ad_AST_Program* prog = eval_program_root_;
     auto sched = task_scheduler_;
     if (sched) {
+        auto state = make_task_eval_state(this);
         std::shared_ptr<AdTaskHandle> h = sched->submitPreemptible(
-            [this, prog, sched, callee, args, call_env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) mutable {
+            [state, callee, args, call_env](const std::shared_ptr<AdTaskHandle>& handle, size_t budget) {
+                handle->frontend_kind = AdTaskFrontendKind::Eval;
+                handle->frontend_state = state;
                 AdTaskExecutionContext ctx;
                 ctx.task = handle;
                 ctx.checkpoint_budget = budget;
                 ctx.remaining_budget = budget;
-                GarbageCollector local_gc;
                 Evaluator inner;
-                inner.setGarbageCollector(&local_gc);
-                inner.task_scheduler_ = sched;
-                inner.eval_program_root_ = prog;
+                inner.setGarbageCollector(state->gc.get());
+                inner.task_scheduler_ = state->sched;
+                inner.eval_program_root_ = state->prog;
                 return inner.runCallableSlice(ctx, callee, args, call_env);
             });
         Ad_Task_Object* t = new Ad_Task_Object();
         t->handle = std::move(h);
+        t->handle->kept_alive.push_back(callee);
+        for (Ad_Object* arg : args) {
+            t->handle->kept_alive.push_back(arg);
+        }
         garbageCollector->addObject(t);
         return t;
     }
@@ -2587,7 +2839,7 @@ Ad_Object* Evaluator::spawnCall(Ad_Object* callee, std::vector<Ad_Object*> args,
     auto handle = std::make_shared<AdTaskHandle>();
     auto prom = std::make_shared<std::promise<Ad_Object*>>();
     handle->future = prom->get_future();
-    auto pl = new AdSpawnPthreadPayload{prog, std::move(prom), callee, std::move(args), call_env};
+    auto pl = new AdSpawnPthreadPayload{eval_program_root_, std::move(prom), callee, std::move(args), call_env};
     pthread_t tid{};
     constexpr size_t kStack = 8u * 1024u * 1024u;
     if (!start_pthread_with_stack(kStack, ad_spawn_pthread_main, pl, &tid)) {

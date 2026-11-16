@@ -109,6 +109,10 @@ public:
     void printRuntimeStatistics();
 
 private:
+    friend AdRunSliceResult ad_eval_resume_slice(const std::shared_ptr<AdTaskHandle>& handle, size_t budget,
+                                                 const std::function<Ad_Object*(Ad_Object*)>& resume_cont,
+                                                 Ad_Object* pending, std::exception_ptr pending_error);
+
     bool validateNumberOfArguments(std::vector<int>, int);
 
     AdRunSliceResult runWorkSlice(AdTaskExecutionContext& ctx, const std::function<Ad_Object*()>& work);
